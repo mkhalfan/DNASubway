@@ -1,0 +1,10 @@
+{
+	program => '/usr/local/bin/augustus',
+	options => [
+				'--AUGUSTUS_CONFIG_PATH=/usr/local/augustus/config',
+				'--species=arabidopsis',
+				'--gff3=on',			#output in gff3 format
+			],
+	output_file => '--outfile',
+	option_glue => '=',
+}

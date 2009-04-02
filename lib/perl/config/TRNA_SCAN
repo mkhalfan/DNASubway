@@ -1,0 +1,13 @@
+
+{
+	program => '/usr/local/bin/tRNAscan-SE',
+	options => [
+				'-Q', # overwrite output files
+				'-q', # quite
+				'-b', # brief output format (no column headers)
+			],
+	output_file => '-o',
+	file_to_parse => qr/\.out$/,
+	gff3_file	=> 'output.gff3',
+}
+
