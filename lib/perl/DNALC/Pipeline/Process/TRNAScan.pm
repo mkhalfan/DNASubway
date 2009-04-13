@@ -6,8 +6,10 @@ use Data::Dumper;
 
 {
 
-	sub new {	
-		__PACKAGE__->SUPER::new('TRNA_SCAN');
+	sub new {
+		my ($class, $project_dir) = @_;
+
+		__PACKAGE__->SUPER::new('TRNA_SCAN', $project_dir);
 	}
 
 	sub convert2GFF3 {

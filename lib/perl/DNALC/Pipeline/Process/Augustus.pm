@@ -4,8 +4,10 @@ use base q(DNALC::Pipeline::Process);
 use IO::File ();
 
 {
-	sub new {	
-		__PACKAGE__->SUPER::new('AUGUSTUS');
+	sub new {
+		my ($class, $project_dir) = @_;
+
+		__PACKAGE__->SUPER::new('AUGUSTUS', $project_dir);
 	}
 
 	sub get_gff3_file {

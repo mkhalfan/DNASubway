@@ -9,8 +9,10 @@ use Data::Dumper;
 
 {
 
-	sub new {	
-		__PACKAGE__->SUPER::new('REPEAT_MASKER');
+	sub new {
+		my ($class, $project_dir) = @_;
+
+		__PACKAGE__->SUPER::new('REPEAT_MASKER', $project_dir);
 	}
 
 	sub convert2GFF3 {

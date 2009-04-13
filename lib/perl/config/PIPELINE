@@ -1,0 +1,4 @@
+{
+	project_dir => '/var/www/vhosts/pipeline.dnalc.org/var/projects',
+
+}

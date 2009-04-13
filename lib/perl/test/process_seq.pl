@@ -6,6 +6,8 @@ use strict;
 use Readonly ();
 use Data::Dumper;
 
+use DNALC::Pipeline::Project ();
+
 use DNALC::Pipeline::Process::RepeatMasker ();
 use DNALC::Pipeline::Process::Augustus ();
 use DNALC::Pipeline::Process::TRNAScan ();
@@ -39,11 +41,19 @@ Readonly::Scalar my $WORK_DIR => q{/home/cornel/work};
 #my $seq = $seqio->next_seq;
 #print $seq->seq, $/;
 
+my $proj = DNALC::Pipeline::Project->retrieve($ARGV[0]);
+
+unless ($proj) {
+	print STDERR  "Project [$ARGV[0]] not found..", $/;
+	exit 0;
+}
+
 my $input  = $WORK_DIR . '/100k/'. 'B.fasta';
-my $output = $WORK_DIR . '/' . 'out.gff3';
+my $output = $proj->work_dir . '/' . 'out.gff3';
 my @gffs = ();
 
-my $rep_mask = DNALC::Pipeline::Process::RepeatMasker->new;
+
+my $rep_mask = DNALC::Pipeline::Process::RepeatMasker->new( $proj->work_dir  );
 if ($rep_mask) {
 	my $pretend = 0;
 	$rep_mask->run(
@@ -64,7 +74,7 @@ if ($rep_mask) {
 	print 'RM: duration: ', $rep_mask->{elapsed}, $/ if $rep_mask->{elapsed};
 }
 
-my $augustus = DNALC::Pipeline::Process::Augustus->new;
+my $augustus = DNALC::Pipeline::Process::Augustus->new( $proj->work_dir );
 if ( $augustus) {
 	my $pretend = 0;
 	$augustus->run(
@@ -84,7 +94,7 @@ if ( $augustus) {
 	print 'AUGUSTUS: duration: ', $augustus->{elapsed}, $/;
 }
 
-my $trna_scan = DNALC::Pipeline::Process::TRNAScan->new;
+my $trna_scan = DNALC::Pipeline::Process::TRNAScan->new( $proj->work_dir );
 if ($trna_scan ) {
 	my $pretend = 0;
 	$trna_scan->run(
@@ -114,7 +124,7 @@ if (@gffs) {
 	for (@gffs) {
 		push @params, ('-g', $_);
 	}
-	my @args = ('./tests/gff3_merger.pl', @params, '-f', $input, '-o', $output);
-	print STDERR  "@args", $/;
+	my @args = ('./test/gff3_merger.pl', @params, '-f', $input, '-o', $output);
+	print STDERR  Dumper(\@args), $/;
 	system (@args) && die "Error: $!\n";
 }

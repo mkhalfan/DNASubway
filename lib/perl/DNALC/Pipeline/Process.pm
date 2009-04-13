@@ -6,14 +6,19 @@ use File::Path;
 use Time::HiRes qw/gettimeofday tv_interval/;
 use Data::Dumper;
 
+use Carp;
+
+
 # runs processes
 {
 
-	# FIXME - get this from somewhere else
-	my $WORK_DIR = q{/home/cornel/work};
-
 	sub new {
-		my ($class, $task_name) = @_;
+		my ($class, $task_name, $project_dir) = @_;
+
+		unless (-e $project_dir) {
+			carp "Project's dir not created: $project_dir?!\n";
+			return;
+		}
 
 		my $self = bless {}, $class;
 		$self->{type} = $task_name;
@@ -28,18 +33,22 @@ use Data::Dumper;
 			return;
 		}
 		$self->{conf} = $pcf;
-		$self->_setup;
+		$self->_setup($project_dir);
+
 		return unless $self->{work_dir};
+
 		$self;
 	}
 
 	sub _setup {
-		my ($self) = @_;
-		my $dir = $WORK_DIR. '/' . $self->{type};
-		#print "work dir = ", $dir, $/;
+		my ($self, $project_dir) = @_;
+
+		my $dir = $project_dir . '/' . $self->{type};
+		print "work dir = ", $dir, $/;
+
 		if (-e $dir) {
 			# should we remove the folder?
-			#print "must RM working folder? ", $dir, $/;
+			warn "Must RM working folder? ", $dir, $/;
 		}
 
 		unless (-e $dir) {
