@@ -34,10 +34,17 @@ use IO::File ();
 		my $gene_count = 0;
 		while (my $line = <$in>) {
 			next if $line =~ /^#/;
+			next if $line =~ /\t(:?intron|start_codon|stop_codon|transcription_start_site|transcription_end_site)\t/;
 			if ($line =~ /AUGUSTUS\tgene\t/) {
 				$gene_count++;
 				my $name = sprintf("AUGUSTUS%03d", $gene_count);
 				$line =~ s/\tID=/\tName=$name;ID=/;
+			}
+			elsif ($line =~ /AUGUSTUS\tCDS\t/) {
+				$line =~ s/ID=.*?;Parent=/Parent=/;
+			}
+			elsif ($line =~ /AUGUSTUS\ttranscript\t/) {
+				$line =~ s/transcript/mRNA/;
 			}
 			print $out $line;
 		}
