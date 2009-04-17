@@ -38,7 +38,7 @@ use Data::Dumper;
 		#system("$self->{conf}->{parser_program} $file_to_parse > $gff_file") 
 		#	and die "rmOutToGFF3.pl died: $!\n";
 		#/usr/local/RepeatMasker/util/rmOutToGFF3.pl
-		my $currentQueryName;
+		my $currentQueryName = '';
 		my $searchResults =
 		    CrossmatchSearchEngine::parseOutput( searchOutput => $file_to_parse );
 
@@ -82,8 +82,8 @@ use Data::Dumper;
 			print $out ".\t";
 			my $type = $result->getSubjType;
 			print $out "ID=RepeatMasker$i;Name=RepeatMasker$i-$type;Target="
-				. $result->getSubjName . ";start="
-				. $result->getSubjStart . ";end="
+				. $result->getSubjName . ' '
+				. $result->getSubjStart . ' '
 				. $result->getSubjEnd . "\n";
 
 			}

@@ -6,6 +6,10 @@ use DNALC::Pipeline::Workflow ();
 use DNALC::Pipeline::Config ();
 use DNALC::Pipeline::Project ();
 
+use DNALC::Pipeline::Process::RepeatMasker ();
+use DNALC::Pipeline::Process::TRNAScan ();
+use DNALC::Pipeline::Process::Augustus ();
+
 use File::Copy qw/cp/;
 use Carp;
 
@@ -32,7 +36,6 @@ use Carp;
 		#my $wf = DNALC::Pipeline::Workflow->search(
 		#		project_id => $project,
 		#		user_id	=> $user_id,
-		#		archived => 0
 		#	);
 		#unless ($wf) {
 		#	init_workflow();
@@ -69,23 +72,46 @@ use Carp;
 
 	#-------------------------------------------------------------------------
 	sub set_status {
-		my ($self, $task_name, $status_name) = @_;
+		my ($self, $task_name, $status_name, $duration) = @_;
 
 		unless (defined $status_map{ $status_name }) {
 			croak "Unknown status: ", $status_name, $/;
 		}
 
-		my $wf = eval{
+		my $wf = DNALC::Pipeline::Workflow->retrieve(
+					project_id => $self->project->id,
+					task_id => $self->{task_name_to_id}->{$task_name},
+				);
+
+		if ($wf) {
+			# make a history of this wf
+			my $wfh = DNALC::Pipeline::WorkflowHistory->create({
+						project_id => $wf->project->id,
+						task_id => $wf->task->id,
+						status_id => $wf->status_id,
+						duration => $wf->duration,
+						created => $wf->created
+					});
+
+			$wf->status_id($status_map{ $status_name });
+			$wf->duration( $duration ? $duration : 0);
+
+			$wf->update;
+		}
+		else {
+			$wf = eval{
 					DNALC::Pipeline::Workflow->create({
 						project_id => $self->project->id,
 						task_id => $self->{task_name_to_id}->{$task_name},
-						status_id => $status_map{ $status_name }
+						status_id => $status_map{ $status_name },
+						duration => $duration ? $duration : 0,
 					});
 				};
-		if ( $@ ) {
-			my $commit_error = $@;
-			eval { $wf->dbi_rollback }; # might also die!
-			die $commit_error;
+			if ( $@ ) {
+				my $commit_error = $@;
+				eval { $wf->dbi_rollback }; # might also die!
+				die $commit_error;
+			}
 		}
 		$wf->dbi_commit;
 		$wf->status;
@@ -97,7 +123,6 @@ use Carp;
 		my ($wf) = DNALC::Pipeline::Workflow->search(
 					project_id => $self->project->id,
 					task_id => $self->{task_name_to_id}->{$task_name},
-					archived => 0
 				);
 
 		unless ($wf) {
@@ -132,9 +157,109 @@ use Carp;
 		else {
 			$s = $self->set_status('upload_fasta','Error');
 		}
-		use Data::Dumper;
-		print STDERR "\nAfter upload: ", Dumper( $s), $/;
+		#use Data::Dumper;
+		#print STDERR "\nAfter upload: ", Dumper( $s), $/;
 		return $upload_file if $rc;
+	}
+	#-------------------------------------------------------------------------
+
+	sub run_repeat_masker {
+		my ($self) = @_;
+		
+		my $status = { success => 0 };
+	
+		my $proj = $self->project;
+		print STDERR "FASTA FILE = ", $proj->fasta_file, $/;;
+		carp "Fasta file is missing\n" unless $proj->fasta_file;
+
+		my $rep_mask = DNALC::Pipeline::Process::RepeatMasker->new( $proj->work_dir  );
+		if ($rep_mask) {
+			my $pretend = 0;
+			$rep_mask->run(
+					input => $proj->fasta_file,
+					pretend => $pretend,
+				);
+			if (defined $rep_mask->{exit_status} && $rep_mask->{exit_status} == 0) {
+				print STDERR "REPEAT_MASKER: success\n";
+				$status->{success} = 1;
+				$status->{elapsed} = $rep_mask->{elapsed};
+				$status->{gff_file}= $rep_mask->get_gff3_file;
+				$self->set_status('repeat_masker', 'Done', $rep_mask->{elapsed});
+			}
+			else {
+				print STDERR "REPEAT_MASKER: fail\n";
+				$self->set_status('repeat_masker', 'Error', $rep_mask->{elapsed});
+			}
+			print STDERR 'RM: duration: ', $rep_mask->{elapsed}, $/ if $rep_mask->{elapsed};
+		}
+
+		$status;
+	}
+	
+	#-------------------------------------------------------------------------
+	sub run_augustus {
+		my ($self) = @_;
+		
+		my $status = { success => 0 };
+	
+		my $proj = $self->project;
+		my $augustus = DNALC::Pipeline::Process::Augustus->new( $proj->work_dir );
+		if ( $augustus) {
+			my $pretend = 0;
+			$augustus->run(
+					input => $proj->fasta_file,
+					output_file => $augustus->{work_dir} . '/' . 'augustus.gff3',
+					pretend => $pretend,
+				);
+			if (defined $augustus->{exit_status} && $augustus->{exit_status} == 0) {
+				print STDERR "AUGUSTUS: success\n";
+
+				$status->{success} = 1;
+				$status->{elapsed} = $augustus->{elapsed};
+				$status->{gff_file}= $augustus->get_gff3_file;
+				$self->set_status('augustus', 'Done', $augustus->{elapsed});
+			}
+			else {
+				print STDERR "AUGUSTUS: fail\n";
+				$self->set_status('augustus', 'Error', $augustus->{elapsed});
+			}
+			print 'AUGUSTUS: duration: ', $augustus->{elapsed}, $/;
+		}
+	}
+	#-------------------------------------------------------------------------
+
+	sub run_trna_scan {
+
+		my ($self) = @_;
+		
+		my $status = { success => 0 };	
+		my $proj = $self->project;
+
+		my $trna_scan = DNALC::Pipeline::Process::TRNAScan->new( $proj->work_dir );
+		if ($trna_scan ) {
+			my $pretend = 0;
+			$trna_scan->run(
+					input => $proj->fasta_file,
+					output_file => $trna_scan->{work_dir} . '/' . 'output.out',
+					pretend => $pretend,
+				);
+			if (defined $trna_scan->{exit_status} && $trna_scan->{exit_status} == 0) {
+				print STDERR "TRNA_SCAN: success\n";
+				$status->{success} = 1;
+				$status->{elapsed} = $trna_scan->{elapsed};
+				$status->{gff_file}= $trna_scan->get_gff3_file;
+				$self->set_status('trna_scan', 'Done', $trna_scan->{elapsed});
+			}
+			else {
+				print STDERR "TRNA_SCAN: fail\n";
+				$self->set_status('trna_scan', 'Error', $trna_scan->{elapsed});
+				#print $trna_scan->{cmd}, $/;
+			}
+			#my $gff_file = $trna_scan->get_gff3_file;
+			#push @gffs, $gff_file if $gff_file;
+			#print 'TS: gff_file: ', $gff_file, $/ if $gff_file;
+			print STDERR 'TS: duration: ', $trna_scan->{elapsed}, $/;
+		}
 	}
 	#-------------------------------------------------------------------------
 }

@@ -79,7 +79,7 @@ use Data::Dumper;
 			sprintf("ID=%s;Name=%s", $gene_id, $gene_id);
 		# print transcript
 		printf $out "%s\t%s\t%s\t%d\t%d\t%.2f\t%s\t%s\t%s\n",
-			$seq_id, "tRNAScan-SE", "mRNA",
+			$seq_id, "tRNAScan-SE", "tRNA",
 			$begin, $end, $score, $strand, ".",
 			sprintf("ID=%s;Name=%s;Parent=%s",
 				$transcript_id, $transcript_id, $gene_id);

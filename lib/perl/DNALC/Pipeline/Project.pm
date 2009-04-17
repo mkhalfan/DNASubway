@@ -44,6 +44,13 @@ sub work_dir {
 }
 
 
+sub fasta_file {
+	my ($self) = @_;
+	
+	my $ff = $self->work_dir . '/fasta.fa';
+	return $ff if -e $ff;
+}
+
 #__PACKAGE__->has_a(
 #    created  => 'Time::Piece',
 #    inflate => sub { Time::Piece->strptime(shift, "%Y-%m-%d %H:%M:%S") },

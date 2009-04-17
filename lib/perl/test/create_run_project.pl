@@ -59,20 +59,43 @@ my $wfm = DNALC::Pipeline::App::WorkflowManager->new( $proj );
 
 my $upload_st = $wfm->get_status('upload_fasta');
 
-print '1.fasta_status = ', $upload_st->name, $/;
-
 if ( $upload_st->name eq 'Not processed') {
 	my $fasta = $wfm->upload_sequence($input_file);
-	print "Fasta = $fasta", $/;
 
-	my $ust = $wfm->get_status('upload_fasta');
-	print '2.fasta_status = ', $ust->name;
+	$upload_st = $wfm->get_status('upload_fasta');
+}
+
+print STDERR "U_ST = ", $upload_st->name , $/;
+
+if ( $upload_st->name eq 'Done') {
+	my $st;
+#	print STDERR  '-' x 20 , $/;
+# 	$st = $wfm->run_repeat_masker;
+# 	#print STDERR Dumper( $st ), $/;
+# 	my $rm_st = $wfm->get_status('repeat_masker');
+# 	print STDERR "RM_ST = ", $rm_st->name, ($/ x 2);
+
+	#-------------------------------------
+
+	print STDERR  '-' x 20 , $/;
+	$st = $wfm->run_augustus;
+	print STDERR Dumper( $st ), $/;
+	my $a_st = $wfm->get_status('repeat_masker');
+	print STDERR  "AUGUSTUS_ST = ", $a_st->name, $/;
+
+	#-------------------------------------
+	print STDERR  '-' x 20 , $/;
+	$st = $wfm->run_trna_scan;
+	print STDERR Dumper( $st ), $/;
+	my $t_st = $wfm->get_status('trna_scan');
+	print STDERR "TRNA_SCAN_ST = ", $t_st->name, ($/ x 2);
+
 }
 
 =head1 TODO
 
 Use WFM to:
-0. check if fasta was
+0. check if fasta was uploaded
 1. run RepeatMasker => updated workflow
 2. Augustus
 3. 
