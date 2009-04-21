@@ -40,7 +40,7 @@ Example: Test_testus_test or Homo_sapiens_human.
 
 =item data_dir
 
-The path to the directory where the user's GFF files.
+The path to the directory containing the user's GFF files.
 
 =item gbrowse_template
 
@@ -86,8 +86,10 @@ GetOptions(
   'data_dir=s'         => \$DATADIR,
   'gbrowse_template=s' => \$GBROWSE_TEMPLATE,
   'gbrowse_confdir=s'  =>  \$GBROWSE_CONFDIR,
+  'help'               => \$HELP,
 ) or pod2usage(-verbose => 1, -exitval => 1);
 
+pod2usage(-verbose => 2, -exitval => 1) if $HELP;
 
 die unless $USERNAME;
 
