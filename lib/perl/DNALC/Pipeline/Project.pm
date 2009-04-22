@@ -44,6 +44,11 @@ sub work_dir {
 }
 
 
+sub group {
+	warn "To be implemented", $/;
+	return 'Monocots';
+}
+
 sub fasta_file {
 	my ($self) = @_;
 	

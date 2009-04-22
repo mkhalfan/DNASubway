@@ -11,6 +11,8 @@ use DNALC::Pipeline::Project ();
 use DNALC::Pipeline::Process::RepeatMasker ();
 use DNALC::Pipeline::Process::Augustus ();
 use DNALC::Pipeline::Process::TRNAScan ();
+use DNALC::Pipeline::Process::FGenesH ();
+
 #use Bio::SeqIO ();
 
 #------------
@@ -27,7 +29,7 @@ Readonly::Scalar my $WORK_DIR => q{/home/cornel/work};
 # 3. run augustus
 # 	input: X.fasta
 # 	output: A.gff3
-# 4. fun FGeneH
+# 4. run FGenesH
 # 	input: X.fasta
 # 	output: ?
 # 5. run blast
@@ -52,12 +54,32 @@ my $input  = $WORK_DIR . '/100k/'. 'B.fasta';
 my $output = $proj->work_dir . '/' . 'out.gff3';
 my @gffs = ();
 
+my $fgenesh = DNALC::Pipeline::Process::FGenesH->new( $proj->work_dir, 'Monocots' );
+if ($fgenesh) {
+	my $pretend = 0;
+	$fgenesh->run(
+			input => $proj->fasta_file,
+			pretend => $pretend,
+			debug => 1
+		);
+	if (defined $fgenesh->{exit_status} && $fgenesh->{exit_status} == 0) {
+		print "FGENESH: success\n";
+	}
+	else {
+		print "FGENESH: fail\n";
+	}
+	my $gff_file = $fgenesh->get_gff3_file;
+	push @gffs, $gff_file;
+	print 'FG: gff_file: ', $gff_file, $/;
+	print 'FG: duration: ', $fgenesh->{elapsed}, $/ if $fgenesh->{elapsed};
+}
+
 
 my $rep_mask = DNALC::Pipeline::Process::RepeatMasker->new( $proj->work_dir  );
 if ($rep_mask) {
 	my $pretend = 0;
 	$rep_mask->run(
-			input => $input,
+			input => $proj->fasta_file,
 			# FIXME - ideally we should not give this as param
 			#output_dir => $WORK_DIR . '/' . 'repeat_masker',
 			pretend => $pretend,
@@ -78,7 +100,8 @@ my $augustus = DNALC::Pipeline::Process::Augustus->new( $proj->work_dir );
 if ( $augustus) {
 	my $pretend = 0;
 	$augustus->run(
-			input => $input,
+			#input => $input,
+			input => $proj->fasta_file,
 			output_file => $augustus->{work_dir} . '/' . 'augustus.gff3',
 			pretend => $pretend,
 		);
@@ -98,7 +121,8 @@ my $trna_scan = DNALC::Pipeline::Process::TRNAScan->new( $proj->work_dir );
 if ($trna_scan ) {
 	my $pretend = 0;
 	$trna_scan->run(
-			input => $input,
+			#input => $input,
+			input => $proj->fasta_file,
 			# FIXME - ideally we should not give this as param
 			output_file => $trna_scan->{work_dir} . '/' . 'output.out',
 			#debug => 1,

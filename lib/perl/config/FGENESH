@@ -1,0 +1,7 @@
+{
+	program => '/usr/local/fgenesh/fgenesh',
+	options => [],
+	monocots_matrix => '/usr/local/fgenesh/Monocots',
+	dicots_matrix => '/usr/local/fgenesh/Dicots',
+	file_to_parse => qr/stdout\.txt$/,
+}

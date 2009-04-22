@@ -93,7 +93,7 @@ use Carp;
 		my $debug = $params{debug} ? delete $params{debug} : $pretend;
 
 
-		#print STDERR Dumper( \%params ), $/;
+		print STDERR Dumper( \%params ), $/;
 		unless ($input_file) {
 			print STDERR 'Input file is missing...', $/;
 			return -1;
@@ -120,7 +120,7 @@ use Carp;
 
 		$self->{cmd} = join ' ', @opts;
 		if ($debug) {
-			print STDERR Dumper( \@opts ), $/;
+			print STDERR 'OPTIONS: ', Dumper( \@opts ), $/;
 		}
 
 		unless ($pretend) {

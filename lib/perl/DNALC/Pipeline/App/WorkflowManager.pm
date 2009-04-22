@@ -9,6 +9,7 @@ use DNALC::Pipeline::Project ();
 use DNALC::Pipeline::Process::RepeatMasker ();
 use DNALC::Pipeline::Process::TRNAScan ();
 use DNALC::Pipeline::Process::Augustus ();
+use DNALC::Pipeline::Process::FGenesH ();
 
 use File::Copy qw/cp/;
 use Carp;
@@ -255,13 +256,41 @@ use Carp;
 				$self->set_status('trna_scan', 'Error', $trna_scan->{elapsed});
 				#print $trna_scan->{cmd}, $/;
 			}
-			#my $gff_file = $trna_scan->get_gff3_file;
-			#push @gffs, $gff_file if $gff_file;
-			#print 'TS: gff_file: ', $gff_file, $/ if $gff_file;
 			print STDERR 'TS: duration: ', $trna_scan->{elapsed}, $/;
 		}
 	}
 	#-------------------------------------------------------------------------
+	sub run_fgenesh {
+		my ($self) = @_;
+		
+		my $status = { success => 0 };
+	
+		my $proj = $self->project;
+		# TODO - get the specie type: Monocots|Dicots
+		my $group = $proj->group;
+
+		my $fgenesh = DNALC::Pipeline::Process::FGenesH->new( $proj->work_dir, $group );
+		if ( $fgenesh) {
+			my $pretend = 0;
+			$fgenesh->run(
+					input => $proj->fasta_file,
+					pretend => $pretend,
+				);
+			if (defined $fgenesh->{exit_status} && $fgenesh->{exit_status} == 0) {
+				print STDERR "FGENESH: success\n";
+
+				$status->{success} = 1;
+				$status->{elapsed} = $fgenesh->{elapsed};
+				$status->{gff_file}= $fgenesh->get_gff3_file;
+				$self->set_status('fgenesh', 'Done', $fgenesh->{elapsed});
+			}
+			else {
+				print STDERR "FGENESH: fail\n";
+				$self->set_status('fgenesh', 'Error', $fgenesh->{elapsed});
+			}
+			print 'FGENESH: duration: ', $fgenesh->{elapsed}, $/;
+		}
+	}
 }
 
 =head1 TODO

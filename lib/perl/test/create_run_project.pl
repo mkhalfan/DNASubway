@@ -79,7 +79,7 @@ if ( $upload_st->name eq 'Done') {
 
 	print STDERR  '-' x 20 , $/;
 	$st = $wfm->run_augustus;
-	print STDERR Dumper( $st ), $/;
+	#print STDERR Dumper( $st ), $/;
 	my $a_st = $wfm->get_status('repeat_masker');
 	print STDERR  "AUGUSTUS_ST = ", $a_st->name, $/;
 
@@ -89,6 +89,12 @@ if ( $upload_st->name eq 'Done') {
 	print STDERR Dumper( $st ), $/;
 	my $t_st = $wfm->get_status('trna_scan');
 	print STDERR "TRNA_SCAN_ST = ", $t_st->name, ($/ x 2);
+	#-------------------------------------
+	print STDERR  '-' x 20 , $/;
+	$st = $wfm->run_fgenesh;
+	print STDERR Dumper( $st ), $/;
+	my $f_st = $wfm->get_status('fgenesh');
+	print STDERR "FGNESH_ST = ", $f_st->name, ($/ x 2);
 
 }
 
