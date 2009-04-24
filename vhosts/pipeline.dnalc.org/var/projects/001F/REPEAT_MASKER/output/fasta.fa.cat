@@ -1,0 +1,56 @@
+3107 31.76 2.49 2.95 chr1 4278 6003 (93997) C ATCopia28_I#LTR/Copia (47) 4659 2942 5
+1576 32.11 3.98 4.62 chr1 6374 7780 (92220) C ATCopia29_I#LTR/Copia (1849) 1550 153 5
+1671 32.74 2.85 2.55 chr1 6381 7361 (92639) C ATCopia27_I#LTR/Copia (2111) 3547 2564 5
+27 7.27 0.00 0.00 chr1 11709 11763 (88237) C AT_rich#Low_complexity (153) 147 93 5
+28 0.00 0.00 0.00 chr1 21152 21179 (78821) C AT_rich#Low_complexity (151) 149 122 5
+37 6.15 0.00 0.00 chr1 21761 21825 (78175) C AT_rich#Low_complexity (212) 88 24 5
+32 0.00 0.00 0.00 chr1 23047 23078 (76922) C AT_rich#Low_complexity (259) 41 10 5
+25 3.12 0.00 0.00 chr1 23123 23154 (76846) C AT_rich#Low_complexity (268) 32 1 5
+21 0.00 0.00 0.00 chr1 23481 23501 (76499) C AT_rich#Low_complexity (199) 101 81 5
+25 8.96 0.00 0.00 chr1 23558 23624 (76376) C AT_rich#Low_complexity (233) 67 1 5
+29 0.00 0.00 0.00 chr1 24839 24867 (75133) C AT_rich#Low_complexity (247) 53 25 5
+32 0.00 0.00 0.00 chr1 25255 25286 (74714) C AT_rich#Low_complexity (267) 33 2 5
+23 0.00 0.00 0.00 chr1 48228 48250 (51750) C AT_rich#Low_complexity (273) 27 5 5
+239 0.00 0.00 3.12 chr1 17062 17093 (82907) C (GAA)n#Simple_repeat (148) 32 2 0
+282 5.56 0.00 0.00 chr1 19890 19925 (80075) (CGG)n#Simple_repeat 3 38 (142) 0
+558 0.00 0.00 0.00 chr1 36303 36364 (63636) (GA)n#Simple_repeat 2 63 (117) 0
+222 3.70 0.00 0.00 chr1 44475 44501 (55499) (GAAAA)n#Simple_repeat 3 29 (151) 0
+180 0.00 0.00 0.00 chr1 48721 48740 (51260) C (CAAGC)n#Simple_repeat (158) 22 3 0
+207 0.00 0.00 0.00 chr1 49211 49233 (50767) C (GA)n#Simple_repeat (156) 24 2 0
+226 18.75 0.00 4.95 chr1 10266 10366 (89634) C (CGG)n#Simple_repeat (82) 98 3 5
+237 19.64 0.00 0.00 chr1 29735 29790 (70210) (A)n#Simple_repeat 1 56 (124) 5
+321 29.71 0.70 3.50 chr1 10109 10251 (89749) C (CGG)n#Simple_repeat (40) 140 2 5
+229 17.50 0.00 0.00 chr1 16912 16951 (83049) C (CGG)n#Simple_repeat (138) 42 3 5
+22 0.00 0.00 0.00 chr1 55802 55823 (44177) C AT_rich#Low_complexity (154) 146 125 5
+25 3.12 0.00 0.00 chr1 62178 62209 (37791) C AT_rich#Low_complexity (225) 75 44 5
+28 4.76 0.00 0.00 chr1 64846 64887 (35113) C AT_rich#Low_complexity (205) 95 54 5
+24 3.23 0.00 0.00 chr1 65020 65050 (34950) C AT_rich#Low_complexity (269) 31 1 5
+21 0.00 0.00 0.00 chr1 65428 65448 (34552) C AT_rich#Low_complexity (274) 26 6 5
+32 0.00 0.00 0.00 chr1 71119 71150 (28850) C AT_rich#Low_complexity (239) 61 30 5
+21 0.00 0.00 0.00 chr1 71772 71792 (28208) C GC_rich#Low_complexity (171) 129 109 5
+22 9.86 0.00 0.00 chr1 78605 78675 (21325) C AT_rich#Low_complexity (228) 72 2 5
+29 2.78 0.00 0.00 chr1 85496 85531 (14469) C AT_rich#Low_complexity (264) 36 1 5
+22 0.00 0.00 0.00 chr1 85897 85918 (14082) C AT_rich#Low_complexity (278) 22 1 5
+243 0.00 0.00 0.00 chr1 55661 55687 (44313) (TAA)n#Simple_repeat 1 27 (153) 0
+225 0.00 0.00 0.00 chr1 56283 56307 (43693) (GAA)n#Simple_repeat 1 25 (155) 0
+219 3.57 0.00 0.00 chr1 56830 56857 (43143) (TAGA)n#Simple_repeat 2 29 (151) 0
+198 0.00 0.00 0.00 chr1 63802 63823 (36177) (CAG)n#Simple_repeat 3 24 (156) 0
+234 0.00 0.00 0.00 chr1 71230 71255 (28745) (GAGAA)n#Simple_repeat 2 27 (153) 0
+189 0.00 0.00 0.00 chr1 75335 75355 (24645) (TGGA)n#Simple_repeat 4 24 (156) 0
+234 0.00 0.00 0.00 chr1 76756 76781 (23219) C (CAGCC)n#Simple_repeat (151) 29 4 0
+225 0.00 0.00 0.00 chr1 86397 86421 (13579) C (TA)n#Simple_repeat (155) 25 1 0
+182 3.70 0.00 3.57 chr1 89781 89808 (10192) (CATA)n#Simple_repeat 2 28 (152) 0
+198 0.00 0.00 0.00 chr1 98815 98836 (1164) (TGAA)n#Simple_repeat 3 24 (156) 0
+327 7.92 2.75 7.34 chr1 83467 83575 (16425) (CGG)n#Simple_repeat 3 106 (74) 5
+249 23.19 0.00 0.00 chr1 99615 99683 (317) C (CGG)n#Simple_repeat (109) 71 3 5
+246 28.99 2.31 2.31 chr1 78734 78906 (21094) C (TAAAAA)n#Simple_repeat (3) 177 5 5
+219 27.27 0.00 2.53 chr1 83880 83958 (16042) (CGG)n#Simple_repeat 2 78 (102) 5
+## Batch Overlap Boundaries
+##   chr1  50999, 49000
+## Total Sequences: 1
+## Total Length: 100000
+## Total NonMask ( excluding >20bp runs of N/X bases ): 100000
+## Total NonSub ( excluding all non ACGT bases ):100000
+RepeatMasker version open-3.2.7 , rushjob mode
+run with cross_match version 0.990329
+RepBase Update 20090120, RM database version 20090120

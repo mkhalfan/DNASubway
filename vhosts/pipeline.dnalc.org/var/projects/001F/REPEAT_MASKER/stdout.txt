@@ -1,0 +1,16 @@
+RepeatMasker version open-3.2.7
+Search engine: Crossmatch
+
+analyzing file /var/www/vhosts/pipeline.dnalc.org/var/projects/001F/fasta.fa
+
+Checking for E. coli insertion elements
+identifying simple repeats in batch 1 of 2
+identifying matches to arabidopsis sequences in batch 1 of 2
+identifying more simple repeats in batch 1 of 2
+identifying low complexity regions in batch 1 of 2
+
+Checking for E. coli insertion elements
+identifying simple repeats in batch 2 of 2
+identifying matches to arabidopsis sequences in batch 2 of 2
+identifying more simple repeats in batch 2 of 2
+identifying low complexity regions in batch 2 of 2

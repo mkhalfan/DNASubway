@@ -1,0 +1,7 @@
+<html>
+	<body>
+		<div>
+% $m->call_next;
+		</div>
+	</body>
+</html>
