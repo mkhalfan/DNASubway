@@ -1,0 +1,5 @@
+<%init>
+my ($message, $type, $debug) = @_;
+$type ||= 'info';
+push @{ $m->session->{messages} }, [ $type, $message, $debug ];
+</%init>

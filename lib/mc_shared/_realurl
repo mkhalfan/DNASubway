@@ -1,0 +1,10 @@
+<% $url %>\
+<%init>
+my $path = $r->path_info;
+my $url = $r->uri;
+for ($url) {
+	s/\Q$path\E$//;
+	s{/+}{/}g;
+}
+$url =~ s{/index\.html$}{/};
+</%init>

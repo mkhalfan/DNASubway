@@ -20,8 +20,8 @@ use IO::File ();
 	my %CF;
 
 	# default configuration directory;
-	#my $_def_cf_dir = '/home/cornel/lib/perl/config';
-	my $_def_cf_dir = '/home/cornel/projects/pipeline/lib/perl/config';
+	#my $_def_cf_dir = '/home/cornel/projects/pipeline/lib/perl/config';
+	my $_def_cf_dir = 'var/www/lib/perl/config';
 
 	sub new {
 		my ($class, $cfdir) = @_;

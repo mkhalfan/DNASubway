@@ -1,0 +1,63 @@
+<div class="<% $class %>">\
+% if ($pages > 9) {
+	<div class="pager-firstlast">\
+%	if ($prev) {
+		<a href="<% $prefix %>1<% $suffix %>" title="first page" class="firstPage">&laquo;</a>\
+%	}
+		<span class="pager-pages"><% $pages %></span> pages \
+%	if ($next) {
+		 <a href="<% $prefix %><% $pages %><% $suffix %>" title="last page" class="lastPage">&raquo;</a>\
+%	}
+	</div>\
+% }
+<%perl>
+	my ($prev_set, $next_set) = (0,0);
+	my ($pLo, $pHi) = (1, $pages);
+	if ($pages > 9) {
+		$pLo = $cur - 5 < 1 ? 1 : $cur - 4;
+		$pLo = $pages - 8 if $pLo > $pages - 8;
+		$pHi = $pLo + 8 > $pages ? $pages : $pLo + 8;
+		if($pLo > 1) {
+			$prev_set = $pLo - 5 > 0 ? $pLo - 5 : 1;
+		}
+		if($pHi < $pages) {
+			$next_set = $pHi + 5 <= $pages ? $pHi + 5 : $pages;
+		}
+	}
+</%perl>
+	<div class="pager-currentSet" id="pager-currentSet">\
+%	if ($prev_set) {
+		<a href="<% $prefix %><% $prev_set %><% $suffix %>" title="previous set" class="prevSet" accesskey="[">&laquo;</a>\
+%	}
+%	if ($cur > 1) {
+		 <a href="<% $prefix %><% $cur-1 %><% $suffix %>" title="previous page" class="prevPage" accesskey="&lt;">&lsaquo;</a>\
+%	}
+%	foreach ($pLo .. $pHi) {
+%		if ($_ == $cur) {
+			 <span class="pager-current"><% $_ %></span>\
+%		} else {
+			 <a href="<% $prefix %><% $_ %><% $suffix %>" title="go to page <% $_ %>" class="aPage"><% $_ %></a>\
+%		}
+%	}
+%	if ($cur < $pages) {
+		 <a href="<% $prefix %><% $cur+1 %><% $suffix %>" title="next page" class="nextPage" accesskey="&gt;">&rsaquo;</a>\
+%	}
+%	if ($next_set) {
+		 <a href="<% $prefix %><% $next_set %><% $suffix %>" title="next set" class="nextSet" accesskey="]">&raquo;</a>\
+%	}
+	</div>\
+</div>\
+
+
+<%init>
+return if $pages < 2;
+my $prev = $cur - 1;
+my $next = $cur + 1 > $pages ? 0 : $cur + 1;
+</%init>
+<%args>
+	$pages
+	$cur
+	$prefix => $r->uri
+	$suffix => '.html'
+	$class => 'pager'
+</%args>
