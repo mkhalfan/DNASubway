@@ -1,0 +1,77 @@
+<%once>
+	use DNALC::Pipeline::Config ();
+	use DNALC::Pipeline::Utils qw(random_string);
+</%once>
+
+<%init>
+$m->session->{pipeline} ||= {};
+
+my $s = $m->session->{pipeline};
+
+if ($r->method eq 'POST') {
+	use Apache2::Upload;
+
+	print STDERR  "POST", $/;
+	my $upload = $r->upload('seq_file');
+	if ($upload) {
+		print STDERR  "upload = ", $upload, $/;
+		print STDERR  "type = ", $upload->type, $/;
+		print STDERR  "size = ", $upload->size, $/;
+		print STDERR  "tmpname = ", $upload->tempname, $/;
+		my $config = DNALC::Pipeline::Config->new;
+		my $upl_dir = $config->cf('PIPELINE')->{upload_dir};
+		my $randoms = random_string();
+		$upload->link($upl_dir . '/' . $randoms ) or
+	             die sprintf "link to '%s' failed: $!", $upl_dir . '/' . $randoms;
+	}
+}
+else {
+	print STDERR  "GET", $/;
+}
+
+
+</%init>
+
+<h2>Create new Project</h2>
+
+<p>
+<h3>Choose the sequence source</h3>
+<form id="forma1" enctype="multipart/form-data" method="post">
+<p>1. Upload your sequence file: (max 110kB) 
+	<input type="file" id="seq_file" name="seq_file" /></p>
+<p>2. Select from the samples we provide below:
+	<div>
+		<select id="specie" name="specie" size="2" style="width: 300px">
+		</select>
+	</div>
+	</p>
+<input type="button" onclick="step_one()" value="Continue" />
+</form>
+</p>
+
+<form>
+<table>
+	<tr>
+		<td>Project Name:</td>
+		<td><input type="text" name="" id="" value="" /></td>
+	</tr>
+	<tr>
+		<td></td>
+		<td><input type="text" name="" id="" value="" /></td>
+	</tr>
+	<tr>
+		<td></td>
+		<td><input type="text" name="" id="" value="" /></td>
+	</tr>
+	<tr>
+		<td></td>
+		<td><input type="text" name="" id="" value="" /></td>
+	</tr>
+	<tr>
+		<td></td>
+		<td><input type="text" name="" id="" value="" /></td>
+	</tr>
+
+</table>
+</form>
+%# vim: ft=mason
