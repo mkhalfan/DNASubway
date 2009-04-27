@@ -7,6 +7,7 @@ use Bio::GMOD::Config;
 use Bio::GMOD::DB::Config;
 use Cwd;
 use File::Copy;
+use File::Temp 'tempfile';
 
 =head1 NAME
 
@@ -52,10 +53,40 @@ sub new {
     $self->data_dir        ( $arg{data_dir})         if $arg{data_dir};
     $self->gbrowse_template( $arg{gbrowse_template}) if $arg{gbrowse_template};
     $self->gbrowse_confdir ( $arg{gbrowse_confdir})  if $arg{gbrowse_confdir};
-
+    $self->fastapath       ( $arg{fastapath})        if $arg{fastapath};
 
 
     return $self;
+}
+
+=head2 fastapath
+
+=over
+
+=item Usage
+
+  $obj->fastapath()        #get existing value
+  $obj->fastapath($newval) #set new value
+
+=item Function
+
+=item Returns
+
+value of fastapath (a scalar)
+
+=item Arguments
+
+new value of fastapath (to set)
+
+=back
+
+=cut
+
+sub fastapath {
+    my $self = shift;
+    my $fastapath = shift if defined(@_);
+    return $self->{'fastapath'} = $fastapath if defined($fastapath);
+    return $self->{'fastapath'};
 }
 
 =head2 gbrowse_confdir 
@@ -689,6 +720,43 @@ sub create_gbrowse_conf {
     system("perl -pi -e 's/ORGANISM/$organism/' $conffile");
 
     chdir $orig_dir;
+    return;
+}
+
+sub load_fasta {
+    my $self = shift;
+
+
+    my ($id, $seq);
+    #parse fasta file
+    open FASTA, $self->fastapath or die;
+    while (<FASTA>) {
+        chomp;
+        if (/^>(\S+)/) {
+            $id = $1;
+            $seq= '';
+        }
+        else {
+            $seq .= $_;
+        }
+    }        
+    close FASTA;
+
+    my $length = length $seq;
+
+    #create GFF file
+    my $fh = File::Temp->new(); #may need unlink=0 here
+    my $filename = $fh->filename;
+    print $fh join("\t",$id,$self->user,'contig',1,$length,'.','.','.',"ID=$id,Name=$id"),"\n";
+    print $fh "###\n";
+    print $fh "##FASTA\n";
+    print $fh "$seq\n";
+    close $fh;
+
+    #load
+    my $dbprof = $self->username.".conf";
+    system("gmod_bulk_load_gff3.pl --dbprof $dbprof -g $filename") == 0 or die "fasta load failed";
+
     return;
 }
 
