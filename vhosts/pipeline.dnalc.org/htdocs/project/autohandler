@@ -1,0 +1,14 @@
+% $m->call_next;
+<%init>
+	$m->session->{pipeline} ||= {};
+	my $s = $m->session->{pipeline};
+	my $now = time();
+
+	#pretend the user logged in already
+	$s->{logged_in} = 1;
+	$s->{user_id} = 37;
+	$s->{last} = $now;
+	
+</%init>
+
+%# vim: ft=mason

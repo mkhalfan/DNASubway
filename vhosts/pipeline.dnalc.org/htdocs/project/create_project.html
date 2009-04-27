@@ -1,77 +1,140 @@
+<%args>
+	$name => ''
+	$seq_src => ''
+	$specie => ''
+	$organism => ''
+	$group => ''
+</%args>
 <%once>
-	use DNALC::Pipeline::Config ();
-	use DNALC::Pipeline::Utils qw(random_string);
+	#use DNALC::Pipeline::Config ();
+	use DNALC::Pipeline::App::Utils ();
+	use DNALC::Pipeline::Project ();
+	use DNALC::Pipeline::App::WorkflowManager ();
+	use Data::Dumper;
 </%once>
 
 <%init>
 $m->session->{pipeline} ||= {};
 
 my $s = $m->session->{pipeline};
+my @err = ();
 
 if ($r->method eq 'POST') {
-	use Apache2::Upload;
+	my $uploaded_file = '';
 
-	print STDERR  "POST", $/;
-	my $upload = $r->upload('seq_file');
-	if ($upload) {
-		print STDERR  "upload = ", $upload, $/;
-		print STDERR  "type = ", $upload->type, $/;
-		print STDERR  "size = ", $upload->size, $/;
-		print STDERR  "tmpname = ", $upload->tempname, $/;
-		my $config = DNALC::Pipeline::Config->new;
-		my $upl_dir = $config->cf('PIPELINE')->{upload_dir};
-		my $randoms = random_string();
-		$upload->link($upl_dir . '/' . $randoms ) or
-	             die sprintf "link to '%s' failed: $!", $upl_dir . '/' . $randoms;
+	unless ($name) {
+		push @err, "Project Name is missing";
 	}
-}
+	if ($seq_src eq 'upload') {
+		push @err, "Organism is missing!" unless $organism;
+		push @err, "Group type is missing!" unless $group;
+	}
+	elsif ($seq_src eq 'sample') {
+		push @err, "Sample organism was not selected!" unless $specie;
+		# compute plant group (monocots|dicots)
+	}
+	print STDERR  "seq_src = $seq_src", $/;
+
+	unless (@err) {
+		my $st = DNALC::Pipeline::App::Utils->save_upload($r, 'seq_file');
+		if ($st->{status} eq 'fail') {
+			push @err, "Unable to upload file: ". $st->{message};
+		}
+		else {
+			$uploaded_file = $st->{path};
+		}
+		print STDERR Dumper( $st), $/;
+		#return;
+	}
+
+
+	# create the project 
+	unless (@err) {
+		my $proj = eval { DNALC::Pipeline::Project->create({
+								user_id => $s->{user_id},
+								name => $name,
+								specie => $organism,
+							});
+						};
+		if ($@) {
+			push @err, "Error creating the project: $@";
+		}
+		else {
+			warn "project_created: id = ", $proj, ",\tname = ", $proj->name, $/;
+
+			# create projects work directory
+			if ($proj->create_work_dir) {
+				warn "project's work_dir: ", $proj->work_dir, $/;
+				$proj->dbi_commit;
+			}
+			else {
+				warn "Failed to create work_dir for project [$proj]", $/;
+				push @err, "Failed to create work_dir for project!";
+				$proj->dbi_rollback;
+			}
+
+			# set workflow
+			my $wfm = DNALC::Pipeline::App::WorkflowManager->new( $proj );
+			print STDERR Dumper( \$wfm), $/;
+
+			my $fasta = $wfm->upload_sequence($uploaded_file);
+			print STDERR  "Uploaded fasta file = ", $fasta, $/;
+			print STDERR  "upload status = ", $wfm->get_status('upload_fasta'), $/;
+
+		} #end else
+	} #end unless
+} #ned if POST
 else {
 	print STDERR  "GET", $/;
 }
 
 
 </%init>
-
-<h2>Create new Project</h2>
-
+<div id="stylized" class="myform">
+<h1>Create new Project</h1>
+% if (@err) {
+<div class="message error">
+%	foreach (@err) {
+<div><% $_ %></div>
+%	}
+</div>
+% }
 <p>
-<h3>Choose the sequence source</h3>
+<h1>Choose the sequence source</h1>
 <form id="forma1" enctype="multipart/form-data" method="post">
-<p>1. Upload your sequence file: (max 110kB) 
-	<input type="file" id="seq_file" name="seq_file" /></p>
-<p>2. Select from the samples we provide below:
 	<div>
-		<select id="specie" name="specie" size="2" style="width: 300px">
-		</select>
+		1. <input type="radio" name="seq_src" id="seq_src_upload" value="upload" onclick="select_source(this)" />
+		Upload your sequence file: (max 110kB) 
+		<input class="stylized" type="file" id="seq_file" name="seq_file" 
+			onchange="set_source('upload')" onclick="set_source('upload')"/>
 	</div>
-	</p>
-<input type="button" onclick="step_one()" value="Continue" />
+	<div class="spacer" style="font-size:larger">or</div>
+	<div>
+		2. <input type="radio" name="seq_src" id="seq_src_sample" value="sample" onclick="select_source(this)" />
+		Select from the samples we provide below:
+		<div>
+			<select class="stylized" id="specie" name="specie" size="2" style="width: 300px"
+				onchange="set_source('sample')">
+				<option id="o1" value="arabidopsis">Arabidopsis thaliana</option>
+			</select>
+		</div>
+	<div class="spacer"></div>
+	<p></p>
+	<label>Project Name	<span class="small">Type your project's name</span></label>
+	<input class="stylized" type="text" name="name" id="name" value="<% $name|html%>" />
+	<div id="organism_info">
+		<label>Organism <span class="small">Pick one or type your own</span></label>
+		<input class="stylized" type="text" name="organism" id="organism" value="<% $organism |html%>" />
+		<div class="spacer"></div>
+		<label style="clear:both">Group<span class="small">Monocots or Dicots</span></label>&nbsp;&nbsp;
+		<input class="resetradio" type="radio" name="group" id="g1" value="monocots" /> Monocots
+		<input class="resetradio" type="radio" name="group" id="g2" value="dicots" /> Dicots
+		</div>
+	</div>
+<div class="spacer"></div>
+
+<button type="button" onclick="step_one()">Continue</button>
 </form>
 </p>
-
-<form>
-<table>
-	<tr>
-		<td>Project Name:</td>
-		<td><input type="text" name="" id="" value="" /></td>
-	</tr>
-	<tr>
-		<td></td>
-		<td><input type="text" name="" id="" value="" /></td>
-	</tr>
-	<tr>
-		<td></td>
-		<td><input type="text" name="" id="" value="" /></td>
-	</tr>
-	<tr>
-		<td></td>
-		<td><input type="text" name="" id="" value="" /></td>
-	</tr>
-	<tr>
-		<td></td>
-		<td><input type="text" name="" id="" value="" /></td>
-	</tr>
-
-</table>
-</form>
+</div>
 %# vim: ft=mason
