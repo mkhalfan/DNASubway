@@ -355,11 +355,13 @@ sub profile          {
         my $db_user = $db_conf->user;
         my $db_host = $db_conf->host;
         my $db_port = $db_conf->port;
+        my $dbh     = $db_conf->dbh;
 
         $self->confdir($confdir);
         $self->dbuser ($db_user);
         $self->port   ($db_port);
         $self->host   ($db_host);
+        $self->dbh    ($dbh);
     }
 
     return $self->{'profile'} = $profile          if defined($profile         );
@@ -546,6 +548,36 @@ sub confdir {
     return $self->{'confdir'};
 }
 
+=head2 dbh
+
+=over
+
+=item Usage
+
+  $obj->dbh()        #get existing value
+  $obj->dbh($newval) #set new value
+
+=item Function
+
+=item Returns
+
+value of dbh (a scalar)
+
+=item Arguments
+
+new value of dbh (to set)
+
+=back
+
+=cut
+
+sub dbh {
+    my $self = shift;
+    my $dbh = shift if defined(@_);
+    return $self->{'dbh'} = $dbh if defined($dbh);
+    return $self->{'dbh'};
+}
+
 
 sub create_db {
     my $self = shift;
@@ -572,12 +604,17 @@ sub create_conf_file {
     chdir $confdir;
 
     my $conffile = $self->username.".conf"; 
-    copy('default.conf',$conffile);
 
-    system("perl -pi -e 's/DBNAME=chado/DBNAME=".$self->username."/' $conffile");
-    system("perl -pi -e 's/DBORGANISM=/DBORGANISM=".$self->common_name."/' $conffile"); 
+    if (-f $conffile) {
+        warn "Configuration file for this user already exists";
+    }
+    else {
+        copy('default.conf',$conffile);
+
+        system("perl -pi -e 's/DBNAME=chado/DBNAME=".$self->username."/' $conffile");
+        system("perl -pi -e 's/DBORGANISM=/DBORGANISM=".$self->common_name."/' $conffile"); 
+    }
    
-    insert_organism();
 
     chdir $orig_dir;
     return; 
@@ -586,19 +623,32 @@ sub create_conf_file {
 sub insert_organism {
     my $self = shift;
 
+    my $dbh = $self->dbh;
+
+    #check to see if the organism is already in the db
+    my $query = "SELECT abbreviateion,genus,species,common_name FROM organism WHERE common_name=?";
+    my $sth   = $dbh->prepare($query);
+    $sth->execute($self->common_name) or die;
+    my $hash_ref = $sth->fetchrow_hashref;
+
+    if ($$hash_ref{common_name}) {
+        if ($$hash_ref{abbreviateion} ne $self->abbreviateion or
+            $$hash_ref{genus}         ne $self->genus or
+            $$hash_ref{species}       ne $self->species) {
+            die $self->common_name." is already in the database but not with the given genus and species"; 
+        }
+        else {
+            warn "nothing to do--this organism is already in the database";
+            return;
+        } 
+    }
+
     #wow--the org string better be scrubbed before it gets here! Or we may get
     #a visit from little Jonny Tables
     #no really need for the overhead of DBI here for on query.
-    my $insert_query= "INSERT INTO organism (abbreviation,genus,species,common_name) "
-                     ."VALUES ('".$self->abbreviateion
-                              ."','".$self->genus
-                              ."','".$self->species
-                              ."','".$self->common_name."')";
-    my $dbuser = $self->dbuser;
-    my $host   = $self->host;
-    my $port   = $self->port;
-    my $user   = $self->username;
-    system(qq(psql -U $dbuser -h $host -p $port -c $insert_query $user));
+    my $insert_query= "INSERT INTO organism (abbreviation,genus,species,common_name) VALUES (?,?,?,?)";
+    $sth  = $dbh->prepare($insert_query);
+    $sth->execute($self->abbreviation,$self->genus,$self->species,$self->common_name) or die; 
 
     return;
 }
