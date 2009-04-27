@@ -712,8 +712,10 @@ sub create_gbrowse_conf {
     chdir $self->gbrowse_confdir;
    
     my $user     = $self->username; 
-    my $conffile = "$user.conf";
     my $organism = $self->common_name;
+    my $conffile = $user."_$organism.conf";
+    return if -f $conffile;
+
     copy($self->gbrowse_template, $conffile);
 
     system("perl -pi -e 's/USER/$user/' $conffile"); 
@@ -754,7 +756,7 @@ sub load_fasta {
     close $fh;
 
     #load
-    my $dbprof = $self->username.".conf";
+    my $dbprof = $self->username;
     system("gmod_bulk_load_gff3.pl --dbprof $dbprof -g $filename") == 0 or die "fasta load failed";
 
     return;
