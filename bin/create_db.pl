@@ -4,8 +4,8 @@ use warnings;
 use lib '../lib/perl';
 
 use DNALC::Pipeline::Chado::Utils;
-use GetOpt::Long;
-use PodUsage;
+use Getopt::Long;
+use Pod::Usage;
 
 my ($PROFILE, $DUMPPATH, $USERNAME, $HELP);
 
@@ -28,7 +28,7 @@ my %args = (
   'profile'   => $PROFILE,
 );
 
-my $utils = DNALC::Pipeline::Chado::Utils->new(%args};
+my $utils = DNALC::Pipeline::Chado::Utils->new(%args);
 
 $utils->create_db();
 

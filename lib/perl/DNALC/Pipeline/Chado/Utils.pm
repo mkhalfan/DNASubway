@@ -45,7 +45,7 @@ sub new {
 
     my $self  = bless {}, ref($class) || $class;
 
-    $self->username        ( $arg{username})         if $arg{username}
+    $self->username        ( $arg{username})         if $arg{username};
     $self->dumppath        ( $arg{dumppath})         if $arg{dumppath};
     $self->profile         ( $arg{profile})          if $arg{profile};
     $self->organism_string ( $arg{organism_string})  if $arg{organism_string};
@@ -174,9 +174,148 @@ new value of organism_string  (to set)
 sub organism_string  {
     my $self = shift;
     my $organism_string  = shift if defined(@_);
+
+    if ($organism_string) {
+        my @org_array = split /_/, $organism_string;
+        die "Improperly formated organism_string" unless scalar @org_array ==3;
+
+        $self->genus($org_array[0]);
+        $self->species($org_array[1]);
+        $self->common_name($org_array[2]);
+
+        my $genus_init = substr($org_array[0],0,1);
+
+        $self->abbreviation("$genus_init.$org_array[1]");
+    }
+
     return $self->{'organism_string'} = $organism_string  if defined($organism_string );
     return $self->{'organism_string'};
 }
+
+
+=head2 genus
+
+=over
+
+=item Usage
+
+  $obj->genus()        #get existing value
+  $obj->genus($newval) #set new value
+
+=item Function
+
+=item Returns
+
+value of genus (a scalar)
+
+=item Arguments
+
+new value of genus (to set)
+
+=back
+
+=cut
+
+sub genus {
+    my $self = shift;
+    my $genus = shift if defined(@_);
+    return $self->{'genus'} = $genus if defined($genus);
+    return $self->{'genus'};
+}
+
+
+=head2 species
+
+=over
+
+=item Usage
+
+  $obj->species()        #get existing value
+  $obj->species($newval) #set new value
+
+=item Function
+
+=item Returns
+
+value of species (a scalar)
+
+=item Arguments
+
+new value of species (to set)
+
+=back
+
+=cut
+
+sub species {
+    my $self = shift;
+    my $species = shift if defined(@_);
+    return $self->{'species'} = $species if defined($species);
+    return $self->{'species'};
+}
+
+
+=head2 common_name
+
+=over
+
+=item Usage
+
+  $obj->common_name()        #get existing value
+  $obj->common_name($newval) #set new value
+
+=item Function
+
+=item Returns
+
+value of common_name (a scalar)
+
+=item Arguments
+
+new value of common_name (to set)
+
+=back
+
+=cut
+
+sub common_name {
+    my $self = shift;
+    my $common_name = shift if defined(@_);
+    return $self->{'common_name'} = $common_name if defined($common_name);
+    return $self->{'common_name'};
+}
+
+=head2 abbreviation
+
+=over
+
+=item Usage
+
+  $obj->abbreviation()        #get existing value
+  $obj->abbreviation($newval) #set new value
+
+=item Function
+
+=item Returns
+
+value of abbreviation (a scalar)
+
+=item Arguments
+
+new value of abbreviation (to set)
+
+=back
+
+=cut
+
+sub abbreviation {
+    my $self = shift;
+    my $abbreviation = shift if defined(@_);
+    return $self->{'abbreviation'} = $abbreviation if defined($abbreviation);
+    return $self->{'abbreviation'};
+}
+
+
 
 =head2 profile         
 
@@ -210,7 +349,7 @@ sub profile          {
     if ($profile) {
         #if profile is set, we'll want dbuser, host and port later
         my $gmod_conf = Bio::GMOD::Config->new();
-        my $db_conf   = Bio::GMOD::DB::Config->new($gmod_conf, $DBPROF);
+        my $db_conf   = Bio::GMOD::DB::Config->new($gmod_conf, $profile);
 
         my $confdir = $gmod_conf->confdir;
         my $db_user = $db_conf->user;
@@ -416,9 +555,9 @@ sub create_db {
              .$self->host." -p "
              .$self->port
              ." ".$self->username) == 0 
-                 or (warn "Database called ".$self->username." already exists\n" and die;);
+                 or (die "Database called ".$self->username." already exists\n");
     system("bzip2 -dc ".$self->dumppath
-             ." | psql -U ."$self->dbuser
+             ." | psql -U ".$self->dbuser
              ." -h ".$self->host
              ." -p ".$self->port
              ." ".$self->username);
@@ -432,13 +571,13 @@ sub create_conf_file {
     my $confdir = $self->confdir;
     chdir $confdir;
 
-    my $conffile = "$user.conf"; 
+    my $conffile = $self->username.".conf"; 
     copy('default.conf',$conffile);
 
     system("perl -pi -e 's/DBNAME=chado/DBNAME=".$self->username."/' $conffile");
-    system("perl -pi -e 's/DBORGANISM=/DBORGANISM=$$org_info[2]/' $conffile"); 
+    system("perl -pi -e 's/DBORGANISM=/DBORGANISM=".$self->common_name."/' $conffile"); 
    
-    insert_organism($user,$dbuser,$host,$port,$org_info);
+    insert_organism();
 
     chdir $orig_dir;
     return; 
@@ -447,11 +586,19 @@ sub create_conf_file {
 sub insert_organism {
     my $self = shift;
 
-    my $genus_init = substr($$org_info[0],0,1);
-
     #wow--the org string better be scrubbed before it gets here! Or we may get
     #a visit from little Jonny Tables
-    system(qq(psql -U $dbuser -h $host -p $port -c "INSERT INTO organism (abbreviation,genus,species,common_name) VALUES ('$genus_init.$$org_info[1]','$$org_info[0]','$$org_info[1]','$$org_info[2]')" $user));
+    #no really need for the overhead of DBI here for on query.
+    my $insert_query= "INSERT INTO organism (abbreviation,genus,species,common_name) "
+                     ."VALUES ('".$self->abbreviateion
+                              ."','".$self->genus
+                              ."','".$self->species
+                              ."','".$self->common_name."')";
+    my $dbuser = $self->dbuser;
+    my $host   = $self->host;
+    my $port   = $self->port;
+    my $user   = $self->username;
+    system(qq(psql -U $dbuser -h $host -p $port -c $insert_query $user));
 
     return;
 }
@@ -461,12 +608,13 @@ sub load_database {
 
     my $orig_dir = getcwd;
 
-    chdir $datadir;
+    chdir $self->data_dir;
 
     my @gff_files = glob('*.gff*');
 
+    my $user = $self->username;
     foreach my $file (@gff_files) {
-        my $command = "gmod_bulk_load_gff3.pl -a --noexon --dbprof $conffile -g $file";
+        my $command = "gmod_bulk_load_gff3.pl -a --noexon --dbprof $user -g $file";
         warn "$command\n";
         system($command);
     }
@@ -480,10 +628,12 @@ sub create_gbrowse_conf {
  
     my $orig_dir = getcwd;
 
-    chdir $confdir;
-    
+    chdir $self->gbrowse_confdir;
+   
+    my $user     = $self->username; 
     my $conffile = "$user.conf";
-    copy($template, $conffile);
+    my $organism = $self->common_name;
+    copy($self->gbrowse_template, $conffile);
 
     system("perl -pi -e 's/USER/$user/' $conffile"); 
     system("perl -pi -e 's/ORGANISM/$organism/' $conffile");
@@ -491,3 +641,5 @@ sub create_gbrowse_conf {
     chdir $orig_dir;
     return;
 }
+
+1;
