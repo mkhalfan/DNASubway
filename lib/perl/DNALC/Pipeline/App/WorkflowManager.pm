@@ -11,7 +11,7 @@ use DNALC::Pipeline::Process::TRNAScan ();
 use DNALC::Pipeline::Process::Augustus ();
 use DNALC::Pipeline::Process::FGenesH ();
 
-use File::Copy qw/cp/;
+use File::Copy;
 use Carp;
 
 {
@@ -142,13 +142,15 @@ use Carp;
 	}
 
 	sub upload_sequence {
-		my ($self, $io_h) = @_;
-		
-		# FIXME - io_h should be the upload handler 
+		my ($self, $source_file) = @_;
 
+		unless (-e $source_file) {
+			carp "Source file [$source_file] is missing\n";
+		}
+		
 		my $upload_file = $self->project->work_dir . '/' . 'fasta.fa';
-		#my $rc = DNALC::Pipeline::App::Utils->upload($r, $upload_file);
-		my $rc = cp $io_h, $upload_file;
+		my $rc = copy $source_file, $upload_file;
+		print STDERR  'dont forget to remove file: ', $upload_file, $/;
 		carp 'Unable to upload sequence: ', $! unless $rc;
 
 		my $s;
@@ -158,8 +160,6 @@ use Carp;
 		else {
 			$s = $self->set_status('upload_fasta','Error');
 		}
-		#use Data::Dumper;
-		#print STDERR "\nAfter upload: ", Dumper( $s), $/;
 		return $upload_file if $rc;
 	}
 	#-------------------------------------------------------------------------

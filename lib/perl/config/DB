@@ -1,6 +1,6 @@
 [
 	# DSN
-	'DBI:Pg:database=pipeline',
+	'DBI:Pg:database=pipeline;host=genestage.cshl.edu',
 	# DB USER
 	'pipeline',
 	# DB USER'S PASSWORD

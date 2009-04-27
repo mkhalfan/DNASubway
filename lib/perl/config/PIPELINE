@@ -1,4 +1,6 @@
 {
 	project_dir => '/var/www/vhosts/pipeline.dnalc.org/var/projects',
 	upload_dir => '/var/www/vhosts/pipeline.dnalc.org/var/projects/0000',
+	upload_mime_types => ['text/plain'],
+	upload_max_size => 150 * 1024, # max 150 KB
 }
