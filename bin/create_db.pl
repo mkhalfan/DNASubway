@@ -62,7 +62,7 @@ pod2usage(-verbose => 2, -exitval => 1) if $HELP;
 
 die unless $USERNAME;
 
-$DUMPPATH        ||= '/usr/local/gmod/src/chado_dump.bz2';
+$DUMPPATH        ||= '/usr/local/gmod/src/ontology_only_chado_dump.bz2';
 $PROFILE         ||= 'default';
 
 my %args = (
