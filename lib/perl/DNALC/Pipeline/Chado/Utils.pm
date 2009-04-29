@@ -657,13 +657,13 @@ sub insert_organism {
     my $dbh = $self->dbh;
 
     #check to see if the organism is already in the db
-    my $query = "SELECT abbreviateion,genus,species,common_name FROM organism WHERE common_name=?";
+    my $query = "SELECT abbreviation,genus,species,common_name FROM organism WHERE common_name=?";
     my $sth   = $dbh->prepare($query);
     $sth->execute($self->common_name) or die;
     my $hash_ref = $sth->fetchrow_hashref;
 
     if ($$hash_ref{common_name}) {
-        if ($$hash_ref{abbreviateion} ne $self->abbreviateion or
+        if ($$hash_ref{abbreviation} ne $self->abbreviation or
             $$hash_ref{genus}         ne $self->genus or
             $$hash_ref{species}       ne $self->species) {
             die $self->common_name." is already in the database but not with the given genus and species"; 
