@@ -1,7 +1,8 @@
 #!/usr/bin/perl
 use strict;
 use warnings;
-use lib '../lib/perl';
+use FindBin;
+use lib "$FindBin::Bin/../lib/perl";
 
 use DNALC::Pipeline::Chado::Utils;
 use Getopt::Long;

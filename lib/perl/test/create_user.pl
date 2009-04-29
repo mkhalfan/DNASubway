@@ -28,12 +28,13 @@ unless ($@) {
 	$u->dbi_commit;
 }
 
-print STDERR  "u=", $u->username, $/;
+print STDERR  "user=", $u->username, $/;
+print STDERR  "uid=", $u->id, $/;
 
 #test passwd
 if ($u->password_valid($pwd)) {
-	print STDERR  "User groups: ", Dumper($u->groups), $/;
-	print STDERR  'Login OK', $/;
+	#print STDERR  "User groups: ", Dumper($u->groups), $/;
+	#print STDERR  'Login OK', $/;
 }
 else {
 	print STDERR  'login failed', $/;
@@ -43,6 +44,8 @@ else {
 my $cf = DNALC::Pipeline::Config->new;
 my $exe_path = $cf->cf('PIPELINE')->{EXE_PATH};
 print STDERR  "EXE_PATH: ", $exe_path, $/;
+system ($exe_path . '/create_db.pl',  '--quiet', '--username', $u->username) == 0
+	or die "Unambe to create DB for user: ", $u->username;
 
 exit 0;
 

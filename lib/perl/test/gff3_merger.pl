@@ -72,6 +72,6 @@ sub process_fasta
 			$len += length($line);
 		}
 	}
-	print $out "$id\tDNALC\tchromosome\t1\t$len\t.\t.\t.\tID=$id;Name=$id\n";
+	#print $out "$id\tDNALC\tchromosome\t1\t$len\t.\t.\t.\tID=$id;Name=$id\n";
 	$fasta->seek(0, 0);
 }
