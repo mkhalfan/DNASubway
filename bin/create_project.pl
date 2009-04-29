@@ -75,6 +75,10 @@ my %args = (
 my $utils = DNALC::Pipeline::Chado::Utils->new(%args);
 
 $utils->create_conf_file();
+
+# read the data from the new profile
+$utils->profile($USERNAME);
+
 $utils->insert_organism();
 
 exit(0);

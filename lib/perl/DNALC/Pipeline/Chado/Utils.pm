@@ -384,12 +384,14 @@ sub profile          {
 
         my $confdir = $gmod_conf->confdir;
         my $db_user = $db_conf->user;
+        my $db_pass = $db_conf->password;
         my $db_host = $db_conf->host;
         my $db_port = $db_conf->port;
         my $dbh     = $db_conf->dbh;
 
         $self->confdir($confdir);
         $self->dbuser ($db_user);
+        $self->dbpassword ($db_pass);
         $self->port   ($db_port);
         $self->host   ($db_host);
         $self->dbh    ($dbh);
@@ -549,6 +551,36 @@ sub dbuser {
     return $self->{'dbuser'};
 }
 
+=head2 dbpassword
+
+=over
+
+=item Usage
+
+  $obj->dbpassword()        #get existing value
+  $obj->dbpassword($newval) #set new value
+
+=item Function
+
+=item Returns
+
+value of dbpassword (a scalar)
+
+=item Arguments
+
+new value of dbpassword (to set)
+
+=back
+
+=cut
+
+sub dbpassword {
+    my ($self, $dbpassword) = @_;
+
+    return $self->{dbpassword} = $dbpassword if defined($dbpassword);
+    return $self->{dbpassword};
+}
+
 =head2 confdir
 
 =over
@@ -611,20 +643,30 @@ sub dbh {
 
 
 sub create_db {
-    my $self = shift;
+    my ($self, $quiet) = @_;
+	
+	my $q = $quiet ? '-q' : '';
 
-    system("createdb -U "
-             .$self->dbuser." -h "
-             .$self->host." -p "
-             .$self->port
-             ." ".$self->username) == 0 
-                 or (die "Database called ".$self->username." already exists\n");
-    system("bzip2 -dc ".$self->dumppath
-             ." | psql -U ".$self->dbuser
-             ." -h ".$self->host
-             ." -p ".$self->port
-             ." ".$self->username);
-    return;
+	system("createdb $q"
+			. " -U " . $self->dbuser 
+			. " -h " . $self->host
+			. " -p " . $self->port
+	       . " ". $self->username
+		) == 0 or (die "Database called ".$self->username." already exists\n");
+
+    system("psql $q -U ".$self->dbuser
+             . " -h ".$self->host
+             . " -p ".$self->port
+             . " ". $self->username 
+			 . " < " . $self->dumppath
+			 . ( $quiet ? ' > /dev/null 2>&1' : '')
+		 ) == 0 or do {
+				 warn "Unable to load data into new Chado DB [" 
+					. $self->dbuser . "].\n";
+				return;
+			};
+
+    return 1; # success
 }
 
 sub create_conf_file {
@@ -632,6 +674,9 @@ sub create_conf_file {
 
     my $orig_dir = getcwd;
     my $confdir = $self->confdir;
+	unless (-w $confdir ) {
+		warn "Config dir [$confdir] is not writable.\n\n";
+	}
     chdir $confdir;
 
     my $conffile = $self->username.".conf"; 
@@ -640,7 +685,9 @@ sub create_conf_file {
         warn "Configuration file for this user already exists";
     }
     else {
-        copy('default.conf',$conffile);
+		warn "Profile used = ", $self->profile, "\n";
+        copy($self->profile . '.conf', $conffile) 
+			or die "Copy failed: $!";
 
         system("perl -pi -e 's/DBNAME=chado/DBNAME=".$self->username."/' $conffile");
         system("perl -pi -e 's/DBORGANISM=/DBORGANISM=".$self->common_name."/' $conffile"); 
@@ -659,8 +706,9 @@ sub insert_organism {
     #check to see if the organism is already in the db
     my $query = "SELECT abbreviation,genus,species,common_name FROM organism WHERE common_name=?";
     my $sth   = $dbh->prepare($query);
-    $sth->execute($self->common_name) or die;
+    $sth->execute($self->common_name) or die $dbh->errstr;
     my $hash_ref = $sth->fetchrow_hashref;
+	$sth->finish;
 
     if ($$hash_ref{common_name}) {
         if ($$hash_ref{abbreviation} ne $self->abbreviation or
@@ -679,7 +727,9 @@ sub insert_organism {
     #no really need for the overhead of DBI here for on query.
     my $insert_query= "INSERT INTO organism (abbreviation,genus,species,common_name) VALUES (?,?,?,?)";
     $sth  = $dbh->prepare($insert_query);
-    $sth->execute($self->abbreviation,$self->genus,$self->species,$self->common_name) or die; 
+    $sth->execute($self->abbreviation,$self->genus,$self->species,$self->common_name) or die $dbh->errstr; 
+
+	$dbh->disconnect;
 
     return;
 }
