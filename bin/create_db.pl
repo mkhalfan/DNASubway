@@ -25,7 +25,7 @@ The name of the web-based user
 
 =item dumppath
 
-The path to bzip2 compressed PostgreSQL dump file (default:/usr/local/gmod/src/chado_dump.bz2)
+The path to PostgreSQL dump file (default: /usr/local/gmod/src/ontology_only_chado_dump.sql)
 
 =item profile
 
@@ -49,12 +49,13 @@ it under the same terms as Perl itself.
 
 =cut
 
-my ($PROFILE, $DUMPPATH, $USERNAME, $HELP);
+my ($PROFILE, $DUMPPATH, $USERNAME, $QUIET, $HELP);
 
 GetOptions(
   'username=s'         => \$USERNAME,
   'dumppath=s'         => \$DUMPPATH,
   'profile=s'          => \$PROFILE,
+  'quiet'              => \$QUIET,
   'help'               => \$HELP,
 ) or  pod2usage(-verbose => 1, -exitval => 1);
 
@@ -62,7 +63,7 @@ pod2usage(-verbose => 2, -exitval => 1) if $HELP;
 
 die unless $USERNAME;
 
-$DUMPPATH        ||= '/usr/local/gmod/src/ontology_only_chado_dump.bz2';
+$DUMPPATH        ||= '/usr/local/gmod/src/ontology_only_chado_dump.sql';
 $PROFILE         ||= 'default';
 
 my %args = (
@@ -73,6 +74,7 @@ my %args = (
 
 my $utils = DNALC::Pipeline::Chado::Utils->new(%args);
 
-$utils->create_db();
+$utils->create_db($QUIET);
+
 
 exit(0);

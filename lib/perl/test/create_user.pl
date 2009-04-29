@@ -2,7 +2,7 @@
 
 use DNALC::Pipeline::User ();
 use DNALC::Pipeline::Group ();
-use DNALC::Pipeline::Project ();
+use DNALC::Pipeline::Config ();
 use DNALC::Pipeline::Utils qw(random_string);
 use Data::Dumper;
 
@@ -38,6 +38,12 @@ if ($u->password_valid($pwd)) {
 else {
 	print STDERR  'login failed', $/;
 }
+
+#create user db/env
+my $cf = DNALC::Pipeline::Config->new;
+my $exe_path = $cf->cf('PIPELINE')->{EXE_PATH};
+print STDERR  "EXE_PATH: ", $exe_path, $/;
+
 exit 0;
 
 
