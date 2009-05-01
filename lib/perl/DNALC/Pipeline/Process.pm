@@ -60,28 +60,6 @@ use Carp;
 		}
 		# FIXME - find another place to initialize this
 		$self->{work_dir} = $dir;
-
-		if ($self->{conf}->{output_dir}) {
-			$self->{conf}->{output_dir} = $self->{work_dir} . '/' . $self->{conf}->{output_dir};
-			unless (-e $self->{conf}->{output_dir}) {
-				mkpath($self->{conf}->{output_dir});
-			}
-			#print STDERR  "out dir = ", $self->{conf}->{output_dir}, $/;
-			if (defined $self->{conf}->{option_output_dir}) {
-				my $opt_dir = delete $self->{conf}->{option_output_dir};
-				if ($self->{conf}->{option_glue}) {
-					push @{$self->{conf}->{options}}, 
-						$opt_dir . $self->{conf}->{option_glue} . 
-						$self->{conf}->{output_dir};
-				}
-				else {
-					push @{$self->{conf}->{options}}, (
-							$opt_dir, $self->{conf}->{output_dir}
-						);
-				}
-			}
-		}
-
 	}
 
 	# FIXME split this into 2 functions.. _prepare() and run()

@@ -4,6 +4,8 @@ use lib q(/usr/local/RepeatMasker);
 use CrossmatchSearchEngine ();
 
 use base q(DNALC::Pipeline::Process);
+use File::Path;
+
 use Data::Dumper;
 #use strict;
 
@@ -15,12 +17,38 @@ use Data::Dumper;
 		__PACKAGE__->SUPER::new('REPEAT_MASKER', $project_dir);
 	}
 
+	sub _setup {
+		my ($self, $project_dir) = @_;
+
+		$self->SUPER::_setup($project_dir);
+
+		# extra work
+		if ($self->{conf}->{output_dir}) {
+			my $out_dir = $self->{work_dir} . '/' . $self->{conf}->{output_dir};
+			unless (-e $out_dir) {
+				mkpath($out_dir);
+			}
+			if (defined $self->{conf}->{option_output_dir}) {
+				my $opt_dir = delete $self->{conf}->{option_output_dir};
+				if ($self->{conf}->{option_glue}) {
+					push @{$self->{conf}->{options}}, 
+						$opt_dir . $self->{conf}->{option_glue} . $out_dir;
+				}
+				else {
+					push @{$self->{conf}->{options}}, (
+							$opt_dir, $out_dir
+						);
+				}
+			}
+		}
+	}
+
+
 	sub convert2GFF3 {
 		my ($self) = @_;
 
-		#print "output_dir = ", $self->{conf}->{output_dir}, $/;
 		my $gff_file = $self->{work_dir} . '/' . $self->{conf}->{gff3_file};
-		my $dir = $self->{conf}->{output_dir};
+		my $dir = $self->{work_dir} . '/' . $self->{conf}->{output_dir};
 
 		#find file to parse
 		opendir(DIR, $dir) or die "Can't opendir $dir: $!";

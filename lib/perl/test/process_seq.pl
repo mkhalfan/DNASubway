@@ -54,6 +54,25 @@ my $input  = $WORK_DIR . '/100k/'. 'B.fasta';
 my $output = $proj->work_dir . '/' . 'out.gff3';
 my @gffs = ();
 
+my $rep_mask = DNALC::Pipeline::Process::RepeatMasker->new( $proj->work_dir  );
+if ($rep_mask) {
+	my $pretend = 0;
+	$rep_mask->run(
+			input => $proj->fasta_file,
+			pretend => $pretend,
+		);
+	if (defined $rep_mask->{exit_status} && $rep_mask->{exit_status} == 0) {
+		print "REPEAT_MASKER: success\n";
+	}
+	else {
+		print "REPEAT_MASKER: fail\n";
+	}
+	my $gff_file = $rep_mask->get_gff3_file;
+	push @gffs, $gff_file;
+	print 'RM: gff_file: ', $gff_file, $/;
+	print 'RM: duration: ', $rep_mask->{elapsed}, $/ if $rep_mask->{elapsed};
+}
+
 my $fgenesh = DNALC::Pipeline::Process::FGenesH->new( $proj->work_dir, 'Monocots' );
 if ($fgenesh) {
 	my $pretend = 0;
@@ -72,28 +91,6 @@ if ($fgenesh) {
 	push @gffs, $gff_file;
 	print 'FG: gff_file: ', $gff_file, $/;
 	print 'FG: duration: ', $fgenesh->{elapsed}, $/ if $fgenesh->{elapsed};
-}
-
-
-my $rep_mask = DNALC::Pipeline::Process::RepeatMasker->new( $proj->work_dir  );
-if ($rep_mask) {
-	my $pretend = 0;
-	$rep_mask->run(
-			input => $proj->fasta_file,
-			# FIXME - ideally we should not give this as param
-			#output_dir => $WORK_DIR . '/' . 'repeat_masker',
-			pretend => $pretend,
-		);
-	if (defined $rep_mask->{exit_status} && $rep_mask->{exit_status} == 0) {
-		print "REPEAT_MASKER: success\n";
-	}
-	else {
-		print "REPEAT_MASKER: fail\n";
-	}
-	my $gff_file = $rep_mask->get_gff3_file;
-	push @gffs, $gff_file;
-	print 'RM: gff_file: ', $gff_file, $/;
-	print 'RM: duration: ', $rep_mask->{elapsed}, $/ if $rep_mask->{elapsed};
 }
 
 my $augustus = DNALC::Pipeline::Process::Augustus->new( $proj->work_dir );
