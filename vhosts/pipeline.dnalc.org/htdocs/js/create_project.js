@@ -21,27 +21,19 @@ function step_one() {
 function select_source(el) {
 	if (el && el.value == 'upload') {
 		$('specie').selectedIndex = -1;
+		//$('organism_info').show();
 	}
 	else if (el && el.value == 'sample') {
-		$('organism_info').show();
+		//$('organism_info').hide();
 	}
 }
 
 function set_source(s) {
 	var el = $('seq_src_' + s);
-	if (el)
-		el.checked = true;
+	if (el) {
+		//el.checked = true;
+		el.click();
+	}
 }
 
-/*
-function step_one_jquery() {
-	var f = $("#forma1");
-	var has_file = $("#seq_file").val() != '';
-	var has_sample = $("#specie").selectedIndex != '';
-	if (!has_file && !has_sample) {
-		alert("You must upload file or select a sample organism!");
-		return;
-	}
-	//alert(has_file + '-' + has_sample);
-	f.submit();
-}*/
+

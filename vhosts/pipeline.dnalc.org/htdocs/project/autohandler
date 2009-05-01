@@ -6,7 +6,8 @@
 
 	#pretend the user logged in already
 	$s->{logged_in} = 1;
-	$s->{user_id} = 37;
+	$s->{user_id}  = 45;
+	$s->{username} = "H9VV";
 	$s->{last} = $now;
 	
 </%init>

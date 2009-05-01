@@ -4,19 +4,22 @@ use DNALC::Pipeline::User ();
 use DNALC::Pipeline::Group ();
 use DNALC::Pipeline::Config ();
 use DNALC::Pipeline::Utils qw(random_string);
+use DNALC::Pipeline::Chado::Utils ();
 use Data::Dumper;
 
 use strict;
 
 #-----------------------------------------------------------------------------
 my ($users_group) = DNALC::Pipeline::Group->search(group_name => 'user');
-
 #-----------------------------------------------------------------------------
 
+my $username = $ARGV[0] || random_string(4, 15);
+
+print STDERR "Trying to create user = ", $username, $/;
 my $pwd = random_string(4, 15);
 
 my $u = DNALC::Pipeline::User->create({
-			username => random_string(4, 15),
+			username => $username,
 			password => $pwd,
 			email => 'ghiban@cshl.edu',
 			name_first => 'Cornel',
@@ -40,12 +43,21 @@ else {
 	print STDERR  'login failed', $/;
 }
 
-#create user db/env
+
 my $cf = DNALC::Pipeline::Config->new;
-my $exe_path = $cf->cf('PIPELINE')->{EXE_PATH};
-print STDERR  "EXE_PATH: ", $exe_path, $/;
-system ($exe_path . '/create_db.pl',  '--quiet', '--username', $u->username) == 0
-	or die "Unambe to create DB for user: ", $u->username;
+my $pcf = $cf->cf('PIPELINE');
+#create user db/env
+
+my %args = (
+  'username'  => $u->username,
+  'dumppath'  => $pcf->{GMOD_DUMPFILE},
+  'profile'   => $pcf->{GMOD_PROFILE},
+);
+
+my $cutils = DNALC::Pipeline::Chado::Utils->new(%args);
+
+my $QUIET = 1;
+$cutils->create_db($QUIET);
 
 exit 0;
 

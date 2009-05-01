@@ -3,11 +3,11 @@ package DNALC::Pipeline::Chado::Utils;
 use strict;
 use warnings;
 
-use Bio::GMOD::Config;
-use Bio::GMOD::DB::Config;
+use Bio::GMOD::Config ();
+use Bio::GMOD::DB::Config ();
 use Cwd;
 use File::Copy;
-use File::Temp 'tempfile';
+use IO::File ();
 
 =head1 NAME
 
@@ -387,17 +387,17 @@ sub profile          {
         my $db_pass = $db_conf->password;
         my $db_host = $db_conf->host;
         my $db_port = $db_conf->port;
-        my $dbh     = $db_conf->dbh;
+		#my $dbh     = $db_conf->dbh;
 
         $self->confdir($confdir);
         $self->dbuser ($db_user);
         $self->dbpassword ($db_pass);
         $self->port   ($db_port);
         $self->host   ($db_host);
-        $self->dbh    ($dbh);
+		#$self->dbh    ($dbh);
     }
 
-    return $self->{'profile'} = $profile          if defined($profile         );
+    return $self->{'profile'} = $profile if defined($profile);
     return $self->{'profile'};
 }
 
@@ -617,18 +617,13 @@ sub confdir {
 
 =item Usage
 
-  $obj->dbh()        #get existing value
-  $obj->dbh($newval) #set new value
+  $obj->dbh()        # gets a DB connection bases on the already set profile
 
 =item Function
 
 =item Returns
 
-value of dbh (a scalar)
-
-=item Arguments
-
-new value of dbh (to set)
+value of db handler
 
 =back
 
@@ -636,11 +631,61 @@ new value of dbh (to set)
 
 sub dbh {
     my $self = shift;
-    my $dbh = shift if defined(@_);
-    return $self->{'dbh'} = $dbh if defined($dbh);
-    return $self->{'dbh'};
+	#my $dbh = shift if defined(@_);
+	#return $self->{'dbh'} = $dbh if defined($dbh);
+	return $self->{dbh} if defined $self->{dbh} && $self->{dbh}->ping;
+
+	return unless $self->profile();
+
+    my $gmod_conf = Bio::GMOD::Config->new();
+    my $db_conf = Bio::GMOD::DB::Config->new($gmod_conf, $self->profile);
+	$self->{dbh} = $db_conf->dbh;
 }
 
+sub create_conf_file {
+    my ($self, $project_id) = @_;
+
+	unless ($project_id && $project_id =~ /\d+/) {
+		warn "Project ID is missing or invalid\n";
+		return;
+	}
+
+	unless ($self->profile) {
+		warn "Profiles was not set!\n";
+		return;
+	}
+
+	my $username = $self->username;
+    my $confdir = $self->confdir;
+	unless ($confdir && -w $confdir ) {
+		warn "Config dir [$confdir] is not writable.\n\n";
+	}
+
+    my $conffile = sprintf("%s/%s_%d.conf", $confdir, $username, $project_id); 
+
+    if (-f $conffile) {
+        warn "Configuration file for this user [$username] already exists.";
+    }
+    else {
+		my $in  = IO::File->new( $confdir . '/' . $self->profile . '.conf' );
+		my $out = IO::File->new( "> $conffile" );
+		if (defined $in && $out) {
+			my $organism = $self->common_name;
+			while (my $line = <$in> ) {
+				$line =~ s/DBNAME=chado/DBNAME=$username/;
+				$line =~ s/DBORGANISM=/DBORGANISM=$organism/;
+				print $out $line;
+			}
+			undef $in;
+			undef $out;
+		}
+		else {
+			warn "Unable to create project conf file: ", $conffile , "\n";
+		}
+    }
+
+    return $conffile if (-f $conffile);
+}
 
 sub create_db {
     my ($self, $quiet) = @_;
@@ -669,34 +714,6 @@ sub create_db {
     return 1; # success
 }
 
-sub create_conf_file {
-    my $self = shift;
-
-    my $orig_dir = getcwd;
-    my $confdir = $self->confdir;
-	unless (-w $confdir ) {
-		warn "Config dir [$confdir] is not writable.\n\n";
-	}
-    chdir $confdir;
-
-    my $conffile = $self->username.".conf"; 
-
-    if (-f $conffile) {
-        warn "Configuration file for this user already exists";
-    }
-    else {
-		warn "Profile used = ", $self->profile, "\n";
-        copy($self->profile . '.conf', $conffile) 
-			or die "Copy failed: $!";
-
-        system("perl -pi -e 's/DBNAME=chado/DBNAME=".$self->username."/' $conffile");
-        system("perl -pi -e 's/DBORGANISM=/DBORGANISM=".$self->common_name."/' $conffile"); 
-    }
-   
-
-    chdir $orig_dir;
-    return; 
-}
 
 sub insert_organism {
     my $self = shift;
@@ -717,7 +734,7 @@ sub insert_organism {
             die $self->common_name." is already in the database but not with the given genus and species"; 
         }
         else {
-            warn "nothing to do--this organism is already in the database";
+            warn "nothing to do--this organism is already in the database\n";
             return;
         } 
     }

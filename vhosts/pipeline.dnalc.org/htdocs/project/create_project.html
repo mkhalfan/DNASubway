@@ -3,10 +3,12 @@
 	$seq_src => ''
 	$specie => ''
 	$organism => ''
+	$common_name => ''
 	$group => ''
 </%args>
 <%once>
-	#use DNALC::Pipeline::Config ();
+	use DNALC::Pipeline::Config ();
+	use DNALC::Pipeline::Chado::Utils ();
 	use DNALC::Pipeline::App::Utils ();
 	use DNALC::Pipeline::Project ();
 	use DNALC::Pipeline::App::WorkflowManager ();
@@ -22,18 +24,32 @@ my @err = ();
 if ($r->method eq 'POST') {
 	my $uploaded_file = '';
 
+	for ($name, $organism, $common_name) {
+		$_ =~ s/\s+/ /g;
+		$_ =~ s/^\s+//;
+		$_ =~ s/\s+$//;
+	}
+
 	unless ($name) {
 		push @err, "Project Name is missing";
 	}
 	if ($seq_src eq 'upload') {
-		push @err, "Organism is missing!" unless $organism;
-		push @err, "Group type is missing!" unless $group;
 	}
 	elsif ($seq_src eq 'sample') {
 		push @err, "Sample organism was not selected!" unless $specie;
 		# compute plant group (monocots|dicots)
 	}
-	print STDERR  "seq_src = $seq_src", $/;
+
+	push @err, "Organism name is missing or incorrectly formatted!" unless $organism && $common_name;
+
+	if($organism =~ /[^a-z0-9\s]/i || $common_name =~ /[^a-z0-9\s]/i) {
+		push @err, "Organism name may contain only letters, digits and spaces";
+	}
+	my @subnames = split /\s/, $organism;
+	unless (2 == @subnames) {
+		push @err, "Organism name should contain only two words: genus and specie";
+	}
+	#push @err, "Group type is missing!" unless $group;
 
 	unless (@err) {
 		my $st = DNALC::Pipeline::App::Utils->save_upload($r, 'seq_file');
@@ -47,13 +63,18 @@ if ($r->method eq 'POST') {
 		#return;
 	}
 
-
+	my $proj = DNALC::Pipeline::Project->search(user_id => $s->{user_id}, name => $name);
+	if ($proj) {
+		push @err, "You already have a project named [$name]";
+	}
 	# create the project 
 	unless (@err) {
-		my $proj = eval { DNALC::Pipeline::Project->create({
+		$proj = eval { DNALC::Pipeline::Project->create({
 								user_id => $s->{user_id},
 								name => $name,
-								specie => $organism,
+								organism => $organism,
+								common_name => $common_name,
+								#group => $group,
 							});
 						};
 		if ($@) {
@@ -65,31 +86,61 @@ if ($r->method eq 'POST') {
 			# create projects work directory
 			if ($proj->create_work_dir) {
 				warn "project's work_dir: ", $proj->work_dir, $/;
-				$proj->dbi_commit;
 			}
 			else {
 				warn "Failed to create work_dir for project [$proj]", $/;
 				push @err, "Failed to create work_dir for project!";
-				$proj->dbi_rollback;
 			}
 
 			# set workflow
 			my $wfm = DNALC::Pipeline::App::WorkflowManager->new( $proj );
-			print STDERR Dumper( \$wfm), $/;
+			#print STDERR Dumper( \$wfm), $/;
 
+			# the fasta file may be available not only via upload
 			my $fasta = $wfm->upload_sequence($uploaded_file);
 			print STDERR  "Uploaded fasta file = ", $fasta, $/;
 			print STDERR  "upload status = ", $wfm->get_status('upload_fasta'), $/;
+			
+			if ($fasta) {
+				# create project files
+				my $cf = DNALC::Pipeline::Config->new;
+				my $pcf = $cf->cf('PIPELINE');
 
+				my $cutils = DNALC::Pipeline::Chado::Utils->new(
+					username => $s->{username},
+					dumppath => $pcf->{GMOD_DUMPFILE},
+					profile => $pcf->{GMOD_PROFILE},
+					organism_string => join('_', @subnames). '_' . $common_name,
+				);
+				my $conffile_ok = $cutils->create_conf_file( $proj->id );
+				print STDERR "Created file = ", $conffile_ok, $/;
+				my $new_profile = sprintf("%s_%d", $s->{username}, $proj->id);
+				# read data from new file
+				$cutils->profile($new_profile);
+				$cutils->insert_organism;
+
+				# TODO : submit job to run repeat masker
+
+				# redirect user to dashboard
+				$m->comp('/_message_add', "Project created successfully!");
+				$m->redirect('./dashboard.html?pid=' . $proj->id);
+
+			}
+			
 		} #end else
 	} #end unless
 } #ned if POST
 else {
 	print STDERR  "GET", $/;
+	#for ( sort { $a cmp $b } keys %ENV) {
+	#	print STDERR  $_, " => ", $ENV{$_}, $/;
+	#}
 }
 
 
 </%init>
+user = <% $s->{user_id}%>/<% $s->{username} %><br/>
+src = <% $seq_src %><br/>
 <div id="stylized" class="myform">
 <h1>Create new Project</h1>
 % if (@err) {
@@ -99,22 +150,23 @@ else {
 %	}
 </div>
 % }
+<& /_messages &>
 <p>
 <h1>Choose the sequence source</h1>
 <form id="forma1" enctype="multipart/form-data" method="post">
 	<div>
-		1. <input type="radio" name="seq_src" id="seq_src_upload" value="upload" onclick="select_source(this)" />
+		1. <input type="radio" name="seq_src" id="seq_src_upload" value="upload" onclick="select_source(this)" <% $seq_src eq 'upload' ? 'checked="checked"' : ''%> />
 		Upload your sequence file: (max 110kB) 
 		<input class="stylized" type="file" id="seq_file" name="seq_file" 
 			onchange="set_source('upload')" onclick="set_source('upload')"/>
 	</div>
 	<div class="spacer" style="font-size:larger">or</div>
 	<div>
-		2. <input type="radio" name="seq_src" id="seq_src_sample" value="sample" onclick="select_source(this)" />
+		2. <input type="radio" name="seq_src" id="seq_src_sample" value="sample" onclick="select_source(this)" <% $seq_src eq 'sample' ? 'checked="checked"' : ''%>/>
 		Select from the samples we provide below:
 		<div>
 			<select class="stylized" id="specie" name="specie" size="2" style="width: 300px"
-				onchange="set_source('sample')">
+				onchange="set_source('sample');">
 				<option id="o1" value="arabidopsis">Arabidopsis thaliana</option>
 			</select>
 		</div>
@@ -123,12 +175,14 @@ else {
 	<label>Project Name	<span class="small">Type your project's name</span></label>
 	<input class="stylized" type="text" name="name" id="name" value="<% $name|html%>" />
 	<div id="organism_info">
-		<label>Organism <span class="small">Pick one or type your own</span></label>
-		<input class="stylized" type="text" name="organism" id="organism" value="<% $organism |html%>" />
+		<label>Organism <span class="small">Scientific name (Genus Specie)</span></label>
+		<input class="stylized" type="text" name="organism" id="organism" value="<% $organism |html%>" maxlength="128" />
+		<label><span class="small">Common name</span></label>
+		<input class="stylized" type="text" name="common_name" id="common_name" value="<% $common_name |html%>" maxlength="128" />
 		<div class="spacer"></div>
 		<label style="clear:both">Group<span class="small">Monocots or Dicots</span></label>&nbsp;&nbsp;
-		<input class="resetradio" type="radio" name="group" id="g1" value="monocots" /> Monocots
-		<input class="resetradio" type="radio" name="group" id="g2" value="dicots" /> Dicots
+		<input class="resetradio" type="radio" name="group" id="g1" value="m" /> Monocots
+		<input class="resetradio" type="radio" name="group" id="g2" value="d" /> Dicots
 		</div>
 	</div>
 <div class="spacer"></div>

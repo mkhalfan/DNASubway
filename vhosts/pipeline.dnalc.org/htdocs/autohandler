@@ -4,8 +4,7 @@
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <meta name="author" content="Dolan DNA Learning Center" />
 <meta http-equiv="Content-Language" content="en" />
-<title><& SELF:title &> Science Summer Camps 2009</title>
-%#<script type="text/javascript" src="/js/jquery-1.3.2.js"></script>
+<title><& SELF:title &> Pipeline</title>
 <script type="text/javascript" src="/js/prototype-1.6.0.3.js"></script>
 % if ($m->request_comp->attr_if_exists('js')) { 
 %	foreach my $js (@{$m->request_comp->attr('js')}) {
