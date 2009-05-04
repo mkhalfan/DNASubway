@@ -1,0 +1,60 @@
+
+<%args>
+	$pid => 0
+</%args>
+%#-------------------------------------------------
+<%once>
+	use DNALC::Pipeline::Project ();
+	use DNALC::Pipeline::App::WorkflowManager ();
+
+	my @routines = qw/trnascan augustus fgenesh/;
+</%once>
+%#-------------------------------------------------
+<%init>
+
+$m->session->{pipeline} ||= {};
+my $s = $m->session->{pipeline};
+
+my $proj = DNALC::Pipeline::Project->retrieve($pid);
+unless ($proj) {
+	$m->comp('/_message_add', 'Project not found!', 'error');
+	$m->redirect('/project/');
+}
+
+my $wfm = DNALC::Pipeline::App::WorkflowManager->new( $proj );
+my $upload_st = $wfm->get_status('upload_fasta');
+
+# TODO : set in session when you're starting to run a routine, 
+# and reset this flash after you get info about the execution of the routine
+</%init>
+%#-------------------------------------------------
+
+<div id="content">
+	<& "/_messages" &>
+<pre>
+Project id = <% $pid %>
+Project Name: <% $proj->name %>
+Fasta file: <% $proj->fasta_file %>
+Upload status: <% $upload_st->name %>
+Augustus status: <% $wfm->get_status('augustus')->name %>
+FGenesH status: <% $wfm->get_status('fgenesh')->name %>
+X status: <% $wfm->get_status('x')->name %>
+</pre>
+	<ul>
+%	for (@routines) {
+	<li><span style="font-weight:bold"><% $_ %></span>&nbsp;
+		<input type="button" id="<% $_ %>_btn" value="Run" onclick="run('<% $_ %>')"/>
+		<span class="loading" id="<% $_ %>">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+	</li>
+%	}
+
+</ul>
+
+</div>
+
+
+<%attr>
+	js => ['dashboard.js']
+</%attr>
+
+%# vim: ft=mason

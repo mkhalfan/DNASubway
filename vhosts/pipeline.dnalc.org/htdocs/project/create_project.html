@@ -33,6 +33,7 @@ if ($r->method eq 'POST') {
 	unless ($name) {
 		push @err, "Project Name is missing";
 	}
+
 	if ($seq_src eq 'upload') {
 	}
 	elsif ($seq_src eq 'sample') {
@@ -191,4 +192,9 @@ src = <% $seq_src %><br/>
 </form>
 </p>
 </div>
+
+<%attr>
+	js => ['create_project.js']
+</%attr>
+
 %# vim: ft=mason
