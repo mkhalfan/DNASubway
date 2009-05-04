@@ -47,7 +47,15 @@ sub save_upload {
 		}
 		undef $out;
 		$in->close;
-		$status = 'ok';
+
+		# check if file is text file..
+		if ( -f $path && -T $path) {
+			$status = 'ok';
+		}
+		else {
+			$status = 'fail';
+			$msg = "Uploaded doesn't appear to be a text file.";
+		}
 	}
 
 	return { status => $status, 
