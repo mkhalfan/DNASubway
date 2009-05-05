@@ -1,0 +1,52 @@
+<%args>
+	$t => ''
+	$pid => 0
+</%args>
+%#-------------------------------------------------
+<%once>
+	use DNALC::Pipeline::Project ();
+	use DNALC::Pipeline::Config ();
+	use DNALC::Pipeline::App::WorkflowManager ();
+	use DNALC::Pipeline::Utils qw(isin);
+	use Data::Dumper;
+
+	my @routines = qw/trna_scan augustus fgenesh repeat_masker/;
+</%once>
+%#-------------------------------------------------
+<%init>
+	$r->content_type('text/plain');
+
+	$m->session->{pipeline} ||= {};
+	my $s = $m->session->{pipeline};
+
+	unless ($t) {
+		print "{'status':'error', 'message': 'Task unknown.'}";
+		return;
+	}
+
+	my $proj = DNALC::Pipeline::Project->retrieve($pid);
+	unless ($proj) {
+		print "{'status':'error', 'message':'Project unknown.'}";
+		return;
+	}
+	my $wfm = DNALC::Pipeline::App::WorkflowManager->new( $proj );
+	my $routine = "run_$t";
+	my ($status, $file);
+	if ($wfm->can($routine)) {
+		print STDERR  "It can run $t", $/;
+		$status = $wfm->$routine();
+		$file = $status->{gff_file};
+		my $config = DNALC::Pipeline::Config->new->cf('PIPELINE');
+		my $web_pd = $config->{web_project_dir};
+		my $pd = $config->{project_dir};
+		$file =~ s/$pd/$web_pd/;
+		print STDERR "$t status = ", Dumper( $status ), $/;
+	}
+</%init>
+<%flags>
+	inherit => undef
+</%flags>
+% if ($status && $status->{success}) {
+{'status':'success', 'elapsed' : '<%$status->{elapsed}%>', 'file' : '<% $file %>'}	
+% }
+%# vim: ft=mason

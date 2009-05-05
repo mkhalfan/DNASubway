@@ -7,7 +7,7 @@
 	use DNALC::Pipeline::Project ();
 	use DNALC::Pipeline::App::WorkflowManager ();
 
-	my @routines = qw/trnascan augustus fgenesh/;
+	my @routines = qw/fgenesh repeat_masker trna_scan/;
 </%once>
 %#-------------------------------------------------
 <%init>
@@ -31,20 +31,27 @@ my $upload_st = $wfm->get_status('upload_fasta');
 
 <div id="content">
 	<& "/_messages" &>
+<input type="hidden" id="pid" value="<% $pid %>"/>
 <pre>
+root dir = <% $r->document_root %>
 Project id = <% $pid %>
 Project Name: <% $proj->name %>
 Fasta file: <% $proj->fasta_file %>
 Upload status: <% $upload_st->name %>
-Augustus status: <% $wfm->get_status('augustus')->name %>
+%#Augustus status: <% $wfm->get_status('augustus')->name %>
 FGenesH status: <% $wfm->get_status('fgenesh')->name %>
-X status: <% $wfm->get_status('x')->name %>
+Repeat Masker status: <% $wfm->get_status('repeat_masker')->name %>
+TRN Scan status: <% $wfm->get_status('trna_scan')->name %>
 </pre>
 	<ul>
 %	for (@routines) {
 	<li><span style="font-weight:bold"><% $_ %></span>&nbsp;
 		<input type="button" id="<% $_ %>_btn" value="Run" onclick="run('<% $_ %>')"/>
-		<span class="loading" id="<% $_ %>">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+		<span class="loading" id="<% $_ %>">
+%	if ($wfm->get_status($_)->name eq 'Done') {
+			get_gff3_file
+%	}
+		</span>
 	</li>
 %	}
 
