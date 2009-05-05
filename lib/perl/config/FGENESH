@@ -1,7 +1,9 @@
 {
 	program => '/usr/local/fgenesh/fgenesh',
+	redirect => 1, # use shell redirection => implies executing the programm under shell
 	options => [],
 	monocots_matrix => '/usr/local/fgenesh/Monocots',
 	dicots_matrix => '/usr/local/fgenesh/Dicots',
 	file_to_parse => qr/stdout\.txt$/,
+	gff3_file => 'output.gff',
 }

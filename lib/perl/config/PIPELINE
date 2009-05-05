@@ -2,6 +2,7 @@
 	EXE_PATH => '/var/www/bin',
 	GMOD_DUMPFILE => '/usr/local/gmod/src/ontology_only_chado_dump.sql',
 	GMOD_PROFILE => 'default',
+	web_project_dir => '/files/projects_files',
 	project_dir => '/var/www/vhosts/pipeline.dnalc.org/var/projects',
 	upload_dir => '/var/www/vhosts/pipeline.dnalc.org/var/projects/0000',
 	upload_mime_types => ['text/plain', 'application/octet-stream'],

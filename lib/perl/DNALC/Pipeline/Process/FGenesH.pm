@@ -29,6 +29,9 @@ use strict;
 		my ($self) = @_;
 
 		my $dir = $self->{work_dir};
+		my $gff_file = $dir . '/' . $self->{conf}->{gff3_file};
+		return $gff_file if (-e $gff_file);
+
 
 		#find file to parse
 		opendir(DIR, $dir) or die "Can't opendir $dir: $!";
@@ -45,7 +48,6 @@ use strict;
 
 		my $file_to_parse = "$dir/$f[0]";
 
-		my $gff_file = "$dir/output.gff";
 		my $out = IO::File->new("> $gff_file") 
 			or die "Can't write to gff file [$gff_file]: $!\n";
 

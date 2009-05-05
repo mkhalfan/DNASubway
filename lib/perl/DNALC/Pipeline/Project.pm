@@ -57,11 +57,19 @@ sub fasta_file {
 	return $ff if -e $ff;
 }
 
-#__PACKAGE__->has_a(
-#    created  => 'Time::Piece',
-#    inflate => sub { Time::Piece->strptime(shift, "%Y-%m-%d %H:%M:%S") },
-#    deflate => sub { shift()->strftime("%Y-%m-%d %H:%M:%S") },
-#);
+#-------------------------------
+# TODO: Move into ProjectManager.pm
 
+sub get_gff3_file {
+	my ($self, $routine) = @_;
+	
+	$routine = uc $routine;
+	my $dir = $self->work_dir . '/' . $routine;
+	return unless -d $dir;
+
+	my $config = DNALC::Pipeline::Config->new;
+	my $file = $dir . '/' . $config->cf($routine)->{gff3_file};
+	return $file if -f $file;
+}
 
 1;

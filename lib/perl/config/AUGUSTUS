@@ -7,4 +7,5 @@
 			],
 	output_file => '--outfile',
 	option_glue => '=',
+	gff3_file	=> 'augustus.gff3.fixed',
 }

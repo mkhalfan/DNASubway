@@ -167,9 +167,13 @@ use Data::Dumper;
 	sub get_gff3_file {
 		my ($self) = @_;
 
+		my $gff_file = $self->{work_dir} . '/' . $self->{conf}->{gff3_file};
+		return $gff_file if (-e $gff_file);
+
+		print STDERR  "creating the GFF file..", $/;
 		$self->convert2GFF3;
 
-		my $gff_file = $self->{work_dir} . '/' . $self->{conf}->{gff3_file};
+		$gff_file = $self->{work_dir} . '/' . $self->{conf}->{gff3_file};
 		return $gff_file if (-e $gff_file);
 	}
 }

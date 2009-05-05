@@ -32,15 +32,6 @@ use Carp;
 		unless ($project) {
 			return;
 		}
-		#init_status();
-		#
-		#my $wf = DNALC::Pipeline::Workflow->search(
-		#		project_id => $project,
-		#		user_id	=> $user_id,
-		#	);
-		#unless ($wf) {
-		#	init_workflow();
-		#}
 
 		$self->{project} = $project;
 
@@ -224,8 +215,9 @@ use Carp;
 				print STDERR "AUGUSTUS: fail\n";
 				$self->set_status('augustus', 'Error', $augustus->{elapsed});
 			}
-			print 'AUGUSTUS: duration: ', $augustus->{elapsed}, $/;
+			print STDERR 'AUGUSTUS: duration: ', $augustus->{elapsed}, $/;
 		}
+		return $status;
 	}
 	#-------------------------------------------------------------------------
 
@@ -258,6 +250,7 @@ use Carp;
 			}
 			print STDERR 'TS: duration: ', $trna_scan->{elapsed}, $/;
 		}
+		return $status;
 	}
 	#-------------------------------------------------------------------------
 	sub run_fgenesh {
@@ -288,8 +281,9 @@ use Carp;
 				print STDERR "FGENESH: fail\n";
 				$self->set_status('fgenesh', 'Error', $fgenesh->{elapsed});
 			}
-			print 'FGENESH: duration: ', $fgenesh->{elapsed}, $/;
+			print STDERR 'FGENESH: duration: ', $fgenesh->{elapsed}, $/;
 		}
+		return $status;
 	}
 }
 

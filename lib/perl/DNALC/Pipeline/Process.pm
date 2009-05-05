@@ -4,6 +4,7 @@ use strict;
 use DNALC::Pipeline::Config ();
 use File::Path;
 use Time::HiRes qw/gettimeofday tv_interval/;
+use IPC::Run3;
 use Data::Dumper;
 
 use Carp;
@@ -44,11 +45,21 @@ use Carp;
 		my ($self, $project_dir) = @_;
 
 		my $dir = $project_dir . '/' . $self->{type};
-		print "work dir = ", $dir, $/;
+		print STDERR "work dir = ", $dir, $/;
 
+		# TODO : move these into a future ProjectManager module
 		if (-e $dir) {
-			# should we remove the folder?
-			warn "Must RM working folder? ", $dir, $/;
+			my @old_files = <$dir/*>;
+			foreach my $of (@old_files) {
+				if (-f $of) {
+					unlink $of;
+				} elsif (-d $of) {
+					for (<$of/*>) {
+						unlink;
+					}
+					rmdir $of;
+				}
+			}
 		}
 
 		unless (-e $dir) {
@@ -71,7 +82,6 @@ use Carp;
 		my $debug = $params{debug} ? delete $params{debug} : $pretend;
 
 
-		print STDERR Dumper( \%params ), $/;
 		unless ($input_file) {
 			print STDERR 'Input file is missing...', $/;
 			return -1;
@@ -106,25 +116,32 @@ use Carp;
 			$stdout_file = $self->{work_dir} . '/' . 'stdout.txt';
 			$stderr_file = $self->{work_dir} . '/' . 'stderr.txt';
 
-			open OLDOUT,'>&', \*STDOUT or die "Can't dup STDOUT: $!";
-			open OLDERR, '>&', \*STDERR or die "Can't dup STDERR: $!";
-			open STDOUT, '>', $stdout_file 
-						or die "Can't dup STDOUT to $self->{work_dir}: $!";
-			open STDERR, '>', $stderr_file 
-						or die "Can't dup STDERR to $self->{work_dir}: $!";
-
 			# get the time it too this process to run
 			my $t0 = [gettimeofday];
+			if ($self->{conf}->{redirect}) {
+				my $cmd = join " ", @opts;
+				print STDERR  "CMD = ", $cmd, $/;
 
-			system(@opts);
+				system($cmd . ' > ' . $stdout_file);
+				$self->{exit_status} = $?;
+			}
+			else {
+				open OLDOUT,'>&', \*STDOUT or die "Can't dup STDOUT: $!";
+				open OLDERR, '>&', \*STDERR or die "Can't dup STDERR: $!";
+				open STDOUT, '>', $stdout_file 
+							or die "Can't dup STDOUT to $self->{work_dir}: $!";
+				open STDERR, '>', $stderr_file 
+							or die "Can't dup STDERR to $self->{work_dir}: $!";
 
-			$self->{exit_status} = $?;
+				system(@opts);
+				$self->{exit_status} = $?;
+
+				close STDOUT;
+				close STDERR;
+				open STDOUT, '>&', \*OLDOUT;
+				open STDERR, '>&', \*OLDERR;
+			}
 			$self->{elapsed} = tv_interval($t0, [gettimeofday]);
-
-			close STDOUT;
-			close STDERR;
-			open STDOUT, '>&', \*OLDOUT;
-			open STDERR, '>&', \*OLDERR;
 
 			return $self->{exit_status};
 		}

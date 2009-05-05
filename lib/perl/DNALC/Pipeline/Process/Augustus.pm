@@ -25,7 +25,8 @@ use IO::File ();
 		}
 
 		my $gff_file = "$dir/$f[0]";
-		my $gff_file2 = "$dir/augustus.gff3.fixed";
+		#my $gff_file2 = "$dir/augustus.gff3.fixed";
+		my $gff_file2 = $dir . '/' . $self->{conf}->{gff3_file};
 		#parse file
 
 		my $in  = IO::File->new($gff_file) or die "Can't open gff3 file: $!\n";
