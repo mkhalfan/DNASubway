@@ -29,13 +29,14 @@ use Data::Dumper;
 				mkpath($out_dir);
 			}
 			if (defined $self->{conf}->{option_output_dir}) {
+				#my $opt_dir = delete $self->{conf}->{option_output_dir};
 				my $opt_dir = delete $self->{conf}->{option_output_dir};
 				if ($self->{conf}->{option_glue}) {
-					push @{$self->{conf}->{options}}, 
+					push @{$self->{work_options}}, 
 						$opt_dir . $self->{conf}->{option_glue} . $out_dir;
 				}
 				else {
-					push @{$self->{conf}->{options}}, (
+					push @{$self->{work_options}}, (
 							$opt_dir, $out_dir
 						);
 				}

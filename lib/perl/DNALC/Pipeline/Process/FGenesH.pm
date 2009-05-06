@@ -16,10 +16,10 @@ use strict;
 		$group ||= 'Monocots';
 		$self->{group} = $group;
 		if ($group eq 'Monocots') {
-			unshift @{ $self->{conf}->{options} }, $self->{conf}->{monocots_matrix};
+			unshift @{ $self->{work_options} }, $self->{conf}->{monocots_matrix};
 		}
 		elsif ($group eq 'Dicots') {
-			unshift @{ $self->{conf}->{options} }, $self->{conf}->{dicots_matrix};
+			unshift @{ $self->{work_options} }, $self->{conf}->{dicots_matrix};
 		}
 
 		return $self;

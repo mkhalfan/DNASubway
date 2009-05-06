@@ -69,6 +69,7 @@ use Carp;
 				print STDERR "Couldn't create $dir: $@\n";
 			}
 		}
+		$self->{work_options} = [ @{ $self->{conf}->{options} } ];
 		# FIXME - find another place to initialize this
 		$self->{work_dir} = $dir;
 	}
@@ -88,8 +89,8 @@ use Carp;
 		}
 
 		my @opts = ($self->{conf}->{program});
-		if ($self->{conf}->{options}) {
-			push @opts, @{$self->{conf}->{options}};
+		if ($self->{work_options}) {
+			push @opts, @{$self->{work_options}};
 		}
 
 		# take extra params and check if we find them in the config file
