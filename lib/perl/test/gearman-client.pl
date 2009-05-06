@@ -6,13 +6,31 @@ use Data::Dumper;
 use Storable qw/thaw/;
 
 my $client = Gearman::Client->new;
-$client->job_servers('127.0.0.1');
+my $sx = $client->job_servers('127.0.0.1');
 
-my $h = $client->dispatch_background( augustus => '/var/www/vhosts/pipeline.dnalc.org/var/projects/0035' );
+#my $h = $client->dispatch_background( augustus => '/var/www/vhosts/pipeline.dnalc.org/var/projects/0035' );
+my $h = $client->dispatch_background( fgenesh => '/var/www/vhosts/pipeline.dnalc.org/var/projects/0035' );
+
+print STDERR  "h = ", $h, $/;
+print STDERR  '--------------------------', $/;
+
+__END__
+
+my $x = eval {
+	$client->do_task( 
+		repeat_masker => '/var/www/vhosts/pipeline.dnalc.org/var/projects/0035'
+	);
+};
+if ($@) {
+	print STDERR  "Errors: $!", $/;
+}
+else {
+	print STDERR  Dumper(thaw $$x), $/;
+}
 
 print STDERR  '--------------------------', $/;
 
-my $x = $client->do_task( fgenesh => '/var/www/vhosts/pipeline.dnalc.org/var/projects/0035');
+$x = $client->do_task( fgenesh => '/var/www/vhosts/pipeline.dnalc.org/var/projects/0035');
 print STDERR  Dumper(thaw $$x), $/;
 
 print STDERR  '--------------------------', $/;

@@ -71,32 +71,36 @@ sub run_augustus {
 }
 #-------------------------------------------------------------------------
 
-
-
 sub run_repeatmasker {
-   my $gearman = shift;
-   my $WD = $gearman->arg;
+	my $gearman = shift;
+	my $wd = $gearman->arg;
 
-   my $rep_mask = DNALC::Pipeline::Process::RepeatMasker->new( $WD  );
-   if ($rep_mask) {
-	$rep_mask->run(
-			input => $WD . '/augustus.fa',
-			debug => 1,
-		);
-	print STDERR Dumper( $rep_mask ), $/;
-	if (defined $rep_mask->{exit_status} && $rep_mask->{exit_status} == 0) {
-		print "REPEAT_MASKER: success\n";
+	return unless -d $wd;
 
-		my $gff_file = $rep_mask->get_gff3_file;
-		print 'RM: gff_file: ', $gff_file, $/;
-		print 'RM: duration: ', $rep_mask->{elapsed}, $/ if $rep_mask->{elapsed};
-		return 1;
+	my $status = { success => 0 };
+
+	my $rep_mask = DNALC::Pipeline::Process::RepeatMasker->new( $wd  );
+	if ($rep_mask) {
+		my $pretend = 0;
+		$rep_mask->run(
+				input => $wd . '/fasta.fa',
+				pretend => $pretend,
+				debug => 1,
+			);
+		if (defined $rep_mask->{exit_status} && $rep_mask->{exit_status} == 0) {
+			print STDERR "REPEAT_MASKER: success\n";
+			$status->{success} = 1;
+			$status->{elapsed} = $rep_mask->{elapsed};
+			$status->{gff_file}= $rep_mask->get_gff3_file;
+			#$self->set_status('repeat_masker', 'Done', $rep_mask->{elapsed});
+		}
+		else {
+			print STDERR "REPEAT_MASKER: fail\n";
+			#$self->set_status('repeat_masker', 'Error', $rep_mask->{elapsed});
+		}
+		print STDERR 'RM: duration: ', $rep_mask->{elapsed}, $/ if $rep_mask->{elapsed};
 	}
-	else {
-		print "REPEAT_MASKER: fail\n";
-		return 0;
-	}
-   }
+	return freeze $status;
 }
 
 sub run_trnascan {
@@ -139,6 +143,7 @@ sub run_fgenesh {
 		}
 		print STDERR 'FGENESH: duration: ', $fgenesh->{elapsed}, $/;
 	}
+	#print STDERR Dumper( $status ), $/;
 	return freeze $status;
 }
 

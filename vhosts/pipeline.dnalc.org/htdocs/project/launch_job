@@ -10,6 +10,8 @@
 	use DNALC::Pipeline::Utils qw(isin);
 	use Data::Dumper;
 
+	use Gearman::Client ();
+
 	my @routines = qw/trna_scan augustus fgenesh repeat_masker/;
 </%once>
 %#-------------------------------------------------
@@ -29,25 +31,17 @@
 		print "{'status':'error', 'message':'Project unknown.'}";
 		return;
 	}
-	my $wfm = DNALC::Pipeline::App::WorkflowManager->new( $proj );
-	my $routine = "run_$t";
-	my ($status, $file);
-	if ($wfm->can($routine)) {
-		print STDERR  "It can run $t", $/;
-		$status = $wfm->$routine();
-		#$file = $status->{gff_file};
-		#my $config = DNALC::Pipeline::Config->new->cf('PIPELINE');
-		#my $web_pd = $config->{web_project_dir};
-		#my $pd = $config->{project_dir};
-		#$file =~ s/$pd/$web_pd/;
-		print STDERR "$t status = ", Dumper( $status ), $/;
-	}
+	my $client = Gearman::Client->new;
+	$client->job_servers('127.0.0.1');
+	my $h = $client->dispatch_background( $t => $proj->work_dir);
+	print STDERR  "Launched [$t], h = ", $h, $/;
 </%init>
 <%flags>
 	inherit => undef
 </%flags>
-% if ($status && $status->{success}) {
-{'status':'success', 'elapsed' : '<%$status->{elapsed}%>',\
-'file' : '<& './.comp/filepath_to_web', file => $status->{gff_file} &>'}	
+% if ($h) {
+{'status':'success', 'h':'<% $h %>'}
+% } else {
+{'status':'error', 'message':'Unable to submit job request.'}
 % }
 %# vim: ft=mason

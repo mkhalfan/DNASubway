@@ -43,13 +43,17 @@ FGenesH status: <% $wfm->get_status('fgenesh')->name %>
 Repeat Masker status: <% $wfm->get_status('repeat_masker')->name %>
 TRN Scan status: <% $wfm->get_status('trna_scan')->name %>
 </pre>
+<div id="debug"></div>
 	<ul>
 %	for (@routines) {
 	<li><span style="font-weight:bold"><% $_ %></span>&nbsp;
 		<input type="button" id="<% $_ %>_btn" value="Run" onclick="run('<% $_ %>')"/>
 		<span class="loading" id="<% $_ %>">
 %	if ($wfm->get_status($_)->name eq 'Done') {
-			get_gff3_file
+%		my $path = $m->comp('./.comp/filepath_to_web', file => $proj->get_gff3_file($_) || '', just_return => 1);
+%		if ($path) {
+			<a target="_blank" href="<% $path %>">View output</a>
+%		}
 %	}
 		</span>
 	</li>
@@ -61,7 +65,7 @@ TRN Scan status: <% $wfm->get_status('trna_scan')->name %>
 
 
 <%attr>
-	js => ['dashboard.js']
+	js => ['dashboard2.js']
 </%attr>
 
 %# vim: ft=mason

@@ -28,10 +28,8 @@ use Data::Dumper;
 
 		my $file_to_parse = "$dir/$f[0]";
 
-		#print "file=", $file_to_parse, $/;
-		#print "outfile=", $gff_file, $/;
-
-		return if -z $file_to_parse;
+		# it's ok to create an empty file?
+		#return if -z $file_to_parse;
 
 		my $in  = IO::File->new($file_to_parse) or die "Can't open tRNA_SCAN file: $!\n";
 		my $out = IO::File->new("> $gff_file") 
