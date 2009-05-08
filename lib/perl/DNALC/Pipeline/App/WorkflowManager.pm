@@ -18,7 +18,8 @@ use Carp;
 	my %status_map = (
 			"Not processed" => 1,
 			"Done"          => 2,
-			"Error"         => 3
+			"Error"         => 3,
+			"Running"       => 4
 		);
 
 	sub new {
@@ -170,6 +171,7 @@ use Carp;
 			$rep_mask->run(
 					input => $proj->fasta_file,
 					pretend => $pretend,
+					debug => 1,
 				);
 			if (defined $rep_mask->{exit_status} && $rep_mask->{exit_status} == 0) {
 				print STDERR "REPEAT_MASKER: success\n";

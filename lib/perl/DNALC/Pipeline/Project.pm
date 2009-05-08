@@ -69,6 +69,7 @@ sub get_gff3_file {
 
 	my $config = DNALC::Pipeline::Config->new;
 	my $file = $dir . '/' . $config->cf($routine)->{gff3_file};
+	print STDERR  "GFF3 for {$routine} = ", $file, $/;
 	return $file if -f $file;
 }
 

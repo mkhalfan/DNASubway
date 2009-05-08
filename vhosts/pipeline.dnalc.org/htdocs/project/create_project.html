@@ -101,8 +101,9 @@ if ($r->method eq 'POST') {
 			my $fasta = $wfm->upload_sequence($uploaded_file);
 			print STDERR  "Uploaded fasta file = ", $fasta, $/;
 			print STDERR  "upload status = ", $wfm->get_status('upload_fasta'), $/;
-			
-			if ($fasta) {
+
+			print STDERR  'skipping CHADO creation...', $/;
+			if (0 && $fasta) {
 				# create project files
 				my $cf = DNALC::Pipeline::Config->new;
 				my $pcf = $cf->cf('PIPELINE');
@@ -120,13 +121,11 @@ if ($r->method eq 'POST') {
 				$cutils->profile($new_profile);
 				$cutils->insert_organism;
 
-				# TODO : submit job to run repeat masker
-
-				# redirect user to dashboard
-				$m->comp('/_message_add', "Project created successfully!");
-				$m->redirect('./dashboard.html?pid=' . $proj->id);
-
 			}
+
+			# redirect user to dashboard
+			$m->comp('/_message_add', "Project created successfully!");
+			$m->redirect('./dashboard.html?pid=' . $proj->id);
 			
 		} #end else
 	} #end unless

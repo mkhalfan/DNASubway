@@ -1,0 +1,59 @@
+% if ($status) {
+{'status':'success','running' : <% $status->running %>, 'known' : '<% $status->known %>', 'output':'<& './.comp/filepath_to_web', file => $output &>'}
+% } else {
+{'status':'error','message':'???'}
+% }
+%#-------------------------------------------------
+<%args>
+	$t => ''
+	$h => ''
+	$pid => 0
+</%args>
+%#-------------------------------------------------
+<%once>
+	use Gearman::Client ();
+	use DNALC::Pipeline::Project ();
+	use Data::Dumper;
+
+	my @routines = qw/trna_scan augustus fgenesh repeat_masker/;
+</%once>
+%#-------------------------------------------------
+<%init>
+	$r->content_type('text/plain');
+	$r->no_cache(1);
+
+	$m->session->{pipeline} ||= {};
+	my $s = $m->session->{pipeline};
+
+	#print STDERR  "H = ", $h, $/;
+	#print STDERR  "pid = ", $pid, $/;
+
+	unless ($t) {
+		print "{'status':'error', 'message': 'Task unknown.'}";
+		return;
+	}
+
+	unless ($h) {
+		print "{'status':'error', 'message': 'Unknown error.'}";
+		return;
+	}
+	my $proj = DNALC::Pipeline::Project->retrieve($pid);
+	unless ($proj) {
+		print "{'status':'error', 'message':'Project unknown.'}";
+		return;
+	}
+
+	my $client = Gearman::Client->new;
+	$client->job_servers('127.0.0.1');
+	my $status = $client->get_status($h);
+	#print STDERR 'have stat', $/ if $status;
+	#print STDERR 'xxx: ', ($status && !$status->running), $/ if $status;
+	my $output = '';
+	if ($status && !$status->running && !$status->known) {
+		$output = $proj->get_gff3_file($t);
+	}
+</%init>
+%#-------------------------------------------------
+<%flags>
+	inherit => undef
+</%flags>

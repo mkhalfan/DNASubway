@@ -7,7 +7,7 @@ use base q(DNALC::Pipeline::Process);
 use File::Path;
 
 use Data::Dumper;
-#use strict;
+use strict;
 
 {
 
@@ -29,8 +29,7 @@ use Data::Dumper;
 				mkpath($out_dir);
 			}
 			if (defined $self->{conf}->{option_output_dir}) {
-				#my $opt_dir = delete $self->{conf}->{option_output_dir};
-				my $opt_dir = delete $self->{conf}->{option_output_dir};
+				my $opt_dir = $self->{conf}->{option_output_dir};
 				if ($self->{conf}->{option_glue}) {
 					push @{$self->{work_options}}, 
 						$opt_dir . $self->{conf}->{option_glue} . $out_dir;
@@ -120,50 +119,6 @@ use Data::Dumper;
 			undef $out;
 	}
 
-	sub convert2GFF3_save {
-		my ($self) = @_;
-
-		#print "output_dir = ", $self->{conf}->{output_dir}, $/;
-		my $gff_file = $self->{work_dir} . '/' . $self->{conf}->{gff3_file};
-		my $dir = $self->{conf}->{output_dir};
-
-		#find file to parse
-		opendir(DIR, $dir) or die "Can't opendir $dir: $!";
-		my @f = grep { /$self->{conf}->{file_to_parse}/ && -f "$dir/$_" } readdir(DIR);
-		unless (@f == 1) {
-			print STDERR "files: ", Dumper( \@f ), $/;
-			print STDERR "RM gff2 file is missing.", $/;
-			return;
-		}
-		
-		my $file_to_parse = "$dir/$f[0]";
-		print "file=", $file_to_parse, $/;
-		my $counter = 1;
-
-		my $in  = IO::File->new($file_to_parse) or die "Can't open gff2 file: $!\n";
-		my $out = IO::File->new("> $gff_file") 
-			or die "Can't write to gff file [$gff_file]: $!\n";
-		print $out "##gff-version 3\n";
-		while (<$in>) {
-			next if /^#/;
-			next if /^$/;
-			my @d = split /\s+/;
-			next if @d < 8;
-			my ($seq_name, $start, $end, $score, $strand, $name) = @d[0, 3 .. 7];
-			#my $strand = substr $d[6], 0, 1;
-			$strand = substr $strand, 0, 1;
-			my $num = sprintf("%04d", $counter);
-			if ($name =~ /"Motif:(.*?)"/) {
-				$name = $1;
-			}
-			print $out "$seq_name\tRepeatMasker\trepeat_region\t$start\t$end\t$score\t$strand\t.\tID=RepeatMasker$num;Name=RepeatMasker-$name-$num\n";
-
-			$counter++;
-		}
-
-		undef $in;
-		undef $out;
-	}
 
 	sub get_gff3_file {
 		my ($self) = @_;
@@ -171,7 +126,6 @@ use Data::Dumper;
 		my $gff_file = $self->{work_dir} . '/' . $self->{conf}->{gff3_file};
 		return $gff_file if (-e $gff_file);
 
-		print STDERR  "creating the GFF file..", $/;
 		$self->convert2GFF3;
 
 		$gff_file = $self->{work_dir} . '/' . $self->{conf}->{gff3_file};

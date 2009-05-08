@@ -4,10 +4,16 @@
 </%args>
 %#-------------------------------------------------
 <%once>
+	use Data::Dumper; 
 	use DNALC::Pipeline::Project ();
 	use DNALC::Pipeline::App::WorkflowManager ();
 
-	my @routines = qw/fgenesh repeat_masker trna_scan/;
+	my @routines = (
+			{ name => 'augustus', label => 'Augustus', delay => 15},
+			{ name => 'fgenesh', 'label' => 'FgenesH'},
+			{ name => 'repeat_masker', label => 'Repeat Masker', delay => 10},
+			{ name => 'trna_scan', label => 'tRNA Scan'},
+		);
 </%once>
 %#-------------------------------------------------
 <%init>
@@ -38,19 +44,19 @@ Project id = <% $pid %>
 Project Name: <% $proj->name %>
 Fasta file: <% $proj->fasta_file %>
 Upload status: <% $upload_st->name %>
-%#Augustus status: <% $wfm->get_status('augustus')->name %>
+Augustus status: <% $wfm->get_status('augustus')->name %>
 FGenesH status: <% $wfm->get_status('fgenesh')->name %>
 Repeat Masker status: <% $wfm->get_status('repeat_masker')->name %>
 TRN Scan status: <% $wfm->get_status('trna_scan')->name %>
 </pre>
-<div id="debug"></div>
-	<ul>
-%	for (@routines) {
-	<li><span style="font-weight:bold"><% $_ %></span>&nbsp;
-		<input type="button" id="<% $_ %>_btn" value="Run" onclick="run('<% $_ %>')"/>
-		<span class="loading" id="<% $_ %>">
-%	if ($wfm->get_status($_)->name eq 'Done') {
-%		my $path = $m->comp('./.comp/filepath_to_web', file => $proj->get_gff3_file($_) || '', just_return => 1);
+<ul>
+%	for my $rt (@routines) {
+%		my $rname = $rt->{name};
+	<li><span style="font-weight:bold"><% $rt->{label} %></span>&nbsp;
+		<input type="button" id="<% $rname %>_btn" value="Run" onclick="run('<% $rname %>')"/>
+		<span class="loading" id="<% $rname %>" delay="<% $rt->{delay} || 3 %>">
+%	if ($wfm->get_status($rname)->name eq 'Done') {
+%		my $path = $m->comp('./.comp/filepath_to_web', file => $proj->get_gff3_file($rname) || '', just_return => 1);
 %		if ($path) {
 			<a target="_blank" href="<% $path %>">View output</a>
 %		}
@@ -60,6 +66,7 @@ TRN Scan status: <% $wfm->get_status('trna_scan')->name %>
 %	}
 
 </ul>
+<div id="debug"></div>
 
 </div>
 

@@ -1,4 +1,4 @@
-#/usr/lib/perl -w
+#!/usr/lib/perl -w
 
 use strict;
 use Gearman::Client ();
@@ -9,18 +9,15 @@ my $client = Gearman::Client->new;
 my $sx = $client->job_servers('127.0.0.1');
 
 #my $h = $client->dispatch_background( augustus => '/var/www/vhosts/pipeline.dnalc.org/var/projects/0035' );
-my $h = $client->dispatch_background( fgenesh => '/var/www/vhosts/pipeline.dnalc.org/var/projects/0035' );
+#my $h = $client->dispatch_background( trna_scan => 59 );
+#print STDERR  "h = ", $h, $/;
+#print STDERR  '--------------------------', $/;
 
-print STDERR  "h = ", $h, $/;
-print STDERR  '--------------------------', $/;
 
-__END__
-
-my $x = eval {
-	$client->do_task( 
-		repeat_masker => '/var/www/vhosts/pipeline.dnalc.org/var/projects/0035'
-	);
-};
+my $x = $client->do_task( tran_scan => 59 );
+#my $x = eval {
+#	$client->do_task( tran_scan => 59 );
+#};
 if ($@) {
 	print STDERR  "Errors: $!", $/;
 }
@@ -30,6 +27,7 @@ else {
 
 print STDERR  '--------------------------', $/;
 
+__END__
 $x = $client->do_task( fgenesh => '/var/www/vhosts/pipeline.dnalc.org/var/projects/0035');
 print STDERR  Dumper(thaw $$x), $/;
 
