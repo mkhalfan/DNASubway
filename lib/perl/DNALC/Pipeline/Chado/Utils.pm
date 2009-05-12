@@ -6,8 +6,9 @@ use warnings;
 use Bio::GMOD::Config ();
 use Bio::GMOD::DB::Config ();
 use Cwd;
-use File::Copy;
+use File::Path;
 use IO::File ();
+use Data::Dumper;
 
 =head1 NAME
 
@@ -115,6 +116,8 @@ new value of gbrowse_confdir  (to set)
 sub gbrowse_confdir  {
     my $self = shift;
     my $gbrowse_confdir  = shift if defined(@_);
+	$gbrowse_confdir = undef if defined ($gbrowse_confdir) && !-d $gbrowse_confdir;
+
     return $self->{'gbrowse_confdir'} = $gbrowse_confdir  if defined($gbrowse_confdir );
     return $self->{'gbrowse_confdir'};
 }
@@ -773,24 +776,63 @@ sub load_database {
 }
 
 sub create_gbrowse_conf {
-    my $self = shift;
+    my ($self, $project_id, $base_db_dir) = @_;
+	print STDERR Dumper( $self ), $/;
  
-    my $orig_dir = getcwd;
+	unless ($project_id && $project_id =~ /\d+/) {
+		warn "Project ID is missing or invalid\n";
+		return;
+	}
 
-    chdir $self->gbrowse_confdir;
-   
-    my $user     = $self->username; 
+    my $username = $self->username; 
     my $organism = $self->common_name;
-    my $conffile = $user."_$organism.conf";
-    return if -f $conffile;
+    my $confdir  = $self->gbrowse_confdir;
 
-    copy($self->gbrowse_template, $conffile);
+	if (defined $base_db_dir) {
+		my $gbrowse_db_dir = $base_db_dir . '/' . $username . '/' . $project_id;
+		unless (-d $gbrowse_db_dir) {
+			print STDERR "Creating gBrowse DB dir: ", $gbrowse_db_dir, $/;
+			eval { mkpath($gbrowse_db_dir); };
+			if ($@) {
+				print STDERR  "Unable to create gbrowse db dir: $@", $/;
+			}
+		}
+		else {
+			print STDERR  "BBrowse DB dir already exists: ", $gbrowse_db_dir, $/;;
+		}
+	}
 
-    system("perl -pi -e 's/USER/$user/' $conffile"); 
-    system("perl -pi -e 's/ORGANISM/$organism/' $conffile");
+	unless ($confdir && -w $confdir ) {
+		warn "GBrowse config dir [$confdir] is not writable.\n\n";
+		return;
+	}
 
-    chdir $orig_dir;
-    return;
+    my $conffile = sprintf("%s/%s_%d.conf", $confdir, $username, $project_id); 
+	#return if -f $conffile;
+	print STDERR  "Config dir = ", $confdir, $/;
+	print STDERR  "Config file = ", $conffile, $/;
+	if (-f $conffile) {
+        warn "Gbrowse configuration file for this user [$username].[pid=$project_id] already exists.";
+		return $conffile;
+	}
+	my $in  = IO::File->new( $confdir . '/' . $self->gbrowse_template );
+	my $out = IO::File->new( "> $conffile" );
+	if (defined $in && $out) {
+		my $organism = $self->common_name;
+		while (my $line = <$in> ) {
+			$line =~ s/__USER__/$username/;
+			$line =~ s/__ORGANISM__/$organism/;
+			$line =~ s/__PID__/$project_id/;
+			print $out $line;
+		}
+		undef $in;
+		undef $out;
+	}
+	else {
+		warn "Unable to create gbrowse conf file: ", $conffile , "\n";
+	}
+   
+    return $conffile if (-f $conffile);
 }
 
 sub load_fasta {

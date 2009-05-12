@@ -69,8 +69,23 @@ sub get_gff3_file {
 
 	my $config = DNALC::Pipeline::Config->new;
 	my $file = $dir . '/' . $config->cf($routine)->{gff3_file};
-	print STDERR  "GFF3 for {$routine} = ", $file, $/;
+	#print STDERR  "GFF3 for {$routine} = ", $file, $/;
 	return $file if -f $file;
+}
+
+sub get_available_gff3_files {
+	my ($self) = @_;
+
+	my @files = ();
+	my $config = DNALC::Pipeline::Config->new;
+	my $routines = $config->cf('PIPELINE')->{enabled_routines} || [];
+
+	for my $routine (@$routines) {
+		my $f = $self->get_gff3_file($routine);
+		#print STDERR  $routine, "->", $f, $/;
+		push @files, $f if defined ($f) &&  -f $f;
+	}
+	return \@files;
 }
 
 1;

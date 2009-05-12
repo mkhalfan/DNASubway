@@ -99,11 +99,10 @@ if ($r->method eq 'POST') {
 
 			# the fasta file may be available not only via upload
 			my $fasta = $wfm->upload_sequence($uploaded_file);
-			print STDERR  "Uploaded fasta file = ", $fasta, $/;
-			print STDERR  "upload status = ", $wfm->get_status('upload_fasta'), $/;
+			#print STDERR  "Uploaded fasta file = ", $fasta, $/;
+			#print STDERR  "upload status = ", $wfm->get_status('upload_fasta'), $/;
 
-			print STDERR  'skipping CHADO creation...', $/;
-			if (0 && $fasta) {
+			if ($fasta) {
 				# create project files
 				my $cf = DNALC::Pipeline::Config->new;
 				my $pcf = $cf->cf('PIPELINE');
@@ -113,13 +112,19 @@ if ($r->method eq 'POST') {
 					dumppath => $pcf->{GMOD_DUMPFILE},
 					profile => $pcf->{GMOD_PROFILE},
 					organism_string => join('_', @subnames). '_' . $common_name,
+					gbrowse_template => $pcf->{GBROWSE_TEMPLATE},
+					gbrowse_confdir  => $pcf->{GBROWSE_CONF_DIR},
 				);
-				my $conffile_ok = $cutils->create_conf_file( $proj->id );
-				print STDERR "Created file = ", $conffile_ok, $/;
-				my $new_profile = sprintf("%s_%d", $s->{username}, $proj->id);
-				# read data from new file
-				$cutils->profile($new_profile);
-				$cutils->insert_organism;
+				if (0) {
+					print STDERR  'skipping CHADO insert organism, chado conf file..', $/;
+					my $conffile_ok = $cutils->create_conf_file( $proj->id );
+					print STDERR "Created file = ", $conffile_ok, $/;
+					my $new_profile = sprintf("%s_%d", $s->{username}, $proj->id);
+					# read data from new file
+
+					$cutils->profile($new_profile);
+					$cutils->insert_organism;
+				}
 
 			}
 

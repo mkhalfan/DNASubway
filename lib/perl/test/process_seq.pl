@@ -50,7 +50,7 @@ unless ($proj) {
 	exit 0;
 }
 
-my $input  = $WORK_DIR . '/100k/'. 'B.fasta';
+#my $input  = $WORK_DIR . '/100k/'. 'B.fasta';
 my $output = $proj->work_dir . '/' . 'out.gff3';
 my @gffs = ();
 
@@ -97,7 +97,6 @@ my $augustus = DNALC::Pipeline::Process::Augustus->new( $proj->work_dir );
 if ( $augustus) {
 	my $pretend = 0;
 	$augustus->run(
-			#input => $input,
 			input => $proj->fasta_file,
 			output_file => $augustus->{work_dir} . '/' . 'augustus.gff3',
 			pretend => $pretend,
@@ -118,7 +117,6 @@ my $trna_scan = DNALC::Pipeline::Process::TRNAScan->new( $proj->work_dir );
 if ($trna_scan ) {
 	my $pretend = 0;
 	$trna_scan->run(
-			#input => $input,
 			input => $proj->fasta_file,
 			# FIXME - ideally we should not give this as param
 			output_file => $trna_scan->{work_dir} . '/' . 'output.out',
@@ -145,7 +143,7 @@ if (@gffs) {
 	for (@gffs) {
 		push @params, ('-g', $_);
 	}
-	my @args = ('./test/gff3_merger.pl', @params, '-f', $input, '-o', $output);
+	my @args = ('/var/www/bin/gff3_merger.pl', @params, '-f', $proj->fasta_file, '-o', $output);
 	print STDERR  Dumper(\@args), $/;
 	system (@args) && die "Error: $!\n";
 }

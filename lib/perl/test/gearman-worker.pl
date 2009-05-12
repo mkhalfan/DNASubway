@@ -2,6 +2,7 @@
 
 use strict;
 use lib "/var/www/lib/perl";
+
 use DNALC::Pipeline::Process::Augustus ();
 use DNALC::Pipeline::Process::RepeatMasker ();
 use DNALC::Pipeline::Process::TRNAScan ();
@@ -38,7 +39,6 @@ sub run_repeatmasker {
 
 sub run_trnascan {
    my $gearman = shift;
-   #my ($pid, $task) = split /,\s?/, $gearman->arg;
    my $pid = $gearman->arg;
    my $proj = DNALC::Pipeline::Project->retrieve( $pid );
    return unless $proj;
@@ -59,42 +59,9 @@ sub run_fgenesh {
    return freeze $st;
 }
 
-sub run_fgenesh___ {
-   my $gearman = shift;
-   my $wd = $gearman->arg;
-   return unless -d $wd;
-
-	my $status = { success => 0 };
-
-	my $fgenesh = DNALC::Pipeline::Process::FGenesH->new( $wd, 'Monocots' );
-	if ( $fgenesh) {
-		my $pretend = 0;
-		$fgenesh->run(
-				input => $wd . '/fasta.fa',
-				pretend => $pretend,
-				debug => 0,
-			);
-		if (defined $fgenesh->{exit_status} && $fgenesh->{exit_status} == 0) {
-			print STDERR "FGENESH: success\n";
-
-			$status->{success} = 1;
-			$status->{elapsed} = $fgenesh->{elapsed};
-			$status->{gff_file}= $fgenesh->get_gff3_file;
-			#$self->set_status('fgenesh', 'Done', $fgenesh->{elapsed});
-		}
-		else {
-			print STDERR "FGENESH: fail\n";
-			#$self->set_status('fgenesh', 'Error', $fgenesh->{elapsed});
-		}
-		print STDERR 'FGENESH: duration: ', $fgenesh->{elapsed}, $/;
-	}
-	#print STDERR Dumper( $status ), $/;
-	return freeze $status;
-}
 
 my $worker = Gearman::Worker->new;
 $worker->job_servers('localhost');
-#$worker->register_function("augustus", \&run_aug);
 $worker->register_function("augustus", \&run_augustus);
 $worker->register_function("repeat_masker", \&run_repeatmasker);
 $worker->register_function("trna_scan", \&run_trnascan);

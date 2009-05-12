@@ -5,7 +5,6 @@ var intervalID = {};
 
 function check_status (pid, op, h) {
 	var s = $(op);
-	s.update(new Element('img', {'src' : '/images/ajax-loader.gif'}));
 
 	new Ajax.Request('/project/check_status',{
 		method:'get',
@@ -19,10 +18,12 @@ function check_status (pid, op, h) {
 			if (r.status == 'success') {
 				var file = r.output || '#';
 				if (r.running == 0 && r.known == 1) {
-					s.update('Job waiting in line.');
+					s.update(new Element('img', {'src' : '/images/ajax-loader.gif'}));
+					s.insert(' Job waiting in line.');
 				}
 				else if (r.running == 1 && r.known == 1) {
-					s.update('Job running.');
+					s.update(new Element('img', {'src' : '/images/ajax-loader.gif'}));
+					s.insert(' Job running.');
 				}
 				else if (r.running == 0) {
 					clearInterval(intervalID[op]);
@@ -51,7 +52,10 @@ function run (op) {
 	var b = $(op + '_btn');
 	var p = $('pid').value;
 	if (b) b.disable();
-	if (s) s.update('Job sent');
+	if (s) {
+		s.update(new Element('img', {'src' : '/images/ajax-loader.gif'}));
+		s.insert(' Job sent.');
+	}
 
 	new Ajax.Request('/project/launch_job',{
 		method:'get',
