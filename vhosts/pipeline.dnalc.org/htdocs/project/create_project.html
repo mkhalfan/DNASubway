@@ -53,7 +53,14 @@ if ($r->method eq 'POST') {
 	#push @err, "Group type is missing!" unless $group;
 
 	unless (@err) {
-		my $st = DNALC::Pipeline::App::Utils->save_upload($r, 'seq_file');
+		#fix common_name
+		$common_name =~ s/\s+/-/g;
+		my $st = DNALC::Pipeline::App::Utils->save_upload( {
+					r => $r, 
+					param_name => 'seq_file',
+					common_name => $common_name,
+				});
+
 		if ($st->{status} eq 'fail') {
 			push @err, "Unable to upload file: ". $st->{message};
 		}
@@ -82,11 +89,11 @@ if ($r->method eq 'POST') {
 			push @err, "Error creating the project: $@";
 		}
 		else {
-			warn "project_created: id = ", $proj, ",\tname = ", $proj->name, $/;
+			print STDERR "project_created: id = ", $proj, ",\tname = ", $proj->name, $/;
 
 			# create projects work directory
 			if ($proj->create_work_dir) {
-				warn "project's work_dir: ", $proj->work_dir, $/;
+				print STDERR "project's work_dir: ", $proj->work_dir, $/;
 			}
 			else {
 				warn "Failed to create work_dir for project [$proj]", $/;
@@ -103,6 +110,10 @@ if ($r->method eq 'POST') {
 			#print STDERR  "upload status = ", $wfm->get_status('upload_fasta'), $/;
 
 			if ($fasta) {
+				# remove temporary file
+				if ($seq_src eq 'upload') {
+					unlink $uploaded_file;
+				}
 				# create project files
 				my $cf = DNALC::Pipeline::Config->new;
 				my $pcf = $cf->cf('PIPELINE');
@@ -136,7 +147,7 @@ if ($r->method eq 'POST') {
 	} #end unless
 } #ned if POST
 else {
-	print STDERR  "GET", $/;
+	#print STDERR  "GET", $/;
 	#for ( sort { $a cmp $b } keys %ENV) {
 	#	print STDERR  $_, " => ", $ENV{$_}, $/;
 	#}
