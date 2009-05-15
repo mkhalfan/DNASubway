@@ -81,4 +81,8 @@ margin:0 0 0 0;
 	font-weight:bold;
 }
 
-
+.processing {
+	background-image: url(/images/ajax-loader.gif);
+	background-repeat: no-repeat;
+	padding-left: 20px;
+}

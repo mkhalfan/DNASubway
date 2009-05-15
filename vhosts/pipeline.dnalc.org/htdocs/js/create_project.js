@@ -26,6 +26,7 @@ function select_source(el) {
 	else if (el && el.value == 'sample') {
 		//$('organism_info').hide();
 	}
+	populate_fields(el.value);
 }
 
 function set_source(s) {
@@ -36,4 +37,18 @@ function set_source(s) {
 	}
 }
 
+function populate_fields(src) {
+	var sel = $('specie');
+	var organism = $('organism');
+	var common_name = $('common_name');
+	if (src == 'upload' || !sel || sel.selectedIndex == -1) {
+		organism.value = '';
+		common_name.value = '';
+	}
+	else {
+		var o = sel.options[sel.selectedIndex];
+		organism.value = o.text;
+		common_name.value = o.value;
+	}
+}
 

@@ -19,7 +19,7 @@ use Carp;
 			"Not processed" => 1,
 			"Done"          => 2,
 			"Error"         => 3,
-			"Running"       => 4
+			"Processing"    => 4
 		);
 
 	sub new {
@@ -168,6 +168,7 @@ use Carp;
 		my $rep_mask = DNALC::Pipeline::Process::RepeatMasker->new( $proj->work_dir  );
 		if ($rep_mask) {
 			my $pretend = 0;
+			$self->set_status('repeat_masker', 'Processing');
 			$rep_mask->run(
 					input => $proj->fasta_file,
 					pretend => $pretend,
@@ -199,11 +200,10 @@ use Carp;
 		my $proj = $self->project;
 		my $augustus = DNALC::Pipeline::Process::Augustus->new( $proj->work_dir );
 		if ( $augustus) {
-			my $pretend = 0;
+			$self->set_status('augustus', 'Processing');
 			$augustus->run(
 					input => $proj->fasta_file,
 					output_file => $augustus->{work_dir} . '/' . 'augustus.gff3',
-					pretend => $pretend,
 				);
 			if (defined $augustus->{exit_status} && $augustus->{exit_status} == 0) {
 				print STDERR "AUGUSTUS: success\n";
@@ -232,11 +232,10 @@ use Carp;
 
 		my $trna_scan = DNALC::Pipeline::Process::TRNAScan->new( $proj->work_dir );
 		if ($trna_scan ) {
-			my $pretend = 0;
+			$self->set_status('trna_scan', 'Processing');
 			$trna_scan->run(
 					input => $proj->fasta_file,
 					output_file => $trna_scan->{work_dir} . '/' . 'output.out',
-					pretend => $pretend,
 				);
 			if (defined $trna_scan->{exit_status} && $trna_scan->{exit_status} == 0) {
 				print STDERR "TRNA_SCAN: success\n";
@@ -266,10 +265,9 @@ use Carp;
 
 		my $fgenesh = DNALC::Pipeline::Process::FGenesH->new( $proj->work_dir, $group );
 		if ( $fgenesh) {
-			my $pretend = 0;
+			$self->set_status('fgenesh', 'Processing');
 			$fgenesh->run(
 					input => $proj->fasta_file,
-					pretend => $pretend,
 				);
 			if (defined $fgenesh->{exit_status} && $fgenesh->{exit_status} == 0) {
 				print STDERR "FGENESH: success\n";

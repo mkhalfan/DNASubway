@@ -49,21 +49,31 @@ FGenesH status: <% $wfm->get_status('fgenesh')->name %>
 Repeat Masker status: <% $wfm->get_status('repeat_masker')->name %>
 TRN Scan status: <% $wfm->get_status('trna_scan')->name %>
 </pre>
-<ul>
-%	for my $rt (@routines) {
+<div style="background:red">alabala portocala:_<span class="loading">---</span></div>
+<ul id="routines">
+% for my $rt (@routines) {
 %		my $rname = $rt->{name};
+%		my $rt_status = $wfm->get_status($rname)->name;
 	<li><span style="font-weight:bold"><% $rt->{label} %></span>&nbsp;
-		<input type="button" id="<% $rname %>_btn" value="Run" onclick="run('<% $rname %>')"/>
-		<span class="loading" id="<% $rname %>" delay="<% $rt->{delay} || 3 %>">
-%	if ($wfm->get_status($rname)->name eq 'Done') {
+%#	if ($rt_status !~ /Done|Processing/) {
+%	if ($rt_status ne 'Processing') {
+<input type="button" id="<% $rname %>_btn" value="Run" onclick="run('<% $rname %>')" />
+%	}
+<span class="<%lc $rt_status %>" id="<% $rname %>" delay="<% $rt->{delay} || 5 %>" status="<%$rt_status%>">
+%	if ($rt_status eq 'Done') {
 %		my $path = $m->comp('./.comp/filepath_to_web', file => $proj->get_gff3_file($rname) || '', just_return => 1);
 %		if ($path) {
 			<a target="_blank" href="<% $path %>">View output</a>
 %		}
+%   } else {
+%#		if ($rt_status eq 'Processing') {
+%#		<img src="/images/ajax-loader.gif" />
+%#		}
+	<% $rt_status %>\
 %	}
 		</span>
 	</li>
-%	}
+% }
 
 </ul>
 <div id="gbrowse" style="display:block"><a href="./prepare_gbrowse?pid=<% $proj->id%>">Browse</a></div>

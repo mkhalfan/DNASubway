@@ -13,6 +13,12 @@
 	use DNALC::Pipeline::Project ();
 	use DNALC::Pipeline::App::WorkflowManager ();
 	use Data::Dumper;
+	my $samples = [
+		{id => 1, organism=>'Juglans duclouxiana', common_name => 'Walnut'},
+		{id => 2, organism=>'Acer saccharinum', common_name => 'White Maple'},
+		{id => 3, organism=>'Citrus sinensis', common_name => 'Orange'},
+		{id => 4, organism=>'Narcissus pseudonarcissus', common_name => 'Daffodil'},
+	];
 </%once>
 
 <%init>
@@ -181,9 +187,12 @@ src = <% $seq_src %><br/>
 		2. <input type="radio" name="seq_src" id="seq_src_sample" value="sample" onclick="select_source(this)" <% $seq_src eq 'sample' ? 'checked="checked"' : ''%>/>
 		Select from the samples we provide below:
 		<div>
-			<select class="stylized" id="specie" name="specie" size="2" style="width: 300px"
+			<select class="stylized" id="specie" name="specie" size="4" style="width: 300px;"
 				onchange="set_source('sample');">
-				<option id="o1" value="arabidopsis">Arabidopsis thaliana</option>
+			<option id="o1" value="arabidopsis">Arabidopsis thaliana</option>
+% for my $sample (@$samples) {
+			<option id="o<%$sample->{id}%>" value="<%$sample->{common_name}%>"><%$sample->{organism}%> (<%$sample->{common_name}%>)</option>
+% }
 			</select>
 		</div>
 	<div class="spacer"></div>

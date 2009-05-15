@@ -25,8 +25,8 @@
 	$m->session->{pipeline} ||= {};
 	my $s = $m->session->{pipeline};
 
-	#print STDERR  "H = ", $h, $/;
-	#print STDERR  "pid = ", $pid, $/;
+	print STDERR  "H = ", $h, $/;
+	print STDERR  "pid = ", $pid, $/;
 
 	unless ($t) {
 		print "{'status':'error', 'message': 'Task unknown.'}";
