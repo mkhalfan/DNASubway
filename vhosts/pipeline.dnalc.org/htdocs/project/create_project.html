@@ -12,23 +12,24 @@
 	use DNALC::Pipeline::App::Utils ();
 	use DNALC::Pipeline::Project ();
 	use DNALC::Pipeline::App::WorkflowManager ();
+	use DNALC::Pipeline::Utils qw(random_string);
+	use Carp;
 	use Data::Dumper;
-	my $samples = [
-		{id => 1, organism=>'Juglans duclouxiana', common_name => 'Walnut'},
-		{id => 2, organism=>'Acer saccharinum', common_name => 'White Maple'},
-		{id => 3, organism=>'Citrus sinensis', common_name => 'Orange'},
-		{id => 4, organism=>'Narcissus pseudonarcissus', common_name => 'Daffodil'},
-	];
 </%once>
 
 <%init>
 $m->session->{pipeline} ||= {};
-
 my $s = $m->session->{pipeline};
+
+my $cf = DNALC::Pipeline::Config->new;
+my $pcf = $cf->cf('PIPELINE');
+my $samples = $pcf->{samples};
+
 my @err = ();
 
 if ($r->method eq 'POST') {
-	my $uploaded_file = '';
+
+	my ($uploaded_file, $sample_file) = '';
 
 	for ($name, $organism, $common_name) {
 		$_ =~ s/\s+/ /g;
@@ -40,14 +41,19 @@ if ($r->method eq 'POST') {
 		push @err, "Project Name is missing";
 	}
 
-	if ($seq_src eq 'upload') {
-	}
-	elsif ($seq_src eq 'sample') {
-		push @err, "Sample organism was not selected!" unless $specie;
-		# compute plant group (monocots|dicots)
-	}
-
 	push @err, "Organism name is missing or incorrectly formatted!" unless $organism && $common_name;
+
+	if (!@err && $seq_src eq 'sample') {
+		my $samples_dir = $pcf->{samples_dir};
+		my ($sample) = grep {$_->{id} == $specie} @$samples; 
+		# checks: organism... group (monocots|dicots)
+		if (!$sample || $sample->{organism} ne $organism || $sample->{common_name} ne $common_name) {
+			push @err, "Sample organism was not found!!";
+		} 
+		else {
+			$sample_file = $samples_dir . '/' . $sample->{id} . '/fasta.fa';
+		}
+	}
 
 	if($organism =~ /[^a-z0-9\s]/i || $common_name =~ /[^a-z0-9\s]/i) {
 		push @err, "Organism name may contain only letters, digits and spaces";
@@ -61,20 +67,37 @@ if ($r->method eq 'POST') {
 	unless (@err) {
 		#fix common_name
 		$common_name =~ s/\s+/-/g;
-		my $st = DNALC::Pipeline::App::Utils->save_upload( {
-					r => $r, 
-					param_name => 'seq_file',
-					common_name => $common_name,
-				});
 
-		if ($st->{status} eq 'fail') {
-			push @err, "Unable to upload file: ". $st->{message};
+		if ($seq_src eq 'upload') {
+			my $st = DNALC::Pipeline::App::Utils->save_upload( {
+						r => $r, 
+						param_name => 'seq_file',
+						common_name => $common_name,
+					});
+
+			if ($st->{status} eq 'fail') {
+				push @err, "Unable to upload file: ". $st->{message};
+			}
+			else {
+				$uploaded_file = $st->{path};
+			}
+			print STDERR Dumper( $st), $/;
 		}
-		else {
-			$uploaded_file = $st->{path};
+		elsif ($seq_src eq 'sample') {
+			my $upl_dir = $pcf->{upload_dir};
+			my $rand_s = random_string(8,8);
+		    my $output_file = $upl_dir . '/' . $rand_s;
+
+			my ($status, $msg) = DNALC::Pipeline::App::Utils->process_fasta_file({
+					file => $sample_file,
+					common_name => $common_name,
+					output_file => $output_file,
+				});
+			if ($status eq 'fail') {
+				push @err, $msg;
+			}
+			$uploaded_file = $output_file;
 		}
-		print STDERR Dumper( $st), $/;
-		#return;
 	}
 
 	my $proj = DNALC::Pipeline::Project->search(user_id => $s->{user_id}, name => $name);
@@ -88,6 +111,7 @@ if ($r->method eq 'POST') {
 								name => $name,
 								organism => $organism,
 								common_name => $common_name,
+								sample => $specie,
 								#group => $group,
 							});
 						};
@@ -106,6 +130,9 @@ if ($r->method eq 'POST') {
 				push @err, "Failed to create work_dir for project!";
 			}
 
+			unless (-f $uploaded_file) {
+				carp "Fasta file is missing:, ", $uploaded_file, $/;
+			}
 			# set workflow
 			my $wfm = DNALC::Pipeline::App::WorkflowManager->new( $proj );
 			#print STDERR Dumper( \$wfm), $/;
@@ -117,13 +144,9 @@ if ($r->method eq 'POST') {
 
 			if ($fasta) {
 				# remove temporary file
-				if ($seq_src eq 'upload') {
-					unlink $uploaded_file;
-				}
-				# create project files
-				my $cf = DNALC::Pipeline::Config->new;
-				my $pcf = $cf->cf('PIPELINE');
+				unlink $uploaded_file;
 
+				# create project files
 				my $cutils = DNALC::Pipeline::Chado::Utils->new(
 					username => $s->{username},
 					dumppath => $pcf->{GMOD_DUMPFILE},
@@ -151,7 +174,7 @@ if ($r->method eq 'POST') {
 			
 		} #end else
 	} #end unless
-} #ned if POST
+} #end if POST
 else {
 	#print STDERR  "GET", $/;
 	#for ( sort { $a cmp $b } keys %ENV) {
@@ -189,9 +212,8 @@ src = <% $seq_src %><br/>
 		<div>
 			<select class="stylized" id="specie" name="specie" size="4" style="width: 300px;"
 				onchange="set_source('sample');">
-			<option id="o1" value="arabidopsis">Arabidopsis thaliana</option>
 % for my $sample (@$samples) {
-			<option id="o<%$sample->{id}%>" value="<%$sample->{common_name}%>"><%$sample->{organism}%> (<%$sample->{common_name}%>)</option>
+			<option id="o<%$sample->{id}%>" value="<% $sample->{id} %>"><%$sample->{organism}%> (<%$sample->{common_name}%>)</option>
 % }
 			</select>
 		</div>
@@ -212,7 +234,7 @@ src = <% $seq_src %><br/>
 	</div>
 <div class="spacer"></div>
 
-<button type="button" onclick="step_one()">Continue</button>
+<button type="button" id="continue" onclick="step_one()">Continue</button>
 </form>
 </p>
 </div>

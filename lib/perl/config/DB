@@ -10,7 +10,7 @@
 		PrintError => 0,
 		RaiseError => 1,
 		ShowErrorStatement => 1,
-		AutoCommit => 1,
-		ChopBlanks => 0,
+		AutoCommit => 0,
+		ChopBlanks => 1,
 	}
 ]; 

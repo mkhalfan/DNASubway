@@ -12,9 +12,10 @@ function step_one() {
 		return;
 	}
 	if (has_sample) {
-		alert("Method not yet supported!");
-		return;
+		//alert("Method not yet supported!");
+		//return;
 	}
+	$('continue').disabled = true;
 	f.submit();
 }
 
@@ -44,11 +45,20 @@ function populate_fields(src) {
 	if (src == 'upload' || !sel || sel.selectedIndex == -1) {
 		organism.value = '';
 		common_name.value = '';
+		organism.readOnly = false;
+		common_name.readOnly = false;
 	}
 	else {
 		var o = sel.options[sel.selectedIndex];
-		organism.value = o.text;
-		common_name.value = o.value;
+		var full_name = o.text;
+		organism.value = full_name.replace(/\s*\(.*?\)/,'');
+		var m = full_name.match(/\((.*)\)/);
+		if (m && m.length == 2) {
+			common_name.value = m[1];
+		}
+		organism.readOnly = true;
+		common_name.readOnly = true;
+
 	}
 }
 

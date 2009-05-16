@@ -142,7 +142,6 @@ use Carp;
 		
 		my $upload_file = $self->project->work_dir . '/' . 'fasta.fa';
 		my $rc = copy $source_file, $upload_file;
-		print STDERR  'dont forget to remove file: ', $upload_file, $/;
 		carp 'Unable to upload sequence: ', $! unless $rc;
 
 		my $s;
