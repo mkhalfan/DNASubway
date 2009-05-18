@@ -278,6 +278,27 @@ ALTER TABLE ONLY workflow
     ADD CONSTRAINT workflow_task_id_fk FOREIGN KEY (task_id) REFERENCES task(task_id) ON UPDATE CASCADE ON DELETE CASCADE;
 
 
+CREATE TABLE cachemd5
+(
+  id serial NOT NULL,
+  project_id integer NOT NULL,
+  task_name character varying(16) NOT NULL DEFAULT ''::character varying,
+  crc character(32),
+  CONSTRAINT cachemd5_pk_ndx PRIMARY KEY (id),
+  CONSTRAINT cachemd5_fk_ndx FOREIGN KEY (project_id)
+      REFERENCES project (project_id) MATCH SIMPLE
+      ON UPDATE CASCADE ON DELETE CASCADE,
+  CONSTRAINT cachemd5_uniq_ndx UNIQUE (project_id, task_name)
+)
+WITHOUT OIDS;
+ALTER TABLE cachemd5 OWNER TO pipeline;
+
+-- Index: cachemd5_crc_ndx
+
+-- DROP INDEX cachemd5_crc_ndx;
+
+CREATE INDEX cachemd5_crc_ndx ON cachemd5 USING hash (crc);
+
 --
 -- Name: public; Type: ACL; Schema: -; Owner: postgres
 --

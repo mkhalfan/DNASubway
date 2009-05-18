@@ -5,11 +5,14 @@ use strict;
 use DNALC::Pipeline::Workflow ();
 use DNALC::Pipeline::Config ();
 use DNALC::Pipeline::Project ();
+use DNALC::Pipeline::CacheMD5 ();
 
 use DNALC::Pipeline::Process::RepeatMasker ();
 use DNALC::Pipeline::Process::TRNAScan ();
 use DNALC::Pipeline::Process::Augustus ();
 use DNALC::Pipeline::Process::FGenesH ();
+
+use Digest::MD5 ();
 
 use File::Copy;
 use Carp;
@@ -166,8 +169,20 @@ use Carp;
 
 		my $rep_mask = DNALC::Pipeline::Process::RepeatMasker->new( $proj->work_dir  );
 		if ($rep_mask) {
+			my $crc = $self->crc($rep_mask->get_options);
+			print STDERR  "REPEAT_MASKER options = ", join('', $rep_mask->get_options), $/;
+			print STDERR  "REPEAT_MASKER CRC = ", $crc, $/;
+
 			my $pretend = 0;
 			$self->set_status('repeat_masker', 'Processing');
+
+			# TODO
+			# search for cachemd5($self->project->id, $task_name, $crc);
+			# if cache_found {
+			#	$self->copy_results(....);
+			#	return {success => 1, gff_file => '...', elapsed => 0.01, 
+			# }
+			# $self->set_status($task_name, 'Done', 0.01);
 			$rep_mask->run(
 					input => $proj->fasta_file,
 					pretend => $pretend,
@@ -179,6 +194,7 @@ use Carp;
 				$status->{elapsed} = $rep_mask->{elapsed};
 				$status->{gff_file}= $rep_mask->get_gff3_file;
 				$self->set_status('repeat_masker', 'Done', $rep_mask->{elapsed});
+				$self->set_cache('repeat_masker', $crc);
 			}
 			else {
 				print STDERR "REPEAT_MASKER: fail\n";
@@ -199,6 +215,9 @@ use Carp;
 		my $proj = $self->project;
 		my $augustus = DNALC::Pipeline::Process::Augustus->new( $proj->work_dir );
 		if ( $augustus) {
+			my $crc = $self->crc($augustus->get_options);
+			print STDERR  "AUGUSTUS options = ", join('', $augustus->get_options), $/;
+			print STDERR  "AUGUSTUS CRC = ", $crc, $/;
 			$self->set_status('augustus', 'Processing');
 			$augustus->run(
 					input => $proj->fasta_file,
@@ -211,6 +230,7 @@ use Carp;
 				$status->{elapsed} = $augustus->{elapsed};
 				$status->{gff_file}= $augustus->get_gff3_file;
 				$self->set_status('augustus', 'Done', $augustus->{elapsed});
+				$self->set_cache('augustus', $crc);
 			}
 			else {
 				print STDERR "AUGUSTUS: fail\n";
@@ -231,6 +251,10 @@ use Carp;
 
 		my $trna_scan = DNALC::Pipeline::Process::TRNAScan->new( $proj->work_dir );
 		if ($trna_scan ) {
+			my $crc = $self->crc($trna_scan->get_options);
+			print STDERR  "TRNAScan options = ", join('', $trna_scan->get_options), $/;
+			print STDERR  "TRNAScan CRC = ", $crc, $/;
+
 			$self->set_status('trna_scan', 'Processing');
 			$trna_scan->run(
 					input => $proj->fasta_file,
@@ -242,6 +266,7 @@ use Carp;
 				$status->{elapsed} = $trna_scan->{elapsed};
 				$status->{gff_file}= $trna_scan->get_gff3_file;
 				$self->set_status('trna_scan', 'Done', $trna_scan->{elapsed});
+				$self->set_cache('trna_scan', $crc);
 			}
 			else {
 				print STDERR "TRNA_SCAN: fail\n";
@@ -264,6 +289,9 @@ use Carp;
 
 		my $fgenesh = DNALC::Pipeline::Process::FGenesH->new( $proj->work_dir, $group );
 		if ( $fgenesh) {
+			my $crc = $self->crc($fgenesh->get_options);
+			#print STDERR  "FGENESH options = ", join('', $fgenesh->get_options), $/;
+			#print STDERR  "FGENESH CRC = ", $crc, $/;
 			$self->set_status('fgenesh', 'Processing');
 			$fgenesh->run(
 					input => $proj->fasta_file,
@@ -275,6 +303,7 @@ use Carp;
 				$status->{elapsed} = $fgenesh->{elapsed};
 				$status->{gff_file}= $fgenesh->get_gff3_file;
 				$self->set_status('fgenesh', 'Done', $fgenesh->{elapsed});
+				$self->set_cache('fgenesh', $crc);
 			}
 			else {
 				print STDERR "FGENESH: fail\n";
@@ -284,6 +313,32 @@ use Carp;
 		}
 		return $status;
 	}
+	#-------------------------------------------------------------------------
+	#-------------------------------------------------------------------------
+	# computes MD5 sum from the given @args list
+	sub crc {
+		my ($self, @args) = @_;
+		my $ctx = Digest::MD5->new;
+		$ctx->add(@args);
+		return $ctx->hexdigest;
+	}
+	#-------------------------------------------------------------------------
+	sub set_cache {
+		my ($self, $task_name, $crc) = @_;
+		
+		my $c = eval {
+					DNALC::Pipeline::CacheMD5->create({
+						project_id => $self->project->id,
+						task_name => $task_name,
+						crc => $crc
+					});
+				};
+		if ($@) {
+			carp "Unable to set cache for PID=", $self->project, ', task_name = ', $task_name, $/, $@, $/;
+		}
+
+	}
+	#-------------------------------------------------------------------------
 }
 
 =head1 TODO

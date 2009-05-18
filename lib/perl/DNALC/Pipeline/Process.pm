@@ -74,6 +74,17 @@ use Carp;
 		$self->{work_dir} = $dir;
 	}
 
+	# this will generate the option to be passed to the pogram
+	sub get_options {
+		my ($self) = @_;
+		my @opts = ();
+		if ($self->{work_options}) {
+			push @opts, @{$self->{work_options}};
+		}
+
+		return @opts;
+	}
+
 	# FIXME split this into 2 functions.. _prepare() and run()
 	sub run {
 		my ($self, %params) = @_;
@@ -89,9 +100,10 @@ use Carp;
 		}
 
 		my @opts = ($self->{conf}->{program});
-		if ($self->{work_options}) {
-			push @opts, @{$self->{work_options}};
-		}
+		push @opts, $self->get_options;
+		#if ($self->{work_options}) {
+		#	push @opts, @{$self->{work_options}};
+		#}
 
 		# take extra params and check if we find them in the config file
 		my $option_glue = $self->{conf}->{option_glue} || undef;

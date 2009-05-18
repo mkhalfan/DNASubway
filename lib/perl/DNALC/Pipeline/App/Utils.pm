@@ -9,6 +9,9 @@ use Bio::SeqIO ();
 
 use DNALC::Pipeline::Config ();
 use DNALC::Pipeline::Utils qw(random_string);
+
+use Digest::MD5 ();
+
 =head1 TODO
 
 =item * upload
@@ -19,7 +22,7 @@ use DNALC::Pipeline::Utils qw(random_string);
 sub save_upload {
 	#print STDERR "save_upload: ", Dumper( \@_), $/;
 	my ($class, $args) = @_;
-	my ($status, $msg, $path);
+	my ($status, $msg, $path, $crc);
 
 	my $r = $args->{r};
 	my $param_name  = $args->{param_name};
@@ -49,14 +52,14 @@ sub save_upload {
 
 	# check/fix content 
 	unless ($msg) {
-		($status, $msg) = $class->process_fasta_file({
-				fh => $u->fh,
-				common_name => $args->{common_name},
-				output_file => $path,
-			});
+		($status, $msg, $crc) = $class->process_fasta_file({
+					fh => $u->fh,
+					common_name => $args->{common_name},
+					output_file => $path,
+				});
 	}
 
-	return { status => $status, message => $msg, path => $path };
+	return { status => $status, message => $msg, path => $path, crc => $crc };
 }
 
 sub process_fasta_file {
@@ -87,8 +90,9 @@ sub process_fasta_file {
 
 	my $config = DNALC::Pipeline::Config->new;
 
+	my $crc => '';
 	my $fasta_seq = $in->next_seq;
-	print STDERR  "ALPHABETU = ", $fasta_seq->alphabet, $/;
+	#print STDERR  "ALPHABETU = ", $fasta_seq->alphabet, $/;
 	if ($fasta_seq && $fasta_seq->alphabet eq 'dna') {
 		my $max_seq_length = $config->cf('PIPELINE')->{sequence_length} || 50_000;
 		# make sure the sequence is not longer then expected..
@@ -96,6 +100,11 @@ sub process_fasta_file {
 			$fasta_seq->seq( uc $fasta_seq->subseq(1, $max_seq_length), 'dna' );
 		}
 		$fasta_seq->display_id( $common_name );
+		
+		my $ctx = Digest::MD5->new;
+		$ctx->add($fasta_seq->seq);
+		$crc = $ctx->hexdigest;
+
 		my $out = Bio::SeqIO->new(-file => "> $output_file", -format => 'Fasta');
 		$out->write_seq( $fasta_seq );
 		$status = 'ok';
@@ -105,7 +114,7 @@ sub process_fasta_file {
 		$msg = 'File content is not valid.';
 	}
 	
-	return ($status, $msg);
+	return ($status, $msg, $crc);
 }
 
 sub _is_upload_ok {
