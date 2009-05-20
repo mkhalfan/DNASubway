@@ -6,11 +6,15 @@
 <meta http-equiv="Content-Language" content="en" />
 <title><& SELF:title &> Pipeline</title>
 <script type="text/javascript" src="/js/prototype-1.6.0.3.js"></script>
-% if ($m->request_comp->attr_if_exists('js')) { 
+% if ($m->request_comp->attr_if_exists('js') && @{$m->request_comp->attr('js')}) { 
 %	foreach my $js (@{$m->request_comp->attr('js')}) {
+%		next unless $js;
 <script type="text/javascript" src="/js/<% $ js %>"></script>
 %	}
 % }
+<!--[if IE]>
+<script type="text/javascript" src="/js/firebug-lite-compressed.js"></script>
+<![endif]-->
 <link type='text/css' rel='stylesheet' href='/css/style.css' />
 </head>
 <body>
@@ -26,7 +30,7 @@
 </%method>\
 %#---------------------------------
 <%attr>
-	js => ['']
+	js => []
 </%attr>
 %#---------------------------------
 

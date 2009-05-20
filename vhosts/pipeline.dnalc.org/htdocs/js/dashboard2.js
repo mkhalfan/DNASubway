@@ -1,6 +1,6 @@
 //---
 
-var dbg;
+var dbg, sent;
 var intervalID = {};
 
 function check_status (pid, op, h) {
@@ -9,9 +9,11 @@ function check_status (pid, op, h) {
 	/*alert(op + ' - ' + h);
 	if (!op || !h)
 		return;*/
+	var params = { 'pid' : pid, 't' : op, 'h' : h};
+	sent = params;
 	new Ajax.Request('/project/check_status',{
 		method:'get',
-		parameters: { 'pid' : pid, 't' : op, 'h' : h}, 
+		parameters: params, 
 		onSuccess: function(transport){
 			var response = transport.responseText || "{'status':'error', 'message':'No response'}";
 			debug(response);
@@ -21,8 +23,8 @@ function check_status (pid, op, h) {
 			if (r.status == 'success') {
 				var file = r.output || '#';
 				if (r.running == 0 && r.known == 1) {
-					s.update(new Element('img', {'src' : '/images/ajax-loader.gif'}));
-					s.insert(' Job waiting in line.');
+					/*s.update(new Element('img', {'src' : '/images/ajax-loader.gif'}));*/
+					s.update(' Job waiting in line.');
 				}
 				else if (r.running == 1 && r.known == 1) {
 					//s.update(new Element('img', {'src' : '/images/ajax-loader.gif'}));
@@ -71,13 +73,17 @@ function run (op) {
 			debug(response);
 			var r = response.evalJSON();
 			dbg = r;
-			//alert(r);
-			//alert(response + ' ' + r.h);
+			//alert('after launch job:\n' + response + ' ' + r.h);
 			if (r.status == 'success') {
 				var h = r.h || '';
 				var delay = parseFloat(s.getAttribute('delay'));
 				delay = !isNaN(delay) ? delay * 1000 : 5000;
-				intervalID[op] = setInterval(check_status, delay, p, op, h);
+				/*alert('about to check again:\n' +
+					'delay = ' + delay + '\n' +
+					'p = ' + p + '\n' +
+					'op = ' + op + '\n' +
+					'h = ' + h );*/
+				intervalID[op] = setInterval(function (){ check_status(p, op, h)}, delay);
 			}
 			else  if (r.status == 'error') {
 				s.update(r.error);
