@@ -4,7 +4,6 @@ use strict;
 use DNALC::Pipeline::Config ();
 use File::Path;
 use Time::HiRes qw/gettimeofday tv_interval/;
-use IPC::Run3;
 use Data::Dumper;
 
 use Carp;

@@ -8,11 +8,12 @@ use Storable qw/thaw/;
 my $client = Gearman::Client->new;
 my $sx = $client->job_servers('127.0.0.1');
 
-#my $h = $client->dispatch_background( augustus => '/var/www/vhosts/pipeline.dnalc.org/var/projects/0035' );
-#my $h = $client->dispatch_background( trna_scan => 59 );
-#print STDERR  "h = ", $h, $/;
-#print STDERR  '--------------------------', $/;
+#my $h = $client->dispatch_background( augustus => 98 );
+my $h = $client->dispatch_background( trna_scan => 98 );
+print STDERR  "h = ", $h, $/;
+print STDERR  '--------------------------', $/;
 
+__END__
 
 my $x = $client->do_task( tran_scan => 59 );
 #my $x = eval {
