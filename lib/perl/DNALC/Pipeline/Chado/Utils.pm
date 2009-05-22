@@ -725,7 +725,7 @@ sub insert_organism {
 
     #check to see if the organism is already in the db
     my $query = "SELECT abbreviation,genus,species,common_name FROM organism WHERE common_name = ?
-					OR (genus = ? AND specie = ?)";
+					OR (genus = ? AND species = ?)";
     my $sth   = $dbh->prepare($query);
     $sth->execute($self->common_name, $self->genus, $self->species) or die $dbh->errstr;
     my $hash_ref = $sth->fetchrow_hashref;
