@@ -45,6 +45,8 @@ my $proj = eval {
 		DNALC::Pipeline::Project->create({
 			user_id => $u->id,
 			name => 'Project name: '. random_string(4, 15),
+			organism => $organism,
+			common_name => $common_name,
 			crc => '',
 		});};
 
@@ -141,6 +143,9 @@ if ( $upload_st->name eq 'Done') {
 	#-------------------------------------
 }
 
+#let apache be able to work with projects files..
+system('chmod -R a+w ' . $proj->work_dir);
+
 # 1st create GBrowse conf file & DB dir for this project
 $cutils->create_gbrowse_conf($proj->id, $pcf->{GBROWSE_DB_DIR});
 
@@ -158,10 +163,12 @@ if (@params) {
 	my @args = ($gff_merger, @params, '-f', $proj->fasta_file, '-o', $gff_file);
 
 	system (@args) && die "Error: $!\n";
+	chmod 0666, $gff_file;
 
 	my $slink = $pcf->{GBROWSE_DB_DIR} . '/' . $username . '/' . $proj->id . '/gff3.gff' ;
 	print STDERR  "SYMLINK $gff_file -> ", $slink, $/;
 	symlink $gff_file, $slink;
+	chmod 0666, $slink;
 }
 
 print $/;
