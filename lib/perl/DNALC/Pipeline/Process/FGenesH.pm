@@ -13,12 +13,14 @@ use strict;
 
 		my $self = __PACKAGE__->SUPER::new('FGENESH', $project_dir);
 
-		$group ||= 'Monocots';
+		unless ($group && $group =~ /^(?:m|d)$/) {
+			$group = 'm';
+		}
 		$self->{group} = $group;
-		if ($group eq 'Monocots') {
+		if ($group eq 'm') {
 			unshift @{ $self->{work_options} }, $self->{conf}->{monocots_matrix};
 		}
-		elsif ($group eq 'Dicots') {
+		elsif ($group eq 'd') {
 			unshift @{ $self->{work_options} }, $self->{conf}->{dicots_matrix};
 		}
 
@@ -42,7 +44,8 @@ use strict;
 		}
 		closedir DIR;
 
-		my $program = 'FGenesH' . '_' . $self->{group};
+		#my $program = 'FGenesH' . '_' . $self->{group};
+		my $program = 'FGenesH';
 		my $gene_count = 0;
 		my $seq_id;
 

@@ -8,7 +8,7 @@ function step_one() {
 	var has_file = $('seq_src_upload').checked && ( $('seq_file').value != '' );
 	var has_sample = $('seq_src_sample').checked && $('specie').selectedIndex != -1;
 	if (!has_file && !has_sample) {
-		alert("You must upload file or select a sample organism!");
+		alert("You must select a file to upload or a sample organism!");
 		return;
 	}
 	if (has_sample) {

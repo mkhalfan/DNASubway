@@ -18,6 +18,8 @@
 		$m->redirect('/project/');
 	}
 
+	# TODO : check project ownership.. ;)
+
 	#my $config = DNALC::Pipeline::Config->new;
 	#my $pcf = $config->cf->('PIPELINE');
 	#my $pcf = $cfg->cf->('PIPELINE');

@@ -13,7 +13,7 @@ use base qw(DNALC::Pipeline::DBI);
 __PACKAGE__->table('project');
 __PACKAGE__->columns(Primary => qw/project_id/);
 __PACKAGE__->columns(Essential => qw/user_id name organism common_name 
-							sample crc created/);
+								clade sample crc created/);
 __PACKAGE__->sequence('project_project_id_seq');
 
 __PACKAGE__->add_trigger(before_create => sub {
@@ -47,8 +47,8 @@ sub work_dir {
 
 
 sub group {
-	warn "To be implemented", $/;
-	return 'Monocots';
+	warn "To be removed", $/;
+	return shift()->clade;
 }
 
 sub fasta_file {

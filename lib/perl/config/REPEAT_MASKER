@@ -12,7 +12,6 @@
 			],
 	option_output_dir => '-dir',
 	output_dir => 'output',		# must be the same with options->{-dir}
-	#file_to_parse => qr/\.out\.gff$/,
 	file_to_parse => qr/\.out$/,
 	parser_program => '/usr/local/RepeatMasker/util/rmOutToGFF3.pl',
 	gff3_file	=> 'output.gff3',

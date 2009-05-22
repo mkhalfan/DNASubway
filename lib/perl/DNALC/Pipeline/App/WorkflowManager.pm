@@ -221,7 +221,7 @@ use Carp;
 			$self->set_status('augustus', 'Processing');
 			$augustus->run(
 					input => $proj->fasta_file,
-					output_file => $augustus->{work_dir} . '/' . 'augustus.gff3',
+					#output_file => $augustus->{work_dir} . '/' . 'augustus.gff3',
 				);
 			if (defined $augustus->{exit_status} && $augustus->{exit_status} == 0) {
 				print STDERR "AUGUSTUS: success\n";
@@ -284,7 +284,6 @@ use Carp;
 		my $status = { success => 0 };
 	
 		my $proj = $self->project;
-		# TODO - get the specie type: Monocots|Dicots
 		my $group = $proj->group;
 
 		my $fgenesh = DNALC::Pipeline::Process::FGenesH->new( $proj->work_dir, $group );
@@ -295,6 +294,7 @@ use Carp;
 			$self->set_status('fgenesh', 'Processing');
 			$fgenesh->run(
 					input => $proj->fasta_file,
+					debug => 1,
 				);
 			if (defined $fgenesh->{exit_status} && $fgenesh->{exit_status} == 0) {
 				print STDERR "FGENESH: success\n";

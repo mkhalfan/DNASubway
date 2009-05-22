@@ -2,6 +2,7 @@
 	program => '/usr/local/fgenesh/fgenesh',
 	redirect => 1, # use shell redirection => implies executing the programm under shell
 	options => [],
+	default_clade => 'm',
 	monocots_matrix => '/usr/local/fgenesh/Monocots',
 	dicots_matrix => '/usr/local/fgenesh/Dicots',
 	file_to_parse => qr/stdout\.txt$/,

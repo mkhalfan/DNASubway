@@ -9,7 +9,8 @@ use Data::Dumper;
 use strict;
 
 #-----------------------------------------------------------------------------
-my $input_file = '/home/cornel/work/100k/B.fasta';
+#my $input_file = '/home/cornel/work/100k/B.fasta';
+my $input_file = '/home/cornel/work/10k/A.fasta';
 #-----------------------------------------------------------------------------
 
 my $proj;
@@ -69,32 +70,32 @@ print STDERR "U_ST = ", $upload_st->name , $/;
 
 if ( $upload_st->name eq 'Done') {
 	my $st;
-	print STDERR  '-' x 20 , $/;
- 	$st = $wfm->run_repeat_masker;
- 	#print STDERR Dumper( $st ), $/;
- 	my $rm_st = $wfm->get_status('repeat_masker');
- 	print STDERR "RM_ST = ", $rm_st->name, ($/ x 2);
+#	print STDERR  '-' x 20 , $/;
+# 	$st = $wfm->run_repeat_masker;
+# 	my $rm_st = $wfm->get_status('repeat_masker');
+# 	print STDERR "RM_ST = ", $rm_st->name, ($/ x 2);
 
 	#-------------------------------------
 
  	print STDERR  '-' x 20 , $/;
  	$st = $wfm->run_augustus;
  	#print STDERR Dumper( $st ), $/;
- 	my $a_st = $wfm->get_status('repeat_masker');
+ 	my $a_st = $wfm->get_status('augustus');
  	print STDERR  "AUGUSTUS_ST = ", $a_st->name, $/;
+	print STDERR  "GFF = ", $proj->get_gff3_file('augustus'), $/;
 
 	#-------------------------------------
- 	print STDERR  '-' x 20 , $/;
- 	$st = $wfm->run_trna_scan;
- 	print STDERR Dumper( $st ), $/;
- 	my $t_st = $wfm->get_status('trna_scan');
- 	print STDERR "TRNA_SCAN_ST = ", $t_st->name, ($/ x 2);
+# 	print STDERR  '-' x 20 , $/;
+# 	$st = $wfm->run_trna_scan;
+# 	print STDERR Dumper( $st ), $/;
+# 	my $t_st = $wfm->get_status('trna_scan');
+# 	print STDERR "TRNA_SCAN_ST = ", $t_st->name, ($/ x 2);
 	#-------------------------------------
-	print STDERR  '-' x 20 , $/;
-	$st = $wfm->run_fgenesh;
-	print STDERR Dumper( $st ), $/;
-	my $f_st = $wfm->get_status('fgenesh');
-	print STDERR "FGNESH_ST = ", $f_st->name, ($/ x 2);
+#	print STDERR  '-' x 20 , $/;
+#	$st = $wfm->run_fgenesh;
+#	print STDERR Dumper( $st ), $/;
+#	my $f_st = $wfm->get_status('fgenesh');
+#	print STDERR "FGNESH_ST = ", $f_st->name, ($/ x 2);
 
 }
 

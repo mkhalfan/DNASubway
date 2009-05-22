@@ -39,14 +39,15 @@ my $upload_st = $wfm->get_status('upload_fasta');
 	<& "/_messages" &>
 <input type="hidden" id="pid" value="<% $pid %>"/>
 <pre>
-Project id = <% $pid %>
-%#Project Name: <% $proj->name %>
-%#Fasta file: <% $proj->fasta_file %>
-Upload status: <% $upload_st->name %>
-Augustus status: <% $wfm->get_status('augustus')->name %>
-FGenesH status: <% $wfm->get_status('fgenesh')->name %>
-Repeat Masker status: <% $wfm->get_status('repeat_masker')->name %>
-TRN Scan status: <% $wfm->get_status('trna_scan')->name %>
+%#Project = <% $proj %>
+Project Name: <% $proj->name %>
+Organism : <% $proj->organism %>, <% $proj->common_name %>
+Clade : <% $proj->clade %>
+%#Upload status: <% $upload_st->name %>
+%#Augustus status: <% $wfm->get_status('augustus')->name %>
+%#FGenesH status: <% $wfm->get_status('fgenesh')->name %>
+%#Repeat Masker status: <% $wfm->get_status('repeat_masker')->name %>
+%#TRN Scan status: <% $wfm->get_status('trna_scan')->name %>
 </pre>
 %#<div style="background:red">alabala portocala:_<span class="loading">---</span></div>
 <ul id="routines">

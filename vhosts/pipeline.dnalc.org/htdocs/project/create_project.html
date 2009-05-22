@@ -38,10 +38,15 @@ if ($r->method eq 'POST') {
 	}
 
 	unless ($name) {
-		push @err, "Project Name is missing";
+		push @err, "Project name is missing";
 	}
 
-	push @err, "Organism name is missing or incorrectly formatted!" unless $organism && $common_name;
+	unless ($organism && $common_name) {
+		push @err, "Organism name is missing or incorrectly formatted!";
+	}
+	elsif($organism =~ /[^a-z0-9\s]/i || $common_name =~ /[^a-z0-9\s]/i) {
+		push @err, "Organism name may contain only letters, digits and spaces";
+	}
 
 	if (!@err && $seq_src eq 'sample') {
 		my $samples_dir = $pcf->{samples_dir};
@@ -55,14 +60,11 @@ if ($r->method eq 'POST') {
 		}
 	}
 
-	if($organism =~ /[^a-z0-9\s]/i || $common_name =~ /[^a-z0-9\s]/i) {
-		push @err, "Organism name may contain only letters, digits and spaces";
-	}
 	my @subnames = split /\s/, $organism;
 	unless (2 == @subnames) {
 		push @err, "Organism name should contain only two words: genus and specie";
 	}
-	#push @err, "Group type is missing!" unless $group;
+	#push @err, "Clade is missing!" unless $group;
 
 	unless (@err) {
 		#fix common_name
@@ -115,7 +117,7 @@ if ($r->method eq 'POST') {
 								organism => $organism,
 								common_name => $common_name,
 								sample => $specie,
-								#group => $group,
+								clade => $group || 'u', # unknown if $clade is unset
 								crc => $seq_crc || '',
 							});
 						};
@@ -217,7 +219,8 @@ src = <% $seq_src %><br/>
 			<select class="stylized" id="specie" name="specie" size="4" style="width: 300px;"
 				onchange="set_source('sample');">
 % for my $sample (@$samples) {
-			<option id="o<%$sample->{id}%>" value="<% $sample->{id} %>"><%$sample->{organism}%> (<%$sample->{common_name}%>)</option>
+%	my $sel = $seq_src eq 'sample' && $sample->{id} == $specie ? 'selected="selected"' : '';
+			<option id="o<%$sample->{id}%>" value="<% $sample->{id} %>" <% $sel %>><%$sample->{organism}%> (<%$sample->{common_name}%>)</option>
 % }
 			</select>
 		</div>
@@ -231,9 +234,10 @@ src = <% $seq_src %><br/>
 		<label><span class="small">Common name</span></label>
 		<input class="stylized" type="text" name="common_name" id="common_name" value="<% $common_name |html%>" maxlength="128" />
 		<div class="spacer"></div>
-		<label style="clear:both">Group<span class="small">Monocots or Dicots</span></label>&nbsp;&nbsp;
-		<input class="resetradio" type="radio" name="group" id="g1" value="m" /> Monocots
-		<input class="resetradio" type="radio" name="group" id="g2" value="d" /> Dicots
+		<label style="clear:both">Clade<span class="small">Monocots, Dicots, Other</span></label>&nbsp;&nbsp;
+		<input class="resetradio" type="radio" name="group" id="g1" value="m" <% $group eq 'm' ? 'checked="checked"' : ''%>/> Monocots
+		<input class="resetradio" type="radio" name="group" id="g2" value="d" <% $group eq 'd' ? 'checked=+"checked"' : ''%>/> Dicots
+		<input class="resetradio" type="radio" name="group" id="g3" value="o" <% $group eq 'o' ? 'checked=+"checked"' : ''%>/> Other
 		</div>
 	</div>
 <div class="spacer"></div>

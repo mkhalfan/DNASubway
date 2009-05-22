@@ -7,17 +7,32 @@ use IO::File ();
 	sub new {
 		my ($class, $project_dir) = @_;
 
-		__PACKAGE__->SUPER::new('AUGUSTUS', $project_dir);
+		my $self = __PACKAGE__->SUPER::new('AUGUSTUS', $project_dir);
+
+		if (defined $self->{conf}->{output_file} && defined $self->{conf}->{option_output_file}) {
+			my $out_file = $self->{work_dir} . '/' . $self->{conf}->{output_file};
+			my $opt_file = $self->{conf}->{option_output_file};
+			if ($self->{conf}->{option_glue}) {
+				push @{$self->{work_options}}, 
+					$opt_file . $self->{conf}->{option_glue} . $out_file;
+			}
+			else {
+				push @{$self->{work_options}}, (
+						$opt_file, $out_file
+					);
+			}
+		}
+		return $self;
 	}
 
 	sub get_gff3_file {
 		my ($self) = @_;
 
-		#my $gff_file = $self->{work_dir} . '/' . $self->{conf}->{output_file};
 		my $dir = $self->{work_dir};
 
 		#find file to parse
 		opendir(DIR, $dir) or die "Can't opendir $dir: $!";
+		#my @f = grep { /$self->{conf}->{file_to_parse}/ && -f "$dir/$_" } readdir(DIR);
 		my @f = grep { /\.gff3$/ && -f "$dir/$_" } readdir(DIR);
 		unless (@f == 1) {
 			print STDERR "AUGUSTUS: gff3 output file is missing.", $/;
@@ -25,7 +40,6 @@ use IO::File ();
 		}
 
 		my $gff_file = "$dir/$f[0]";
-		#my $gff_file2 = "$dir/augustus.gff3.fixed";
 		my $gff_file2 = $dir . '/' . $self->{conf}->{gff3_file};
 		#parse file
 
