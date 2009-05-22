@@ -27,6 +27,10 @@ The name of the web-based user
  
 Path to the directory containing GFF3 files
 
+=item project_id
+
+Project ID number
+
 =item gbrowse_template
 
 The name of the template for creating GBrowse conf files (default:gbrowse.template)
@@ -57,7 +61,7 @@ it under the same terms as Perl itself.
 
 =cut
 
-my ($PROFILE, $DATADIR, $USERNAME, $GBROWSETEMPLATE, $GBROWSECONFDIR, $HELP);
+my ($PROFILE, $DATADIR, $USERNAME, $GBROWSETEMPLATE, $GBROWSECONFDIR, $HELP, $PROJECTID);
 
 GetOptions(
   'username=s'         => \$USERNAME,
@@ -65,6 +69,7 @@ GetOptions(
   'growse_template=s'  => \$GBROWSETEMPLATE,
   'gbrowse_confdir=s'  => \$GBROWSECONFDIR,
   'profile=s'          => \$PROFILE,
+  'project_id=s'       => \$PROJECTID,
   'help'               => \$HELP,
 ) or  pod2usage(-verbose => 1, -exitval => 1);
 
@@ -72,6 +77,7 @@ pod2usage(-verbose => 2, -exitval => 1) if $HELP;
 
 die unless $USERNAME;
 die unless $DATADIR;
+die unless $PROJECTID;
 
 $PROFILE         ||= 'default';
 $GBROWSECONFDIR  ||= '/etc/httpd/conf/gbrowse.conf';
@@ -84,11 +90,12 @@ my %args = (
   'data_dir'        => $DATADIR,
   'growse_template' => $GBROWSETEMPLATE,
   'gbrowse_confdir' => $GBROWSECONFDIR,
+  'project_id'      => $PROJECTID,
 );
 
 my $utils = DNALC::Pipeline::Chado::Utils->new(%args);
 
 $utils->load_database();
-$utils->create_gbrowse_conf();
+$utils->create_gbrowse_conf($PROJECTID);
 
 exit(0);

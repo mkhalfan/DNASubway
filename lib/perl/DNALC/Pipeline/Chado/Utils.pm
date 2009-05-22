@@ -55,10 +55,42 @@ sub new {
     $self->gbrowse_template( $arg{gbrowse_template}) if $arg{gbrowse_template};
     $self->gbrowse_confdir ( $arg{gbrowse_confdir})  if $arg{gbrowse_confdir};
     $self->fastapath       ( $arg{fastapath})        if $arg{fastapath};
+    $self->project_id      ( $arg{project_id})       if $arg{project_id};
 
 
     return $self;
 }
+
+=head2 project_id
+
+=over
+
+=item Usage
+
+  $obj->project_id()        #get existing value
+  $obj->project_id($newval) #set new value
+
+=item Function
+
+=item Returns
+
+value of project_id (a scalar)
+
+=item Arguments
+
+new value of project_id (to set)
+
+=back
+
+=cut
+
+sub project_id {
+    my $self = shift;
+    my $project_id = shift if defined(@_);
+    return $self->{'project_id'} = $project_id if defined($project_id);
+    return $self->{'project_id'};
+}
+
 
 =head2 fastapath
 
@@ -764,7 +796,7 @@ sub load_database {
 
     my @gff_files = glob('*.gff*');
 
-    my $user = $self->username;
+    my $user = $self->username ."_".$self->project_id;
     foreach my $file (@gff_files) {
         my $command = "gmod_bulk_load_gff3.pl -a --noexon --dbprof $user -g $file";
         warn "$command\n";
