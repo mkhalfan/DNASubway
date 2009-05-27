@@ -21,6 +21,7 @@ use IO::File ();
 
 	# default configuration directory;
 	#my $_def_cf_dir = '/home/cornel/projects/pipeline/lib/perl/config';
+	#my $_def_cf_dir = '/home/luj/projects/pipeline/lib/perl/config';
 	my $_def_cf_dir = '/var/www/lib/perl/config';
 
 	sub new {
