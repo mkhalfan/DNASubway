@@ -24,6 +24,7 @@ use Carp;
 			"Error"         => 3,
 			"Processing"    => 4
 		);
+	my %status_id_to_name = reverse %status_map;
 
 	sub new {
 		my ($class, $project) = @_;
@@ -125,6 +126,16 @@ use Carp;
 			return DNALC::Pipeline::TaskStatus->retrieve( $status_map{'Not processed'} );
 		}
 		$wf->status;
+	}
+	#-------------------------------------------------------------------------
+	sub get_history {
+		my ($self) = @_;
+
+		my $history = DNALC::Pipeline::Workflow->get_history($self->project->project_id);
+		foreach my $h (@$history) {
+			$h->{task_name} = $self->{task_id_to_name} -> {$h->{task_id} };
+		}
+		return $history;
 	}
 	#-------------------------------------------------------------------------
 

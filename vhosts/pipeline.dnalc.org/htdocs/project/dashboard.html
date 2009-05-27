@@ -7,6 +7,7 @@
 	use Data::Dumper; 
 	use DNALC::Pipeline::Project ();
 	use DNALC::Pipeline::App::WorkflowManager ();
+	use DNALC::Pipeline::App::Utils ();
 
 	my @routines = (
 			{ name => 'augustus', label => 'Augustus', delay => 15},
@@ -29,6 +30,7 @@ unless ($proj) {
 
 my $wfm = DNALC::Pipeline::App::WorkflowManager->new( $proj );
 my $upload_st = $wfm->get_status('upload_fasta');
+my $history = $wfm->get_history;
 
 # TODO : set in session when you're starting to run a routine, 
 # and reset this flash after you get info about the execution of the routine
@@ -77,6 +79,21 @@ Clade : <% $proj->clade %>
 
 </ul>
 <div id="gbrowse" style="display:block"><a href="./prepare_gbrowse?pid=<% $proj->id%>">Browse</a></div>
+<div>
+	<h4>History</h4>
+<ul>
+% for my $h (@$history) {
+	<li>
+	<strong><% $h->{task_name} %></strong>,
+% if ($h->{duration} > 0) {
+	duration = <% $h->{duration}%> sec., 
+% }
+%#	<% $h->{status_id}%>,
+	<% DNALC::Pipeline::App::Utils->format_datetime($h->{created}) %>
+	</li>
+% }
+</ul>
+</div>
 <div id="debug"></div>
 
 </div>

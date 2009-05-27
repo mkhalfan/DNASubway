@@ -1,7 +1,21 @@
 body{
 font-family:"Lucida Grande", "Lucida Sans Unicode", Verdana, Arial, Helvetica, sans-serif;
 font-size:12px;
+margin: 0px;
 }
+#main {
+width: 960px;
+margin-left: auto;
+margin-right: auto;
+}
+
+#topnavi {
+	margin: 0px 0px 0px 0px;
+	padding: 2px 10px 2px 10px;
+	color:#000;
+	background-color:#ffce82;
+}
+
 p, h1, form, button{border:0; margin:0; padding:0;}
 .spacer{clear:both;}
 /* ----------- My Form ----------- */
@@ -85,4 +99,19 @@ margin:0 0 0 0;
 	background-image: url(/images/ajax-loader.gif);
 	background-repeat: no-repeat;
 	padding-left: 20px;
+}
+
+/* -------------------------- */
+#home div.homebox {
+	width: 33%;
+	float: left;
+	min-height: 300px;
+}
+.homebox {
+	border: 1px solid red;
+}
+
+#loginbox {
+	padding: 10px 20px 10px 0px;
+	text-align: right;
 }

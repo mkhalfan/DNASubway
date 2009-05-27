@@ -1,13 +1,25 @@
+<div id="topnavi">
+	<a href="/">Home</a>
+	<a href="/project/">Project selector</a>
+% if ($s->{logged_in}) {
+		<a href="/logout">Logout</a>
+% } else {
+		<a href="/">Login</a>
+% }
+</div>
 % $m->call_next;
 <%init>
 	$m->session->{pipeline} ||= {};
 	my $s = $m->session->{pipeline};
 	my $now = time();
 
-	#pretend the user logged in already
-	$s->{logged_in} = 1;
-	$s->{user_id}  = 45;
-	$s->{username} = "H9VV";
+	if ($s->{logged_in}) {
+	}
+	else {
+		#pretend the user logged in already
+		$s->{user_id}  = 45;
+		$s->{username} = "guest";
+	}
 	$s->{last} = $now;
 	
 </%init>

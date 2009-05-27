@@ -40,6 +40,9 @@ function check_status (pid, op, h) {
 			}
 			else  if (r.status == 'error') {
 				clearInterval(intervalID[op]);
+				s.removeClassName('processing');
+				s.addClassName('error');
+				s.update('Error');
 			}
 			else {
 				s.update('Unknown status!');
@@ -60,6 +63,7 @@ function run (op) {
 	var p = $('pid').value;
 	if (b) b.disable();
 	if (s) {
+		s.removeClassName('error');
 		s.addClassName('processing');
 		s.update('Job sent.');
 		//s.insert(' Job sent.');

@@ -1,5 +1,5 @@
 % if ($status) {
-{'status':'success','running' : <% $status->running %>, 'known' : '<% $status->known %>', 'output':'<& './.comp/filepath_to_web', file => $output &>'}
+{'status':'<%$success%>','running' : <% $status->running %>, 'known' : '<% $status->known %>', 'output':'<& './.comp/filepath_to_web', file => $output &>'}
 % } else {
 {'status':'error','message':'???'}
 % }
@@ -13,6 +13,7 @@
 <%once>
 	use Gearman::Client ();
 	use DNALC::Pipeline::Project ();
+	use DNALC::Pipeline::App::WorkflowManager ();
 	use Data::Dumper;
 
 	my @routines = qw/trna_scan augustus fgenesh repeat_masker/;
@@ -24,9 +25,7 @@
 
 	$m->session->{pipeline} ||= {};
 	my $s = $m->session->{pipeline};
-
-	#print STDERR  "H = ", $h, $/;
-	#print STDERR  "pid = ", $pid, $/;
+	my $success = 'success';
 
 	unless ($t) {
 		print "{'status':'error', 'message': 'Task unknown.'}";
@@ -50,10 +49,19 @@
 	#print STDERR 'xxx: ', ($status && !$status->running), $/ if $status;
 	my $output = '';
 	if ($status && !$status->running && !$status->known) {
-		$output = $proj->get_gff3_file($t);
+		my $wfm = DNALC::Pipeline::App::WorkflowManager->new( $proj );
+		my $task_status = $wfm->get_status($t);
+		#print STDERR Dumper( $task_status ), $/;
+		if ($task_status && $task_status->name eq 'Done' ) {
+			$output = $proj->get_gff3_file($t);
+		}
+		else {
+			$success = 'error';
+		}
 	}
 </%init>
 %#-------------------------------------------------
 <%flags>
 	inherit => undef
 </%flags>
+%# vim: ft=mason

@@ -3,6 +3,7 @@ package DNALC::Pipeline::Workflow;
 use strict;
 use warnings;
 
+use Carp;
 use POSIX ();
 
 #use DNALC::Pipeline::Config ();
@@ -22,7 +23,6 @@ __PACKAGE__->columns(Other => qw/duration created/);
 __PACKAGE__->add_trigger(before_create => sub {
     $_[0]->{created} ||= POSIX::strftime "%Y-%m-%d %H:%M:%S", localtime(+time);
 	$_[0]->{duration} ||= 0.0;
-	$_[0]->{archived} ||= 0;
 
 	unless ($_[0]->{user_id}) {
 		my $prj = DNALC::Pipeline::Project->retrieve($_[0]->{project_id});
@@ -69,6 +69,26 @@ sub status {
 	my ($self) = @_;
 	#return $self->status_id;
 	DNALC::Pipeline::TaskStatus->retrieve($self->status_id);
+}
+
+__PACKAGE__->set_sql( get_history => q{
+	SELECT task_id, status_id, duration, created 
+	FROM workflow WHERE project_id = ? AND status_id != 4
+	UNION
+	SELECT task_id, status_id, duration, archived
+	FROM workflow_history WHERE project_id = ? AND status_id != 4
+	ORDER BY created
+	});
+sub get_history {
+	my ($class, $project_id) = @_;
+	my $sth = __PACKAGE__->sql_get_history;
+	$sth->execute($project_id, $project_id) or do { carp $!; return; };
+	my @history = ();
+	while (my $h = $sth->fetchrow_hashref) {
+		push @history, $h;
+	}
+	$sth->finish;
+	return \@history;
 }
 
 1;

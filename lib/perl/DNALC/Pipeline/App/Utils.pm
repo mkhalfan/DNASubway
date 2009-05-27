@@ -11,6 +11,7 @@ use DNALC::Pipeline::Config ();
 use DNALC::Pipeline::Utils qw(random_string);
 
 use Digest::MD5 ();
+use Time::Piece ();
 
 =head1 TODO
 
@@ -134,6 +135,14 @@ sub _is_upload_ok {
 
 	# TODO - check content & size
 	return $ok;
+}
+
+sub format_datetime {
+	my ($class, $time_str, $format_str) = @_;
+	$format_str ||= "%Y-%m-%d %H:%M:%S";
+	my $t = Time::Piece->strptime($time_str, $format_str);
+	
+	return $t->strftime("%m/%d/%Y %H:%M:%S");
 }
 
 1;

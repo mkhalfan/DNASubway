@@ -161,10 +161,16 @@ if ($r->method eq 'POST') {
 					gbrowse_template => $pcf->{GBROWSE_TEMPLATE},
 					gbrowse_confdir  => $pcf->{GBROWSE_CONF_DIR},
 				);
-				if (0) {
-					print STDERR  'skipping CHADO insert organism, chado conf file..', $/;
+				if (1) {
+					eval {
+					    $cutils->create_db(1);
+					};
+					if ($@)  {
+					    print STDERR  "CHADO DB already exists. skipping...", $/;
+					}
+
 					my $conffile_ok = $cutils->create_conf_file( $proj->id );
-					print STDERR "Created file = ", $conffile_ok, $/;
+					print STDERR "Created CHADO CONF file = ", $conffile_ok, $/;
 					my $new_profile = sprintf("%s_%d", $s->{username}, $proj->id);
 					# read data from new file
 
@@ -191,7 +197,6 @@ else {
 
 </%init>
 user = <% $s->{user_id}%>/<% $s->{username} %><br/>
-src = <% $seq_src %><br/>
 <div id="stylized" class="myform">
 <h1>Create new Project</h1>
 % if (@err) {

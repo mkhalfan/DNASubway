@@ -5,6 +5,7 @@ use warnings;
 
 use Bio::GMOD::Config ();
 use Bio::GMOD::DB::Config ();
+use File::Temp ();
 use Cwd;
 use File::Path;
 use IO::File ();
@@ -891,14 +892,15 @@ sub load_fasta {
     #create GFF file
     my $fh = File::Temp->new(); #may need unlink=0 here
     my $filename = $fh->filename;
-    print $fh join("\t",$id,$self->user,'contig',1,$length,'.','.','.',"ID=$id,Name=$id"),"\n";
+    print $fh join("\t", $id, $self->username, 'contig', 1, 
+			$length, '.', '.', '.', "ID=$id,Name=$id"),"\n";
     print $fh "###\n";
     print $fh "##FASTA\n";
     print $fh "$seq\n";
     close $fh;
 
     #load
-    my $dbprof = $self->username;
+    my $dbprof = $self->profile;
     system("gmod_bulk_load_gff3.pl --dbprof $dbprof -g $filename") == 0 or die "fasta load failed";
 
     return;
