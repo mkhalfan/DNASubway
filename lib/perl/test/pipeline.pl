@@ -13,7 +13,7 @@ use strict;
 $ENV{GMOD_ROOT} = '/usr/local/gmod';
 
 #-----------------------------------------------------------------------------
-my $input_file = '/home/cornel/work/100k/B.fasta';
+my $input_file = '/home/cain/005E/fasta.fa';
 my $organism = 'Narcissus pseudonarcissus';
 my @subnames = split /\s/, $organism;
 my $common_name = 'daffodil';
@@ -174,3 +174,17 @@ if (@params) {
 print $/;
 print 'GFF FILE = ', $gff_file, $/;
 print $/;
+
+warn @$gff3_files;
+
+my $load_fasta_command="perl /var/www/bin/load_fasta.pl --username guest --profile "
+                             .$username."_".$proj->id." --fastapath ".$proj->fasta_file;
+warn $load_fasta_command;
+system($load_fasta_command);
+
+for my $file (@$gff3_files) {
+    warn $file;
+    my $gff_load_command = "gmod_bulk_load_gff3.pl -a --noexon --dbprof ".$username."_".$proj->id." -g $file";
+    warn $gff_load_command;
+    system($gff_load_command);
+}
