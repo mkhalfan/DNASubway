@@ -892,8 +892,9 @@ sub load_fasta {
     #create GFF file
     my $fh = File::Temp->new(); #may need unlink=0 here
     my $filename = $fh->filename;
-    print $fh join("\t", $id, $self->username, 'contig', 1, 
-			$length, '.', '.', '.', "ID=$id,Name=$id"),"\n";
+	print $fh "$id\tDNALC\tchromosome\t1\t$length\t.\t.\t.\tID=$id;Name=$id\n";
+	#print $fh join("\t", $id, $self->username, 'contig', 1, 
+	#		$length, '.', '.', '.', "ID=$id,Name=$id"),"\n";
     print $fh "###\n";
     print $fh "##FASTA\n";
     print $fh "$seq\n";

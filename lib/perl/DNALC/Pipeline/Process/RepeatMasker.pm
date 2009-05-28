@@ -79,8 +79,10 @@ use strict;
 			# First annotation of a region
 			if ( $result->getQueryName() ne $currentQueryName ) {
 			  $currentQueryName = $result->getQueryName();
-			  print $out "##sequence-region $currentQueryName 1 "
-				  . ( $result->getQueryRemaining() + $result->getQueryEnd() ) . "\n";
+
+			  # it turns out gff bulk loader complains about this line
+			  #print $out "##sequence-region $currentQueryName 1 "
+			  #	  . ( $result->getQueryRemaining() + $result->getQueryEnd() ) . "\n";
 			}
 
 			# FORMAT:
