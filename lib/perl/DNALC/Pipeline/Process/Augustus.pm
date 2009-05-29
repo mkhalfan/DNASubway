@@ -7,22 +7,7 @@ use IO::File ();
 	sub new {
 		my ($class, $project_dir) = @_;
 
-		my $self = __PACKAGE__->SUPER::new('AUGUSTUS', $project_dir);
-
-		if (defined $self->{conf}->{output_file} && defined $self->{conf}->{option_output_file}) {
-			my $out_file = $self->{work_dir} . '/' . $self->{conf}->{output_file};
-			my $opt_file = $self->{conf}->{option_output_file};
-			if ($self->{conf}->{option_glue}) {
-				push @{$self->{work_options}}, 
-					$opt_file . $self->{conf}->{option_glue} . $out_file;
-			}
-			else {
-				push @{$self->{work_options}}, (
-						$opt_file, $out_file
-					);
-			}
-		}
-		return $self;
+		__PACKAGE__->SUPER::new('AUGUSTUS', $project_dir);
 	}
 
 	sub get_gff3_file {

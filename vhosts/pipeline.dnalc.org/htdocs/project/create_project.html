@@ -58,6 +58,9 @@ if ($r->method eq 'POST') {
 		else {
 			$sample_file = $samples_dir . '/' . $sample->{id} . '/fasta.fa';
 		}
+		print STDERR  "---------------------------------", $/;
+		print STDERR  "TODO: JUST COPY SAMPLE's FASTA FILE....", $/;
+		print STDERR  "---------------------------------", $/;
 	}
 
 	my @subnames = split /\s/, $organism;
@@ -222,14 +225,17 @@ user = <% $s->{user_id}%>/<% $s->{username} %><br/>
 		Select from the samples we provide below:
 		<div>
 			<select class="stylized" id="specie" name="specie" size="4" style="width: 300px;"
-				onchange="set_source('sample');">
+				onchange="set_source('sample');show_sample_info()">
 % for my $sample (@$samples) {
 %	my $sel = $seq_src eq 'sample' && $sample->{id} == $specie ? 'selected="selected"' : '';
-			<option id="o<%$sample->{id}%>" value="<% $sample->{id} %>" <% $sel %>><%$sample->{organism}%> (<%$sample->{common_name}%>)</option>
+			<option id="o<%$sample->{id}%>" value="<% $sample->{id} %>" \
+			extra="location: <% $sample->{location}%>, position: <% $sample->{position}%>&lt;br/&gt; source: <% $sample->{source}%>, release: <%$sample->{release} %>" clade="<% $sample->{clade} ? $sample->{clade} : 'o' %>"\
+		<% $sel %>><%$sample->{organism}%> (<%$sample->{common_name}%>)</option>
 % }
 			</select>
 		</div>
 	<div class="spacer"></div>
+	<div id="sample_info">&nbsp;</div>
 	<p></p>
 	<label>Project Name	<span class="small">Type your project's name</span></label>
 	<input class="stylized" type="text" name="name" id="name" value="<% $name|html%>" />
@@ -240,9 +246,10 @@ user = <% $s->{user_id}%>/<% $s->{username} %><br/>
 		<input class="stylized" type="text" name="common_name" id="common_name" value="<% $common_name |html%>" maxlength="128" />
 		<div class="spacer"></div>
 		<label style="clear:both">Clade<span class="small">Monocots, Dicots, Other</span></label>&nbsp;&nbsp;
-		<input class="resetradio" type="radio" name="group" id="g1" value="m" <% $group eq 'm' ? 'checked="checked"' : ''%>/> Monocots
-		<input class="resetradio" type="radio" name="group" id="g2" value="d" <% $group eq 'd' ? 'checked=+"checked"' : ''%>/> Dicots
-		<input class="resetradio" type="radio" name="group" id="g3" value="o" <% $group eq 'o' ? 'checked=+"checked"' : ''%>/> Other
+		<input class="resetradio" type="radio" name="group" id="gm" value="m" <% $group eq 'm' ? 'checked="checked"' : ''%>/> Monocots
+		<input class="resetradio" type="radio" name="group" id="gd" value="d" <% $group eq 'd' ? 'checked="checked"' : ''%>/> Dicots<br/>
+		&nbsp;&nbsp;<input class="resetradio" type="radio" name="group" id="go" value="o" <% $group eq 'o' ? 'checked="checked"' : ''%>/> Other
+		<input class="resetradio" type="radio" name="group" id="gu" value="u" <% $group eq 'o' ? 'checked="checked"' : ''%>/> I don't know
 		</div>
 	</div>
 <div class="spacer"></div>

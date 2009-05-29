@@ -12,13 +12,46 @@
 	upload_dir => '/var/www/vhosts/pipeline.dnalc.org/var/projects/0000',
 	upload_mime_types => ['text/plain', 'application/octet-stream'],
 	upload_max_size => 150 * 1024, # max 150 KB
-	samples => [
+	samples_old => [
 			{id => 1, organism=>'Arabidopsis thaliana', common_name => 'arabidopsis'},
 			{id => 2, organism=>'Juglans duclouxiana', common_name => 'walnut'},
 			{id => 3, organism=>'Acer saccharinum', common_name => 'white maple'},
 			{id => 4, organism=>'Citrus sinensis', common_name => 'orange'},
 			{id => 5, organism=>'Narcissus pseudonarcissus', common_name => 'daffodil'},
 		],
+	samples => [
+			{id => 1, organism=>'Arabidopsis thaliana', common_name => 'Mustard Weed', 
+				location => 'Chromosome 1', position => '3777001-3877000', clade => 'd',
+				source => 'TAIR', release => 'Tair8', date => '2009-05-20'},
+# 			{id => 2, organism=>'Arabidopsis thaliana', common_name => 'Mustard Weed',
+# 				location => 'Chromosome 2', position => '15743001-15843000', clade => 'd',
+# 				source => 'TAIR', release => 'Tair8', date => '2009-05-20'},
+# 			{id => 3, organism=>'Arabidopsis thaliana', common_name => 'Mustard Weed',
+# 				location => 'Chromosome 3', position => '18862001-18962000', clade => 'd',
+# 				source => 'TAIR', release => 'Tair8', date => '2009-05-20'},
+
+			{id => 4, organism=>'Oryza sativa', common_name => 'Rice',
+				location => 'Chromosome 1', position => '18862001-18962000', clade => 'm',
+				source => 'MSU/Buell', release => '6', date => '2009-05-20'},
+# 			{id => 5, organism=>'Oryza sativa', common_name => 'Rice', 
+# 				location => 'Chromosome 2', position => '26000001-26100000', clade => 'm',
+# 				source => 'MSU/Buell', release => '6', date => '2009-05-20'},
+# 			{id => 6, organism=>'Oryza sativa', common_name => 'Rice',
+# 				location => 'Chromosome 3', position => '9190000-9289999', clade => 'm',
+# 				source => 'MSU/Buell', release => '6', date => '2009-05-20'},
+
+# 			{id => 7, organism=>'Vitis vinifera', common_name => 'Grape',
+# 				location => 'Chromosome 1', position => '1145001-1245000', clade => 'd',
+# 				source => 'genoscope/INRA', release => '2007', date => '2009-05-20'},
+# 			{id => 8, organism=>'Vitis vinifera', common_name => 'Grape',
+# 				location => 'Chromosome 2', position => '16019001-16119000', clade => 'd',
+# 				source => 'genoscope/INRA', release => '2007', date => '2009-05-20'},
+			{id => 9, organism=>'Vitis vinifera', common_name => 'Grape',
+				location => 'Chromosome 3', position => '3573001-3673000', clade => 'd',
+				source => 'genoscope/INRA', release => '2007', date => '2009-05-20'},
+		],
+
+	samples_common_name => qr/__%SPECIESNAMEHERE%__/,
 	samples_dir => '/var/www/vhosts/pipeline.dnalc.org/var/samples',
-	sequence_length => 50_000,
+	sequence_length => 100_000,
 }

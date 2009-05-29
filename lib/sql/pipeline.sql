@@ -299,9 +299,22 @@ ALTER TABLE cachemd5 OWNER TO pipeline;
 
 CREATE INDEX cachemd5_crc_ndx ON cachemd5 USING hash (crc);
 
+CREATE TYPE t_history as (task_id smallint,  status_id smallint, duration numeric(7,3) , created timestamp without time zone);
+
+CREATE OR REPLACE FUNCTION history(int) RETURNS SETOF t_history
+AS $$
+select task_id, status_id, duration, created from workflow where project_id = $1
+union
+select task_id, status_id, duration, created from workflow_history where project_id = $1
+$$
+LANGUAGE SQL;
+
+
 --
 -- Name: public; Type: ACL; Schema: -; Owner: postgres
 --
+
+
 
 REVOKE ALL ON SCHEMA public FROM PUBLIC;
 REVOKE ALL ON SCHEMA public FROM postgres;

@@ -841,7 +841,9 @@ sub create_gbrowse_conf {
 	}
 
     my $conffile = sprintf("%s/%s_%d.conf", $confdir, $username, $project_id); 
-	#return if -f $conffile;
+
+	return $conffile if -f $conffile;
+
 	print STDERR  "Config dir = ", $confdir, $/;
 	print STDERR  "Config file = ", $conffile, $/;
 	if (-f $conffile) {
@@ -851,7 +853,7 @@ sub create_gbrowse_conf {
 	my $in  = IO::File->new( $confdir . '/' . $self->gbrowse_template );
 	my $out = IO::File->new( "> $conffile" );
 	if (defined $in && $out) {
-		my $organism = $self->common_name;
+		$organism =~ s/\s+/-/g;;
 		while (my $line = <$in> ) {
 			$line =~ s/__USER__/$username/;
 			$line =~ s/__ORGANISM__/$organism/;
@@ -892,7 +894,7 @@ sub load_fasta {
     #create GFF file
     my $fh = File::Temp->new(); #may need unlink=0 here
     my $filename = $fh->filename;
-	print $fh "$id\tDNALC\tchromosome\t1\t$length\t.\t.\t.\tID=$id;Name=$id\n";
+	#print $fh "$id\tDNALC\tchromosome\t1\t$length\t.\t.\t.\tID=$id;Name=$id\n";
 	#print $fh join("\t", $id, $self->username, 'contig', 1, 
 	#		$length, '.', '.', '.', "ID=$id,Name=$id"),"\n";
     print $fh "###\n";

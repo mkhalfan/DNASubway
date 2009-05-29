@@ -6,8 +6,10 @@
 				'-q', # quite
 				'-b', # brief output format (no column headers)
 			],
-	output_file => '-o',
+	
+	option_output_file => '-o',
+	output_file => 'output.out',
 	file_to_parse => qr/\.out$/,
-	gff3_file	=> 'output.gff3',
+	gff3_file	=> 'output.gff',
 }
 

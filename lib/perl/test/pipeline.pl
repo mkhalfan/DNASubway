@@ -19,7 +19,7 @@ my @subnames = split /\s/, $organism;
 my $common_name = 'daffodil';
 #-----------------------------------------------------------------------------
 
-my $username = $ARGV[0] || 'ala_bala-122';
+my $username = $ARGV[0] || 'guest';
 if (!$username || $username =~ /[^a-z0-9_-]/i) {
 	print STDERR  "Username missing or not well formated.", $/;
 	exit 0;

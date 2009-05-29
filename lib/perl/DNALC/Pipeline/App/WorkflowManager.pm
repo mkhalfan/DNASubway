@@ -12,6 +12,8 @@ use DNALC::Pipeline::Process::TRNAScan ();
 use DNALC::Pipeline::Process::Augustus ();
 use DNALC::Pipeline::Process::FGenesH ();
 
+use DNALC::Pipeline::Sample ();
+
 use Digest::MD5 ();
 
 use File::Copy;
@@ -150,13 +152,28 @@ use Carp;
 	sub upload_sequence {
 		my ($self, $source_file) = @_;
 
-		unless (-e $source_file) {
-			carp "Source file [$source_file] is missing\n";
-		}
-		
+		my $rc;
 		my $upload_file = $self->project->work_dir . '/' . 'fasta.fa';
-		my $rc = copy $source_file, $upload_file;
-		carp 'Unable to upload sequence: ', $! unless $rc;
+		
+		my $sample_id = $self->project->sample;
+		if ($sample_id) {
+			my $sample = DNALC::Pipeline::Sample->new($sample_id);
+			return unless $sample;
+
+			$rc = $sample->copy_fasta({
+					project_dir => $self->project->work_dir,
+					common_name => $self->project->common_name,
+				});
+			print STDERR  "Uploaded file = ", $upload_file, $/;
+		} 
+		else {
+			unless (-f $source_file) {
+				carp "Source file [$source_file] is missing\n";
+			}
+			
+			$rc = copy $source_file, $upload_file;
+			carp 'Unable to upload sequence: ', $! unless $rc;
+		}
 
 		my $s;
 		if ($rc) {
@@ -175,16 +192,18 @@ use Carp;
 		my $status = { success => 0 };
 	
 		my $proj = $self->project;
-		print STDERR "FASTA FILE = ", $proj->fasta_file, $/;;
-		carp "Fasta file is missing\n" unless $proj->fasta_file;
+
+		if ($proj->sample) {
+			my $st = $self->run_fake('repeat_masker');
+			return $st if $st->{success};
+		}
 
 		my $rep_mask = DNALC::Pipeline::Process::RepeatMasker->new( $proj->work_dir  );
 		if ($rep_mask) {
 			my $crc = $self->crc($rep_mask->get_options);
-			print STDERR  "REPEAT_MASKER options = ", join('', $rep_mask->get_options), $/;
-			print STDERR  "REPEAT_MASKER CRC = ", $crc, $/;
+			#print STDERR  "REPEAT_MASKER options = ", join('', $rep_mask->get_options), $/;
+			#print STDERR  "REPEAT_MASKER CRC = ", $crc, $/;
 
-			my $pretend = 0;
 			$self->set_status('repeat_masker', 'Processing');
 
 			# TODO
@@ -196,8 +215,7 @@ use Carp;
 			# $self->set_status($task_name, 'Done', 0.01);
 			$rep_mask->run(
 					input => $proj->fasta_file,
-					pretend => $pretend,
-					debug => 1,
+					debug => 0,
 				);
 			if (defined $rep_mask->{exit_status} && $rep_mask->{exit_status} == 0) {
 				print STDERR "REPEAT_MASKER: success\n";
@@ -224,6 +242,12 @@ use Carp;
 		my $status = { success => 0 };
 	
 		my $proj = $self->project;
+
+		if ($proj->sample) {
+			my $st = $self->run_fake('augustus');
+			return $st if $st->{success};
+		}
+
 		my $augustus = DNALC::Pipeline::Process::Augustus->new( $proj->work_dir );
 		if ( $augustus) {
 			my $crc = $self->crc($augustus->get_options);
@@ -260,16 +284,19 @@ use Carp;
 		my $status = { success => 0 };	
 		my $proj = $self->project;
 
+		if ($proj->sample) {
+			my $st = $self->run_fake('trna_scan');
+			return $st if $st->{success};
+		}
+
 		my $trna_scan = DNALC::Pipeline::Process::TRNAScan->new( $proj->work_dir );
 		if ($trna_scan ) {
 			my $crc = $self->crc($trna_scan->get_options);
-			print STDERR  "TRNAScan options = ", join('', $trna_scan->get_options), $/;
-			print STDERR  "TRNAScan CRC = ", $crc, $/;
 
 			$self->set_status('trna_scan', 'Processing');
 			$trna_scan->run(
 					input => $proj->fasta_file,
-					output_file => $trna_scan->{work_dir} . '/' . 'output.out',
+					#output_file => $trna_scan->{work_dir} . '/' . 'output.out',
 				);
 			if (defined $trna_scan->{exit_status} && $trna_scan->{exit_status} == 0) {
 				print STDERR "TRNA_SCAN: success\n";
@@ -295,17 +322,21 @@ use Carp;
 		my $status = { success => 0 };
 	
 		my $proj = $self->project;
+
+		if ($proj->sample) {
+			my $st = $self->run_fake('fgenesh');
+			return $st if $st->{success};
+		}
+
 		my $group = $proj->group;
 
 		my $fgenesh = DNALC::Pipeline::Process::FGenesH->new( $proj->work_dir, $group );
 		if ( $fgenesh) {
 			my $crc = $self->crc($fgenesh->get_options);
-			#print STDERR  "FGENESH options = ", join('', $fgenesh->get_options), $/;
-			#print STDERR  "FGENESH CRC = ", $crc, $/;
 			$self->set_status('fgenesh', 'Processing');
 			$fgenesh->run(
 					input => $proj->fasta_file,
-					debug => 1,
+					debug => 0,
 				);
 			if (defined $fgenesh->{exit_status} && $fgenesh->{exit_status} == 0) {
 				print STDERR "FGENESH: success\n";
@@ -313,7 +344,7 @@ use Carp;
 				$status->{success} = 1;
 				$status->{elapsed} = $fgenesh->{elapsed};
 				$status->{gff_file}= $fgenesh->get_gff3_file;
-				$self->set_status('fgenesh', 'Done', $fgenesh->{elapsed});
+				$self->set_status('fgenesh', 'Done', $status->{elapsed});
 				$self->set_cache('fgenesh', $crc);
 			}
 			else {
@@ -325,6 +356,31 @@ use Carp;
 		return $status;
 	}
 	#-------------------------------------------------------------------------
+	sub run_fake {
+		my ($self, $routine) = @_;
+
+		my $status = {success => 0};
+
+		my $proj = $self->project;
+		my $sample_id = $proj->sample;
+		if ($sample_id) {
+			my $sample = DNALC::Pipeline::Sample->new($sample_id);
+			return $status unless $sample;
+
+			my $rc = $sample->copy_results({
+						routine => $routine,
+						project_dir => $proj->work_dir,
+						common_name => $proj->common_name,
+					});
+			if ($rc) {
+				$status->{success} = 1;
+				$status->{elapsed} = 1.59;
+				$self->set_status($routine, 'Done', $status->{elapsed});
+			}
+		}
+
+		return $status;
+	}
 	#-------------------------------------------------------------------------
 	# computes MD5 sum from the given @args list
 	sub crc {

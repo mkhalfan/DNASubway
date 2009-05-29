@@ -8,8 +8,6 @@ use Data::Dumper;
 
 use Carp;
 
-
-# runs processes
 {
 
 	sub new {
@@ -71,6 +69,20 @@ use Carp;
 		$self->{work_options} = [ @{ $self->{conf}->{options} } ];
 		# FIXME - find another place to initialize this
 		$self->{work_dir} = $dir;
+
+		if (defined $self->{conf}->{output_file} && defined $self->{conf}->{option_output_file}) {
+			my $out_file = $self->{work_dir} . '/' . $self->{conf}->{output_file};
+			my $opt_file = $self->{conf}->{option_output_file};
+			if ($self->{conf}->{option_glue}) {
+				push @{$self->{work_options}}, 
+					$opt_file . $self->{conf}->{option_glue} . $out_file;
+			}
+			else {
+				push @{$self->{work_options}}, (
+						$opt_file, $out_file
+					);
+			}
+		}
 	}
 
 	# this will generate the option to be passed to the pogram
@@ -91,7 +103,6 @@ use Carp;
 		my $pretend = exists $params{pretend} ? delete $params{pretend} : undef;
 		my $input_file = $params{input} ? delete $params{input} : undef;
 		my $debug = $params{debug} ? delete $params{debug} : $pretend;
-
 
 		unless ($input_file) {
 			print STDERR 'Input file is missing...', $/;

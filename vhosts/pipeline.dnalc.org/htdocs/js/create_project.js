@@ -23,11 +23,19 @@ function select_source(el) {
 	if (el && el.value == 'upload') {
 		$('specie').selectedIndex = -1;
 		//$('organism_info').show();
+		$('sample_info').update('');
 	}
 	else if (el && el.value == 'sample') {
 		//$('organism_info').hide();
 	}
 	populate_fields(el.value);
+}
+
+function show_sample_info() {
+	var si = $('sample_info');
+	var species = $('specie');
+	var extra = species.options[species.selectedIndex].getAttribute('extra');
+	si.update(extra);
 }
 
 function set_source(s) {
@@ -50,6 +58,8 @@ function populate_fields(src) {
 	}
 	else {
 		var o = sel.options[sel.selectedIndex];
+		var clade = o.hasAttribute('clade') ? o.getAttribute('clade') : 'o';
+		var clade_o = $('g' + clade);
 		var full_name = o.text;
 		organism.value = full_name.replace(/\s*\(.*?\)/,'');
 		var m = full_name.match(/\((.*)\)/);
@@ -58,7 +68,9 @@ function populate_fields(src) {
 		}
 		organism.readOnly = true;
 		common_name.readOnly = true;
-
+		if (clade_o) {
+			clade_o.checked = true;
+		}
 	}
 }
 
