@@ -42,6 +42,7 @@ use strict;
 		push @opts, @{ $self->{conf}{parser_opt} };
 		push @opts, ("-i", $file_to_parse, "-o", $gff_file);
 		my $cmd=join ' ', @opts;
+		print STDERR  "PARSER = ", $cmd, $/;
 		system($cmd);
 
 		#end parse file

@@ -14,11 +14,14 @@
 		'-i',
 	],
 	file_to_parse => qr/stdout\.txt$/,
-	parser_program => '/usr/bin/bp_search2gff.pl',
+	parser_program => '/var/www/bin/bp_search2gff_revised.pl',
 	parser_opt => [
 		'--version', 3,
 		'-m',
 		'--method', 'match_part',
+		'--coverage', '0.5',
+		'--identity', '0.4',
+		'--bits', '30',
 	],
 	gff3_file => 'output.gff',
 }
