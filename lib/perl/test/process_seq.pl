@@ -10,6 +10,7 @@ use DNALC::Pipeline::Project ();
 
 use DNALC::Pipeline::Process::RepeatMasker ();
 use DNALC::Pipeline::Process::Augustus ();
+use DNALC::Pipeline::Process::Snap ();
 use DNALC::Pipeline::Process::TRNAScan ();
 use DNALC::Pipeline::Process::FGenesH ();
 
@@ -43,7 +44,7 @@ Readonly::Scalar my $WORK_DIR => q{/home/cornel/work};
 #my $seq = $seqio->next_seq;
 #print $seq->seq, $/;
 
-my $proj = DNALC::Pipeline::Project->retrieve($ARGV[0]);
+my $proj = DNALC::Pipeline::Project->retrieve($ARGV[0] || 192);
 
 unless ($proj) {
 	print STDERR  "Project [$ARGV[0]] not found..", $/;
@@ -53,6 +54,29 @@ unless ($proj) {
 #my $input  = $WORK_DIR . '/100k/'. 'B.fasta';
 my $output = $proj->work_dir . '/' . 'out.gff3';
 my @gffs = ();
+
+
+my $snap = DNALC::Pipeline::Process::Snap->new( $proj->work_dir, $proj->clade );
+if ( $snap) {
+	my $pretend = 0;
+	$snap->run(
+			input => $proj->fasta_file,
+			pretend => $pretend,
+			debug => 1,
+		);
+	if (defined $snap->{exit_status} && $snap->{exit_status} == 0) {
+		print "SNAP: success\n";
+		
+		my $gff_file = $snap->get_gff3_file;
+		push @gffs, $gff_file;
+		print 'SNAP: gff_file: ', $gff_file, $/;
+		print 'SNAP: duration: ', $snap->{elapsed}, $/;
+	}
+	else {
+		print "SNAP: fail\n";
+	}
+
+}
 
 my $rep_mask = DNALC::Pipeline::Process::RepeatMasker->new( $proj->work_dir  );
 if ($rep_mask) {
