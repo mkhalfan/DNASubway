@@ -33,6 +33,8 @@ else {
 			DNALC::Pipeline::Project->create({
 				user_id => $u->id,
 				name => 'Project name: '. random_string(4, 15),
+				organism => 'Some species',
+				common_name => 'species',
 			});};
 
 	if ($@) {
@@ -56,7 +58,7 @@ else {
 
 my $wfm = DNALC::Pipeline::App::WorkflowManager->new( $proj );
 
-#print STDERR Dumper( \$wfm), $/;
+print STDERR Dumper( \$wfm), $/;
 
 my $upload_st = $wfm->get_status('upload_fasta');
 
@@ -70,6 +72,14 @@ print STDERR "U_ST = ", $upload_st->name , $/;
 
 if ( $upload_st->name eq 'Done') {
 	my $st;
+	
+	print STDERR  '-' x 20 , $/;
+ 	$st = $wfm->run_snap;
+ 	my $s_st = $wfm->get_status('snap');
+ 	print STDERR "SNAP_ST = ", $s_st->name, ($/ x 2);
+
+
+
 #	print STDERR  '-' x 20 , $/;
 # 	$st = $wfm->run_repeat_masker;
 # 	my $rm_st = $wfm->get_status('repeat_masker');

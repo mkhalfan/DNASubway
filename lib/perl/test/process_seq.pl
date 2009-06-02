@@ -78,12 +78,13 @@ if ( $snap) {
 
 }
 
-my $rep_mask = DNALC::Pipeline::Process::RepeatMasker->new( $proj->work_dir  );
+my $rep_mask = DNALC::Pipeline::Process::RepeatMasker->new( $proj->work_dir, $proj->clade);
 if ($rep_mask) {
 	my $pretend = 0;
 	$rep_mask->run(
 			input => $proj->fasta_file,
 			pretend => $pretend,
+			debug => 1,
 		);
 	if (defined $rep_mask->{exit_status} && $rep_mask->{exit_status} == 0) {
 		print "REPEAT_MASKER: success\n";
@@ -97,7 +98,7 @@ if ($rep_mask) {
 	print 'RM: duration: ', $rep_mask->{elapsed}, $/ if $rep_mask->{elapsed};
 }
 
-my $fgenesh = DNALC::Pipeline::Process::FGenesH->new( $proj->work_dir, 'Monocots' );
+my $fgenesh = DNALC::Pipeline::Process::FGenesH->new( $proj->work_dir, $proj->clade );
 if ($fgenesh) {
 	my $pretend = 0;
 	$fgenesh->run(
@@ -116,14 +117,13 @@ if ($fgenesh) {
 	print 'FG: gff_file: ', $gff_file, $/;
 	print 'FG: duration: ', $fgenesh->{elapsed}, $/ if $fgenesh->{elapsed};
 }
-
-my $augustus = DNALC::Pipeline::Process::Augustus->new( $proj->work_dir );
+my $augustus = DNALC::Pipeline::Process::Augustus->new( $proj->work_dir , $proj->clade);
 if ( $augustus) {
 	my $pretend = 0;
 	$augustus->run(
 			input => $proj->fasta_file,
-			output_file => $augustus->{work_dir} . '/' . 'augustus.gff3',
 			pretend => $pretend,
+			debug => 1,
 		);
 	if (defined $augustus->{exit_status} && $augustus->{exit_status} == 0) {
 		print "AUGUSTUS: success\n";

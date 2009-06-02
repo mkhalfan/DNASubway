@@ -12,9 +12,23 @@ use strict;
 {
 
 	sub new {
-		my ($class, $project_dir) = @_;
+		my ($class, $project_dir, $clade) = @_;
 
-		__PACKAGE__->SUPER::new('REPEAT_MASKER', $project_dir);
+		my $self = __PACKAGE__->SUPER::new('REPEAT_MASKER', $project_dir);
+
+		my $species_map = $self->{conf}->{species_map};
+		if (defined $species_map && %$species_map) {
+			unless ($clade && $clade =~ /^(?:m|d)$/) {
+				$clade = 'default';
+			}
+			$self->{clade} = $clade;
+			if (defined $species_map->{$clade}) {
+				my @species = 'ARRAY' eq ref $species_map->{$clade} ? @{$species_map->{$clade}} : ($species_map->{$clade});
+				unshift @{ $self->{work_options} }, @species;
+			}
+		}
+
+		return $self;
 	}
 
 	sub _setup {

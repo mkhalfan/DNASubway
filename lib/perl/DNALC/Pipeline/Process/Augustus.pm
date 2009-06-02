@@ -3,11 +3,26 @@ package DNALC::Pipeline::Process::Augustus;
 use base q(DNALC::Pipeline::Process);
 use IO::File ();
 
+use strict;
+
 {
 	sub new {
-		my ($class, $project_dir) = @_;
+		my ($class, $project_dir, $clade) = @_;
 
-		__PACKAGE__->SUPER::new('AUGUSTUS', $project_dir);
+		my $self = __PACKAGE__->SUPER::new('AUGUSTUS', $project_dir);
+
+		my $species_map = $self->{conf}->{species_map};
+		if (defined $species_map && %$species_map) {
+			unless ($clade && $clade =~ /^(?:m|d)$/) {
+				$clade = 'default';
+			}
+			$self->{clade} = $clade;
+			if (defined $species_map->{$clade}) {
+				unshift @{ $self->{work_options} }, $species_map->{$clade};
+			}
+		}
+
+		return $self;
 	}
 
 	sub get_gff3_file {

@@ -7,4 +7,10 @@
 	dicots_matrix => '/usr/local/fgenesh/Dicots',
 	file_to_parse => qr/stdout\.txt$/,
 	gff3_file => 'output.gff',
+
+	species_map => {
+		d => '/usr/local/fgenesh/Dicots',
+		m => '/usr/local/fgenesh/Monocots',
+		default => '/usr/local/fgenesh/Dicots',
+	},
 }

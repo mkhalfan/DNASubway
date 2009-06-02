@@ -37,6 +37,18 @@ sub run_repeatmasker {
    return freeze $st;
 }
 
+sub run_snap {
+   my $gearman = shift;
+   my $pid = $gearman->arg;
+   my $proj = DNALC::Pipeline::Project->retrieve( $pid );
+   return unless $proj;
+
+   my $wfm = DNALC::Pipeline::App::WorkflowManager->new( $proj );
+   my $st = $wfm->run_snap;
+   return freeze $st;
+}
+
+
 sub run_trnascan {
    my $gearman = shift;
    my $pid = $gearman->arg;
@@ -65,6 +77,7 @@ $worker->job_servers('localhost');
 $worker->register_function("augustus", \&run_augustus);
 $worker->register_function("repeat_masker", \&run_repeatmasker);
 $worker->register_function("trna_scan", \&run_trnascan);
+$worker->register_function("snap", \&run_snap);
 $worker->register_function("fgenesh", \&run_fgenesh);
 
 $worker->work while 1;

@@ -9,19 +9,19 @@ use strict;
 
 {
 	sub new {
-		my ($class, $project_dir, $group) = @_;
+		my ($class, $project_dir, $clade) = @_;
 
 		my $self = __PACKAGE__->SUPER::new('FGENESH', $project_dir);
 
-		unless ($group && $group =~ /^(?:m|d)$/) {
-			$group = 'm';
-		}
-		$self->{group} = $group;
-		if ($group eq 'm') {
-			unshift @{ $self->{work_options} }, $self->{conf}->{monocots_matrix};
-		}
-		elsif ($group eq 'd') {
-			unshift @{ $self->{work_options} }, $self->{conf}->{dicots_matrix};
+		my $species_map = $self->{conf}->{species_map};
+		if (defined $species_map && %$species_map) {
+			unless ($clade && $clade =~ /^(?:m|d)$/) {
+				$clade = 'default';
+			}
+			$self->{clade} = $clade;
+			if (defined $species_map->{$clade}) {
+				unshift @{ $self->{work_options} }, $species_map->{$clade};
+			}
 		}
 
 		return $self;

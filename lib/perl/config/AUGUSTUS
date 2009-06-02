@@ -2,7 +2,7 @@
 	program => '/usr/local/bin/augustus',
 	options => [
 				'--AUGUSTUS_CONFIG_PATH=/usr/local/augustus/config',
-				'--species=arabidopsis',
+				#'--species=arabidopsis',
 				'--gff3=on',			#output in gff3 format
 			],
 
@@ -11,4 +11,10 @@
 	option_glue => '=',
 	file_to_parse => qr/stdout\.gff3$/,
 	gff3_file	=> 'augustus.gff',
+	species_map => {
+		d => '--species=arabidopsis',
+		m => '--species=maize',
+		default => '--species=arabidopsis',
+	},
+
 }

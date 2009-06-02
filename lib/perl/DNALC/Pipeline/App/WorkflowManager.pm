@@ -11,6 +11,7 @@ use DNALC::Pipeline::Process::RepeatMasker ();
 use DNALC::Pipeline::Process::TRNAScan ();
 use DNALC::Pipeline::Process::Augustus ();
 use DNALC::Pipeline::Process::FGenesH ();
+use DNALC::Pipeline::Process::Snap ();
 
 use DNALC::Pipeline::Sample ();
 
@@ -198,11 +199,9 @@ use Carp;
 			return $st if $st->{success};
 		}
 
-		my $rep_mask = DNALC::Pipeline::Process::RepeatMasker->new( $proj->work_dir  );
+		my $rep_mask = DNALC::Pipeline::Process::RepeatMasker->new( $proj->work_dir, $proj->clade  );
 		if ($rep_mask) {
 			my $crc = $self->crc($rep_mask->get_options);
-			#print STDERR  "REPEAT_MASKER options = ", join('', $rep_mask->get_options), $/;
-			#print STDERR  "REPEAT_MASKER CRC = ", $crc, $/;
 
 			$self->set_status('repeat_masker', 'Processing');
 
@@ -212,7 +211,6 @@ use Carp;
 			#	$self->copy_results(....);
 			#	return {success => 1, gff_file => '...', elapsed => 0.01, 
 			# }
-			# $self->set_status($task_name, 'Done', 0.01);
 			$rep_mask->run(
 					input => $proj->fasta_file,
 					debug => 0,
@@ -248,7 +246,7 @@ use Carp;
 			return $st if $st->{success};
 		}
 
-		my $augustus = DNALC::Pipeline::Process::Augustus->new( $proj->work_dir );
+		my $augustus = DNALC::Pipeline::Process::Augustus->new( $proj->work_dir, $proj->clade );
 		if ( $augustus) {
 			my $crc = $self->crc($augustus->get_options);
 			print STDERR  "AUGUSTUS options = ", join('', $augustus->get_options), $/;
@@ -328,9 +326,7 @@ use Carp;
 			return $st if $st->{success};
 		}
 
-		my $group = $proj->group;
-
-		my $fgenesh = DNALC::Pipeline::Process::FGenesH->new( $proj->work_dir, $group );
+		my $fgenesh = DNALC::Pipeline::Process::FGenesH->new( $proj->work_dir, $proj->clade );
 		if ( $fgenesh) {
 			my $crc = $self->crc($fgenesh->get_options);
 			$self->set_status('fgenesh', 'Processing');
@@ -352,6 +348,43 @@ use Carp;
 				$self->set_status('fgenesh', 'Error', $fgenesh->{elapsed});
 			}
 			print STDERR 'FGENESH: duration: ', $fgenesh->{elapsed}, $/;
+		}
+		return $status;
+	}
+	#-------------------------------------------------------------------------
+
+	sub run_snap {
+
+		my ($self) = @_;
+		
+		my $status = { success => 0 };	
+		my $proj = $self->project;
+
+		if ($proj->sample) {
+			my $st = $self->run_fake('trna_scan');
+			return $st if $st->{success};
+		}
+
+		my $snap = DNALC::Pipeline::Process::Snap->new( $proj->work_dir, $proj->clade );
+		if ($snap) {
+
+			$self->set_status('snap', 'Processing');
+			$snap->run(
+					input => $proj->fasta_file,
+				);
+			if (defined $snap->{exit_status} && $snap->{exit_status} == 0) {
+				print STDERR "SNAP: success\n";
+				$status->{success} = 1;
+				$status->{elapsed} = $snap->{elapsed};
+				$status->{gff_file}= $snap->get_gff3_file;
+				$self->set_status('snap', 'Done', $snap->{elapsed});
+				$self->set_cache('snap', $self->crc($snap->get_options));
+			}
+			else {
+				print STDERR "SNAP: fail\n";
+				$self->set_status('snap', 'Error', $snap->{elapsed});
+			}
+			print STDERR 'SNAP: duration: ', $snap->{elapsed}, $/;
 		}
 		return $status;
 	}
