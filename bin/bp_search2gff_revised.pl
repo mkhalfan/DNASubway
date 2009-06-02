@@ -168,6 +168,7 @@ if( defined $output ) {
 }
 my (%seen_hit,%seen);
 my $other = $type eq 'query' ? 'hit' : 'query';
+my $count=0;
 
 while( my $result = $parser->next_result ) {
     my $qname = $result->query_name;
@@ -185,6 +186,7 @@ while( my $result = $parser->next_result ) {
     }
     while( my $hit = $result->next_hit ) {
 	next if ! filter($hit);
+	$count++;
 	my $acc = $qname;
 	my $desc = $hit->description;
 	my @hsp_feature;
@@ -204,19 +206,20 @@ while( my $result = $parser->next_result ) {
 				     'Sequence' => $hit->name
 				     }));
 	}
-	my (%min,%max,$seqid,$name,$st);
+	my (%min,%max,$seqid,$name,$target,$st);
 	while( my $hsp = $hit->next_hsp ) {
 	    my $feature = new Bio::SeqFeature::Generic;
 	    my ($proxyfor,$otherf);
 	    if( $type eq 'query' ) {
 		($proxyfor,$otherf) = ($hsp->query,
 				      $hsp->hit);
-		$name  ||= $hit->name;
+				  $target  ||= $hit->name;
 	    } else {
 		($otherf,$proxyfor) = ($hsp->query,
 				      $hsp->hit);
-		$name ||= $acc;
+				  $target ||= $acc;
 	    }
+		$name="match" . sprintf("%05d", $count);
 	    $proxyfor->score($hit->bits) unless( $proxyfor->score );
 	    if (($gffver == 3) && ($match || $parent)) {
 		$feature->add_tag_value('Parent', $parent || $name);
@@ -231,7 +234,7 @@ while( my $result = $parser->next_result ) {
 	    $max{$other} = $otherf->end 
                 unless defined $max{$other} && $max{$other} > $otherf->end;
 	    if ($addtarget || $match) {
-                $feature->add_tag_value('Target', $name);
+                $feature->add_tag_value('Target', $target);
                 $feature->add_tag_value('Target', $otherf->start);
                 $feature->add_tag_value('Target', $otherf->end);
             }
@@ -265,7 +268,6 @@ while( my $result = $parser->next_result ) {
             last if $onehsp;
 	}
 	if( $match ) { 
-	    
 	    my $matchf = Bio::SeqFeature::Generic->new
 		(-start => $min{$type},
 		 -end   => $max{$type},
@@ -277,7 +279,9 @@ while( my $result = $parser->next_result ) {
 	    if( $gffver == 3 ) { 
 		$matchf->add_tag_value('ID', $name);
 	    }
-	    $matchf->add_tag_value('Target', $name);
+		#$matchf->add_tag_value('Target', $target);
+		#$matchf->add_tag_value('Target', $min{$type});
+		#$matchf->add_tag_value('Target', $max{$type});
 	    $matchf->add_tag_value('Description', $desc);
 	    $out->write_feature($matchf);
 	}
