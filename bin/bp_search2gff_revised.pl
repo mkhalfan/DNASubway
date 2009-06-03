@@ -356,9 +356,11 @@ sub filter{
 	my $hit=shift;
 	my $pass;
 	my @hsps;
-	if (defined $bits) {
+	if (defined $bits || defined $identity) {
 		while(my $hsp = $hit->next_hsp) {
-			push(@hsps, $hsp) if $hsp->bits > $bits;
+			next if defined $bits && $hsp->bits < $bits;
+			next if defined $identity && $hsp->frac_identical < $identity;
+			push(@hsps, $hsp);
 		}
 		$hit->rewind;
 		$hit->{'_hsps'}=\@hsps;
@@ -366,7 +368,7 @@ sub filter{
 	if (! $hit->num_hsps) {
 	} elsif( defined $cutoff && $hit->significance > $cutoff) {
 	} elsif (defined $coverage && $hit->frac_aligned_hit < $coverage) {
-	} elsif (defined $identity && $hit->hsp->frac_identical < $identity) {
+	#} elsif (defined $identity && $hit->hsp->frac_identical < $identity) {
 	} else {
 		$pass=1;
 	}
