@@ -164,6 +164,7 @@ use Carp;
 			$rc = $sample->copy_fasta({
 					project_dir => $self->project->work_dir,
 					common_name => $self->project->common_name,
+					project_id => $self->project->id,
 				});
 			print STDERR  "Uploaded file = ", $upload_file, $/;
 		} 
@@ -361,7 +362,7 @@ use Carp;
 		my $proj = $self->project;
 
 		if ($proj->sample) {
-			my $st = $self->run_fake('trna_scan');
+			my $st = $self->run_fake('snap');
 			return $st if $st->{success};
 		}
 
@@ -402,6 +403,7 @@ use Carp;
 
 			my $rc = $sample->copy_results({
 						routine => $routine,
+						project_id => $self->project->id,
 						project_dir => $proj->work_dir,
 						common_name => $proj->common_name,
 					});

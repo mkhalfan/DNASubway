@@ -853,7 +853,8 @@ sub create_gbrowse_conf {
 	my $in  = IO::File->new( $confdir . '/' . $self->gbrowse_template );
 	my $out = IO::File->new( "> $conffile" );
 	if (defined $in && $out) {
-		$organism =~ s/\s+/-/g;;
+		$organism =~ s/\s+/-/g;
+		$organism .= '-' . $project_id;
 		while (my $line = <$in> ) {
 			$line =~ s/__USER__/$username/;
 			$line =~ s/__ORGANISM__/$organism/;

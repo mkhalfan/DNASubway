@@ -47,7 +47,7 @@ image widths  = 640 800 1024
 
 # default width of detailed view (pixels)
 default width = 800
-default features = Augustus_Genes FgenesH Repeats tRNA
+default features = Augustus_Genes FgenesH Repeats tRNA Snap
 
 # max and default segment sizes for detailed view
 max segment     = 50000
@@ -76,18 +76,7 @@ head =
 header =
 
 # a footer
-footer = <hr>
-	<table width="100%">
-	<TR>
-	<TD align="LEFT" class="databody">
-	For the source code for this browser, see the <a href="http://www.gmod.org">
-	Generic Model Organism Database Project.</a>  For other questions, send
-	mail to <a href="mailto:lstein@cshl.org">lstein@cshl.org</a>.
-	</TD>
-	</TR>
-	</table>
-	<hr>
-	<pre>$Id: 07.chado.conf,v 1.8.6.3.2.1.2.2 2009/02/06 21:26:00 scottcain Exp $</pre>
+footer =
 
 # Various places where you can insert your own HTML -- see configuration docs
 html1 = 
@@ -147,6 +136,15 @@ sub_part     = CDS
 glyph        = cds
 height       = 20
 key          = CDS
+
+[Snap]
+feature      = gene:SNAP
+glyph        = gene
+bgcolor      = green
+label_transcripts = 1
+thin_utr     = 1
+pad_bottom   = 3
+key          = Snap
 
 [tRNA]
 feature      = gene:tRNAScan-SE

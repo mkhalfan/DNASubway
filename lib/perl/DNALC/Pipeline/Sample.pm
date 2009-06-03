@@ -18,6 +18,7 @@
 package DNALC::Pipeline::Sample;
 
 use DNALC::Pipeline::Config ();
+use strict;
 use Carp;
 
 sub new {
@@ -55,6 +56,7 @@ sub copy_results {
 	return unless defined $args && 'HASH' eq ref $args;
 
 	my $routine = $args->{routine};
+	my $project_id = $args->{project_id};
 	my $project_dir = $args->{project_dir};
 	my $common_name = $args->{common_name} || $self->common_name;
 
@@ -68,12 +70,18 @@ sub copy_results {
 		carp "Sample::copy_results: destination directory $project_dir is missing\n";
 		return;
 	}
+	unless (defined $project_id && $project_id ) {
+		carp "Sample::copy_results: project_id is missing\n";
+		return;
+	}
+
 	unless (defined $common_name && $common_name ) {
 		carp "Sample::copy_results: Species name is missing\n";
 		return;
 	}
 	# remove spaces
 	$common_name =~ s/\s+/-/g;
+	$common_name .= '-' . $project_id;
 
 	my $routine_dir = $project_dir . '/' . uc $routine;
 	unless (-d $routine_dir) {
@@ -93,7 +101,7 @@ sub copy_results {
 	my $out = IO::File->new;
 	if ($in->open($sample_gff_file, 'r') && $out->open($out_gff_file, 'w')) {
 		while (<$in>) {
-			$_ =~ s/$self->{samples_common_name}/$common_name/;
+			$_ =~ s/$self->{samples_common_name}/$common_name/g;
 			print $out $_;
 		}
 		undef $out;
@@ -114,10 +122,15 @@ sub copy_fasta {
 	print STDERR Dumper( $args), $/;
 
 	my $project_dir = $args->{project_dir};
+	my $project_id = $args->{project_id};
 	my $common_name = $args->{common_name} || $self->common_name;
 
 	unless (-d $project_dir) {
 		carp "Sample::copy_results: destination directory $project_dir is missing\n";
+		return;
+	}
+	unless (defined $project_id && $project_id ) {
+		carp "Sample::copy_results: project_id is missing\n";
 		return;
 	}
 	unless (defined $common_name && $common_name ) {
@@ -126,6 +139,7 @@ sub copy_fasta {
 	}
 	# remove spaces
 	$common_name =~ s/\s+/-/g;
+	$common_name .= '-' . $project_id;
 
 	my $sample_fasta = $self->{sample_dir} . '/fasta.fa';
 	my $out_fasta = $project_dir . '/fasta.fa';
@@ -136,7 +150,7 @@ sub copy_fasta {
 	my $out = IO::File->new;
 	if ($in->open($sample_fasta, 'r') && $out->open($out_fasta, 'w')) {
 		while (<$in>) {
-			$_ =~ s/>$self->{samples_common_name}/>$common_name/;
+			$_ =~ s/^>$self->{samples_common_name}/>$common_name/;
 			print $out $_;
 		}
 		undef $out;
