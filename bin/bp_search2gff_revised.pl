@@ -172,6 +172,7 @@ my $count=0;
 
 while( my $result = $parser->next_result ) {
     my $qname = $result->query_name;
+	my $alg = $result->algorithm;
     if ( $comp && $type eq 'query' && 
 	 $result->query_length ) {
 	$out->write_feature(Bio::SeqFeature::Generic->new
@@ -186,7 +187,7 @@ while( my $result = $parser->next_result ) {
     }
     while( my $hit = $result->next_hit ) {
 	next if ! filter($hit);
-	$count++;
+	$count++ if $match;
 	my $acc = $qname;
 	my $desc = $hit->description;
 	my @hsp_feature;
@@ -219,7 +220,11 @@ while( my $result = $parser->next_result ) {
 				      $hsp->hit);
 				  $target ||= $acc;
 	    }
-		$name="match" . sprintf("%05d", $count);
+		if (! $match) {
+				$count++;
+	    		$feature->add_tag_value('Description', $desc);
+		}
+		$name="$alg\_match" . sprintf("%05d", $count);
 	    $proxyfor->score($hit->bits) unless( $proxyfor->score );
 	    if (($gffver == 3) && ($match || $parent)) {
 		$feature->add_tag_value('Parent', $parent || $name);
@@ -237,10 +242,10 @@ while( my $result = $parser->next_result ) {
                 $feature->add_tag_value('Target', $target);
                 $feature->add_tag_value('Target', $otherf->start);
                 $feature->add_tag_value('Target', $otherf->end);
-            }
-            if ($addid) {
+        }
+        if ($addid) {
                 $feature->add_tag_value('ID', $name);
-            }
+        }
 
 	    $feature->location(&$locfunc($proxyfor,$otherf));
 	    #  strand for feature is always going to be product of
