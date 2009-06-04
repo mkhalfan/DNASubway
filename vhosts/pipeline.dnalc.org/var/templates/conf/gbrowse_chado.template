@@ -1,0 +1,14 @@
+[GENERAL]
+description =  __USER__'s __ORGANISM__ Data
+db_adaptor    = Bio::DB::Das::Chado
+db_args       =  -dsn 'dbi:Pg:dbname=__DBNAME__'
+                 -user cain
+                 -srcfeatureslice 1
+                 -inferCDS 1
+
+initial landmark = __ORGANISM__:1..10000
+
+#include gbrowse_conf.inc
+ 
+#include gbrowse_chado_tracks.inc
+
