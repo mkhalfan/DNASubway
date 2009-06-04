@@ -44,7 +44,7 @@ if ($r->method eq 'POST') {
 	unless ($organism && $common_name) {
 		push @err, "Organism name is missing or incorrectly formatted!";
 	}
-	elsif($organism =~ /[^a-z0-9\s]/i || $common_name =~ /[^a-z0-9\s]/i) {
+	elsif($organism =~ /[^a-z0-9\s]/i || $common_name =~ /[^a-z0-9\s-]/i) {
 		push @err, "Organism name may contain only letters, digits and spaces";
 	}
 
@@ -72,39 +72,7 @@ if ($r->method eq 'POST') {
 	unless (@err) {
 		#fix common_name
 		$common_name =~ s/\s+/-/g;
-
-		if ($seq_src eq 'upload') {
-			my $st = DNALC::Pipeline::App::Utils->save_upload( {
-						r => $r, 
-						param_name => 'seq_file',
-						common_name => $common_name,
-					});
-
-			if ($st->{status} eq 'fail') {
-				push @err, "Unable to upload file: ". $st->{message};
-			}
-			else {
-				$uploaded_file = $st->{path};
-				$seq_crc = $st->{crc};
-			}
-			print STDERR 'save_upload status = ', Dumper( $st), $/;
-		}
-		elsif ($seq_src eq 'sample') {
-			my $upl_dir = $pcf->{upload_dir};
-			my $rand_s = random_string(8,8);
-		    my $output_file = $upl_dir . '/' . $rand_s;
-
-			my ($status, $msg);
-			($status, $msg, $seq_crc) = DNALC::Pipeline::App::Utils->process_fasta_file({
-						file => $sample_file,
-						common_name => $common_name,
-						output_file => $output_file,
-					});
-			if ($status eq 'fail') {
-				push @err, $msg;
-			}
-			$uploaded_file = $output_file;
-		}
+		$common_name =~ tr/A-Z/a-z/;
 	}
 
 	my $proj = DNALC::Pipeline::Project->search(user_id => $s->{user_id}, name => $name);
@@ -113,7 +81,6 @@ if ($r->method eq 'POST') {
 	}
 	# create the project 
 	unless (@err) {
-		print STDERR  'project crc = ', $seq_crc, $/;
 		$proj = eval { DNALC::Pipeline::Project->create({
 								user_id => $s->{user_id},
 								name => $name,
@@ -121,7 +88,7 @@ if ($r->method eq 'POST') {
 								common_name => $common_name,
 								sample => $specie,
 								clade => $group || 'u', # unknown if $clade is unset
-								crc => $seq_crc || '',
+								crc => '',
 							});
 						};
 		if ($@) {
@@ -130,62 +97,103 @@ if ($r->method eq 'POST') {
 		else {
 			print STDERR "project_created: id = ", $proj, ",\tname = ", $proj->name, $/;
 
+			if ($seq_src eq 'upload') {
+				my $st = DNALC::Pipeline::App::Utils->save_upload( {
+						r => $r, 
+						param_name => 'seq_file',
+						common_name => $common_name . '-' . $proj->id,
+					});
+
+				if ($st->{status} eq 'fail') {
+					push @err, "Unable to upload file: ". $st->{message};
+				}
+				else {
+					$uploaded_file = $st->{path};
+					$seq_crc = $st->{crc};
+				}
+				print STDERR 'save_upload status = ', Dumper( $st), $/;
+			}
+			elsif ($seq_src eq 'sample') {
+				my $upl_dir = $pcf->{upload_dir};
+				my $rand_s = random_string(8,8);
+			    my $output_file = $upl_dir . '/' . $rand_s;
+
+				my ($status, $msg);
+				($status, $msg, $seq_crc) = DNALC::Pipeline::App::Utils->process_fasta_file({
+						file => $sample_file,
+						common_name => $common_name . '-' . $proj->id,
+						output_file => $output_file,
+					});
+				if ($status eq 'fail') {
+					push @err, $msg;
+				}
+				$uploaded_file = $output_file;
+			}
+
+
+			unless (-f $uploaded_file) {
+				carp "Fasta file is missing:, ", $uploaded_file, $/;
+			}
+
 			# create projects work directory
 			if ($proj->create_work_dir) {
 				print STDERR "project's work_dir: ", $proj->work_dir, $/;
 			}
 			else {
 				warn "Failed to create work_dir for project [$proj]", $/;
-				push @err, "Failed to create work_dir for project!";
+				push @err, "Failed to create working directory for project!";
 			}
 
-			unless (-f $uploaded_file) {
-				carp "Fasta file is missing:, ", $uploaded_file, $/;
+			#####
+			if (@err) {
+			print STDERR  "\n**** DELETING PROJ = ", $proj->id, $/;
+				$proj->delete if $proj;
 			}
-			# set workflow
-			my $wfm = DNALC::Pipeline::App::WorkflowManager->new( $proj );
-			#print STDERR Dumper( \$wfm), $/;
+			else {
+				$proj->crc($seq_crc);
+				$proj->update;
+				# set workflow
+				my $wfm = DNALC::Pipeline::App::WorkflowManager->new( $proj );
 
-			# the fasta file may be available not only via upload
-			my $fasta = $wfm->upload_sequence($uploaded_file);
-			#print STDERR  "Uploaded fasta file = ", $fasta, $/;
-			#print STDERR  "upload status = ", $wfm->get_status('upload_fasta'), $/;
+				# the fasta file may be available not only via upload
+				my $fasta = $wfm->upload_sequence($uploaded_file);
 
-			if ($fasta) {
-				# remove temporary file
-				unlink $uploaded_file;
+				if ($fasta) {
+					# remove temporary file
+					unlink $uploaded_file;
 
-				# create project files
-				my $cutils = DNALC::Pipeline::Chado::Utils->new(
-					username => $s->{username},
-					dumppath => $pcf->{GMOD_DUMPFILE},
-					profile => $pcf->{GMOD_PROFILE},
-					organism_string => join('_', @subnames). '_' . $common_name,
-					gbrowse_template => $pcf->{GBROWSE_TEMPLATE},
-					gbrowse_confdir  => $pcf->{GBROWSE_CONF_DIR},
-				);
-				if (1) {
-					eval {
-					    $cutils->create_db(1);
-					};
-					if ($@)  {
-					    print STDERR  "CHADO DB already exists. skipping...", $/;
+					# create project files
+					my $cutils = DNALC::Pipeline::Chado::Utils->new(
+						username => $s->{username},
+						dumppath => $pcf->{GMOD_DUMPFILE},
+						profile => $pcf->{GMOD_PROFILE},
+						organism_string => join('_', @subnames). '_' . $common_name,
+						gbrowse_template => $pcf->{GBROWSE_TEMPLATE},
+						gbrowse_confdir  => $pcf->{GBROWSE_CONF_DIR},
+					);
+					if (1) {
+						eval {
+							$cutils->create_db(1);
+						};
+						if ($@)  {
+							print STDERR  "CHADO DB already exists. skipping...", $/;
+						}
+
+						my $conffile_ok = $cutils->create_conf_file( $proj->id );
+						print STDERR "Created CHADO CONF file = ", $conffile_ok, $/;
+						my $new_profile = sprintf("%s_%d", $s->{username}, $proj->id);
+						# read data from new file
+
+						$cutils->profile($new_profile);
+						$cutils->insert_organism;
 					}
 
-					my $conffile_ok = $cutils->create_conf_file( $proj->id );
-					print STDERR "Created CHADO CONF file = ", $conffile_ok, $/;
-					my $new_profile = sprintf("%s_%d", $s->{username}, $proj->id);
-					# read data from new file
-
-					$cutils->profile($new_profile);
-					$cutils->insert_organism;
 				}
 
-			}
-
-			# redirect user to dashboard
-			$m->comp('/_message_add', "Project created successfully!");
-			$m->redirect('./dashboard.html?pid=' . $proj->id);
+				# redirect user to dashboard
+				$m->comp('/_message_add', "Project created successfully!");
+				$m->redirect('./dashboard.html?pid=' . $proj->id);
+			} ####
 			
 		} #end else
 	} #end unless

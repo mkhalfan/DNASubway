@@ -8,6 +8,7 @@ use DNALC::Pipeline::Project ();
 use DNALC::Pipeline::CacheMD5 ();
 
 use DNALC::Pipeline::Process::RepeatMasker ();
+use DNALC::Pipeline::Process::RepeatMasker2 ();
 use DNALC::Pipeline::Process::TRNAScan ();
 use DNALC::Pipeline::Process::Augustus ();
 use DNALC::Pipeline::Process::FGenesH ();
@@ -200,12 +201,13 @@ use Carp;
 			return $st if $st->{success};
 		}
 
-		my $rep_mask = DNALC::Pipeline::Process::RepeatMasker->new( $proj->work_dir, $proj->clade  );
-		if ($rep_mask) {
-			my $crc = $self->crc($rep_mask->get_options);
+		my $rep_mask  = DNALC::Pipeline::Process::RepeatMasker->new( $proj->work_dir, $proj->clade );
+		my $rep_mask2 = DNALC::Pipeline::Process::RepeatMasker2->new( $proj->work_dir, $proj->clade );
+		if ($rep_mask && $rep_mask2) {
 
 			$self->set_status('repeat_masker', 'Processing');
 
+			#my $crc = $self->crc($rep_mask->get_options);
 			# TODO
 			# search for cachemd5($self->project->id, $task_name, $crc);
 			# if cache_found {
@@ -214,23 +216,34 @@ use Carp;
 			# }
 			$rep_mask->run(
 					input => $proj->fasta_file,
-					debug => 0,
+					debug => 1,
 				);
 			if (defined $rep_mask->{exit_status} && $rep_mask->{exit_status} == 0) {
-				print STDERR "REPEAT_MASKER: success\n";
-				$status->{success} = 1;
-				$status->{elapsed} = $rep_mask->{elapsed};
-				$status->{gff_file}= $rep_mask->get_gff3_file;
-				$self->set_status('repeat_masker', 'Done', $rep_mask->{elapsed});
-				$self->set_cache('repeat_masker', $crc);
+				print STDERR  "Time 1 = ", $rep_mask->{elapsed}, $/;
+
+				$rep_mask2->run( input => $proj->fasta_file, debug => 1);
+				if (defined $rep_mask2->{exit_status} && $rep_mask2->{exit_status} == 0) {
+					print STDERR "REPEAT_MASKER: success\n";
+					$status->{success} = 1;
+					$status->{elapsed} = $rep_mask->{elapsed} + $rep_mask2->{elapsed};
+					$status->{gff_file}= $rep_mask->get_gff3_file;
+					#$self->set_cache('repeat_masker', $crc);
+					print STDERR  "Time 2 = ", $rep_mask2->{elapsed}, $/;
+					$self->set_status('repeat_masker', 'Done', $status->{elapsed});
+				}
+				else {
+					print STDERR "REPEAT_MASKER: fail\n";
+					$self->set_status('repeat_masker', 'Error');
+				}
 			}
 			else {
 				print STDERR "REPEAT_MASKER: fail\n";
-				$self->set_status('repeat_masker', 'Error', $rep_mask->{elapsed});
+				$self->set_status('repeat_masker', 'Error');
 			}
-			print STDERR 'RM: duration: ', $rep_mask->{elapsed}, $/ if $rep_mask->{elapsed};
 		}
 
+		use Data::Dumper;
+		print STDERR  Dumper ($status), $/;
 		$status;
 	}
 	

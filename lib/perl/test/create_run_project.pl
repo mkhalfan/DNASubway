@@ -58,7 +58,7 @@ else {
 
 my $wfm = DNALC::Pipeline::App::WorkflowManager->new( $proj );
 
-print STDERR Dumper( \$wfm), $/;
+#print STDERR Dumper( \$wfm), $/;
 
 my $upload_st = $wfm->get_status('upload_fasta');
 
@@ -73,26 +73,24 @@ print STDERR "U_ST = ", $upload_st->name , $/;
 if ( $upload_st->name eq 'Done') {
 	my $st;
 	
+# 	print STDERR  '-' x 20 , $/;
+#  	$st = $wfm->run_snap;
+#  	my $s_st = $wfm->get_status('snap');
+#  	print STDERR "SNAP_ST = ", $s_st->name, ($/ x 2);
+
 	print STDERR  '-' x 20 , $/;
- 	$st = $wfm->run_snap;
- 	my $s_st = $wfm->get_status('snap');
- 	print STDERR "SNAP_ST = ", $s_st->name, ($/ x 2);
-
-
-
-#	print STDERR  '-' x 20 , $/;
-# 	$st = $wfm->run_repeat_masker;
-# 	my $rm_st = $wfm->get_status('repeat_masker');
-# 	print STDERR "RM_ST = ", $rm_st->name, ($/ x 2);
+	$st = $wfm->run_repeat_masker;
+	my $rm_st = $wfm->get_status('repeat_masker');
+	print STDERR "RM_ST = ", $rm_st->name, ($/ x 2);
 
 	#-------------------------------------
 
- 	print STDERR  '-' x 20 , $/;
- 	$st = $wfm->run_augustus;
- 	#print STDERR Dumper( $st ), $/;
- 	my $a_st = $wfm->get_status('augustus');
- 	print STDERR  "AUGUSTUS_ST = ", $a_st->name, $/;
-	print STDERR  "GFF = ", $proj->get_gff3_file('augustus'), $/;
+#  	print STDERR  '-' x 20 , $/;
+#  	$st = $wfm->run_augustus;
+#  	#print STDERR Dumper( $st ), $/;
+#  	my $a_st = $wfm->get_status('augustus');
+#  	print STDERR  "AUGUSTUS_ST = ", $a_st->name, $/;
+# 	print STDERR  "GFF = ", $proj->get_gff3_file('augustus'), $/;
 
 	#-------------------------------------
 # 	print STDERR  '-' x 20 , $/;

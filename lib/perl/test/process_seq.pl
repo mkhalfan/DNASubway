@@ -9,6 +9,7 @@ use Data::Dumper;
 use DNALC::Pipeline::Project ();
 
 use DNALC::Pipeline::Process::RepeatMasker ();
+use DNALC::Pipeline::Process::RepeatMasker2 ();
 use DNALC::Pipeline::Process::Augustus ();
 use DNALC::Pipeline::Process::Snap ();
 use DNALC::Pipeline::Process::TRNAScan ();
@@ -55,7 +56,27 @@ unless ($proj) {
 my $output = $proj->work_dir . '/' . 'out.gff3';
 my @gffs = ();
 
+my $rm2 = DNALC::Pipeline::Process::RepeatMasker2->new( $proj->work_dir, $proj->clade );
+print STDERR Dumper( $rm2 ), $/;
+if ( $rm2 ) {
+	$rm2->run(
+			input => $proj->fasta_file,
+			debug => 1,
+		);
+	if (defined $rm2->{exit_status} && $rm2->{exit_status} == 0) {
+		print "rm2: success\n";
+		
+		#my $gff_file = $rm2->get_gff3_file;
+		#push @gffs, $gff_file;
+		#print 'SNAP: gff_file: ', $gff_file, $/;
+		print 'SNAP: duration: ', $rm2->{elapsed}, $/;
+	}
+	else {
+		print "SNAP: fail\n";
+	}
+}
 
+__END__
 my $snap = DNALC::Pipeline::Process::Snap->new( $proj->work_dir, $proj->clade );
 if ( $snap) {
 	my $pretend = 0;
