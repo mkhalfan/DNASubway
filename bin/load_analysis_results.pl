@@ -66,7 +66,7 @@ my ($PROFILE, $DATADIR, $USERNAME, $GBROWSETEMPLATE, $GBROWSECONFDIR, $HELP, $PR
 GetOptions(
   'username=s'         => \$USERNAME,
   'data_dir=s'         => \$DATADIR,
-  'growse_template=s'  => \$GBROWSETEMPLATE,
+  'gbrowse_template=s' => \$GBROWSETEMPLATE,
   'gbrowse_confdir=s'  => \$GBROWSECONFDIR,
   'profile=s'          => \$PROFILE,
   'project_id=s'       => \$PROJECTID,
