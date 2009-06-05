@@ -35,7 +35,7 @@ default width = 800
 default features = Augustus_Genes FgenesH Repeats tRNA Snap
 
 # max and default segment sizes for detailed view
-max segment     = 50000
+max segment     = 100000
 default segment = 10000
 
 # zoom levels
