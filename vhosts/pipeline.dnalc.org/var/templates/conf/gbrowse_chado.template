@@ -4,11 +4,12 @@ db_adaptor    = Bio::DB::Das::Chado
 db_args       =  -dsn 'dbi:Pg:dbname=__DBNAME__'
                  -user cain
                  -srcfeatureslice 1
+                 -organism __ORGANISM__
                  -inferCDS 1
 
 reference class = chromosome
 
-initial landmark = __ORGANISM__:1..10000
+initial landmark = __ORGANISM_____PID__:1..10000
 
 #include gbrowse_conf.inc
  

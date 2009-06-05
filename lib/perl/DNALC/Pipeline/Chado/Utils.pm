@@ -57,10 +57,44 @@ sub new {
     $self->gbrowse_confdir ( $arg{gbrowse_confdir})  if $arg{gbrowse_confdir};
     $self->fastapath       ( $arg{fastapath})        if $arg{fastapath};
     $self->project_id      ( $arg{project_id})       if $arg{project_id};
+    $self->chado_gbrowse   ( $arg{chado_gbrowse})    if $arg{chado_gbrowse};
 
 
     return $self;
 }
+
+=head2 chado_gbrowse
+
+=over
+
+=item Usage
+
+  $obj->chado_gbrowse()        #get existing value
+  $obj->chado_gbrowse($newval) #set new value
+
+=item Function
+
+Sets the path of the Chado-specific GBrowse conf file template.
+
+=item Returns
+
+value of chado_gbrowse (a scalar)
+
+=item Arguments
+
+new value of chado_gbrowse (to set)
+
+=back
+
+=cut
+
+sub chado_gbrowse {
+    my $self = shift;
+    my $chado_gbrowse = shift if defined(@_);
+    return $self->{'chado_gbrowse'} = $chado_gbrowse if defined($chado_gbrowse);
+    return $self->{'chado_gbrowse'};
+}
+
 
 =head2 project_id
 
@@ -870,6 +904,63 @@ sub create_gbrowse_conf {
    
     return $conffile if (-f $conffile);
 }
+
+sub create_gbrowse_chado_conf {
+    my ( $self, $project_id ) = @_;
+    print STDERR Dumper( $self ), $/;
+
+    unless ($project_id && $project_id =~ /\d+/) {
+        warn "Project ID is missing or invalid\n";
+        return;
+    }
+
+    my $username = $self->username;
+    my $organism = $self->common_name;
+    my $confdir  = $self->gbrowse_confdir;
+
+    unless ($confdir && -w $confdir ) {
+        warn "GBrowse config dir [$confdir] is not writable.\n\n";
+        return;
+    }
+
+    my $conffile = sprintf("%s/%s_db_%d.conf", $confdir, $username, $project_id);
+
+    return $conffile if -f $conffile;
+
+    print STDERR  "Config dir = ", $confdir, $/;
+    print STDERR  "Config file = ", $conffile, $/;
+
+
+    #this if statement never executes because of the return if -f a few lines above
+    if (-f $conffile) {
+        warn "Gbrowse configuration file for this user [$username].[pid=$project_id] already exists.";
+        return $conffile;
+    }
+    warn $self->chado_gbrowse;
+    my $in  = IO::File->new( $confdir . '/' . $self->chado_gbrowse );
+    my $out = IO::File->new( "> $conffile" );
+    if (defined $in && $out) {
+
+       # these lines are breaking chado becuase it has spaces!
+       # $organism =~ s/\s+/-/g;
+       # $organism .= '-' . $project_id;
+        while (my $line = <$in> ) {
+            $line =~ s/__USER__/$username/;
+            $line =~ s/__ORGANISM__/$organism/;
+            $line =~ s/__PID__/$project_id/;
+            $line =~ s/__DBNAME__/$username/;
+            print $out $line;
+        }
+        undef $in;
+        undef $out;
+    }
+    else {
+        warn "Unable to create gbrowse conf file: ", $conffile , "\n";
+    }
+
+    return $conffile if (-f $conffile);
+}
+
 
 sub load_fasta {
     my $self = shift;
