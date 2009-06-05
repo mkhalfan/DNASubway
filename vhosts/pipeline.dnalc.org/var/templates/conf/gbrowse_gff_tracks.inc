@@ -47,6 +47,20 @@ bgcolor      = black
 fgcolor      = black
 key          = Repeats
 
+[Blastn]
+feature      = match:BLASTN
+glyph        = segments
+fgcolor      = red
+height       = 8
+key          = Blastn
+
+[Blastx]
+feature      = match:BLASTX
+glyph        = segments
+fgcolor      = magenta
+key          = Blastx
+
+
 [Translation]
 glyph        = translation
 global feature = 1

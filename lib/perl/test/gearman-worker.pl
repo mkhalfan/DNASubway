@@ -71,6 +71,29 @@ sub run_fgenesh {
    return freeze $st;
 }
 
+sub run_blastn {
+   my $gearman = shift;
+   my $pid = $gearman->arg;
+   my $proj = DNALC::Pipeline::Project->retrieve( $pid );
+   return unless $proj;
+
+   my $wfm = DNALC::Pipeline::App::WorkflowManager->new( $proj );
+   my $st = $wfm->run_blastn;
+   return freeze $st;
+}
+
+sub run_blastx {
+   my $gearman = shift;
+   my $pid = $gearman->arg;
+   my $proj = DNALC::Pipeline::Project->retrieve( $pid );
+   return unless $proj;
+
+   my $wfm = DNALC::Pipeline::App::WorkflowManager->new( $proj );
+   my $st = $wfm->run_blastx;
+   return freeze $st;
+}
+
+#-------------------------------------------------
 
 my $worker = Gearman::Worker->new;
 $worker->job_servers('localhost');
@@ -79,5 +102,7 @@ $worker->register_function("repeat_masker", \&run_repeatmasker);
 $worker->register_function("trna_scan", \&run_trnascan);
 $worker->register_function("snap", \&run_snap);
 $worker->register_function("fgenesh", \&run_fgenesh);
+$worker->register_function("blastn", \&run_blastn);
+$worker->register_function("blastx", \&run_blastx);
 
 $worker->work while 1;

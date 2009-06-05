@@ -13,6 +13,7 @@ use DNALC::Pipeline::Process::TRNAScan ();
 use DNALC::Pipeline::Process::Augustus ();
 use DNALC::Pipeline::Process::FGenesH ();
 use DNALC::Pipeline::Process::Snap ();
+use DNALC::Pipeline::Process::Blast ();
 
 use DNALC::Pipeline::Sample ();
 
@@ -412,6 +413,81 @@ use Carp;
 		}
 		return $status;
 	}
+	#-------------------------------------------------------------------------
+	sub run_blastn {
+
+		my ($self) = @_;
+		
+		my $status = { success => 0 };	
+		my $proj = $self->project;
+
+		if ($proj->sample) {
+			my $st = $self->run_fake('blastn');
+			return $st if $st->{success};
+		}
+
+		my $blastn = DNALC::Pipeline::Process::Blast->new( $proj->work_dir, 'blastn' );
+		if ($blastn) {
+
+			my $input_file = $proj->fasta_masked_xsmall;
+			if ($input_file) {
+				$self->set_status('blastn', 'Processing');
+				$blastn->run( input => $proj->fasta_file, debug => 1 );
+			}
+			if (defined $blastn->{exit_status} && $blastn->{exit_status} == 0) {
+				print STDERR "BLASTN: success\n";
+				$status->{success} = 1;
+				$status->{elapsed} = $blastn->{elapsed};
+				$status->{gff_file}= $blastn->get_gff3_file;
+				$self->set_status('blastn', 'Done', $blastn->{elapsed});
+				#$self->set_cache('blastn', $self->crc($blastn->get_options));
+			}
+			else {
+				print STDERR "BLASTN: fail\n";
+				$self->set_status('blastn', 'Error');
+			}
+			print STDERR 'BLASTN: duration: ', $blastn->{elapsed}, $/;
+		}
+		return $status;
+	}
+	#-------------------------------------------------------------------------
+	sub run_blastx {
+
+		my ($self) = @_;
+		
+		my $status = { success => 0 };	
+		my $proj = $self->project;
+
+		if ($proj->sample) {
+			my $st = $self->run_fake('blastx');
+			return $st if $st->{success};
+		}
+
+		my $blastx = DNALC::Pipeline::Process::Blast->new( $proj->work_dir, 'blastx' );
+		if ($blastx) {
+
+			my $input_file = $proj->fasta_masked_xsmall;
+			if ($input_file) {
+				$self->set_status('blastx', 'Processing');
+				$blastx->run( input => $proj->fasta_file, debug => 1 );
+			}
+			if (defined $blastx->{exit_status} && $blastx->{exit_status} == 0) {
+				print STDERR "BLASTX: success\n";
+				$status->{success} = 1;
+				$status->{elapsed} = $blastx->{elapsed};
+				$status->{gff_file}= $blastx->get_gff3_file;
+				$self->set_status('blastx', 'Done', $blastx->{elapsed});
+				#$self->set_cache('blastx', $self->crc($blastx->get_options));
+			}
+			else {
+				print STDERR "BLASTX: fail\n";
+				$self->set_status('blastx', 'Error');
+			}
+			print STDERR 'BLASTN: duration: ', $blastx->{elapsed}, $/;
+		}
+		return $status;
+	}
+
 	#-------------------------------------------------------------------------
 	sub run_fake {
 		my ($self, $routine) = @_;

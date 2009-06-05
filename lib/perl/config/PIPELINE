@@ -6,7 +6,7 @@
 	GBROWSE_TEMPLATE => 'gbrowse.template',
 	GBROWSE_DB_DIR   => '/var/www/html/gbrowse/databases',
 	GBROWSE_URL  => '/cgi-bin/gbrowse',
-	enabled_routines => [qw/augustus fgenesh repeat_masker snap trna_scan/],
+	enabled_routines => [qw/augustus fgenesh repeat_masker snap trna_scan blastx blastn/],
 	web_project_dir => '/files/projects_files',
 	project_dir => '/var/www/vhosts/pipeline.dnalc.org/var/projects',
 	upload_dir => '/var/www/vhosts/pipeline.dnalc.org/var/projects/0000',

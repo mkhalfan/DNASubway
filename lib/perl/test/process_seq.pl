@@ -3,7 +3,6 @@
 use strict;
 #use diagnostics;
 
-use Readonly ();
 use Data::Dumper;
 
 use DNALC::Pipeline::Project ();
@@ -14,90 +13,18 @@ use DNALC::Pipeline::Process::Augustus ();
 use DNALC::Pipeline::Process::Snap ();
 use DNALC::Pipeline::Process::TRNAScan ();
 use DNALC::Pipeline::Process::FGenesH ();
+use DNALC::Pipeline::Process::Blast ();
 
-#use Bio::SeqIO ();
-
-#------------
-Readonly::Scalar my $WORK_DIR => q{/home/cornel/work};
-#------------
-
-# 1. read/get seq either from:
-#	a.file
-# 	b.genebank by id
-# 	save the seq into a directory w. unique name (X.fasta)
-# 2. repeat mask the sequence
-# 	input: X.fasta
-# 	output: R.fasta, X.masked
-# 3. run augustus
-# 	input: X.fasta
-# 	output: A.gff3
-# 4. run FGenesH
-# 	input: X.fasta
-# 	output: ?
-# 5. run blast
-# 	input: R.fasta
-# 	output: B.gff3
-# 6. merge gff3 files
-# 7. create gbrowse conf
-# 8. view results in browser
-
-#my $seqio = Bio::SeqIO->new(-file => $WORK_DIR . '/'. 'A.fasta', -format => 'Fasta');
-#my $seq = $seqio->next_seq;
-#print $seq->seq, $/;
-
-my $proj = DNALC::Pipeline::Project->retrieve($ARGV[0] || 192);
+my $proj = DNALC::Pipeline::Project->retrieve($ARGV[0] || 229);
 
 unless ($proj) {
 	print STDERR  "Project [$ARGV[0]] not found..", $/;
 	exit 0;
 }
 
-#my $input  = $WORK_DIR . '/100k/'. 'B.fasta';
 my $output = $proj->work_dir . '/' . 'out.gff3';
 my @gffs = ();
 
-my $rm2 = DNALC::Pipeline::Process::RepeatMasker2->new( $proj->work_dir, $proj->clade );
-print STDERR Dumper( $rm2 ), $/;
-if ( $rm2 ) {
-	$rm2->run(
-			input => $proj->fasta_file,
-			debug => 1,
-		);
-	if (defined $rm2->{exit_status} && $rm2->{exit_status} == 0) {
-		print "rm2: success\n";
-		
-		#my $gff_file = $rm2->get_gff3_file;
-		#push @gffs, $gff_file;
-		#print 'SNAP: gff_file: ', $gff_file, $/;
-		print 'SNAP: duration: ', $rm2->{elapsed}, $/;
-	}
-	else {
-		print "SNAP: fail\n";
-	}
-}
-
-__END__
-my $snap = DNALC::Pipeline::Process::Snap->new( $proj->work_dir, $proj->clade );
-if ( $snap) {
-	my $pretend = 0;
-	$snap->run(
-			input => $proj->fasta_file,
-			pretend => $pretend,
-			debug => 1,
-		);
-	if (defined $snap->{exit_status} && $snap->{exit_status} == 0) {
-		print "SNAP: success\n";
-		
-		my $gff_file = $snap->get_gff3_file;
-		push @gffs, $gff_file;
-		print 'SNAP: gff_file: ', $gff_file, $/;
-		print 'SNAP: duration: ', $snap->{elapsed}, $/;
-	}
-	else {
-		print "SNAP: fail\n";
-	}
-
-}
 
 my $rep_mask = DNALC::Pipeline::Process::RepeatMasker->new( $proj->work_dir, $proj->clade);
 if ($rep_mask) {
@@ -118,13 +45,53 @@ if ($rep_mask) {
 	print 'RM: gff_file: ', $gff_file, $/;
 	print 'RM: duration: ', $rep_mask->{elapsed}, $/ if $rep_mask->{elapsed};
 }
+my $rm2 = DNALC::Pipeline::Process::RepeatMasker2->new( $proj->work_dir, $proj->clade );
+print STDERR Dumper( $rm2 ), $/;
+if ( $rm2 ) {
+	$rm2->run(
+			input => $proj->fasta_file,
+			debug => 1,
+		);
+	if (defined $rm2->{exit_status} && $rm2->{exit_status} == 0) {
+		print "rm2: success\n";
+		
+		#my $gff_file = $rm2->get_gff3_file;
+		#push @gffs, $gff_file;
+		#print 'SNAP: gff_file: ', $gff_file, $/;
+		print 'SNAP: duration: ', $rm2->{elapsed}, $/;
+	}
+	else {
+		print "SNAP: fail\n";
+	}
+}
+
+my $snap = DNALC::Pipeline::Process::Snap->new( $proj->work_dir, $proj->clade );
+if ( $snap) {
+	my $pretend = 0;
+	$snap->run(
+			input => $proj->fasta_masked_nolow,
+			pretend => $pretend,
+			debug => 1,
+		);
+	if (defined $snap->{exit_status} && $snap->{exit_status} == 0) {
+		print "SNAP: success\n";
+		
+		my $gff_file = $snap->get_gff3_file;
+		push @gffs, $gff_file;
+		print 'SNAP: gff_file: ', $gff_file, $/;
+		print 'SNAP: duration: ', $snap->{elapsed}, $/;
+	}
+	else {
+		print "SNAP: fail\n";
+	}
+
+}
+
 
 my $fgenesh = DNALC::Pipeline::Process::FGenesH->new( $proj->work_dir, $proj->clade );
 if ($fgenesh) {
-	my $pretend = 0;
 	$fgenesh->run(
-			input => $proj->fasta_file,
-			pretend => $pretend,
+			input => $proj->fasta_masked_nolow,
 			debug => 1
 		);
 	if (defined $fgenesh->{exit_status} && $fgenesh->{exit_status} == 0) {
@@ -140,10 +107,8 @@ if ($fgenesh) {
 }
 my $augustus = DNALC::Pipeline::Process::Augustus->new( $proj->work_dir , $proj->clade);
 if ( $augustus) {
-	my $pretend = 0;
 	$augustus->run(
-			input => $proj->fasta_file,
-			pretend => $pretend,
+			input => $proj->fasta_masked_nolow,
 			debug => 1,
 		);
 	if (defined $augustus->{exit_status} && $augustus->{exit_status} == 0) {
@@ -160,13 +125,9 @@ if ( $augustus) {
 
 my $trna_scan = DNALC::Pipeline::Process::TRNAScan->new( $proj->work_dir );
 if ($trna_scan ) {
-	my $pretend = 0;
 	$trna_scan->run(
 			input => $proj->fasta_file,
-			# FIXME - ideally we should not give this as param
-			output_file => $trna_scan->{work_dir} . '/' . 'output.out',
-			#debug => 1,
-			pretend => $pretend,
+			debug => 1,
 		);
 	if (defined $trna_scan->{exit_status} && $trna_scan->{exit_status} == 0) {
 		print "TRNA_SCAN: success\n";
@@ -182,6 +143,50 @@ if ($trna_scan ) {
 	print 'TS: duration: ', $trna_scan->{elapsed}, $/;
 }
 print "\n";
+
+my $blastn = DNALC::Pipeline::Process::Blast->new( $proj->work_dir, 'blastn' );
+if ($blastn) {
+	$blastn->run(
+			input => $proj->fasta_masked_xsmall,
+			debug => 1,
+		);
+	if (defined $blastn->{exit_status} && $blastn->{exit_status} == 0) {
+		print "BLASTN: success\n";
+	}
+	else {
+		print "BLASTN: fail\n";
+		print "exit_code= ", $blastn->{exit_status}, $/;
+		print $blastn->{cmd}, $/;
+	}
+	my $gff_file = $blastn->get_gff3_file;
+	push @gffs, $gff_file if $gff_file;
+	print 'BLASTN: gff_file: ', $gff_file, $/ if $gff_file;
+	print 'BLASTN: duration: ', $blastn->{elapsed}, $/;
+}
+
+print "\n\n";
+
+my $blastx = DNALC::Pipeline::Process::Blast->new( $proj->work_dir, 'blastx' );
+if ($blastx ) {
+	$blastx->run(
+			input => $proj->fasta_masked_xsmall,
+			debug => 1,
+		);
+	if (defined $blastx->{exit_status} && $blastx->{exit_status} == 0) {
+		print "BLASTX: success\n";
+	}
+	else {
+		print "BLASTX: fail\n";
+		print "exit_code= ", $blastx->{exit_status}, $/;
+		print $blastx->{cmd}, $/;
+	}
+	my $gff_file = $blastx->get_gff3_file;
+	push @gffs, $gff_file if $gff_file;
+	print 'BLASTX: gff_file: ', $gff_file, $/ if $gff_file;
+	print 'BLASTX: duration: ', $blastx->{elapsed}, $/;
+}
+
+
 
 if (@gffs) {
 	my @params = ();

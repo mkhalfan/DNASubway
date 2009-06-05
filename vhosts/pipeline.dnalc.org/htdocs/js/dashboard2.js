@@ -2,7 +2,7 @@
 
 var dbg, sent;
 var intervalID = {};
-var routines = ['augustus', 'fgenesh', 'snap'];
+var routines = ['augustus', 'fgenesh', 'snap', 'blastn', 'blastx'];
 
 function check_status (pid, op, h) {
 	var s = $(op);

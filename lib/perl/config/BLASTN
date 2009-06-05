@@ -2,7 +2,7 @@
 	program => '/usr/bin/blastall',
 	blastdb => '/data/blast/db',
 	blastmat => '/usr/share/blast',
-	redirect => 1, # use shell redirection => implies executing the programm under shell
+	#redirect => 1, # use shell redirection => implies executing the programm under shell
 	options => [
 		'-a',	2,
 		'-b',	250,

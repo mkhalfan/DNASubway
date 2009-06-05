@@ -13,13 +13,23 @@ use strict;
 $ENV{GMOD_ROOT} = '/usr/local/gmod';
 
 #-----------------------------------------------------------------------------
+<<<<<<< .mine
+my $input_file = '/home/ghiban/work/100k/B.fasta';
+=======
 my $input_file = '/home/cain/005E/fasta.fa';
+>>>>>>> .r58
 my $organism = 'Narcissus pseudonarcissus';
 my @subnames = split /\s/, $organism;
 my $common_name = 'daffodil';
 #-----------------------------------------------------------------------------
 
+<<<<<<< .mine
+die "Input file not found: $input_file", $/ unless (-f $input_file);
+
 my $username = $ARGV[0] || 'guest';
+=======
+my $username = $ARGV[0] || 'guest';
+>>>>>>> .r58
 if (!$username || $username =~ /[^a-z0-9_-]/i) {
 	print STDERR  "Username missing or not well formated.", $/;
 	exit 0;
@@ -115,18 +125,18 @@ print STDERR "U_ST = ", $upload_st->name , $/;
 
 if ( $upload_st->name eq 'Done') {
 	my $st;
-#	print STDERR  '-' x 20 , $/;
-# 	$st = $wfm->run_repeat_masker;
-# 	my $rm_st = $wfm->get_status('repeat_masker');
-# 	print STDERR "RM_ST = ", $rm_st->name, ($/ x 2);
+	print STDERR  '-' x 20 , $/;
+ 	$st = $wfm->run_repeat_masker;
+ 	my $rm_st = $wfm->get_status('repeat_masker');
+ 	print STDERR "RM_ST = ", $rm_st->name, ($/ x 2);
 
 	#-------------------------------------
 
-# 	print STDERR  '-' x 20 , $/;
-# 	$st = $wfm->run_augustus;
-# 	#print STDERR Dumper( $st ), $/;
-# 	my $a_st = $wfm->get_status('repeat_masker');
-# 	print STDERR  "AUGUSTUS_ST = ", $a_st->name, $/;
+ 	print STDERR  '-' x 20 , $/;
+ 	$st = $wfm->run_augustus;
+ 	#print STDERR Dumper( $st ), $/;
+ 	my $a_st = $wfm->get_status('repeat_masker');
+ 	print STDERR  "AUGUSTUS_ST = ", $a_st->name, $/;
 
 	#-------------------------------------
  	print STDERR  '-' x 20 , $/;
@@ -172,7 +182,7 @@ if (@params) {
 }
 
 print $/;
-print 'GFF FILE = ', $gff_file, $/;
+print 'MERGED GFF FILE = ', $gff_file, $/;
 print $/;
 
 warn @$gff3_files;

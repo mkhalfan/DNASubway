@@ -43,7 +43,8 @@ use strict;
 		push @opts, ("-i", $file_to_parse, "-o", $gff_file);
 		my $cmd=join ' ', @opts;
 		print STDERR  "PARSER = ", $cmd, $/;
-		system($cmd);
+		#system($cmd);
+		system(@opts);
 
 		#end parse file
 

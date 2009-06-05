@@ -17,7 +17,7 @@
 	}
 	else {
 		#pretend the user logged in already
-		$s->{user_id}  = 45;
+		$s->{user_id}  = 54;
 		$s->{username} = "guest";
 	}
 	$s->{last} = $now;
