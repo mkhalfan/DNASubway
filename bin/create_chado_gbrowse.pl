@@ -60,7 +60,7 @@ my ($PROFILE, $ORGANISM, $USERNAME, $GBROWSETEMPLATE, $GBROWSECONFDIR, $HELP, $P
 GetOptions(
   'username=s'         => \$USERNAME,
   'organism=s'         => \$ORGANISM,
-  'gbrowse_chado=s'    => \$GBROWSETEMPLATE,
+  'chado_gbrowse=s'    => \$GBROWSETEMPLATE,
   'gbrowse_confdir=s'  => \$GBROWSECONFDIR,
   'profile=s'          => \$PROFILE,
   'project_id=s'       => \$PROJECTID,
