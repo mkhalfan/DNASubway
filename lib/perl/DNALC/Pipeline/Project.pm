@@ -6,6 +6,7 @@ use warnings;
 use POSIX ();
 use File::Path;
 
+use DNALC::Pipeline::User ();
 use DNALC::Pipeline::Config ();
 
 use base qw(DNALC::Pipeline::DBI);
@@ -45,6 +46,13 @@ sub work_dir {
 			. '/' . sprintf("%04X", $self->id);
 }
 
+#-----------------------------------------------------------------------------
+sub username {
+	my ($self) = @_;
+	my $u = DNALC::Pipeline::User->retrieve($self->user_id);
+	return $u ? $u->username : '';
+}
+#-----------------------------------------------------------------------------
 
 sub group {
 	warn "To be removed", $/;

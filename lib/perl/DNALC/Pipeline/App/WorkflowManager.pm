@@ -228,6 +228,7 @@ use Carp;
 					$status->{success} = 1;
 					$status->{elapsed} = $rep_mask->{elapsed} + $rep_mask2->{elapsed};
 					$status->{gff_file}= $rep_mask->get_gff3_file;
+					my $rc = $self->load_analysis_results($status->{gff_file});
 					#$self->set_cache('repeat_masker', $crc);
 					print STDERR  "Time 2 = ", $rep_mask2->{elapsed}, $/;
 					$self->set_status('repeat_masker', 'Done', $status->{elapsed});
@@ -278,6 +279,7 @@ use Carp;
 				$status->{success} = 1;
 				$status->{elapsed} = $augustus->{elapsed};
 				$status->{gff_file}= $augustus->get_gff3_file;
+				my $rc = $self->load_analysis_results($status->{gff_file});
 				$self->set_status('augustus', 'Done', $augustus->{elapsed});
 				#my $crc = $self->crc($augustus->get_options);
 				#print STDERR  "AUGUSTUS CRC = ", $crc, $/;
@@ -319,6 +321,7 @@ use Carp;
 				$status->{success} = 1;
 				$status->{elapsed} = $trna_scan->{elapsed};
 				$status->{gff_file}= $trna_scan->get_gff3_file;
+				my $rc = $self->load_analysis_results($status->{gff_file});
 				$self->set_status('trna_scan', 'Done', $trna_scan->{elapsed});
 				$self->set_cache('trna_scan', $crc);
 			}
@@ -361,6 +364,7 @@ use Carp;
 				$status->{success} = 1;
 				$status->{elapsed} = $fgenesh->{elapsed};
 				$status->{gff_file}= $fgenesh->get_gff3_file;
+				my $rc = $self->load_analysis_results($status->{gff_file});
 				$self->set_status('fgenesh', 'Done', $status->{elapsed});
 				#my $crc = $self->crc($fgenesh->get_options);
 				#$self->set_cache('fgenesh', $crc);
@@ -402,6 +406,7 @@ use Carp;
 				$status->{success} = 1;
 				$status->{elapsed} = $snap->{elapsed};
 				$status->{gff_file}= $snap->get_gff3_file;
+				my $rc = $self->load_analysis_results($status->{gff_file});
 				$self->set_status('snap', 'Done', $snap->{elapsed});
 				#$self->set_cache('snap', $self->crc($snap->get_options));
 			}
@@ -538,6 +543,21 @@ use Carp;
 			carp "Unable to set cache for PID=", $self->project, ', task_name = ', $task_name, $/, $@, $/;
 		}
 
+	}
+	#-------------------------------------------------------------------------
+	sub load_analysis_results {
+		my ($self, $gff_file) = @_;
+
+		my $username = $self->project->username;
+		return unless -f $gff_file && defined $username;
+		my $profile = sprintf("%s_%d", $username, $self->project->id);
+		my $cmd = '/var/www/bin/load_analysis_results.pl';
+		my @args = ('--username', $username, 
+				'--profile', $profile, 
+				'--gff', $gff_file);
+		print STDERR  "\n\nLOADING DATA:\n", $cmd, " ", "@args", $/;
+		print STDERR 'EXIT CODE = ', system($cmd, @args);
+		return 1;
 	}
 	#-------------------------------------------------------------------------
 }

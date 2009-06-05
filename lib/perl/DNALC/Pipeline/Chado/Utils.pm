@@ -30,9 +30,10 @@ This script accomplishes several tasks:
 
 Soon (possibly): creates user specific Apollo conf stuff
 
-=head1 AUTHOR
+=head1 AUTHORS
 
 Scott Cain E<lt>cain.cshl@gmail.orgE<gt>
+Cornel Ghiban E<lt>ghiban@@cshl.eduE<gt>
 
 Copyright (c) 2009
 
@@ -55,7 +56,7 @@ sub new {
     $self->data_dir        ( $arg{data_dir})         if $arg{data_dir};
     $self->gbrowse_template( $arg{gbrowse_template}) if $arg{gbrowse_template};
     $self->gbrowse_confdir ( $arg{gbrowse_confdir})  if $arg{gbrowse_confdir};
-    $self->fastapath       ( $arg{fastapath})        if $arg{fastapath};
+	#$self->fastapath       ( $arg{fastapath})        if $arg{fastapath};
     $self->project_id      ( $arg{project_id})       if $arg{project_id};
     $self->chado_gbrowse   ( $arg{chado_gbrowse})    if $arg{chado_gbrowse};
 
@@ -124,37 +125,6 @@ sub project_id {
     my $project_id = shift if defined(@_);
     return $self->{'project_id'} = $project_id if defined($project_id);
     return $self->{'project_id'};
-}
-
-
-=head2 fastapath
-
-=over
-
-=item Usage
-
-  $obj->fastapath()        #get existing value
-  $obj->fastapath($newval) #set new value
-
-=item Function
-
-=item Returns
-
-value of fastapath (a scalar)
-
-=item Arguments
-
-new value of fastapath (to set)
-
-=back
-
-=cut
-
-sub fastapath {
-    my $self = shift;
-    my $fastapath = shift if defined(@_);
-    return $self->{'fastapath'} = $fastapath if defined($fastapath);
-    return $self->{'fastapath'};
 }
 
 =head2 gbrowse_confdir 
@@ -822,23 +792,18 @@ sub insert_organism {
     return;
 }
 
-sub load_database {
-    my $self  = shift;
+sub load_analysis_results {
+    my ($self, $file) = @_;
 
-    my $orig_dir = getcwd;
+	return unless -f $file;
 
-    chdir $self->data_dir;
+	my $profile = $self->profile;
+    my $command = "/usr/local/bin/gmod_bulk_load_gff3.pl -a --noexon --dbprof $profile -g $file";
+    print STDERR "$command\n";
+    system($command) == 0 or do {
+		print STDERR  "Failed to load file: ", $file, $/;
+    };
 
-    my @gff_files = glob('*.gff*');
-
-    my $user = $self->username ."_".$self->project_id;
-    foreach my $file (@gff_files) {
-        my $command = "gmod_bulk_load_gff3.pl -a --noexon --dbprof $user -g $file";
-        warn "$command\n";
-        system($command);
-    }
-
-    chdir $orig_dir;
     return;
 }
 
@@ -888,7 +853,7 @@ sub create_gbrowse_conf {
 	my $out = IO::File->new( "> $conffile" );
 	if (defined $in && $out) {
 		$organism =~ s/\s+/-/g;
-		$organism .= '-' . $project_id;
+		$organism .= '_' . $project_id;
 		while (my $line = <$in> ) {
 			$line =~ s/__USER__/$username/;
 			$line =~ s/__ORGANISM__/$organism/;
@@ -963,12 +928,13 @@ sub create_gbrowse_chado_conf {
 
 
 sub load_fasta {
-    my $self = shift;
+    my ($self, $fastafile) = @_;
 
+	return unless -f $fastafile;
 
     my ($id, $seq);
     #parse fasta file
-    open FASTA, $self->fastapath or die;
+    open FASTA, $fastafile or die;
     while (<FASTA>) {
         chomp;
         if (/^>(\S+)/) {
@@ -996,7 +962,7 @@ sub load_fasta {
 
     #load
     my $dbprof = $self->profile;
-    system("gmod_bulk_load_gff3.pl --dbprof $dbprof -g $filename") == 0 or die "fasta load failed";
+    system("/usr/local/bin/gmod_bulk_load_gff3.pl --dbprof $dbprof -g $filename") == 0 or die "fasta load failed";
 
     return;
 }

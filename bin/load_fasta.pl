@@ -69,11 +69,10 @@ $PROFILE         ||= 'default';
 my %args = (
   'username'        => $USERNAME,
   'profile'         => $PROFILE,
-  'fastapath'       => $FASTAPATH,
 );
 
 my $utils = DNALC::Pipeline::Chado::Utils->new(%args);
 
-$utils->load_fasta();
+$utils->load_fasta($FASTAPATH);
 
 exit(0);

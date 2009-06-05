@@ -1,9 +1,10 @@
 #!/usr/bin/perl
 use strict;
 use warnings;
-use lib '../lib/perl';
+use FindBin;
+use lib "$FindBin::Bin/../lib/perl";
 
-use DNALC::Pipeline::Chado::Utils;
+use DNALC::Pipeline::Chado::Utils ();
 use Getopt::Long;
 use Pod::Usage;
 
@@ -61,41 +62,31 @@ it under the same terms as Perl itself.
 
 =cut
 
-my ($PROFILE, $DATADIR, $USERNAME, $GBROWSETEMPLATE, $GBROWSECONFDIR, $HELP, $PROJECTID);
+my ($PROFILE, $FILE, $USERNAME, $HELP, $PROJECTID);
 
 GetOptions(
   'username=s'         => \$USERNAME,
-  'data_dir=s'         => \$DATADIR,
-  'gbrowse_template=s' => \$GBROWSETEMPLATE,
-  'gbrowse_confdir=s'  => \$GBROWSECONFDIR,
+  'gff=s'              => \$FILE,
   'profile=s'          => \$PROFILE,
-  'project_id=s'       => \$PROJECTID,
   'help'               => \$HELP,
 ) or  pod2usage(-verbose => 1, -exitval => 1);
 
 pod2usage(-verbose => 2, -exitval => 1) if $HELP;
 
-die unless $USERNAME;
-die unless $DATADIR;
-die unless $PROJECTID;
+die "Username is mising.\n" unless $USERNAME;
+die "GFF file is mising.\n" unless $FILE;
 
 $PROFILE         ||= 'default';
-$GBROWSECONFDIR  ||= '/etc/httpd/conf/gbrowse.conf';
-$GBROWSETEMPLATE ||= 'gbrowse.template';
-
 
 my %args = (
   'username'        => $USERNAME,
   'profile'         => $PROFILE,
-  'data_dir'        => $DATADIR,
-  'growse_template' => $GBROWSETEMPLATE,
-  'gbrowse_confdir' => $GBROWSECONFDIR,
-  'project_id'      => $PROJECTID,
 );
+
+$ENV{GMOD_ROOT} = '/usr/local/gmod';
 
 my $utils = DNALC::Pipeline::Chado::Utils->new(%args);
 
-$utils->load_database();
-$utils->create_gbrowse_conf($PROJECTID);
+$utils->load_analysis_results($FILE);
 
 exit(0);

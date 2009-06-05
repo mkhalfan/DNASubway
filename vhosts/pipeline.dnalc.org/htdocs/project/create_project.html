@@ -99,7 +99,7 @@ if ($r->method eq 'POST') {
 				my $st = DNALC::Pipeline::App::Utils->save_upload( {
 						r => $r, 
 						param_name => 'seq_file',
-						common_name => $trimmed_common_name . '-' . $proj->id,
+						common_name => $trimmed_common_name . '_' . $proj->id,
 					});
 
 				if ($st->{status} eq 'fail') {
@@ -119,7 +119,7 @@ if ($r->method eq 'POST') {
 				my ($status, $msg);
 				($status, $msg, $seq_crc) = DNALC::Pipeline::App::Utils->process_fasta_file({
 						file => $sample_file,
-						common_name => $trimmed_common_name . '-' . $proj->id,
+						common_name => $trimmed_common_name . '_' . $proj->id,
 						output_file => $output_file,
 					});
 				if ($status eq 'fail') {
@@ -155,6 +155,7 @@ if ($r->method eq 'POST') {
 
 				# the fasta file may be available not only via upload
 				my $fasta = $wfm->upload_sequence($uploaded_file);
+				print STDERR  "\nFASTA = ", $fasta, $/;
 
 				if ($fasta) {
 					# remove temporary file
@@ -184,6 +185,7 @@ if ($r->method eq 'POST') {
 
 						$cutils->profile($new_profile);
 						$cutils->insert_organism;
+						$cutils->load_fasta($fasta);
 					}
 
 				}

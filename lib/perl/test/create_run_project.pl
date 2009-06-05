@@ -79,6 +79,13 @@ if ( $upload_st->name eq 'Done') {
 		print STDERR "RM_ST = ", $rm_st->name, ($/ x 2);
 	}
 
+    #-------------------------------------
+ 	print STDERR  '-' x 20 , $/;
+ 	$st = $wfm->run_fgenesh;
+ 	print STDERR Dumper( $st ), $/;
+ 	my $f_st = $wfm->get_status('fgenesh');
+ 	print STDERR "FGNESH_ST = ", $f_st->name, ($/ x 2);
+if (0) {
 	#-------------------------------------
 	print STDERR  '-' x 20 , $/;
 	$st = $wfm->run_blastn;
@@ -90,7 +97,7 @@ if ( $upload_st->name eq 'Done') {
 	$st = $wfm->run_blastx;
 	my $bx_st = $wfm->get_status('blastx');
 	print STDERR "BLASTX_ST = ", $bx_st->name, ($/ x 2);
-
+}
 	#-------------------------------------
  	print STDERR  '-' x 20 , $/;
   	$st = $wfm->run_snap;
@@ -111,13 +118,6 @@ if ( $upload_st->name eq 'Done') {
  	print STDERR Dumper( $st ), $/;
  	my $t_st = $wfm->get_status('trna_scan');
  	print STDERR "TRNA_SCAN_ST = ", $t_st->name, ($/ x 2);
-   #-------------------------------------
-
- 	print STDERR  '-' x 20 , $/;
- 	$st = $wfm->run_fgenesh;
- 	print STDERR Dumper( $st ), $/;
- 	my $f_st = $wfm->get_status('fgenesh');
- 	print STDERR "FGNESH_ST = ", $f_st->name, ($/ x 2);
 
 }
 
