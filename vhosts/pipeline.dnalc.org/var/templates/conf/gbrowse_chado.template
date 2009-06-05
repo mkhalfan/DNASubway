@@ -6,6 +6,8 @@ db_args       =  -dsn 'dbi:Pg:dbname=__DBNAME__'
                  -srcfeatureslice 1
                  -inferCDS 1
 
+reference class = chromosome
+
 initial landmark = __ORGANISM__:1..10000
 
 #include gbrowse_conf.inc
