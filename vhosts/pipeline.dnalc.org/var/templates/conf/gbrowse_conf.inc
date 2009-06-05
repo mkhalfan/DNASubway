@@ -1,6 +1,8 @@
 
 plugins = AttributeHiliter BatchDumper FastaDumper
 
+show sources  = 0
+
 # Web site configuration info
 gbrowse root = gbrowse
 stylesheet  = gbrowse.css
