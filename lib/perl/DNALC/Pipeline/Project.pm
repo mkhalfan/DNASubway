@@ -59,6 +59,18 @@ sub fasta_file {
 }
 
 #-------------------------------
+# ugly hack
+sub fasta_masked_nolow {
+	my ($self) = @_;
+	my $ff = $self->work_dir . '/REPEAT_MASKER2/output/fasta.fa.masked';
+	return $ff if -e $ff;
+}
+sub fasta_masked_xsmall {
+	my ($self) = @_;
+	my $ff = $self->work_dir . '/REPEAT_MASKER/output/fasta.fa.masked';
+	return $ff if -e $ff;
+}
+#-------------------------------
 # TODO: Move into ProjectManager.pm
 
 sub get_gff3_file {

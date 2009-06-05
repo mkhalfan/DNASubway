@@ -1,5 +1,5 @@
 % if ($status) {
-{'status':'<%$success%>','running' : <% $status->running %>, 'known' : '<% $status->known %>', 'output':'<& './.comp/filepath_to_web', file => $output &>'}
+{'status':'<%$success%>','running' : <% $status->{running} %>, 'known' : '<% $status->{known} %>', 'output':'<& './.comp/filepath_to_web', file => $output &>'}
 % } else {
 {'status':'error','message':'???'}
 % }
@@ -42,21 +42,35 @@
 		return;
 	}
 
-	my $client = Gearman::Client->new;
-	$client->job_servers('127.0.0.1');
-	my $status = $client->get_status($h);
-	#print STDERR 'have stat', $/ if $status;
-	#print STDERR 'xxx: ', ($status && !$status->running), $/ if $status;
-	my $output = '';
-	if ($status && !$status->running && !$status->known) {
+	my ($output, $status) = ('', undef);
+	if ($h eq '-1') {
 		my $wfm = DNALC::Pipeline::App::WorkflowManager->new( $proj );
 		my $task_status = $wfm->get_status($t);
-		#print STDERR Dumper( $task_status ), $/;
-		if ($task_status && $task_status->name eq 'Done' ) {
-			$output = $proj->get_gff3_file($t);
-		}
-		else {
-			$success = 'error';
+		$status = {
+					running => $task_status->name eq 'Processing' ? 1 : 0,
+					known => $task_status->name eq 'Processing' ? 1 : 0
+				};
+		$output = $task_status->name eq 'Done' ? $proj->get_gff3_file($t) : '';
+	}
+	else {
+		my $client = Gearman::Client->new;
+		$client->job_servers('127.0.0.1');
+		my $jst = $client->get_status($h);
+
+		$status = {
+				running => $jst->running,
+				known => $jst->known
+			};
+		if ($jst && !$jst->running && !$jst->known) {
+
+			my $wfm = DNALC::Pipeline::App::WorkflowManager->new( $proj );
+			my $task_status = $wfm->get_status($t);
+			if ($task_status && $task_status->name eq 'Done' ) {
+				$output = $proj->get_gff3_file($t);
+			}
+			else {
+				$success = 'error';
+			}
 		}
 	}
 </%init>

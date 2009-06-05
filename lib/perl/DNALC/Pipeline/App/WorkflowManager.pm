@@ -262,14 +262,15 @@ use Carp;
 
 		my $augustus = DNALC::Pipeline::Process::Augustus->new( $proj->work_dir, $proj->clade );
 		if ( $augustus) {
-			my $crc = $self->crc($augustus->get_options);
-			print STDERR  "AUGUSTUS options = ", join('', $augustus->get_options), $/;
-			print STDERR  "AUGUSTUS CRC = ", $crc, $/;
-			$self->set_status('augustus', 'Processing');
-			$augustus->run(
-					input => $proj->fasta_file,
-					#output_file => $augustus->{work_dir} . '/' . 'augustus.gff3',
-				);
+
+			my $input_file = $proj->fasta_masked_nolow;
+			if ($input_file) {
+				print STDERR  "AUGUSTUS options = ", join('', $augustus->get_options), $/;
+				$self->set_status('augustus', 'Processing');
+				$augustus->run(
+						input => $input_file,
+					);
+			}
 			if (defined $augustus->{exit_status} && $augustus->{exit_status} == 0) {
 				print STDERR "AUGUSTUS: success\n";
 
@@ -277,7 +278,9 @@ use Carp;
 				$status->{elapsed} = $augustus->{elapsed};
 				$status->{gff_file}= $augustus->get_gff3_file;
 				$self->set_status('augustus', 'Done', $augustus->{elapsed});
-				$self->set_cache('augustus', $crc);
+				#my $crc = $self->crc($augustus->get_options);
+				#print STDERR  "AUGUSTUS CRC = ", $crc, $/;
+				#$self->set_cache('augustus', $crc);
 			}
 			else {
 				print STDERR "AUGUSTUS: fail\n";
@@ -342,12 +345,15 @@ use Carp;
 
 		my $fgenesh = DNALC::Pipeline::Process::FGenesH->new( $proj->work_dir, $proj->clade );
 		if ( $fgenesh) {
-			my $crc = $self->crc($fgenesh->get_options);
-			$self->set_status('fgenesh', 'Processing');
-			$fgenesh->run(
-					input => $proj->fasta_file,
-					debug => 0,
-				);
+
+			my $input_file = $proj->fasta_masked_nolow;
+			if ($input_file) {
+				$self->set_status('fgenesh', 'Processing');
+				$fgenesh->run(
+						input => $input_file,
+						debug => 0,
+					);
+			}
 			if (defined $fgenesh->{exit_status} && $fgenesh->{exit_status} == 0) {
 				print STDERR "FGENESH: success\n";
 
@@ -355,7 +361,8 @@ use Carp;
 				$status->{elapsed} = $fgenesh->{elapsed};
 				$status->{gff_file}= $fgenesh->get_gff3_file;
 				$self->set_status('fgenesh', 'Done', $status->{elapsed});
-				$self->set_cache('fgenesh', $crc);
+				#my $crc = $self->crc($fgenesh->get_options);
+				#$self->set_cache('fgenesh', $crc);
 			}
 			else {
 				print STDERR "FGENESH: fail\n";
@@ -382,17 +389,20 @@ use Carp;
 		my $snap = DNALC::Pipeline::Process::Snap->new( $proj->work_dir, $proj->clade );
 		if ($snap) {
 
-			$self->set_status('snap', 'Processing');
-			$snap->run(
+			my $input_file = $proj->fasta_masked_nolow;
+			if ($input_file) {
+				$self->set_status('snap', 'Processing');
+				$snap->run(
 					input => $proj->fasta_file,
-				);
+					);
+			}
 			if (defined $snap->{exit_status} && $snap->{exit_status} == 0) {
 				print STDERR "SNAP: success\n";
 				$status->{success} = 1;
 				$status->{elapsed} = $snap->{elapsed};
 				$status->{gff_file}= $snap->get_gff3_file;
 				$self->set_status('snap', 'Done', $snap->{elapsed});
-				$self->set_cache('snap', $self->crc($snap->get_options));
+				#$self->set_cache('snap', $self->crc($snap->get_options));
 			}
 			else {
 				print STDERR "SNAP: fail\n";

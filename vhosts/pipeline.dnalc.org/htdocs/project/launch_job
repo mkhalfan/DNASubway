@@ -34,7 +34,7 @@
 	my $client = Gearman::Client->new;
 	$client->job_servers('127.0.0.1');
 	my $h = $client->dispatch_background( $t => $pid);
-	print STDERR  "Launched [$t], h = ", $h, $/;
+	#print STDERR  "Launched [$t], h = ", $h, $/;
 </%init>
 <%flags>
 	inherit => undef

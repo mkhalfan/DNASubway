@@ -73,18 +73,18 @@ print STDERR "U_ST = ", $upload_st->name , $/;
 if ( $upload_st->name eq 'Done') {
 	my $st;
 	
-# 	print STDERR  '-' x 20 , $/;
-#  	$st = $wfm->run_snap;
-#  	my $s_st = $wfm->get_status('snap');
-#  	print STDERR "SNAP_ST = ", $s_st->name, ($/ x 2);
-
 	print STDERR  '-' x 20 , $/;
 	$st = $wfm->run_repeat_masker;
 	my $rm_st = $wfm->get_status('repeat_masker');
 	print STDERR "RM_ST = ", $rm_st->name, ($/ x 2);
 
 	#-------------------------------------
+# 	print STDERR  '-' x 20 , $/;
+#  	$st = $wfm->run_snap;
+#  	my $s_st = $wfm->get_status('snap');
+#  	print STDERR "SNAP_ST = ", $s_st->name, ($/ x 2);
 
+	#-------------------------------------
 #  	print STDERR  '-' x 20 , $/;
 #  	$st = $wfm->run_augustus;
 #  	#print STDERR Dumper( $st ), $/;
@@ -99,11 +99,12 @@ if ( $upload_st->name eq 'Done') {
 # 	my $t_st = $wfm->get_status('trna_scan');
 # 	print STDERR "TRNA_SCAN_ST = ", $t_st->name, ($/ x 2);
 	#-------------------------------------
-#	print STDERR  '-' x 20 , $/;
-#	$st = $wfm->run_fgenesh;
-#	print STDERR Dumper( $st ), $/;
-#	my $f_st = $wfm->get_status('fgenesh');
-#	print STDERR "FGNESH_ST = ", $f_st->name, ($/ x 2);
+
+	print STDERR  '-' x 20 , $/;
+	$st = $wfm->run_fgenesh;
+	print STDERR Dumper( $st ), $/;
+	my $f_st = $wfm->get_status('fgenesh');
+	print STDERR "FGNESH_ST = ", $f_st->name, ($/ x 2);
 
 }
 

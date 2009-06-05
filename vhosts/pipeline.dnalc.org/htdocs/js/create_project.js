@@ -51,8 +51,8 @@ function populate_fields(src) {
 	var organism = $('organism');
 	var common_name = $('common_name');
 	if (src == 'upload' || !sel || sel.selectedIndex == -1) {
-		organism.value = '';
-		common_name.value = '';
+		//organism.value = '';
+		//common_name.value = '';
 		organism.readOnly = false;
 		common_name.readOnly = false;
 	}

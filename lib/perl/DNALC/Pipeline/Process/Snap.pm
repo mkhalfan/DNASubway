@@ -57,7 +57,7 @@ use base q(DNALC::Pipeline::Process);
 		closedir DIR;
 
 		my $file = "$dir/$f[0]";
-		print STDERR  "FILE = ", $file, $/;
+		#print STDERR  "FILE = ", $file, $/;
 
 		my $in  = IO::File->new;
 		my $out = IO::File->new;
@@ -92,12 +92,17 @@ use base q(DNALC::Pipeline::Process);
 			foreach my $gene_name (sort keys %genes) {
 				my $g = $genes{$gene_name};
 				my @data = @{$genes{$gene_name}->{data} };
+				if ($g->{sign} eq '-' && $g->{start} > $g->{end}) {
+					($g->{start}, $g->{end}) = ($g->{end}, $g->{start});
+				}
 				print $out $data[0]->[0], "\t", $data[0]->[1], "\tgene\t", $g->{start}, "\t", $g->{end}, 
-							"\t0\t", $g->{sign}, "\t.\t", "ID=$gene_name;Name=SNAPEGENE.$gene_cnt", "\n";
+							"\t0\t", $g->{sign}, "\t.\t", "ID=g$gene_name;Name=SNAPGENE.$gene_cnt", "\n";
+				print $out $data[0]->[0], "\t", $data[0]->[1], "\tmRNA\t", $g->{start}, "\t", $g->{end}, 
+							"\t0\t", $g->{sign}, "\t.\t", "ID=m$gene_name;Parent=g$gene_name", "\n";
 				for (@data) {
-					$_->[2] =~ s/Exon/exon/;
-					$_->[2] =~ s/(?:Eterm|Einit)/CDS/;
-					$_->[8] = "Parent=" . $_->[8];
+					#$_->[2] =~ s/Exon/exon/;
+					$_->[2] =~ s/(?:Eterm|Einit|Exon)/CDS/;
+					$_->[8] = "Parent=m" . $_->[8];
 					print $out join ("\t", @$_), "\n";
 				}
 				$gene_cnt++;

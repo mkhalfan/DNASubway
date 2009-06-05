@@ -14,6 +14,7 @@
 	use DNALC::Pipeline::App::WorkflowManager ();
 	use DNALC::Pipeline::Utils qw(random_string);
 	use Carp;
+	use Gearman::Client ();
 	use Data::Dumper;
 </%once>
 
@@ -69,18 +70,15 @@ if ($r->method eq 'POST') {
 	}
 	#push @err, "Clade is missing!" unless $group;
 
-	unless (@err) {
-		#fix common_name
-		$common_name =~ s/\s+/-/g;
-		$common_name =~ tr/A-Z/a-z/;
-	}
-
 	my $proj = DNALC::Pipeline::Project->search(user_id => $s->{user_id}, name => $name);
 	if ($proj) {
 		push @err, "You already have a project named [$name]";
 	}
 	# create the project 
 	unless (@err) {
+		$common_name =~ tr/A-Z/a-z/;
+		my $trimmed_common_name = $common_name;
+		$trimmed_common_name =~ s/\s+/-/g;
 		$proj = eval { DNALC::Pipeline::Project->create({
 								user_id => $s->{user_id},
 								name => $name,
@@ -101,7 +99,7 @@ if ($r->method eq 'POST') {
 				my $st = DNALC::Pipeline::App::Utils->save_upload( {
 						r => $r, 
 						param_name => 'seq_file',
-						common_name => $common_name . '-' . $proj->id,
+						common_name => $trimmed_common_name . '-' . $proj->id,
 					});
 
 				if ($st->{status} eq 'fail') {
@@ -121,7 +119,7 @@ if ($r->method eq 'POST') {
 				my ($status, $msg);
 				($status, $msg, $seq_crc) = DNALC::Pipeline::App::Utils->process_fasta_file({
 						file => $sample_file,
-						common_name => $common_name . '-' . $proj->id,
+						common_name => $trimmed_common_name . '-' . $proj->id,
 						output_file => $output_file,
 					});
 				if ($status eq 'fail') {
@@ -189,6 +187,17 @@ if ($r->method eq 'POST') {
 					}
 
 				}
+
+			if (0) {
+				#set this as running
+				$wfm->set_status('repeat_masker', 'Processing');
+
+				# launch RM job
+				my $client = Gearman::Client->new;
+				$client->job_servers('127.0.0.1');
+				my $h = $client->dispatch_background( 'repeat_masker' => $proj->id);
+				# TODO save this handler into session so we can later check upon it..
+			}
 
 				# redirect user to dashboard
 				$m->comp('/_message_add', "Project created successfully!");

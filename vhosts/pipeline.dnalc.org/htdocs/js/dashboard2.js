@@ -2,6 +2,7 @@
 
 var dbg, sent;
 var intervalID = {};
+var routines = ['augustus', 'fgenesh', 'snap'];
 
 function check_status (pid, op, h) {
 	var s = $(op);
@@ -36,6 +37,12 @@ function check_status (pid, op, h) {
 					s.removeClassName('processing');
 					s.update('Job done. ');
 					s.appendChild(new Element('a', {'href' : file,'target':'_blank'}).update('View file'));
+					if (op == 'repeat_masker') {
+						for (var i = 0; i < routines.length; i++) {
+							var rt = $(routines[i] + '_btn')
+							if (rt) rt.enable();
+						}
+					}
 				} else {}
 			}
 			else  if (r.status == 'error') {
@@ -43,6 +50,9 @@ function check_status (pid, op, h) {
 				s.removeClassName('processing');
 				s.addClassName('error');
 				s.update('Error');
+
+				var b = $(op + '_btn');
+				if (b) b.enable();
 			}
 			else {
 				s.update('Unknown status!');
@@ -107,7 +117,6 @@ function debug(msg) {
 	if (d) d.update(msg);
 }
 
-/*
 //-------------
 // keep this at the end
 Event.observe(window, 'load', function() {
@@ -117,12 +126,10 @@ Event.observe(window, 'load', function() {
 	    var stat = spans[i].readAttribute('status');
 		if (!stat)
 			continue;
-		alert(spans[i].id + ' ' + stat);
 		if (stat == 'Processing') {
 			var p = $('pid').value;
-			var op = span.id;
-			intervalID[op] = setInterval(check_status, delay, p, op, h);
+			var op = spans[i].id;
+			intervalID[op] = setInterval(check_status, 10000, p, op, -1);
 		}
 	}
 });
-*/

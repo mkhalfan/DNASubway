@@ -10,10 +10,10 @@
 	use DNALC::Pipeline::App::Utils ();
 
 	my @routines = (
+			{ name => 'trna_scan', label => 'tRNA Scan'},
 			{ name => 'augustus', label => 'Augustus', delay => 15},
 			{ name => 'fgenesh', 'label' => 'FgenesH'},
-			{ name => 'repeat_masker', label => 'Repeat Masker', delay => 10},
-			{ name => 'trna_scan', label => 'tRNA Scan'},
+			#{ name => 'repeat_masker', label => 'Repeat Masker', delay => 10},
 			{ name => 'snap', label => 'Snap'},
 		);
 </%once>
@@ -32,6 +32,8 @@ unless ($proj) {
 my $wfm = DNALC::Pipeline::App::WorkflowManager->new( $proj );
 my $upload_st = $wfm->get_status('upload_fasta');
 my $history = $wfm->get_history;
+
+my $rm_status = $wfm->get_status('repeat_masker')->name;
 
 # TODO : set in session when you're starting to run a routine, 
 # and reset this flash after you get info about the execution of the routine
@@ -54,13 +56,35 @@ Clade : <% $proj->clade %>
 </pre>
 %#<div style="background:red">alabala portocala:_<span class="loading">---</span></div>
 <ul id="routines">
+%#------------------------------------	
+	<li><span style="font-weight:bold">Repeat Masker</span>&nbsp;
+%	if ($rm_status !~ /Done|Processing/) {
+%#	if ($rm_status ne 'Processing') {
+<input type="button" id="repeat_masker_btn" value="Run" onclick="run('repeat_masker')" />
+%	}
+<span class="<%lc $rm_status %>" id="repeat_masker" delay="10" status="<%$rm_status%>">
+%	if ($rm_status eq 'Done') {
+%		my $path = $m->comp('./.comp/filepath_to_web', file => $proj->get_gff3_file('repeat_masker') || '', just_return => 1);
+%		if ($path) {
+			<a target="_blank" href="<% $path %>">View output</a>
+%		}
+%   } else {
+%#		if ($rt_status eq 'Processing') {
+%#		<img src="/images/ajax-loader.gif" />
+%#		}
+	<% $rm_status %>\
+%	}
+		</span>
+	</li>
+%#------------------------------------	
 % for my $rt (@routines) {
-%		my $rname = $rt->{name};
-%		my $rt_status = $wfm->get_status($rname)->name;
+%	my $rname = $rt->{name};
+%	my $rt_status = $wfm->get_status($rname)->name;
+%	my $disabled = $rname ne 'trna_scan' && $rm_status ne 'Done';
 	<li><span style="font-weight:bold"><% $rt->{label} %></span>&nbsp;
-%#	if ($rt_status !~ /Done|Processing/) {
-%	if ($rt_status ne 'Processing') {
-<input type="button" id="<% $rname %>_btn" value="Run" onclick="run('<% $rname %>')" />
+%	if ($rt_status !~ /Done|Processing/) {
+%#	if ($rt_status ne 'Processing') {
+<input type="button" id="<% $rname %>_btn" value="Run" onclick="run('<% $rname %>')" <% $disabled ? 'disabled="disabled"' : '' %>/>
 %	}
 <span class="<%lc $rt_status %>" id="<% $rname %>" delay="<% $rt->{delay} || 5 %>" status="<%$rt_status%>">
 %	if ($rt_status eq 'Done') {
