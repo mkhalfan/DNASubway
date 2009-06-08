@@ -269,9 +269,7 @@ use Carp;
 			if ($input_file) {
 				print STDERR  "AUGUSTUS options = ", join('', $augustus->get_options), $/;
 				$self->set_status('augustus', 'Processing');
-				$augustus->run(
-						input => $input_file,
-					);
+				$augustus->run(	input => $input_file );
 			}
 			if (defined $augustus->{exit_status} && $augustus->{exit_status} == 0) {
 				print STDERR "AUGUSTUS: success\n";
@@ -314,7 +312,6 @@ use Carp;
 			$self->set_status('trna_scan', 'Processing');
 			$trna_scan->run(
 					input => $proj->fasta_file,
-					#output_file => $trna_scan->{work_dir} . '/' . 'output.out',
 				);
 			if (defined $trna_scan->{exit_status} && $trna_scan->{exit_status} == 0) {
 				print STDERR "TRNA_SCAN: success\n";
@@ -398,7 +395,7 @@ use Carp;
 			if ($input_file) {
 				$self->set_status('snap', 'Processing');
 				$snap->run(
-					input => $proj->fasta_file,
+					input => $input_file,
 					);
 			}
 			if (defined $snap->{exit_status} && $snap->{exit_status} == 0) {
@@ -437,7 +434,7 @@ use Carp;
 			my $input_file = $proj->fasta_masked_xsmall;
 			if ($input_file) {
 				$self->set_status('blastn', 'Processing');
-				$blastn->run( input => $proj->fasta_file, debug => 1 );
+				$blastn->run( input => $input_file, debug => 1 );
 			}
 			if (defined $blastn->{exit_status} && $blastn->{exit_status} == 0) {
 				print STDERR "BLASTN: success\n";
@@ -475,7 +472,7 @@ use Carp;
 			my $input_file = $proj->fasta_masked_xsmall;
 			if ($input_file) {
 				$self->set_status('blastx', 'Processing');
-				$blastx->run( input => $proj->fasta_file, debug => 1 );
+				$blastx->run( input => $input_file, debug => 1 );
 			}
 			if (defined $blastx->{exit_status} && $blastx->{exit_status} == 0) {
 				print STDERR "BLASTX: success\n";
