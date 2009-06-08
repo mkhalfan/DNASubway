@@ -80,7 +80,7 @@ sub copy_results {
 		return;
 	}
 	# remove spaces
-	$common_name =~ s/\s+/-/g;
+	$common_name =~ s/\s+/_/g;
 	$common_name .= '_' . $project_id;
 
 	my $routine_dir = $project_dir . '/' . uc $routine;
@@ -138,7 +138,7 @@ sub copy_fasta {
 		return;
 	}
 	# remove spaces
-	$common_name =~ s/\s+/-/g;
+	$common_name =~ s/\s+/_/g;
 	$common_name .= '_' . $project_id;
 
 	my $sample_fasta = $self->{sample_dir} . '/fasta.fa';

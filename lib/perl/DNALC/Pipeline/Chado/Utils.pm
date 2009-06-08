@@ -809,7 +809,7 @@ sub load_analysis_results {
 
 sub create_gbrowse_conf {
     my ($self, $project_id, $base_db_dir) = @_;
-	print STDERR Dumper( $self ), $/;
+	#print STDERR Dumper( $self ), $/;
  
 	unless ($project_id && $project_id =~ /\d+/) {
 		warn "Project ID is missing or invalid\n";
@@ -852,7 +852,7 @@ sub create_gbrowse_conf {
 	my $in  = IO::File->new( $confdir . '/' . $self->gbrowse_template );
 	my $out = IO::File->new( "> $conffile" );
 	if (defined $in && $out) {
-		$organism =~ s/\s+/-/g;
+		$organism =~ s/\s+/_/g;
 		$organism .= '_' . $project_id;
 		while (my $line = <$in> ) {
 			$line =~ s/__USER__/$username/;

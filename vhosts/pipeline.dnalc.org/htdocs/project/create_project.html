@@ -78,7 +78,7 @@ if ($r->method eq 'POST') {
 	unless (@err) {
 		$common_name =~ tr/A-Z/a-z/;
 		my $trimmed_common_name = $common_name;
-		$trimmed_common_name =~ s/\s+/-/g;
+		$trimmed_common_name =~ s/\s+/_/g;
 		$proj = eval { DNALC::Pipeline::Project->create({
 								user_id => $s->{user_id},
 								name => $name,
