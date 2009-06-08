@@ -1,8 +1,8 @@
 [GENERAL]
 description =  __USER__'s __ORGANISM__ Data
 db_adaptor    = Bio::DB::Das::Chado
-db_args       =  -dsn 'dbi:Pg:dbname=__DBNAME__;host=green.cshl.edu'
-                 -user cornel
+db_args       =  -dsn 'dbi:Pg:dbname=__DBNAME__'
+                 -user cain
                  -srcfeatureslice 1
                  -organism __ORGANISM__
                  -inferCDS 1
