@@ -444,6 +444,7 @@ use Carp;
 				$status->{success} = 1;
 				$status->{elapsed} = $blastn->{elapsed};
 				$status->{gff_file}= $blastn->get_gff3_file;
+				my $rc = $self->load_analysis_results($status->{gff_file});
 				$self->set_status('blastn', 'Done', $blastn->{elapsed});
 				#$self->set_cache('blastn', $self->crc($blastn->get_options));
 			}
@@ -481,6 +482,7 @@ use Carp;
 				$status->{success} = 1;
 				$status->{elapsed} = $blastx->{elapsed};
 				$status->{gff_file}= $blastx->get_gff3_file;
+				my $rc = $self->load_analysis_results($status->{gff_file});
 				$self->set_status('blastx', 'Done', $blastx->{elapsed});
 				#$self->set_cache('blastx', $self->crc($blastx->get_options));
 			}
@@ -556,7 +558,7 @@ use Carp;
 				'--profile', $profile, 
 				'--gff', $gff_file);
 		print STDERR  "\n\nLOADING DATA:\n", $cmd, " ", "@args", $/;
-		print STDERR 'EXIT CODE = ', system($cmd, @args);
+		print STDERR 'EXIT CODE = ', system($cmd, @args), $/;
 		return 1;
 	}
 	#-------------------------------------------------------------------------
