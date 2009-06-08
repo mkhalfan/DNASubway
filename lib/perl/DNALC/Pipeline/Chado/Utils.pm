@@ -890,18 +890,13 @@ sub create_gbrowse_chado_conf {
 
     my $conffile = sprintf("%s/%s_db_%d.conf", $confdir, $username, $project_id);
 
-    return $conffile if -f $conffile;
 
     print STDERR  "Config dir = ", $confdir, $/;
     print STDERR  "Config file = ", $conffile, $/;
 
+    return $conffile if -f $conffile;
 
-    #this if statement never executes because of the return if -f a few lines above
-    if (-f $conffile) {
-        warn "Gbrowse configuration file for this user [$username].[pid=$project_id] already exists.";
-        return $conffile;
-    }
-    warn $self->chado_gbrowse;
+    print STDERR $self->chado_gbrowse, $/;
     my $in  = IO::File->new( $confdir . '/' . $self->chado_gbrowse );
     my $out = IO::File->new( "> $conffile" );
     if (defined $in && $out) {

@@ -44,11 +44,11 @@
 		my $gff_merger = $pcf->{EXE_PATH} . '/gff3_merger.pl';
 		my $gff_file = $proj->work_dir . '/gff3.gff';
 		my @args = ($gff_merger, @params, '-f', $proj->fasta_file, '-o', $gff_file);
-		print STDERR Dumper( \@args), $/;
+		#print STDERR Dumper( \@args), $/;
 
 		system (@args) && die "Error: $!\n";
 		my $slink = $pcf->{GBROWSE_DB_DIR} . '/' . $s->{username} . '/' . $proj->id . '/gff3.gff' ;
-		print STDERR  "SYMLINK $gff_file -> ", $slink, $/;
+		#print STDERR  "SYMLINK $gff_file -> ", $slink, $/;
 		symlink $gff_file, $slink;
 		$m->redirect($pcf->{GBROWSE_URL} . '/' . $s->{username} . '_' . $proj->id);
 	}
@@ -57,13 +57,7 @@
 		$m->redirect('./dashboard.html?pid=' . $proj->id);
 	}
 </%init>
-<pre>
-r = <% $r->document_root %>
-files:
-% for my $f (@$gff3_files) {
-	- <% $f %>
-% }
-</pre>
+
 <%flags>
 	inherit => undef
 </%flags>
