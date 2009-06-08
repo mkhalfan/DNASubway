@@ -11,6 +11,9 @@ use DNALC::Pipeline::Config ();
 
 use base qw(DNALC::Pipeline::DBI);
 
+use Class::DBI::Plugin::AbstractCount;
+use Class::DBI::Plugin::Pager;
+
 __PACKAGE__->table('project');
 __PACKAGE__->columns(Primary => qw/project_id/);
 __PACKAGE__->columns(Essential => qw/user_id name organism common_name 

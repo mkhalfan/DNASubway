@@ -84,8 +84,8 @@ Clade : <% $proj->clade %>
 %	my $rt_status = $wfm->get_status($rname)->name;
 %	my $disabled = $rname ne 'trna_scan' && $rm_status ne 'Done';
 	<li><span style="font-weight:bold"><% $rt->{label} %></span>&nbsp;
-%	if ($rt_status !~ /Done|Processing/) {
-%#	if ($rt_status ne 'Processing') {
+%#	if ($rt_status !~ /Done|Processing/) {
+%	if ($rt_status ne 'Processing') {
 <input type="button" id="<% $rname %>_btn" value="Run" onclick="run('<% $rname %>')" <% $disabled ? 'disabled="disabled"' : '' %>/>
 %	}
 <span class="<%lc $rt_status %>" id="<% $rname %>" delay="<% $rt->{delay} || 5 %>" status="<%$rt_status%>">

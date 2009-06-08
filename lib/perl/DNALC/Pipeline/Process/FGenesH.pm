@@ -69,13 +69,13 @@ use strict;
 
 			next unless @exons; #?!?!
 
-			print $out $seq_id . "\t" . $program . "\t" . 'gene' . "\t"
-						. $loc->start . "\t"	. $loc->end . "\t" . '.' . "\t"
-						. $strand . "\t" . '.' . "\t". "$gene_name;ID=$gene_id\n";
-
 			# compute mRNA location
 			my $mstart = $exons[0]->location->start;
 			my $mend = $exons[ $#exons ]->location->end;
+
+			print $out $seq_id . "\t" . $program . "\t" . 'gene' . "\t"
+						. $mstart . "\t"	. $mend . "\t" . '.' . "\t"
+						. $strand . "\t" . '.' . "\t". "$gene_name;ID=$gene_id\n";
 
 			print $out $seq_id . "\t" . $program . "\t" . 'mRNA' . "\t"
 						. $mstart . "\t"	. $mend . "\t" . '.' . "\t"
@@ -86,6 +86,10 @@ use strict;
 				print $out $seq_id . "\t" . $program . "\t" . 'exon' . "\t"
 						. $loc->start . "\t"	. $loc->end . "\t" . sprintf("%.2f", $e->score) . "\t"
 						. $strand . "\t" . '.' . "\t". "Parent=$gene_id.1\n";
+				print $out $seq_id . "\t" . $program . "\t" . 'CDS' . "\t"
+						. $loc->start . "\t"	. $loc->end . "\t" . sprintf("%.2f", $e->score) . "\t"
+						. $strand . "\t" . '.' . "\t". "Parent=$gene_id.1\n";
+
 			}
 
 		}

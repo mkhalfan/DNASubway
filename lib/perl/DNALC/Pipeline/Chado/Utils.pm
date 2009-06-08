@@ -901,9 +901,9 @@ sub create_gbrowse_chado_conf {
     my $out = IO::File->new( "> $conffile" );
     if (defined $in && $out) {
 
-       # these lines are breaking chado becuase it has spaces!
-       # $organism =~ s/\s+/-/g;
-       # $organism .= '-' . $project_id;
+		#these lines are breaking chado becuase it has spaces!
+        $organism =~ s/\s+/_/g;
+        $organism .= '_' . $project_id;
         while (my $line = <$in> ) {
             $line =~ s/__USER__/$username/;
             $line =~ s/__ORGANISM__/$organism/;

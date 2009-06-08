@@ -100,9 +100,14 @@ use base q(DNALC::Pipeline::Process);
 				print $out $data[0]->[0], "\t", $data[0]->[1], "\tmRNA\t", $g->{start}, "\t", $g->{end}, 
 							"\t0\t", $g->{sign}, "\t.\t", "ID=m$gene_name;Parent=g$gene_name", "\n";
 				for (@data) {
-					#$_->[2] =~ s/Exon/exon/;
-					$_->[2] =~ s/(?:Eterm|Einit|Exon)/CDS/;
+					my $col3 = $_->[2];
+					$col3 =~ s/(?:Eterm|Einit|Exon)/CDS/;
+					$_->[2] = $col3;
 					$_->[8] = "Parent=m" . $_->[8];
+					print $out join ("\t", @$_), "\n";
+
+					$col3 =~ s/CDS/exon/;
+					$_->[2] = $col3;
 					print $out join ("\t", @$_), "\n";
 				}
 				$gene_cnt++;

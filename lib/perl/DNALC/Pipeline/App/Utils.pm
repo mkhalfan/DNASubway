@@ -91,16 +91,19 @@ sub process_fasta_file {
 
 	my $config = DNALC::Pipeline::Config->new;
 
-	my $crc => '';
-	my $fasta_seq = $in->next_seq;
-	#print STDERR  "ALPHABETU = ", $fasta_seq->alphabet, $/;
-	if ($fasta_seq && $fasta_seq->alphabet eq 'dna') {
+	my $crc = '';
+	my $seq = $in->next_seq;
+	if ($seq && $seq->alphabet eq 'dna') {
 		my $max_seq_length = $config->cf('PIPELINE')->{sequence_length} || 50_000;
 		# make sure the sequence is not longer then expected..
-		if ($fasta_seq->length > $max_seq_length) {
-			$fasta_seq->seq( uc $fasta_seq->subseq(1, $max_seq_length), 'dna' );
+
+		my $fasta_seq = Bio::Seq->new( -display_id => $common_name );
+		if ($seq->length > $max_seq_length) {
+			$fasta_seq->seq( uc $seq->subseq(1, $max_seq_length), 'dna' );
 		}
-		$fasta_seq->display_id( $common_name );
+		else {
+			$fasta_seq->seq( uc $seq->seq, 'dna' );
+		}
 		
 		my $ctx = Digest::MD5->new;
 		$ctx->add($fasta_seq->seq);
