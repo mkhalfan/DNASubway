@@ -14,7 +14,7 @@ load_analysis_results.pl - Loads a user provided GFF into chado
 
 =head1 SYNOPSIS
 
-  % load_fasta.pl --username <name> --data_dir <path>
+  % load_fasta.pl --username <name> --profile <profile> --algorithm <algorithm> --gff <path>
 
 =head1 COMMAND-LINE OPTIONS
 
@@ -62,12 +62,13 @@ it under the same terms as Perl itself.
 
 =cut
 
-my ($PROFILE, $FILE, $USERNAME, $HELP, $PROJECTID);
+my ($PROFILE, $FILE, $USERNAME, $HELP, $ALG);
 
 GetOptions(
   'username=s'         => \$USERNAME,
   'gff=s'              => \$FILE,
   'profile=s'          => \$PROFILE,
+  'algorithm=s'        => \$ALG,
   'help'               => \$HELP,
 ) or  pod2usage(-verbose => 1, -exitval => 1);
 
@@ -87,6 +88,6 @@ $ENV{GMOD_ROOT} = '/usr/local/gmod';
 
 my $utils = DNALC::Pipeline::Chado::Utils->new(%args);
 
-$utils->load_analysis_results($FILE);
+$utils->load_analysis_results($FILE, $ALG);
 
 exit(0);

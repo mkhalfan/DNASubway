@@ -808,9 +808,9 @@ sub load_analysis_results {
 
 	return unless -f $file;
 
-    my $param = $self->additional_load_parameters($alg);
+    my $param = $self->additional_load_parameters(uc $alg) || '';
 
-	my $profile = $self->profile;
+    my $profile = $self->profile;
     my $command = "/usr/local/bin/gmod_bulk_load_gff3.pl $param -a --dbprof $profile -g $file";
     print STDERR "$command\n";
     system($command) == 0 or do {
