@@ -915,11 +915,14 @@ sub create_gbrowse_chado_conf {
     if (defined $in && $out) {
 
 		#these lines are breaking chado becuase it has spaces!
-        $organism =~ s/\s+/_/g;
-        $organism .= '_' . $project_id;
+		#$organism =~ s/\s+/_/g;
+		#$organism .= '_' . $project_id;
+		my $trimmed_organism = $organism;
+		$trimmed_organism =~ s/\s+/_/g;
         while (my $line = <$in> ) {
             $line =~ s/__USER__/$username/;
             $line =~ s/__ORGANISM__/$organism/;
+            $line =~ s/__TRIMMED_ORGANISM__/$trimmed_organism/;
             $line =~ s/__PID__/$project_id/;
             $line =~ s/__DBNAME__/$username/;
             print $out $line;
