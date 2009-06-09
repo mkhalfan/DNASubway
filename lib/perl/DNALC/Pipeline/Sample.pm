@@ -124,17 +124,18 @@ sub copy_fasta {
 	my $project_dir = $args->{project_dir};
 	my $project_id = $args->{project_id};
 	my $common_name = $args->{common_name} || $self->common_name;
+	my $masker = $args->{masker};
 
 	unless (-d $project_dir) {
-		carp "Sample::copy_results: destination directory $project_dir is missing\n";
+		carp "Sample::copy_fasta: destination directory $project_dir is missing\n";
 		return;
 	}
 	unless (defined $project_id && $project_id ) {
-		carp "Sample::copy_results: project_id is missing\n";
+		carp "Sample::copy_fasta: project_id is missing\n";
 		return;
 	}
 	unless (defined $common_name && $common_name ) {
-		carp "Sample::copy_results: Species name is missing\n";
+		carp "Sample::copy_fasta: Species name is missing\n";
 		return;
 	}
 	# remove spaces
@@ -143,6 +144,21 @@ sub copy_fasta {
 
 	my $sample_fasta = $self->{sample_dir} . '/fasta.fa';
 	my $out_fasta = $project_dir . '/fasta.fa';
+	if (defined $masker && $masker) {
+		my $masker_dir = $project_dir . '/' . uc $masker;
+		foreach my $dir ($masker_dir, "$masker_dir/output") {
+			unless (-d $dir) {
+				my $rc = mkdir $dir;
+				unless ($rc) {
+					carp "Sample::copy_masked_fasta: unable to create masked directory: ", $!, $/;
+					return;
+				}
+			}
+		}
+
+		$sample_fasta = $self->{sample_dir} . '/' . uc ($masker) . '/output/fasta.fa.masked';
+		$out_fasta = $masker_dir . '/output/fasta.fa.masked';
+	}
 	print STDERR  "Fasta sample = ", $sample_fasta, $/;
 	print STDERR  "Fasta output = ", $out_fasta, $/;
 

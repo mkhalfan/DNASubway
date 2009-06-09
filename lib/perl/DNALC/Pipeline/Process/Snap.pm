@@ -75,26 +75,32 @@ use base q(DNALC::Pipeline::Process);
 				my $gene_name = $data[8];
 				if (exists $genes{$gene_name}) {
 					push @{$genes{$gene_name}->{data}}, \@data;
-					$genes{$gene_name}->{end} = $data[4];
+					#$genes{$gene_name}->{end} = $data[4];
+					# start <= minimum of the 3rd column
+					$genes{$gene_name}->{start} = $data[3] < $genes{$gene_name}->{start}
+													? $data[3]
+													: $genes{$gene_name}->{start};
+					# end <= maximum of the 4th column
+					$genes{$gene_name}->{end} = $data[4] > $genes{$gene_name}->{end}
+													? $data[4]
+													: $genes{$gene_name}->{end};
 				}
 				else {
 					$genes{$gene_name}->{data} = [\@data];
-					$genes{$gene_name}->{start} = $data[3];
 					$genes{$gene_name}->{sign} = $data[6];
+					$genes{$gene_name}->{start} = $data[3];
 					$genes{$gene_name}->{end} = $data[4];
 				}
 
-				#print $_, "\n";
 			}
-			#print '-' x 20, $/;
-			#print STDERR Dumper( \%genes), $/;
+
 			my $gene_cnt = 1;
 			foreach my $gene_name (sort keys %genes) {
 				my $g = $genes{$gene_name};
 				my @data = @{$genes{$gene_name}->{data} };
-				if ($g->{sign} eq '-' && $g->{start} > $g->{end}) {
-					($g->{start}, $g->{end}) = ($g->{end}, $g->{start});
-				}
+				#if ($g->{sign} eq '-' && $g->{start} > $g->{end}) {
+				#	($g->{start}, $g->{end}) = ($g->{end}, $g->{start});
+				#}
 				print $out $data[0]->[0], "\t", $data[0]->[1], "\tgene\t", $g->{start}, "\t", $g->{end}, 
 							"\t0\t", $g->{sign}, "\t.\t", "ID=g$gene_name;Name=SNAPGENE.$gene_cnt", "\n";
 				print $out $data[0]->[0], "\t", $data[0]->[1], "\tmRNA\t", $g->{start}, "\t", $g->{end}, 

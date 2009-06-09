@@ -514,6 +514,17 @@ use Carp;
 				$status->{success} = 1;
 				$status->{elapsed} = 1.59;
 				$self->set_status($routine, 'Done', $status->{elapsed});
+				#copy  masked fasta files
+				if ($routine eq 'repeat_masker') {
+					for my $mask (qw/repeat_masker repeat_masker2/) {
+						$rc = $sample->copy_fasta({
+							project_dir => $self->project->work_dir,
+							project_id => $self->project->id,
+							common_name => $self->project->common_name,
+							masker => $mask
+						});
+					}
+				}
 			}
 		}
 
