@@ -42,6 +42,17 @@ it under the same terms as Perl itself.
 
 =cut
 
+my %algorithm_params = (
+    AUGUSTUS            => '--noexon',
+    BLASTN              => '',
+    BLASTX              => '',  
+    FGENESH             => '',  
+    REPEAT_MASKER       => '',  
+    REPEAT_MASKER2      => '',  
+    SNAP                => '',  
+    TRNA_SCAN           => '',  
+);
+
 
 sub new {
     my $class = shift;
@@ -793,12 +804,14 @@ sub insert_organism {
 }
 
 sub load_analysis_results {
-    my ($self, $file) = @_;
+    my ($self, $file, $alg) = @_;
 
 	return unless -f $file;
 
+    my $param = $self->additional_load_parameters($alg);
+
 	my $profile = $self->profile;
-    my $command = "/usr/local/bin/gmod_bulk_load_gff3.pl -a --noexon --dbprof $profile -g $file";
+    my $command = "/usr/local/bin/gmod_bulk_load_gff3.pl $param -a --dbprof $profile -g $file";
     print STDERR "$command\n";
     system($command) == 0 or do {
 		print STDERR  "Failed to load file: ", $file, $/;
@@ -959,6 +972,18 @@ sub load_fasta {
     my $dbprof = $self->profile;
     system("/usr/local/bin/gmod_bulk_load_gff3.pl --dbprof $dbprof -g $filename") == 0 or die "fasta load failed";
 
+    return;
+}
+
+sub additional_load_parameters {
+    my $self = shift;
+    my $alg  = shift;
+
+    if (defined $algorithm_params{$alg}) {
+        return $algorithm_params{$alg};
+    }     
+
+    warn "$alg isn't defined; the data load may not go as planned";
     return;
 }
 
