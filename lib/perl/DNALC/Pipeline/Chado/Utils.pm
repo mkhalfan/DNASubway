@@ -46,11 +46,11 @@ my %algorithm_params = (
     AUGUSTUS            => '--noexon',
     BLASTN              => '',
     BLASTX              => '',  
-    FGENESH             => '',  
-    REPEAT_MASKER       => '',  
-    REPEAT_MASKER2      => '',  
-    SNAP                => '',  
-    TRNA_SCAN           => '',  
+    FGENESH             => '--noexon',
+    REPEAT_MASKER       => '',
+    REPEAT_MASKER2      => '',
+    SNAP                => '--noexon',
+    TRNA_SCAN           => '',
 );
 
 
