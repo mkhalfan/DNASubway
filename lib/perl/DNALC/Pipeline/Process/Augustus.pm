@@ -62,6 +62,10 @@ use strict;
 				$line =~ s/transcript/mRNA/;
 			}
 			print $out $line;
+			if ($self->{clade} eq 'm' && $line =~ /\tCDS\t/) {
+				$line =~ s/\tCDS\t/\texon\t/;
+				print $out $line;
+			}
 		}
 		undef $in;
 		undef $out;
