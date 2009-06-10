@@ -39,6 +39,7 @@ html  = <table style="width:100%">
 feature      = gene:AUGUSTUS
 glyph        = gene
 base         = 1
+sub_part     = exon
 #ignore_sub_part = polypeptide 
 fgcolor      = green
 bgcolor      = lightgreen
@@ -49,7 +50,9 @@ balloon hover = <b>$name</b> is a predicted gene spanning $ref from $start to $e
 [FgenesH]
 feature      = gene:FGenesH_Monocots gene:FGenesH gene:FGenesH_Dicots
 glyph        = gene
+sub_part     = exon
 bgcolor      = green
+#ignore_sub_part = polypeptide
 label_transcripts = 1
 thin_utr     = 1
 pad_bottom   = 3
@@ -64,6 +67,8 @@ key          = CDS
 
 [Snap]
 feature      = gene:SNAP
+sub_part     = exon
+ignore_sub_part = polypeptide
 glyph        = gene
 bgcolor      = green
 label_transcripts = 1
@@ -102,13 +107,39 @@ strand       = both
 fgcolor      = red
 axis_color   = blue
 
-[BLAST]
-feature      = match
+[Blastn]
+feature      = match:BLASTN
 glyph        = segments
+fgcolor      = red
+stranded     = 1
+height       = 8
 description = sub {
         my $f = shift;
         my ($desc) = $f->attributes('description');
         return $desc;
   }
-key          = blast results
+key          = Blastn
 
+[Blastx]
+feature      = match:BLASTX
+glyph        = segments
+fgcolor      = magenta
+key          = Blastx
+
+
+
+#[BLAST]
+#feature      = match
+#glyph        = segments
+#description = sub {
+#        my $f = shift;
+#        my ($desc) = $f->attributes('description');
+#        return $desc;
+#  }
+#key          = blast results
+
+[usergenes]
+feature     = gene:user
+glyph       = gene
+bgcolor     = red
+key         = User created genes

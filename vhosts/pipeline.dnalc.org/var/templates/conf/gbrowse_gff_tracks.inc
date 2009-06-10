@@ -2,7 +2,7 @@
 feature      = gene:AUGUSTUS
 glyph        = gene
 base         = 1
-#ignore_sub_part = polypeptide 
+ignore_sub_part = polypeptide 
 fgcolor      = green
 bgcolor      = lightgreen
 height       = 8
@@ -12,6 +12,7 @@ balloon hover = <b>$name</b> is a predicted gene spanning $ref from $start to $e
 [FgenesH]
 feature      = gene:FGenesH_Monocots gene:FGenesH gene:FGenesH_Dicots
 glyph        = gene
+sub_part     = exon
 bgcolor      = green
 label_transcripts = 1
 thin_utr     = 1
@@ -20,7 +21,7 @@ key          = FGenesH
 
 [CDS]
 feature      = mRNA
-sub_part     = CDS
+sub_part     = exon
 glyph        = cds
 height       = 20
 key          = CDS
