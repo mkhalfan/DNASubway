@@ -866,6 +866,7 @@ sub create_gbrowse_conf {
 	my $out = IO::File->new( "> $conffile" );
 	if (defined $in && $out) {
 		$organism =~ s/\s+/_/g;
+		$organism =~ s/-/_/g;
 		$organism .= '_' . $project_id;
 		while (my $line = <$in> ) {
 			$line =~ s/__USER__/$username/;
@@ -919,6 +920,7 @@ sub create_gbrowse_chado_conf {
 		#$organism .= '_' . $project_id;
 		my $trimmed_organism = $organism;
 		$trimmed_organism =~ s/\s+/_/g;
+		$trimmed_organism =~ s/-/_/g;
         while (my $line = <$in> ) {
             $line =~ s/__USER__/$username/;
             $line =~ s/__ORGANISM__/$organism/;
