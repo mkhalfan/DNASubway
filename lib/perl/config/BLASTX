@@ -12,7 +12,7 @@
 		'-d', 	'uniprot_viridiplantae_sprot',
 		'-F',	'"m"',
 		'-U',
-		'-K',	100,
+		'-K',	40,
 		'-W',	3,
 		'-P',	0,
 		'-I',	'T',
