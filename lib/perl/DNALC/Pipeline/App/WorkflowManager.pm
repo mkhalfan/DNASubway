@@ -134,9 +134,9 @@ use Carp;
 	}
 	#-------------------------------------------------------------------------
 	sub get_history {
-		my ($self) = @_;
+		my ($self, $all) = @_;
 
-		my $history = DNALC::Pipeline::Workflow->get_history($self->project->project_id);
+		my $history = DNALC::Pipeline::Workflow->get_history($self->project->project_id, $all);
 		foreach my $h (@$history) {
 			$h->{task_name} = $self->{task_id_to_name} -> {$h->{task_id} };
 		}

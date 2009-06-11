@@ -74,15 +74,24 @@ sub status {
 __PACKAGE__->set_sql( get_history => q{
 	SELECT task_id, status_id, duration, created 
 	FROM workflow WHERE project_id = ? AND status_id != 4
+	ORDER BY created
+	});
+__PACKAGE__->set_sql( get_history_all => q{
+	SELECT task_id, status_id, duration, created 
+	FROM workflow WHERE project_id = ? AND status_id != 4
 	UNION
-	SELECT task_id, status_id, duration, archived
+	SELECT task_id, status_id, duration, archived AS created
 	FROM workflow_history WHERE project_id = ? AND status_id != 4
 	ORDER BY created
 	});
 sub get_history {
-	my ($class, $project_id) = @_;
-	my $sth = __PACKAGE__->sql_get_history;
-	$sth->execute($project_id, $project_id) or do { carp $!; return; };
+	my ($class, $project_id, $all) = @_;
+	my $sth = $all  ? __PACKAGE__->sql_get_history_all
+					: __PACKAGE__->sql_get_history;
+	my @args = ($project_id);
+	push @args, $project_id if $all;
+
+	$sth->execute(@args) or do { carp $!; return; };
 	my @history = ();
 	while (my $h = $sth->fetchrow_hashref) {
 		push @history, $h;
@@ -92,14 +101,4 @@ sub get_history {
 }
 
 1;
-
-__END__
-
-package main;
-use Data::Dumper;
-my ($wf) = DNALC::Pipeline::Workflow->search(
-                    project_id => 24,
-                    task_id => 1,
-                );
-print STDERR Dumper( $wf ), $/;
 
