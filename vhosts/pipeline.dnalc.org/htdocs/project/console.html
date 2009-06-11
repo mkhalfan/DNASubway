@@ -1,0 +1,272 @@
+
+<%args>
+	$pid => 0
+</%args>
+%#-------------------------------------------------
+<%once>
+	use Data::Dumper; 
+	use DNALC::Pipeline::Project ();
+	use DNALC::Pipeline::App::WorkflowManager ();
+	use DNALC::Pipeline::App::Utils ();
+
+	my @routines = (
+			{ name => 'trna_scan', label => 'tRNA Scan'},
+			{ name => 'augustus', label => 'Augustus', delay => 15},
+			{ name => 'fgenesh', 'label' => 'FgenesH'},
+			#{ name => 'repeat_masker', label => 'Repeat Masker', delay => 10},
+			{ name => 'snap', label => 'Snap'},
+			{ name => 'blastn', label => 'BlastN'},
+			{ name => 'blastx', label => 'BlastX'},
+		);
+</%once>
+%#-------------------------------------------------
+<%init>
+
+$m->session->{pipeline} ||= {};
+my $s = $m->session->{pipeline};
+
+my $proj = DNALC::Pipeline::Project->retrieve($pid);
+unless ($proj) {
+	$m->comp('/_message_add', 'Project not found!', 'error');
+	$m->redirect('/project/');
+}
+
+my $wfm = DNALC::Pipeline::App::WorkflowManager->new( $proj );
+my $upload_st = $wfm->get_status('upload_fasta');
+my $history = $wfm->get_history;
+
+my $rm_status = $wfm->get_status('repeat_masker')->name;
+my %status = ();
+for ('repeat_masker', map {$_->{name}} @routines ) {
+	my $status_name = lc $wfm->get_status($_)->name;
+	$status_name =~ s/\s/-/;
+	$status{$_} = $status_name;
+}
+
+#print STDERR Dumper( \%status ), $/;
+# TODO : set in session when you're starting to run a routine, 
+# and reset this flash after you get info about the execution of the routine
+</%init>
+%#-------------------------------------------------
+<div id="container_devicebg2"></div>
+<div id="container_top">
+	<div id="learn_head"><a href="learn.html">&nbsp;&nbsp;&nbsp;&nbsp;Learn</a></div>
+	<div id="logout_head"><a href="home.html">&nbsp;&nbsp;&nbsp;&nbsp;Log Out</a></div>
+    <div id="backhome"><a href="index.html"></a></div>
+    <div id="backtoconsole_head"><font color="#999999">CONSOLE</font></div>
+    <div id="backtoloader_head"><a href="member_home.html">PROJECTS</a></div>
+    
+  </div>
+
+<div id="container_content_member3">
+	<& "/_messages" &>
+<input type="hidden" id="pid" value="<% $pid %>"/>
+	<div id="container_pagehead">
+		<div id="container_pagetitle">:: CONSOLE ::</div>
+		<div id="container_membername">User: Cornel Ghiban</div>
+	</div>
+	<div id="container_commandertitle"> Title of this project</div>
+	<div id="container_commanderblurb"><p>From the Console you launch DNA analysis routines as well as the annotation browser and editor. First, identify repetitive sequences. This is an important pre-requisite as the program will identify and mask simple repeats as well as transposons, thereby removing sequences that otherwise could act as distracting clutter to subsequent analyses. Then, invoke any or all of the other analysis algorithms. Be aware that synthesizing gene predictions into reasonable gene models will almost certainly require the inclusion of protein and, even more importantly, RNA evidence.</p>
+	</div>
+
+	<div id="container_project">
+		<div class="commandertitle_member">Project</div>
+<pre>
+
+%#Project = <% $proj %>
+Project Name: <% $proj->name %>
+Organism : <% $proj->organism %>, <% $proj->common_name %>
+Clade : <% $proj->clade %>
+</pre>
+
+<div> <!-- history start -->
+	<h4>History</h4>
+<ul>
+% for my $h (@$history) {
+	<li>
+	<strong><% $h->{task_name} %></strong>,
+% if ($h->{duration} > 0) {
+	duration = <% $h->{duration}%> sec., 
+% }
+%#	<% $h->{status_id}%>,
+	<% DNALC::Pipeline::App::Utils->format_datetime($h->{created}) %>
+	</li>
+% }
+</ul>
+</div><!-- history end -->
+<div id="debug"></div>
+</div>
+
+
+
+
+
+%#<div style="background:red">alabala portocala:_<span class="loading">---</span></div>
+<div id="container_analyses">
+	<div class="commandertitle_member">Analyses</div>
+	<div id="container_analyses1">
+		<div class="analysesTexttitle"><img src="/images/v0/dot_blue.png" />&nbsp;Title of these buttons</div>
+
+        <table width="390" border="0px" cellpadding="1">
+		  <tr>
+			<td class="tdtext">Identify Repetitive DNA &amp; Transposons</td>
+			<td class="tdinfo"></td>
+			<td class="">
+				<& '.routine', routine => 'repeat_masker', project => $proj,
+								status => $status{repeat_masker}, delay => 15 &>
+			</td>
+		  </tr>
+		   <tr>
+			<td class="tdtext">Predict tRNA Genes</td>
+			<td class="tdinfo">&nbsp;</td>
+			<td class="">
+				<& '.routine', routine => 'trna_scan', project => $proj,
+								status => $status{trna_scan}, rm_status => $status{repeat_masker} &>
+			</td>
+		  </tr>
+		</table>
+
+		<div class="analysesTexttitle"></div>
+		<div class="analysesTexttitle"><img src="/images/v0/dot_blue.png" />&nbsp;Predict Protein-coding Genes Using</div>
+        <table width="390" border="0px" cellpadding="1">
+		  <tr>
+			<td class="tdtext">FgenesH</td>
+			<td class="tdinfo">&nbsp;</td>
+			<td class="" style="border:none">
+				<& '.routine', routine => 'fgenesh', project => $proj,
+								status => $status{fgenesh}, rm_status => $status{repeat_masker} &>
+
+		  </tr>
+		   <tr>
+			<td class="tdtext">Augustus</td>
+			<td class="tdinfo">&nbsp;</td>
+			<td class="">
+				<& '.routine', routine => 'augustus', project => $proj,
+								status => $status{augustus}, delay => 20, rm_status => $status{repeat_masker} &>
+			</td>
+		  </tr>
+		   <tr>
+			<td class="tdtext">Snap</td>
+			<td class="tdinfo">&nbsp;</td>
+			<td class="">
+				<& '.routine', routine => 'snap', project => $proj,
+				status => $status{snap}, rm_status => $status{repeat_masker} &>
+			</td>
+		  </tr>
+		</table>
+
+
+<ul id="routines" style="clear:both">
+%#------------------------------------	
+	<li><span style="font-weight:bold">Repeat Masker</span>&nbsp;
+%	if ($rm_status !~ /Done|Processing/) {
+%#	if ($rm_status ne 'Processing') {
+<input type="button" id="repeat_masker_btn" value="Run" onclick="run('repeat_masker')" />
+%	}
+<span class="<%lc $rm_status %>" id="repeat_masker" delay="10" status="<%$rm_status%>">
+%	if ($rm_status eq 'Done') {
+%		my $path = $m->comp('./.comp/filepath_to_web', file => $proj->get_gff3_file('repeat_masker') || '#', just_return => 1);
+%		if ($path) {
+			<a target="_blank" href="<% $path %>">View output</a>
+%		}
+%   } else {
+%#		if ($rt_status eq 'Processing') {
+%#		<img src="/images/ajax-loader.gif" />
+%#		}
+	<% $rm_status %>\
+%	}
+		</span>
+	</li>
+%#------------------------------------	
+% for my $rt (@routines) {
+%	last;
+%	my $rname = $rt->{name};
+%	my $rt_status = $wfm->get_status($rname)->name;
+%	my $disabled = $rname ne 'trna_scan' && $rm_status ne 'Done';
+	<li><span style="font-weight:bold"><% $rt->{label} %></span>&nbsp;
+%#	if ($rt_status !~ /Done|Processing/) {
+%	if ($rt_status ne 'Processing') {
+<input type="button" id="<% $rname %>_btn" value="Run" onclick="run('<% $rname %>')" <% $disabled ? 'disabled="disabled"' : '' %>/>
+%	}
+<span class="<%lc $rt_status %>" id="<% $rname %>" delay="<% $rt->{delay} || 5 %>" status="<%$rt_status%>">
+%	if ($rt_status eq 'Done') {
+%		my $path = $m->comp('./.comp/filepath_to_web', file => $proj->get_gff3_file($rname) || '', just_return => 1);
+%		if ($path) {
+			<a target="_blank" href="<% $path %>">View output</a>
+%		}
+%   } else {
+%#		if ($rt_status eq 'Processing') {
+%#		<img src="/images/ajax-loader.gif" />
+%#		}
+	<% $rt_status %>\
+%	}
+		</span>
+	</li>
+% }
+
+</ul>
+</div> <!-- #container_analyses1 -->
+</div> <!-- #container_analyses -->
+
+
+
+
+<div id="container_launch">
+	<div class="commandertitle_member">Launch</div>
+
+<div id="gbrowse" style="display:block"><a href="./prepare_gbrowse?pid=<% $proj->id%>">Browse</a></div>
+<div id="gbrowse2" style="display:block"><a href="./prepare_chadogbrowse?pid=<% $proj->id%>">Browse2</a></div>
+
+
+        <tr><td><div class="launch_space20"></div></td></tr><br />
+        <tr>
+          <td><div class="container_launch1"><img src="/images/v0/dot_blue.png" /><p2>&nbsp;Browser</p2><br /><p1>Browse your annotations in GBrowse, a graphical genome viewer.</p1><div class="launch_button"><a href="memeber_gbrowse.html">Launch</a></div></div></td><br />
+          </tr>
+        <tr>
+          <td><div class="container_launch1"><img src="/images/v0/dot_blue.png" /><p2>&nbsp;Editor</p2><br /><p1>Edit your annotations in <i><b>Apollo</b></i>, a graphical annotation editor.</p1><div class="launch_button"><a href="memeber_gbrowse.html">Launch</a></div></div></td><br />
+          </tr>
+        <tr>
+          <td><div class="container_launch1"><img src="/images/v0/dot_blue.png" /><p2>&nbsp;Exporter</p2><br /><p1>Only available for selected sample sequences.</p1><div class="launch_button"><a href="memeber_gbrowse.html">Launch</a></div></div></td><br />
+          </tr>
+        
+</div>
+
+
+</div>
+
+%#----------------------------------------------------------------------------
+<%def .routine>
+<%args>
+	$routine => ''
+	$rm_status => 'not-processed'
+	$status => 'disabled'
+	$project => undef
+	$delay => 5
+</%args>
+<%init>
+my $link = '#';
+my $action = qq{onclick="run('$routine')"};
+if ($status eq 'processing') {
+	$action = '';
+}
+elsif ($status eq 'done') {
+	$link = $m->comp('./.comp/filepath_to_web', file => $project->get_gff3_file($routine) || '', just_return => 1);
+	$action = '';
+} 
+else {
+	if ($rm_status ne 'done' && $routine !~ /trna_scan|repeat_masker/) {
+		$status = 'disabled';
+		$action = '';
+	}
+}
+</%init>
+<a id="<% $routine %>_btn" href="<% $link %>" class="<% $status %>" \
+status="<% $status %>" <% $action %> delay="<% $delay %>" title="<% $status %>" ></a>
+</%def>
+%#----------------------------------------------------------------------------
+<%attr>
+	js => ['console.js']
+	css => ['device.css']
+</%attr>
+
+%# vim: ft=mason

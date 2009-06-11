@@ -15,10 +15,17 @@
 <!--[if IE]>
 <script type="text/javascript" src="/js/firebug-lite-compressed.js"></script>
 <![endif]-->
-<link type='text/css' rel='stylesheet' href='/css/style.css' />
+%#<link type='text/css' rel='stylesheet' href='/css/device.css' />
+%#<link type='text/css' rel='stylesheet' href='/css/style.css' />
+% if ($m->request_comp->attr_if_exists('css') && @{$m->request_comp->attr('css')}) { 
+%	foreach my $css (@{$m->request_comp->attr('css')}) {
+%		next unless $css;
+<link type='text/css' rel='stylesheet' href='/css/<% $css %>' />
+%	}
+% }
 </head>
 <body>
-<div id="main">
+<div id="container_main">
 
 % $m->call_next;
 
@@ -31,6 +38,7 @@
 %#---------------------------------
 <%attr>
 	js => []
+	css => ['device.css']
 </%attr>
 %#---------------------------------
 

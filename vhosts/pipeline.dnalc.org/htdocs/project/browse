@@ -41,11 +41,17 @@ print STDERR Dumper( $pager ), $/;
 % for (@projects) {
 <tr>
 	<td><a href="/project/dashboard.html?pid=<% $_->id %>"><%$_->name%></a></td>
-	<td><%$_->organism%>, <% $_->common_name %></td>
-	<td><%$_->user_id%></td>
+	<td><% $_->organism %>, <% $_->common_name %></td>
+	<td><% $_->user_id %></td>
 	<td><% $_->created %></td>
 </tr>
 % }
 </table>
 <& '/_pager', cur=>$page, pages => $pages, 
 	suffix => '', prefix => '/project/browse/?page=' &>
+%#----------------------------------------------------------------------------
+<%attr>
+	css => ['style.css']
+</%attr>
+
+

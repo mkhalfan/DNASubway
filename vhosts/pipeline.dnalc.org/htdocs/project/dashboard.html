@@ -45,6 +45,7 @@ my $rm_status = $wfm->get_status('repeat_masker')->name;
 <div id="content">
 	<& "/_messages" &>
 <input type="hidden" id="pid" value="<% $pid %>"/>
+&nbsp;<a href="./console.html?pid=<% $pid %>">Console view</a>
 <pre>
 %#Project = <% $proj %>
 Project Name: <% $proj->name %>
@@ -129,6 +130,7 @@ Clade : <% $proj->clade %>
 
 <%attr>
 	js => ['dashboard2.js']
+	css => ['style.css']
 </%attr>
 
 %# vim: ft=mason

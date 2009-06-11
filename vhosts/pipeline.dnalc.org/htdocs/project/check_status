@@ -50,6 +50,7 @@
 					running => $task_status->name eq 'Processing' ? 1 : 0,
 					known => $task_status->name eq 'Processing' ? 1 : 0
 				};
+		print STDERR  "STAT = ", $proj->get_gff3_file($t), $/;
 		$output = $task_status->name eq 'Done' ? $proj->get_gff3_file($t) : '';
 	}
 	else {
