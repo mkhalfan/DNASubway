@@ -35,10 +35,8 @@ function check_status (pid, op, h) {
 					clearInterval(intervalID[op]);
 					b.removeClassName('processing');
 					b.addClassName('done');
-					//s.update('Job done. ');
-					b.href = file;
-					b.target = '_blank';
-					//s.appendChild(new Element('a', {'href' : file,'target':'_blank'}).update('View file'));
+					b.onclick = function () { launch(null, file)};
+					b.title = 'done';
 					if (op == 'repeat_masker') {
 						for (var i = 0; i < routines.length; i++) {
 							var rt = $(routines[i] + '_btn');
@@ -122,6 +120,28 @@ function run (op) {
 				alert('Something went wrong!\nAborting...');
 			}
 	});
+}
+
+function openWindow(url) {
+  UI.defaultWM.options.blurredWindowsDontReceiveEvents = true;
+  new UI.URLWindow({
+	width: 980, 
+	height: 600,
+	shadow: true,
+	//theme: "mac_os_x",
+	url: url }).show().center();
+}
+
+function launch(what, where) {
+
+	var urls = {
+			chado: 'http://pipeline-dev.dnalc.org/project/prepare_chadogbrowse?pid='
+		};
+   
+	 var uri = what 
+					? urls[what] + $('pid').value
+					: where;
+     openWindow( uri);
 }
 
 function debug(msg) {

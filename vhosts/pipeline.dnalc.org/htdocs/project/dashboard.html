@@ -107,7 +107,7 @@ Clade : <% $proj->clade %>
 
 </ul>
 <div id="gbrowse" style="display:block"><a href="./prepare_gbrowse?pid=<% $proj->id%>">Browse</a></div>
-<div id="gbrowse2" style="display:block"><a href="./prepare_chadogbrowse?pid=<% $proj->id%>">Browse2</a></div>
+<div id="gbrowse2" style="display:block"><a href="#./prepare_chadogbrowse?pid=<% $proj->id%>" onclick="launch_chado()">Browse2</a></div>
 <div>
 	<h4>History</h4>
 <ul>
@@ -129,8 +129,9 @@ Clade : <% $proj->clade %>
 
 
 <%attr>
-	js => ['dashboard2.js']
-	css => ['style.css']
+	js => ['dashboard2.js', 'effects.js', 'window.js']
+	css => ['style.css', 'themes/shadow/mac_shadow.css', 'themes/window/mac_os_x.css']
+
 </%attr>
 
 %# vim: ft=mason

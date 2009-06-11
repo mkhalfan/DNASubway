@@ -31,16 +31,16 @@ h3  {
 p   {
 	font-size:0.9em;
 	}
-p1   {
+.p1   {
 	font-size:0.75em;
 	}
-p2   {
+.p2   {
 	font-size: 0.90em;
 	color: #3399CC;
 	letter-spacing: .1em;
 	clear:right;
 	}
-p3   {
+.p3   {
 	font-size:1em;
 	}
 	
@@ -497,10 +497,7 @@ th {
 td { 
 	height: 24px;
 	text-align: left;
-	border-top: none;
-	border-bottom: 1px solid #663300;
-	border-left: none;
-	border-right: none;
+	/*border-bottom: 1px solid #663300;*/
 	
 	font-family: eurostile;
 	font-size: 0.95em;
@@ -721,7 +718,7 @@ input#project{
 	font-family: georgia;
 	}
 
-/*////PROJECT butttons-----------------------------------------------PROJECT butttons-------////*/
+/*////PROJECT -------////*/
 #container_project{
 	width:286px;
 	height:350px;
@@ -748,10 +745,11 @@ input#project{
 	color: #3399CC;
 	padding: 6px 0px 0px 4px;
 	margin: 0 auto;
+	border-bottom: 1px solid #663300;
 	
 	}
 .tdprojectinfo{
-	width:136px;
+	width:140px;
 	height:18px;
 	position:relative;
 	float:left;
@@ -760,6 +758,7 @@ input#project{
 	color: #996600;
 	margin: 0 auto;
 	padding: 6px 0px 0px 0px;
+	border-bottom: 1px solid #663300;
 	}
 .tdprojectinfo1{
 	width:60px;
@@ -786,10 +785,19 @@ input#project{
 	}
 
 .tdprojectview {
-	width:70px;
+	width:74px;
 	height:24px;
-	background: url("/images/v0/button_short.png");
+	display: block;
+	position:relative;
+	float:left;
+	margin:0 auto;
+	}
+.tdprojectview a {
+	width:74px;
+	height:24px;
+ 	background-image: url("/images/v0/button_viewDown.png");
 	background-repeat: no-repeat;
+	display: block;
 	position:relative;
 	font-size: .95em;
 	float:left;
@@ -816,14 +824,23 @@ input#project{
 
 }
 li.closed {list-style: disc;}
+
 .historylist {
 	width:270px;
-	height:80px;
-	position:relative;
-	float:left;font-size: 0.9em;
+	font-size: 0.9em;
+	clear: both;
 	color: #996600;
-    margin: 0 auto;
+    /*margin: 0 auto;*/
+	padding-left: 14px;
 	}
+.historylist ul {
+	padding-left: 10px;
+	font-size: smaller;
+}
+.historylist ul li {
+	list-style: none;
+	padding: 0px;
+}
 	
 /*////ANALYSES butttons-----------------------------------------------ANALYSES butttons-------////*/
 #container_analyses{
@@ -863,7 +880,6 @@ li.closed {list-style: disc;}
 	height: 25px;
 	font-size: 0.9em;
 	color: #000000;
-	letter-spacing: .1em;
 	position: relative;
 	float:left;
 	padding: 4px 0px 0px 0px;
@@ -872,12 +888,11 @@ li.closed {list-style: disc;}
 	}
 .tdinfo{
 	width: 26px;
-	height: 25px;
-	background-image: url("/images/v0/info.jpg");
-	background-repeat: no-repeat;
+	height: 20px;
 	position: relative;
 	margin:0 auto;
 	border: 0px;
+	padding: 0 0 5px 0;
 	}
 /*
 .tdinfo a{
@@ -923,6 +938,7 @@ li.closed {list-style: disc;}
 .tdrun{
 	width: 122px;
 	height: 25px;
+	display: block;
 	background: url("/images/v0/button_grey.png");
 	background-repeat: no-repeat;
 	position: relative;
@@ -940,10 +956,63 @@ li.closed {list-style: disc;}
 .tdrun:hover{
 	color:#CC6633;
 	filter:alpha(opacity=80); /* IE's opacity*/
-	opacity: 0.80;;
-	}
+	opacity: 0.80;
+}
 
+  /*info BUBBLE______________________*/
+a.tt {
+	/*background: url(/images/v0/info.jpg);
+	background-repeat: no-repeat;*/
+	position:relative;
+	/*z-index:24;*/
+	color:#FF6600;
+	font-size: 1em;
+	font-weight: bold;
+	text-decoration:none;
+}
+a.tt span {	
+	display: none;
+}
 
+/*background:; ie hack, something must be changed in a for ie to execute it*/
+a.tt:hover{ 
+	/*background: url(/images/v0/info.jpg);
+	background-repeat: no-repeat;*/
+	z-index:25; 
+	color: #aaaaff;
+}
+a.tt:hover span.tooltip {
+	display:block;
+	position:absolute;
+	top:-50px;
+	left:-150px;
+	padding: 8px 0 10px 0;
+	width:260px;
+	color: #FF6600;
+	text-align: center;
+	font-family: eurostile;
+	font-size: 1em;
+	filter: alpha(opacity:95);
+	KHTMLOpacity: 0.95;
+	MozOpacity: 0.95;
+	opacity: 0.95;
+}
+a.tt:hover span.top{
+	display: block;
+	padding: 0 0 10px 0;
+    background: url(/images/v0/bubble.png) no-repeat top;
+}
+a.tt:hover span.middle{ /* different middle bg for stretch */
+	display: block;
+	padding: 0 8px; 
+	background: url(/images/v0/bubble_filler.png) repeat bottom; 
+}
+a.tt:hover span.bottom{
+	display: block;
+	padding:3px 8px 10px;
+	color: #548912;
+    background: url(/images/v0/bubble.png) no-repeat bottom;
+}
 	
 /*////LAUNCH butttons-----------------------------------------------LAUNCH butttons-------////*/
 
@@ -1226,7 +1295,7 @@ li.closed {list-style: disc;}
 	position:absolute;
 	font-size:0.7em;
 	font-weight: bold;
-	color:#000000;
+	color:#999999;
 	top:52px;
 	left:820px;
 	}

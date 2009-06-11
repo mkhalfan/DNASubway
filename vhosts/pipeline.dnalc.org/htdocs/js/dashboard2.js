@@ -112,6 +112,46 @@ function run (op) {
 	});
 }
 
+function launch_chado() {
+	UI.defaultWM.options.blurredWindowsDontReceiveEvents = true;
+
+    function openWindow(url) {
+      new UI.URLWindow({
+        width: 800, 
+        height: 600,
+        shadow: true,
+        //theme: "mac_os_x",
+        url: url }).show();  
+     } 
+   
+     openWindow("http://pipeline-dev.dnalc.org/project/prepare_chadogbrowse?pid=" + $('pid').value);
+}
+
+function launch_chado__() {
+  // Request will take 2 seconds to complete
+  Ajax.Request.prototype.originalInitialize = Ajax.Request.prototype.initialize;
+  Ajax.Request.prototype.initialize = function(url, options) {
+      options.onComplete = options.onComplete.wrap(function(proceed, req) {
+        proceed.curry(req).delay(0);
+      });
+      this.originalInitialize(url, options);
+  }
+
+  //new UI.Window({theme: "mac_os_x", shadow: true }).show();
+  //var w = new UI.Window({theme: "mac_os_x", shadow: false, superflousEffects: false});
+  var w = new UI.Window();
+  w.setSize(1200, 850);
+  w.center();
+  
+  w.show().setAjaxContent('/files/a.html', {
+    method: "GET", 
+    onCreate: function() {   
+      this.setContent('<div class="message">Please wait...</div><div class="spinner"></div>');   
+    }
+  });                 
+
+}
+
 function debug(msg) {
 	var d = $('debug');
 	if (d) d.update(msg);
