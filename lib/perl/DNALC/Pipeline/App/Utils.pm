@@ -141,11 +141,12 @@ sub _is_upload_ok {
 }
 
 sub format_datetime {
-	my ($class, $time_str, $format_str) = @_;
+	my ($class, $time_str, $format_str, $out_format_str) = @_;
 	$format_str ||= "%Y-%m-%d %H:%M:%S";
+	$out_format_str ||= "%m/%d/%Y %H:%M:%S";
 	my $t = Time::Piece->strptime($time_str, $format_str);
 	
-	return $t->strftime("%m/%d/%Y %H:%M:%S");
+	return $t->strftime($out_format_str);
 }
 
 1;

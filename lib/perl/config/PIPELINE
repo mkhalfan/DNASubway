@@ -25,7 +25,7 @@
 # 				source => 'TAIR', release => 'Tair8', date => '2009-05-20'},
 
 			{id => 4, organism=>'Oryza sativa', common_name => 'rice',
-				location => 'Chromosome 1', position => '18862001-18962000', clade => 'm',
+				location => 'Chromosome 1', position => '200000-299999', clade => 'm',
 				source => 'MSU/Buell', release => '6', date => '2009-05-20'},
 # 			{id => 5, organism=>'Oryza sativa', common_name => 'rice', 
 # 				location => 'Chromosome 2', position => '26000001-26100000', clade => 'm',
