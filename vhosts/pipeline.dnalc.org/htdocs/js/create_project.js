@@ -1,3 +1,5 @@
+var dbg;
+
 function step_one() {
 	if (! $('seq_src_upload').checked && !$('seq_src_sample').checked) {
 		alert("Source not selected!");
@@ -15,15 +17,14 @@ function step_one() {
 		//alert("Method not yet supported!");
 		//return;
 	}
-	$('continue').disabled = true;
+	//$('continue').disabled = true;
 	f.submit();
 }
 
 function select_source(el) {
 	if (el && el.value == 'upload') {
 		$('specie').selectedIndex = -1;
-		//$('organism_info').show();
-		$('sample_info').update('');
+		//$('sample_info').update('');
 	}
 	else if (el && el.value == 'sample') {
 		//$('organism_info').hide();
@@ -32,6 +33,7 @@ function select_source(el) {
 }
 
 function show_sample_info() {
+	return;
 	var si = $('sample_info');
 	var species = $('specie');
 	var extra = species.options[species.selectedIndex].getAttribute('extra');
@@ -74,3 +76,36 @@ function populate_fields(src) {
 	}
 }
 
+
+function show_errors(html) {
+
+	if (!html || !UI) {
+		return;
+	}
+	var resizable = true;
+	var options = {	
+			resizable: false,
+        	width: 400,
+	        height: 300,
+	        shadow: true,
+	        draggable: false
+		};
+	if (navigator.userAgent.indexOf('MSIE') != -1) {
+		// IE doen't like this option!!!
+		delete options['resizable'];
+	}
+	var w = new UI.Window(options).center();
+	w.setContent(html);
+	w.show(true);
+}
+
+Event.observe(window, 'load', function() {
+	var err = $("error_list");
+	if (!err)
+		return;
+	var html = err.innerHTML;
+	if (!html)
+		return;
+	html = "<div class=\"message-error\">errr</div>";
+	show_errors(html);
+});

@@ -2,7 +2,7 @@
 
 var dbg, sent;
 var intervalID = {};
-var routines = ['augustus', 'fgenesh', 'snap', 'blastn', 'blastx'];
+var routines = ['augustus', 'fgenesh', 'snap', 'blastn', 'blastx', 'gbrowse', 'apollo'];
 
 function check_status (pid, op, h) {
 	var b = $(op + '_btn');
@@ -41,15 +41,25 @@ function check_status (pid, op, h) {
 						for (var i = 0; i < routines.length; i++) {
 							var rt = $(routines[i] + '_btn');
 							if (rt && rt.className == 'disabled') {
-								console.log('enabling.. ' + routines[i]);
+								//console.log('enabling.. ' + routines[i]);
 								rt.removeClassName('disabled');
 								rt.addClassName('not-processed');
 								//Event.observe(routines[i], 'click', function() {
-								rt.onclick = function () {
-												console.log('enable btn.. ' + this.id);
+								if (i < 5 ) {
+									rt.title = 'not-processed';
+									rt.onclick = function () {
+												//console.log('enable btn.. ' + this.id);
 												var routine = this.id.replace('_btn','');
 												run(routine);
 											};
+								}
+								else {
+									rt.onclick = function () {
+												//console.log('enable btn.. ' + this.id);
+												var routine = this.id.replace('_btn','');
+												launch(routine);
+											};
+								}
 							}
 						}
 					}
@@ -123,25 +133,46 @@ function run (op) {
 }
 
 function openWindow(url) {
-  UI.defaultWM.options.blurredWindowsDontReceiveEvents = true;
-  new UI.URLWindow({
-	width: 980, 
-	height: 600,
-	shadow: true,
-	//theme: "mac_os_x",
-	url: url }).show().center();
+	UI.defaultWM.options.blurredWindowsDontReceiveEvents = true;
+
+	/*var w = new UI.Window({
+				width: 916, 
+				height: 496,
+				shadow: true, 
+				draggable:false,
+				url: url
+			});
+	w.center();
+	var p = w.getPosition();
+	w.setPosition(78, p.left-2);
+	w.show();*/
+	var w = new UI.URLWindow({
+		width: 916, 
+		height: 496,
+		shadow: true,
+		draggable: false,
+		//theme: "mac_os_x",
+		url: url }).center();
+	/*w.setHeader("aaaa");*/
+	var p = w.getPosition();
+	w.setPosition(78, p.left-2);
+	w.show();
+	w.focus();
 }
 
 function launch(what, where) {
-
+	
 	var urls = {
-			chado: 'http://pipeline-dev.dnalc.org/project/prepare_chadogbrowse?pid='
+			gbrowse: '/project/prepare_chadogbrowse?pid=',
+			apollo: '/project/prepare_editor?pid='
 		};
    
-	 var uri = what 
-					? urls[what] + $('pid').value
+	var host = window.location.host;
+	var uri = what 
+					? 'http://' + host + urls[what] + $('pid').value
 					: where;
-     openWindow( uri);
+	//alert(uri);
+	openWindow( uri );
 }
 
 function debug(msg) {

@@ -72,7 +72,7 @@ my $rm_status = $status{repeat_masker};
 	</div>
 
 	<div id="container_commandertitle"><% $proj->name |html%></div>
-	<div id="container_commanderblurb"><p>From the Console you launch DNA analysis routines as well as the annotation browser and editor. First, identify repetitive sequences. This is an important pre-requisite as the program will identify and mask simple repeats as well as transposons, thereby removing sequences that otherwise could act as distracting clutter to subsequent analyses. Then, invoke any or all of the other analysis algorithms. Be aware that synthesizing gene predictions into reasonable gene models will almost certainly require the inclusion of protein and, even more importantly, RNA evidence.</p>
+	<div id="container_commanderblurb"><p>Use the console to perform DNA analysis routines on the loaded sequence. To begin, "Prepare Sequence." This key pre-requisite analysis identifies and masks simple repeats and transposons, thus removing sequence that may clutter subsequent analyses. Next, run any or all of the analysis algorithms under "Predict Genes" and/or "Conduct <em>Blast</em> Searches." Finally, launch “GBrowse” viewer or the "<em>Apollo</em>" editor to further analyze and annotate the sequence.</p>
 	</div>
 	<div id="container_project">
 		<div class="commandertitle_member">Project</div>
@@ -260,11 +260,17 @@ my $rm_status = $status{repeat_masker};
 <div id="container_launch">
 	<div class="commandertitle_member">Launch</div>
 
-	<div class="container_launch1"><img src="/images/v0/dot_blue.png" /><span class="p2">&nbsp;Browser</span><br /><span class="p1">Browse your annotations in GBrowse, a graphical genome viewer.</span><div class="launch_button">
-			<a href="#" onclick="launch('chado')">Launch</a>
+	<div class="container_launch1"><img src="/images/v0/dot_blue.png" /><span class="p2">&nbsp;Browser</span><br/><div class="launch_button">
+			<a id="gbrowse_btn" class="<% $rm_status ne 'done' ? 'disabled' : '' %>" 
+				onclick="<% $rm_status eq 'done' ? "launch('gbrowse')" : '' %>" href="javascript:;">GBrowse</a>
 	</div></div>
         
-	<div class="container_launch1"><img src="/images/v0/dot_blue.png" /><span class="p2">&nbsp;Editor</span><br /><span class="p1">Edit your annotations in <i><b>Apollo</b></i>, a graphical annotation editor.</span><div class="launch_button"><a href="#">Launch</a></div></div>
+	<div class="container_launch1"><img src="/images/v0/dot_blue.png" /><span class="p2">&nbsp;Editor</span><br />
+		<div class="launch_button">
+			<a id="apollo_btn" class="<% $rm_status ne 'done' ? 'disabled' : '' %>" 
+				onclick="<% $rm_status eq 'done' ? "launch('apollo')" : '' %>" href="javascript:;">Apollo</a>
+		</div>
+	</div>
 % if ($proj->sample) {
 	<div class="container_launch1"><img src="/images/v0/dot_blue.png" /><span class="p2">&nbsp;Exporter</span><br /><span class="p1">Only available for selected sample sequences.</span><div class="launch_button"><a href="memeber_gbrowse.html">Launch</a></div></div>
 % }
@@ -285,7 +291,7 @@ my $rm_status = $status{repeat_masker};
 	$delay => 5
 </%args>
 <%init>
-my $link = '#';
+my $link = 'javascript:;';
 my $target = 'target="_blank"';
 my $action = qq{onclick="run('$routine')"};
 
