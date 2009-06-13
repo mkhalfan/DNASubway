@@ -1,8 +1,8 @@
 <div id="container_devicebg1"></div>
 <div id="container_top">
 	<div id="learn_head"><a href="learn.html">&nbsp;&nbsp;&nbsp;&nbsp;Learn</a></div>
-	<div id="logout_head"><a href="home.html">&nbsp;&nbsp;&nbsp;&nbsp;Log Out</a></div
-    ><div id="#container_headbackto">
+	<!--<div id="logout_head"><a href="home.html">&nbsp;&nbsp;&nbsp;&nbsp;Log Out</a></div-->
+    <div id="#container_headbackto">
     </div>
   
   </div>
@@ -27,7 +27,7 @@
     
     
   <div id="container_memberhomebottom">
-    
+% if (0) {
          <!--dropdown -->
 <div id="container-sortmyproject"> 
 <div id="menu_myproject">
@@ -42,7 +42,10 @@
 </ul>
 </div>
 </div><!--dropdown -->
-          <div id="container_mytablehome">
+% }
+
+
+<div id="container_mytablehome">
   <table class="project-list" width="810px"  border="0" cellpadding="0" summary="My project list">
   <tr>
     <th class="thpublicproject" width="30" scope="col">#</th>
@@ -61,7 +64,7 @@
 	<td><% $created %></td>
 	<td><a href="/project/console.html?pid=<% $_->id %>"><%$_->name%></a></td>
 	<td><% $_->organism %>, <% $_->common_name %></td>
-	<td><% $_->clade  %></td>
+	<td><% $clades{$_->clade}  %></td>
 	<td><% $_->user_id %></td>
 	<td> public </td>
 	<td><a href="/project/console.html?pid=<% $_->id %>">load</a></td>
@@ -91,6 +94,13 @@
 	use DNALC::Pipeline::Utils qw(random_string);
 	use DNALC::Pipeline::App::Utils ();
 	use Data::Dumper;
+
+	my %clades = (
+			d => 'Eudicotyledons',
+			m => 'Monocotyledons',
+			u => 'Undefined',
+			o => 'Other'
+		);
 
 	my $epp = 10;
 </%once>

@@ -204,7 +204,7 @@ if ($r->method eq 'POST') {
 
 				# redirect user to dashboard
 				#$m->comp('/_message_add', "Project created successfully!");
-				$m->redirect('./dashboard.html?pid=' . $proj->id);
+				$m->redirect('./console.html?pid=' . $proj->id);
 			} ####
 			
 		} #end else
@@ -223,7 +223,7 @@ else {
 <div id="container_devicebg1"></div>
 <div id="container_top">
 	<div id="learn_head"><a href="learn.html">&nbsp;Learn</a></div>
-	<div id="logout_head"><a href="home.html">&nbsp;Log Out</a></div>
+	<!--<div id="logout_head"><a href="home.html">&nbsp;Log Out</a></div>-->
 	<div id="container_headbackto"></div>
   
 </div>
@@ -249,7 +249,7 @@ else {
     
      <div class="button_newproject"><img src="/images/v0/bt_newprojectUp.png" alt="" /></div>
      
-     <div class="button_publicproject"><a href="publicproject.html"></a></div>
+     <div class="button_publicproject"><a href="/project/browse"></a></div>
     </div><!-- #container_hometab  -->
 
   <div id="container_memberhomebottom">
@@ -263,9 +263,9 @@ else {
     <div class="spacer"></div>
  <div>
     <input class="selectortitle_h2" type="radio" name="seq_src" id="seq_src_upload" value="upload" onclick="select_source(this)" <% $seq_src eq 'upload' ? 'checked="checked"' : ''%> />
-		Upload a Sequence File: (max 100kbp) 
-		<input class="stylized" type="file" id="seq_file" name="seq_file"  
-			onchange="set_source('upload')" onclick="set_source('upload')"  />
+	Upload a Sequence File: (max 100kbp) <br/>
+		<input class="stylized" type="file" id="seq_file" name="seq_file" \
+		onchange="set_source('upload')" onclick="set_source('upload')"  />
  </div>
 	<div class="spacer"></div>
 
@@ -298,17 +298,16 @@ else {
     <div class="spacer"></div>
     
     <label>Project Title:</label>
-	<input class="stylized" type="text" name="name" id="name" value="<% $name|html%>" \
-		style="width: 140px; height: 12px;" maxlength="128" />
+	<input class="stylized" type="text" name="name" id="name" value="<% $name|html%>" maxlength="128" />
 	<div id="organism_info">
 		<div class="spacer"></div><br/>
 		<div class="selectortitle_h2">&nbsp;&nbsp;Organism:</div>
         <div class="spacer"></div>
 		<label>Scientific name<br/><span class="small">(Genus Species)</span></label>
-	<input class="stylized" type="text" name="organism" id="organism" value="<% $organism |html%>" style="width: 140px; height: 12px;" maxlength="128" />
+	<input class="stylized" type="text" name="organism" id="organism" value="<% $organism |html%>" maxlength="128" />
 	
 	<label>Common name</label>
-	<input class="stylized" type="text" name="common_name" id="common_name" value="<% $common_name |html%>" style="width: 140px; height: 12px;" maxlength="128" />
+	<input class="stylized" type="text" name="common_name" id="common_name" value="<% $common_name |html%>" maxlength="128" />
 	
 	<label>Class:</label>
 	<div style="padding-left: 10px;float:left;">

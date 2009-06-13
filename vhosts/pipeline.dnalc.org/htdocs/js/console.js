@@ -135,17 +135,6 @@ function run (op) {
 function openWindow(url) {
 	UI.defaultWM.options.blurredWindowsDontReceiveEvents = true;
 
-	/*var w = new UI.Window({
-				width: 916, 
-				height: 496,
-				shadow: true, 
-				draggable:false,
-				url: url
-			});
-	w.center();
-	var p = w.getPosition();
-	w.setPosition(78, p.left-2);
-	w.show();*/
 	var w = new UI.URLWindow({
 		width: 916, 
 		height: 496,
@@ -153,7 +142,7 @@ function openWindow(url) {
 		draggable: false,
 		//theme: "mac_os_x",
 		url: url }).center();
-	/*w.setHeader("aaaa");*/
+
 	var p = w.getPosition();
 	w.setPosition(78, p.left-2);
 	w.show();

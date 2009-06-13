@@ -1,21 +1,66 @@
-<div id="home">
-<p>
-Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
-</p>
-<div class="homebox" id="one">Learn</div>
-<div class="homebox" id="two">Guest
-	<p>&nbsp;</p>
-	<p><a href="/project/">Annotate some sequence as Guest User.</a></p>
-	<p>You may not save your work.</p>
-</div>
-<div class="homebox" id="three">
-	LOG IN BOX
-	<div id="loginbox">
-		ID <input type="text" id="username" name="username" /><br/>
-		Password <input type="password" id="password" name="password" /><br/>
-		<input type="button" id="submit" name="submit" value="Enter"/><br/>
-		<a href="#">Forgot your password?</a>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<title>Annotation Station</title>
+<link rel="stylesheet" href="/css/device.css" type="text/css" /> 
+</head>
+
+<body>
+<div id="container_main">
+<div id="container_devicebg1"></div>
+<div id="container_top">
+	<div id="learn_head"><a href="learn.html">&nbsp;&nbsp;&nbsp;&nbsp;Learn</a></div>
+	<div id="login_head"><a href="member_home.html">&nbsp;&nbsp;&nbsp;&nbsp;Log In</a></div>
+ 	</div>
+<div id="container_content">
+	<div id="container_homeblurb1">
+    	
+    	 <p class="home_head"><b> Annotation Station:</b> User-friendly tools for annotating genomic DNA sequences</p>
+    	  <p class="home">Annotation is the process of associating genomic DNA with information about the meaning encoded in the DNA sequence.</p>
+    	  <p class="home">Site users can annotate their uploaded (plant) DNA sequences or use pre-loaded sample DNA sequences.</p>
+            
+      
+    	    <p class="home">This site integrates tools to:<br />
+  • Upload and access DNA sequences &nbsp;&nbsp;&nbsp;• Identify and mask repetitive DNA and transposons<br /> • Predict tRNA and protein-encoding genes &nbsp;&nbsp;&nbsp;• Search RNA and protein databases &nbsp;&nbsp;&nbsp;• Browse and edit annotations</p>
+   	</div>
+	<div id="container_homeblurb2">
+	  <div class="title_home"><span class="p3">BACKGROUND &amp; BASICS</span>
+	  </div>
+    	<div class="text_homeblurb"><p>Multimedia tutorials present how DNA encodes meaning, how DNA is sequenced, and why it is important to sequence plant genomes. 
+   	  <span class="spantext" style="text-align: right;"><a href="learn.html">&nbsp;&nbsp;&nbsp;&nbsp;.&nbsp;.&nbsp;.&nbsp;.&nbsp;LEARN</a></span>
+   	  </div>
+    	</div>
+	<div id="container_homeblurb3">
+	  <div class="title_home"><span class="p3">GUEST</span>
+	  </div>
+    	<div class="text_homeblurb"><p>Guest users can utilize all analysis tools in Annotation Station but are <em>unable to save</em> results.
+   	 <span class="spantext"><a href="project/create_project.html">&nbsp;&nbsp;&nbsp;&nbsp;.&nbsp;.&nbsp;.&nbsp;.&nbsp;START</a></span></div>
+   	 </div>
+    <!--member start -->
+	<div id="container_memberblurb">
+		<div class="title_home1"><span class="p3">LOG IN</span>
+		</div>
+        
+     <div ="spacer"> </div>
+		<p><label for="name">ID:</label> <input type="text" maxlength="20" class="inputlogin" /></p>
+		<p><label for="password">Password:</label> <input type="password" maxlength="12"  class="inputlogin" /></p>
+		<p class="member"><input type="submit" value="Enter" /></p>
+	 
+        
+        <span class="p2"><a href="">&nbsp;&nbsp;&nbsp;&nbsp;Forgot your password?</a></span>
+    </div>
+    <!--member end -->
+	<div id="register_homeblurb"><a href="register.html"><span class="p3"><br>REGISTER NOW</span></a></div>
+    
 	</div>
-	<a href="#">Register</a>
-</div> <!-- end #three -->
-</div> <!-- end #home -->
+    <div id="container_footer">Copyright 2009, Cold Spring Harbor Laboratory. All rights reserved.</div>
+</div>
+</body>
+</html>
+<!--
+<%flags>
+	inherit => undef
+</%flags>
+%# vim: ft=mason
+-->
