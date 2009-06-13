@@ -13,8 +13,7 @@ js          = js
 balloon tips    = 1
 drag and drop = 1
 
-# one hour
-cache time    = 1
+cache time = 0 
 
 # Default glyph settings
 glyph       = generic
@@ -32,7 +31,7 @@ image widths  = 640 800 1024
 
 # default width of detailed view (pixels)
 default width = 800
-default features = Augustus_Genes FgenesH Repeats tRNA Snap
+default features = Augustus_Genes FgenesH Repeats tRNA Snap usergenes Blastx Blastn
 
 # max and default segment sizes for detailed view
 max segment     = 100000

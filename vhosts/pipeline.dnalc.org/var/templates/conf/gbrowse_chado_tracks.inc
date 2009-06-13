@@ -39,7 +39,7 @@ html  = <table style="width:100%">
 feature      = gene:AUGUSTUS
 glyph        = gene
 base         = 1
-sub_part     = exon
+#sub_part     = exon
 #ignore_sub_part = polypeptide 
 fgcolor      = green
 bgcolor      = lightgreen
@@ -142,4 +142,4 @@ key          = Blastx
 feature     = gene:user
 glyph       = gene
 bgcolor     = red
-key         = User created genes
+key         = User created models

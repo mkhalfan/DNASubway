@@ -7,6 +7,8 @@ db_args       = -adaptor memory
 initial landmark = __ORGANISM__:1..10000
 
 #include gbrowse_conf.inc
+
+cache time = 24
  
 #include gbrowse_gff_tracks.inc
 
