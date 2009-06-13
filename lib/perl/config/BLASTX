@@ -22,8 +22,9 @@
 	parser_program => '/var/www/bin/bp_search2gff_revised.pl',
 	parser_opt => [
 		'--version', 3,
-		'--addid',
-		'--method', 'match',
+		'-m',
+		'--method', 'match_part',
+		'--shatter',
 		'--coverage', '0.05',
 		'--identity', '0.2',
 		'--bits', '30',
