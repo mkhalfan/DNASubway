@@ -970,6 +970,7 @@ sub load_fasta {
 #			$length, '.', '.', '.', "ID=$id,Name=$id"),"\n";
     print $fh "###\n";
     print $fh "##FASTA\n";
+    print $fh ">$id\n";
     print $fh "$seq\n";
     close $fh;
 
@@ -1100,7 +1101,8 @@ sub create_chado_config {
         </genePredictionPrograms>
 
         <searchHitPrograms>
-            <program>blat</program>
+            <program>BLASTN</program>
+            <program>BLASTX</program>
         </searchHitPrograms>
 
         <searchHitsHaveFeatLocs>true</searchHitsHaveFeatLocs>
