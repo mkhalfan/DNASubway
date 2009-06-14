@@ -192,6 +192,8 @@ while( my $result = $parser->next_result ) {
 		if ($shatter) {
 			my $shattered=shatter_hit($hit);
 			push @hits, @$shattered;
+		} else {
+			push @hits, $hit;
 		}
 	}
 	foreach my $hit (@hits) {
