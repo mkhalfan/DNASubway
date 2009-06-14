@@ -49,6 +49,11 @@ for ('repeat_masker', map {$_->{name}} @routines ) {
 }
 my $rm_status = $status{repeat_masker};
 
+my $trimmed_common_name = $proj->common_name . '_' . $proj->id;
+$trimmed_common_name =~ s/\s+/_/g;
+$trimmed_common_name =~ s/-/_/g;
+
+
 #print STDERR Dumper( \%status ), $/;
 # TODO : set in session when you're starting to run a routine, 
 # and reset this flash after you get info about the execution of the routine
@@ -264,18 +269,26 @@ my $rm_status = $status{repeat_masker};
 	<div class="commandertitle_member">Launch</div>
 	<div style="height:40px">&nbsp;</div>
 
-	<div class="container_launch1"><img src="/images/v0/dot_blue.png" /><span class="p2">&nbsp;Browser</span><br/><div class="launch_button">
+	<div class="container_launch1"><img src="/images/v0/dot_blue.png" /><span class="p2">&nbsp;Browser</span><br/>
+		<div class="launch_button">
 			<a id="gbrowse_btn" class="<% $rm_status ne 'done' ? 'disabled' : '' %>" 
 				onclick="<% $rm_status eq 'done' ? "launch('gbrowse')" : '' %>" href="javascript:;">GBrowse</a>
-	</div></div>
-        
-	<div class="container_launch1"><img src="/images/v0/dot_blue.png" /><span class="p2">&nbsp;Editor</span><br />
+		</div>
+%#	</div>    
+%#	<div class="container_launch1">
+	<img src="/images/v0/dot_blue.png" /><span class="p2">&nbsp;Editor</span><br />
 		<div class="launch_button">
-			<a id="apollo_btn" class="<% $rm_status ne 'done' ? 'disabled' : '' %>" 
+			<a id="apollo_btn" class="<% $rm_status ne 'done' ? 'disabled' : '' %>" \
+				commonname="<% $trimmed_common_name %>" seq_length="<% $proj->sequence_length %>" \
 				onclick="<% $rm_status eq 'done' ? "launch('apollo')" : '' %>" href="javascript:;">Apollo</a>
 		</div>
+		<div id="apollo_status" style="padding-top:10px; height: 40px; display: none; background: yellow;">
+			Preparing files. stand by...
+		</a>
 	</div>
+
 % if ($proj->sample) {
+	<br />
 	<div class="container_launch1"><img src="/images/v0/dot_blue.png" /><span class="p2">&nbsp;Exporter</span><div class="launch_button"><a href="memeber_gbrowse.html">Launch</a></div></div>
 % }
 

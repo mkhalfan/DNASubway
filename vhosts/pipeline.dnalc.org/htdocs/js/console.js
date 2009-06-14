@@ -3,6 +3,7 @@
 var dbg, sent;
 var intervalID = {};
 var routines = ['augustus', 'fgenesh', 'snap', 'blastn', 'blastx', 'gbrowse', 'apollo'];
+var windows = [];
 
 function check_status (pid, op, h) {
 	var b = $(op + '_btn');
@@ -132,6 +133,58 @@ function run (op) {
 	});
 }
 
+
+function launch_apollo() {
+	var abtn = $('apollo_btn');
+	//alert(abtn.getAttribute('commonname'));
+	var status_div = $('apollo_status');
+	status_div.show();
+
+	var sel = abtn.getAttribute('commonname') + ':1..' + abtn.getAttribute('seq_length');
+	var params = { 'selection' : sel};
+	sent = params;
+	new Ajax.Request('/cgi-bin/create-jnpl.pl',{
+		method:'get',
+		parameters: params, 
+		onSuccess: function(transport){
+			var response = transport.responseText || "{'status':'error', 'message':'No response'}";
+			debug(response);
+			var r = response.evalJSON();
+			dbg = r;
+			//alert(r);
+			if (r.status == 'success') {
+				status_div.update(
+					new Element('a', {'href' : r.file}).update('Open Apollo.')
+				);
+				var upl = new Element('iframe', {src:'/project/upload.html', width: '100%', height:'50px'});
+				status_div.appendChild(upl);
+			}
+			else  if (r.status == 'error') {
+			}
+			else {
+			}
+		},
+		onFailure: function(){
+				alert("Something went wrong.");
+			}
+	});
+
+}
+
+function activate_console_link() {
+	var d = $('backtoconsole_head');
+	//backtoconsole_head
+	d.style.color = '000000';
+	var a = new Element('a');
+	a..update('CONSOLE');
+	a.onclick = close_windows();
+	d.appendChild(a);
+}
+
+function close_windows() {
+	alert(123)
+}
+
 function openWindow(url) {
 	UI.defaultWM.options.blurredWindowsDontReceiveEvents = true;
 
@@ -147,15 +200,21 @@ function openWindow(url) {
 	w.setPosition(78, p.left-2);
 	w.show();
 	w.focus();
+	//windows.push(w);
+	//activate_console_link();
 }
 
 function launch(what, where) {
 	
 	var urls = {
 			gbrowse: '/project/prepare_chadogbrowse?pid=',
-			apollo: '/project/prepare_editor?pid='
+			apollo: '/project/prepare_editor.html?pid='
 		};
-   
+
+	/*if (what && what == 'apollo') {
+		launch_apollo();
+		return;
+	}*/
 	var host = window.location.host;
 	var uri = what 
 					? 'http://' + host + urls[what] + $('pid').value
