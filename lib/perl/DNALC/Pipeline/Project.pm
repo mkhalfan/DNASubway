@@ -87,6 +87,10 @@ sub fasta_masked_xsmall {
 sub get_gff3_file {
 	my ($self, $routine) = @_;
 	
+	unless ($routine) {
+		print STDERR  "Project->get_gff3_file: routine is missing!!", $/;
+		return;
+	}
 	$routine = uc $routine;
 	my $dir = $self->work_dir . '/' . $routine;
 	return unless -d $dir;

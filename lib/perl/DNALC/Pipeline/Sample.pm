@@ -81,6 +81,7 @@ sub copy_results {
 	}
 	# remove spaces
 	$common_name =~ s/\s+/_/g;
+	$common_name =~ s/-/_/g;
 	$common_name .= '_' . $project_id;
 
 	my $routine_dir = $project_dir . '/' . uc $routine;
@@ -93,6 +94,10 @@ sub copy_results {
 	}
 
 	my $sample_gff_file = $self->{sample_dir} . '/' . uc ($routine) . '/' . $rcf->{gff3_file};
+	unless (-f $sample_gff_file) {
+		print STDERR  "SAMPLE GFF is missing for: ", $routine, $/;
+		return;
+	}
 	my $out_gff_file = $routine_dir . '/' . $rcf->{gff3_file};
 	print STDERR  "GFF file for $routine = ", $sample_gff_file, $/;
 	print STDERR  "GFF out file for $routine = ", $out_gff_file, $/;
@@ -118,8 +123,6 @@ sub copy_fasta {
 	my ($self, $args) = @_;
 
 	return unless defined $args && 'HASH' eq ref $args;
-	use Data::Dumper; 
-	print STDERR Dumper( $args), $/;
 
 	my $project_dir = $args->{project_dir};
 	my $project_id = $args->{project_id};
@@ -140,6 +143,7 @@ sub copy_fasta {
 	}
 	# remove spaces
 	$common_name =~ s/\s+/_/g;
+	$common_name =~ s/-/_/g;
 	$common_name .= '_' . $project_id;
 
 	my $sample_fasta = $self->{sample_dir} . '/fasta.fa';

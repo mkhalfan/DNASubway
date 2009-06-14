@@ -199,7 +199,12 @@ use Carp;
 
 		if ($proj->sample) {
 			my $st = $self->run_fake('repeat_masker');
-			return $st if $st->{success};
+			#return $st if $st->{success};
+			if ($st->{success}) {
+				$self->load_analysis_results($st->{gff_file}, 'repeat_masker');
+				return $st;
+			}
+
 		}
 
 		my $rep_mask  = DNALC::Pipeline::Process::RepeatMasker->new( $proj->work_dir, $proj->clade );
@@ -244,8 +249,6 @@ use Carp;
 			}
 		}
 
-		use Data::Dumper;
-		print STDERR  Dumper ($status), $/;
 		$status;
 	}
 	
@@ -259,7 +262,12 @@ use Carp;
 
 		if ($proj->sample) {
 			my $st = $self->run_fake('augustus');
-			return $st if $st->{success};
+			#return $st if $st->{success};
+			if ($st->{success}) {
+				$self->load_analysis_results($st->{gff_file}, 'augustus');
+				return $st;
+			}
+
 		}
 
 		my $augustus = DNALC::Pipeline::Process::Augustus->new( $proj->work_dir, $proj->clade );
@@ -302,7 +310,12 @@ use Carp;
 
 		if ($proj->sample) {
 			my $st = $self->run_fake('trna_scan');
-			return $st if $st->{success};
+			#return $st if $st->{success};
+			if ($st->{success}) {
+				$self->load_analysis_results($st->{gff_file}, 'trna_scan');
+				return $st;
+			}
+
 		}
 
 		my $trna_scan = DNALC::Pipeline::Process::TRNAScan->new( $proj->work_dir );
@@ -341,7 +354,10 @@ use Carp;
 
 		if ($proj->sample) {
 			my $st = $self->run_fake('fgenesh');
-			return $st if $st->{success};
+			if ($st->{success}) {
+				$self->load_analysis_results($st->{gff_file}, 'fgenesh');
+				return $st;
+			}
 		}
 
 		my $fgenesh = DNALC::Pipeline::Process::FGenesH->new( $proj->work_dir, $proj->clade );
@@ -385,7 +401,10 @@ use Carp;
 
 		if ($proj->sample) {
 			my $st = $self->run_fake('snap');
-			return $st if $st->{success};
+			if ($st->{success}) {
+				$self->load_analysis_results($st->{gff_file}, 'snap');
+				return $st;
+			}
 		}
 
 		my $snap = DNALC::Pipeline::Process::Snap->new( $proj->work_dir, $proj->clade );
@@ -425,7 +444,11 @@ use Carp;
 
 		if ($proj->sample) {
 			my $st = $self->run_fake('blastn');
-			return $st if $st->{success};
+			#return $st if $st->{success};
+			if ($st->{success}) {
+				$self->load_analysis_results($st->{gff_file}, 'blastn');
+				return $st;
+			}
 		}
 
 		my $blastn = DNALC::Pipeline::Process::Blast->new( $proj->work_dir, 'blastn' );
@@ -463,7 +486,11 @@ use Carp;
 
 		if ($proj->sample) {
 			my $st = $self->run_fake('blastx');
-			return $st if $st->{success};
+			#return $st if $st->{success};
+			if ($st->{success}) {
+				$self->load_analysis_results($st->{gff_file}, 'blastx');
+				return $st;
+			}
 		}
 
 		my $blastx = DNALC::Pipeline::Process::Blast->new( $proj->work_dir, 'blastx' );
@@ -513,6 +540,7 @@ use Carp;
 			if ($rc) {
 				$status->{success} = 1;
 				$status->{elapsed} = 1.59;
+				$status->{gff_file}= $proj->get_gff3_file($routine);
 				$self->set_status($routine, 'Done', $status->{elapsed});
 				#copy  masked fasta files
 				if ($routine eq 'repeat_masker') {
@@ -525,6 +553,9 @@ use Carp;
 						});
 					}
 				}
+			}
+			else {
+				print STDERR  "copy_results($routine) failed...", $/;
 			}
 		}
 
