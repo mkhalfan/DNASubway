@@ -36,7 +36,7 @@ function check_status (pid, op, h) {
 					b.removeClassName('processing');
 					b.addClassName('done');
 					b.onclick = function () { launch(null, file)};
-					b.title = 'done';
+					b.title = 'Click to view results';
 					if (op == 'repeat_masker') {
 						for (var i = 0; i < routines.length; i++) {
 							var rt = $(routines[i] + '_btn');
@@ -46,7 +46,7 @@ function check_status (pid, op, h) {
 								rt.addClassName('not-processed');
 								//Event.observe(routines[i], 'click', function() {
 								if (i < 5 ) {
-									rt.title = 'not-processed';
+									rt.title = 'Click to process';
 									rt.onclick = function () {
 												//console.log('enable btn.. ' + this.id);
 												var routine = this.id.replace('_btn','');
@@ -69,6 +69,7 @@ function check_status (pid, op, h) {
 				clearInterval(intervalID[op]);
 				b.removeClassName('processing');
 				b.addClassName('error');
+				b.title = 'Click to try again';
 				b.onclick = function () {
 								run(op);
 							};
@@ -97,8 +98,7 @@ function run (op) {
 	if (b) {
 		b.removeClassName(b.className);
 		b.addClassName('processing');
-		//s.update('Job sent.');
-		//s.insert(' Job sent.');
+		b.title = 'Processing';
 	}
 	var delay = b ? parseFloat(b.getAttribute('delay')) : 5;
 	delay = !isNaN(delay) ? delay * 1000 : 5000;

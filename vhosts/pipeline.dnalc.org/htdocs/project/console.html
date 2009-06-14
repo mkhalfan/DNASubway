@@ -1,6 +1,7 @@
 
 <%args>
 	$pid => 0
+	$debug => 0
 </%args>
 %#-------------------------------------------------
 <%once>
@@ -78,6 +79,7 @@ my $rm_status = $status{repeat_masker};
 		<div class="commandertitle_member">Project</div>
 % if (1) {
 <!-- ---------------------------------------- -->
+	<div style="height:40px">&nbsp;</div>
 <table border="0" cellpadding="1" style="margin-left: 20px;margin-right: auto; width: 278px">
   <tr >
     <td class="tdprojectlabel">User</td>
@@ -100,7 +102,7 @@ my $rm_status = $status{repeat_masker};
 </tr>
 <tr>
 	<td class="tdprojectlabel">Sequence size (bp)</td>
-	<td class="tdprojectinfo">: 100,000 &nbsp;<a href="#">view</a></td>
+	<td class="tdprojectinfo">: 100,000 &nbsp;<a href="javascript:;" onclick="launch(null, '<& './.comp/filepath_to_web', file => $proj->fasta_file &>')">view</a></td>
 </tr>
 </table>
 <!--   ----   -->
@@ -119,7 +121,7 @@ my $rm_status = $status{repeat_masker};
 % }
 </ul>
 </div><!-- history end -->
-<div id="debug"></div>
+<div id="debug" style="display:<% $debug ? 'block' : 'none'%>"></div>
 % }
 </div> <!-- #container_project -->
 
@@ -128,11 +130,11 @@ my $rm_status = $status{repeat_masker};
 	<div class="commandertitle_member">Analyses</div>
 % if (1) {
 	<div id="container_analyses1">
-		<div class="analysesTexttitle"><img src="/images/v0/dot_blue.png" />&nbsp;<span class="p2">Title of these buttons</span></div>
+		<div class="analysesTexttitle"><img src="/images/v0/dot_blue.png" />&nbsp;<span class="p2">Prepare Sequence</span></div>
 
         <table width="390" border="0px" cellpadding="1">
 		  <tr>
-  		    <td class="tdtext">Identify Repetitive DNA &amp; Transposons</td>
+  		    <td class="tdtext">Identify and mask Repetitive DNA &amp; transposons</td>
 			<td class="tdinfo">
 				<a href="#" class="tt">i<span class="tooltip"><span class="top"></span><span class="middle">Info about this routine will be available soon. Thank you for your patience.</span><span class="bottom"></span></span></a>
 			</td>
@@ -141,8 +143,37 @@ my $rm_status = $status{repeat_masker};
 								status => $status{repeat_masker}, delay => 15 &>
 			</td>
 		  </tr>
+		</table>
+
+		<div class="analysesTexttitle"></div>
+		<div class="analysesTexttitle"><img src="/images/v0/dot_blue.png" />&nbsp;<span class="p2">Predict Genes</span></div>
+        <table width="390" border="0px" cellpadding="1">
 		   <tr>
-			<td class="tdtext">Predict tRNA Genes</td>
+			<td class="tdtext">Augustus gene predictor</td>
+			<td class="tdinfo"><a href="#" class="tt">i<span class="tooltip"><span class="top"></span><span class="middle">Info about this routine will be available soon. Thank you for your patience.</span><span class="bottom"></span></span></a></td>
+			<td class="">
+				<& '.routine', routine => 'augustus', project => $proj,
+								status => $status{augustus}, delay => 20, rm_status => $rm_status &>
+			</td>
+		  </tr>
+		  <tr>
+			<td class="tdtext">FGenesH gene predictor</td>
+			<td class="tdinfo"> <a href="#" class="tt">i<span class="tooltip"><span class="top"></span><span class="middle">Info about this routine will be available soon. Thank you for your patience.</span><span class="bottom"></span></span></a></td>
+			<td class="" style="border:none">
+				<& '.routine', routine => 'fgenesh', project => $proj,
+								status => $status{fgenesh}, rm_status => $rm_status &>
+		  </tr>
+
+		   <tr>
+			<td class="tdtext">SNAP gene predictor</td>
+			<td class="tdinfo"><a href="#" class="tt">i<span class="tooltip"><span class="top"></span><span class="middle">Info about this routine will be available soon. Thank you for your patience.</span><span class="bottom"></span></span></a></td>
+			<td class="">
+				<& '.routine', routine => 'snap', project => $proj,
+				status => $status{snap}, rm_status => $rm_status &>
+			</td>
+		  </tr>
+		 <tr>
+			<td class="tdtext">tRNA gene predictor</td>
 			<td class="tdinfo">
 				<a href="#" class="tt">i<span class="tooltip"><span class="top"></span><span class="middle">Info about this routine will be available soon. Thank you for your patience.</span><span class="bottom"></span></span></a>
 			</td>
@@ -153,41 +184,13 @@ my $rm_status = $status{repeat_masker};
 		  </tr>
 		</table>
 
-		<div class="analysesTexttitle"></div>
-		<div class="analysesTexttitle"><img src="/images/v0/dot_blue.png" />&nbsp;<span class="p2">Predict Protein-coding Genes Using</span></div>
-        <table width="390" border="0px" cellpadding="1">
-		  <tr>
-			<td class="tdtext">FgenesH</td>
-			<td class="tdinfo"> <a href="#" class="tt">i<span class="tooltip"><span class="top"></span><span class="middle">Info about this routine will be available soon. Thank you for your patience.</span><span class="bottom"></span></span></a></td>
-			<td class="" style="border:none">
-				<& '.routine', routine => 'fgenesh', project => $proj,
-								status => $status{fgenesh}, rm_status => $rm_status &>
-		  </tr>
-		   <tr>
-			<td class="tdtext">Augustus</td>
-			<td class="tdinfo"><a href="#" class="tt">i<span class="tooltip"><span class="top"></span><span class="middle">Info about this routine will be available soon. Thank you for your patience.</span><span class="bottom"></span></span></a></td>
-			<td class="">
-				<& '.routine', routine => 'augustus', project => $proj,
-								status => $status{augustus}, delay => 20, rm_status => $rm_status &>
-			</td>
-		  </tr>
-		   <tr>
-			<td class="tdtext">Snap</td>
-			<td class="tdinfo"><a href="#" class="tt">i<span class="tooltip"><span class="top"></span><span class="middle">Info about this routine will be available soon. Thank you for your patience.</span><span class="bottom"></span></span></a></td>
-			<td class="">
-				<& '.routine', routine => 'snap', project => $proj,
-				status => $status{snap}, rm_status => $rm_status &>
-			</td>
-		  </tr>
-		</table>
-
 
 	<div class="analysesTexttitle"></div>
-	<div class="analysesTexttitle"><img src="/images/v0/dot_blue.png" />&nbsp;<snap class="p2">Conduct Blast Searches</snap></div>
+	<div class="analysesTexttitle"><img src="/images/v0/dot_blue.png" />&nbsp;<span class="p2">Search Databases</span></div>
 
 	<table width="390" border="0px" cellpadding="1">
 	  <tr>
-		<td class="tdtext">Find Protein Homologs</td>
+		<td class="tdtext">BlastX for protein homologs</td>
 		<td class="tdinfo"><a href="#" class="tt">i<span class="tooltip"><span class="top"></span><span class="middle">Info about this routine will be available soon. Thank you for your patience.</span><span class="bottom"></span></span></a></td>
 		<td class="">
 					<& '.routine', routine => 'blastx', project => $proj, delay => 15,
@@ -195,7 +198,7 @@ my $rm_status = $status{repeat_masker};
 		</td>
 	  </tr>
 	   <tr>
-		<td class="tdtext">Find RNA Evidence (cDNA, EST)</td>
+		<td class="tdtext">BlastN for RNA evidence (cDNA, EST)</td>
 		<td class="tdinfo"><a href="#" class="tt">i<span class="tooltip"><span class="top"></span><span class="middle">Info about this routine will be available soon. Thank you for your patience.</span><span class="bottom"></span></span></a></td>
 		<td class="">
 					<& '.routine', routine => 'blastn', project => $proj, delay => 15,
@@ -259,6 +262,7 @@ my $rm_status = $status{repeat_masker};
 
 <div id="container_launch">
 	<div class="commandertitle_member">Launch</div>
+	<div style="height:40px">&nbsp;</div>
 
 	<div class="container_launch1"><img src="/images/v0/dot_blue.png" /><span class="p2">&nbsp;Browser</span><br/><div class="launch_button">
 			<a id="gbrowse_btn" class="<% $rm_status ne 'done' ? 'disabled' : '' %>" 
@@ -272,11 +276,12 @@ my $rm_status = $status{repeat_masker};
 		</div>
 	</div>
 % if ($proj->sample) {
-	<div class="container_launch1"><img src="/images/v0/dot_blue.png" /><span class="p2">&nbsp;Exporter</span><br /><span class="p1">Only available for selected sample sequences.</span><div class="launch_button"><a href="memeber_gbrowse.html">Launch</a></div></div>
+	<div class="container_launch1"><img src="/images/v0/dot_blue.png" /><span class="p2">&nbsp;Exporter</span><div class="launch_button"><a href="memeber_gbrowse.html">Launch</a></div></div>
 % }
 
-	<div id="gbrowse" style="display:block"><a href="./prepare_gbrowse?pid=<% $proj->id%>">Browse</a></div>
-	<div id="gbrowse2" style="display:block"><a href="./prepare_chadogbrowse?pid=<% $proj->id%>">Browse2</a></div>
+<!--
+<div id="gbrowse" style="display:block"><a href="./prepare_gbrowse?pid=<% $proj->id%>">Browse</a></div>
+-->
 </div> <!-- #container_launch -->
 </div> <!-- #container_content_member3 -->
 
@@ -294,26 +299,33 @@ my $rm_status = $status{repeat_masker};
 my $link = 'javascript:;';
 my $target = 'target="_blank"';
 my $action = qq{onclick="run('$routine')"};
+my $title  = '';
 
 if ($status eq 'processing') {
 	$action = '';
 	$target = '';
+	$title = 'Processing';
 }
 elsif ($status eq 'done') {
 	my $url = $m->comp('./.comp/filepath_to_web', file => $project->get_gff3_file($routine) || '#', just_return => 1); 
 	$action = qq{onclick="launch(null, '$url')"};
 	$target = '';
+	$title  = 'Click to view results';
 } 
 else {
 	if ($rm_status ne 'done' && $routine !~ /trna_scan|repeat_masker/) {
 		$status = 'disabled';
 		$action = '';
+		$title = 'Identify repeats first';
+	}
+	else {
+		$title = 'Click to process';
 	}
 	$target = '';
 }
 </%init>
 <a id="<% $routine %>_btn" href="<% $link %>" class="<% $status %>" <% $target %>\
- status="<% $status %>" <% $action %> delay="<% $delay %>" title="<% $status %>" ></a>
+ status="<% $status %>" <% $action %> delay="<% $delay %>" title="<% $title %>" ></a>
 </%def>
 %#----------------------------------------------------------------------------
 <%attr>

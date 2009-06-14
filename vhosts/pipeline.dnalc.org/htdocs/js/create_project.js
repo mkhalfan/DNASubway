@@ -63,7 +63,7 @@ function populate_fields(src) {
 		var clade = o.hasAttribute('clade') ? o.getAttribute('clade') : 'o';
 		var clade_o = $('g' + clade);
 		var full_name = o.text;
-		organism.value = full_name.replace(/\s*\(.*?\)/,'');
+		organism.value = full_name.replace(/\s*\(.*/,'');
 		var m = full_name.match(/\((.*)\)/);
 		if (m && m.length == 2) {
 			common_name.value = m[1];
@@ -106,6 +106,6 @@ Event.observe(window, 'load', function() {
 	var html = err.innerHTML;
 	if (!html)
 		return;
-	html = "<div class=\"message-error\">errr</div>";
+	html = "<div class=\"message-error\">" + html + "</div>";
 	show_errors(html);
 });

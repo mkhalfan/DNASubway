@@ -263,30 +263,28 @@ else {
     <div class="spacer"></div>
  <div>
     <input class="selectortitle_h2" type="radio" name="seq_src" id="seq_src_upload" value="upload" onclick="select_source(this)" <% $seq_src eq 'upload' ? 'checked="checked"' : ''%> />
-	Upload a Sequence File: (max 100kbp) <br/>
+	Upload a Sequence File: (max 100kb) <br/>
 		<input class="stylized" type="file" id="seq_file" name="seq_file" \
 		onchange="set_source('upload')" onclick="set_source('upload')"  />
  </div>
 	<div class="spacer"></div>
 
 	<div><!-- end of enter a sequence -->
-		<input type="radio" name="seq_src1" value="paste" <% $seq_src eq 'upload' ? 'checked="checked"' : ''%> />Enter a Sequence 
+		<input type="radio" name="seq_src" value="paste" <% $seq_src eq 'paste' ? 'checked="checked"' : ''%> />Enter a Sequence:
 		<textarea name="sequence" class="stylized" id="notebox" rows="5" cols="35" onfocus="this.value=''">Paste your sequence here...</textarea>
-		<button class="bt_view"  style="margin-left: 320px" type="button" id="view">VIEW</button>
 	</div><!-- end of enter a sequence -->
   <br/>
   <div class="spacer"></div>
   <div>
-  <input type="radio" name="seq_src" id="seq_src_sample" value="sample" onclick="select_source(this)" />
+	  <input type="radio" name="seq_src" id="seq_src_sample" value="sample" onclick="select_source(this)" <% $seq_src eq 'sample' ? 'checked="checked"' : ''%> />
 		Select a Sample Sequence:
-		
 		<select class="stylized" id="specie" name="specie" size="6" style="width: 420px;"
 				onchange="set_source('sample');show_sample_info()">
 % for my $sample (@$samples) {
 %	my $sel = $seq_src eq 'sample' && $sample->{id} == $specie ? 'selected="selected"' : '';
 			<option id="o<%$sample->{id}%>" value="<% $sample->{id} %>" \
-			extra="location: <% $sample->{location}%>, position: <% $sample->{position}%>&lt;br/&gt; source: <% $sample->{source}%>, release: <%$sample->{release} %>" clade="<% $sample->{clade} ? $sample->{clade} : 'o' %>"\
-		<% $sel %>><%$sample->{organism}%> (<%$sample->{common_name}%>) </option>
+			extra="location: <% $sample->{location}%>, position: <% $sample->{position}%>, source: <% $sample->{source}%>, release: <%$sample->{release} %>" clade="<% $sample->{clade} ? $sample->{clade} : 'o' %>"\
+			<% $sel %>><%$sample->{organism}%> (<%$sample->{common_name}%>) <% $sample->{location} %>, 100 kb</option>
 % }
 		</select>
    </div>
@@ -294,29 +292,29 @@ else {
     </div>
     <!-- #container_newprojectleft -->
     <div id="container_newprojecttopright">
-    <div class="selectortitle_h2">Label Your Project</div>
+    <div class="selectortitle_h2">Name Your Project</div>
     <div class="spacer"></div>
     
     <label>Project Title:</label>
 	<input class="stylized" type="text" name="name" id="name" value="<% $name|html%>" maxlength="128" />
 	<div id="organism_info">
 		<div class="spacer"></div><br/>
-		<div class="selectortitle_h2">&nbsp;&nbsp;Organism:</div>
+		<div class="selectortitle_h2">&nbsp;&nbsp;Organism</div>
         <div class="spacer"></div>
-		<label>Scientific name<br/><span class="small">(Genus Species)</span></label>
+		<label>Scientific name:<br/><span class="small">(Genus Species)</span></label>
 	<input class="stylized" type="text" name="organism" id="organism" value="<% $organism |html%>" maxlength="128" />
 	
-	<label>Common name</label>
+	<label>Common name:</label>
 	<input class="stylized" type="text" name="common_name" id="common_name" value="<% $common_name |html%>" maxlength="128" />
 	
 	<label>Class:</label>
 	<div style="padding-left: 10px;float:left;">
 		<input class="resetradio" type="radio" name="group" id="gm" value="m" <% $group eq 'm' ? 'checked="checked"' : ''%>/>
-        <span class="small">Monocotyledon</span> &nbsp; 
+		<span class="small">Monocotyledon</span><br/>
 		<input class="resetradio" type="radio" name="group" id="go" value="o" <% $group eq 'o' ? 'checked="checked"' : ''%>/>
 		<span class="small">Other</span><br/>
 		<input class="resetradio" type="radio" name="group" id="gd" value="d" <% $group eq 'd' ? 'checked="checked"' : ''%>/>
-		<span class="small">Dicotyledon</span> &nbsp; 
+		<span class="small">Dicotyledon</span> <br/> 
 		<input class="resetradio" type="radio" name="group" id="gu" value="u" <% $group eq 'u' ? 'checked="checked"' : ''%>/>
 		<span class="small">I don't know</span>
 	</div>
