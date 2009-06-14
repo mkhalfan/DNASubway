@@ -102,7 +102,7 @@ my $rm_status = $status{repeat_masker};
 </tr>
 <tr>
 	<td class="tdprojectlabel">Sequence size (bp)</td>
-	<td class="tdprojectinfo">: 100,000 &nbsp;<a href="javascript:;" onclick="launch(null, '<& './.comp/filepath_to_web', file => $proj->fasta_file &>')">view</a></td>
+	<td class="tdprojectinfo">: <% $proj->sequence_length %> &nbsp;<a href="javascript:;" onclick="launch(null, '<& './.comp/filepath_to_web', file => $proj->fasta_file &>')">view</a></td>
 </tr>
 </table>
 <!--   ----   -->

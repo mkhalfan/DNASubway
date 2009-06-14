@@ -30,7 +30,7 @@ my @err = ();
 
 if ($r->method eq 'POST') {
 
-	my ($uploaded_file, $sample_file, $seq_crc) = ('', '', '');
+	my ($uploaded_file, $sample_file, $seq_crc, $seq_length) = ('', '', '', 0);
 
 	for ($name, $organism, $common_name) {
 		$_ =~ s/\s+/ /g;
@@ -107,6 +107,7 @@ if ($r->method eq 'POST') {
 					push @err, "Unable to upload file: ". $st->{message};
 				}
 				else {
+					$seq_length = $st->{seq_length};
 					$uploaded_file = $st->{path};
 					$seq_crc = $st->{crc};
 				}
@@ -118,7 +119,7 @@ if ($r->method eq 'POST') {
 			    my $output_file = $upl_dir . '/' . $rand_s;
 
 				my ($status, $msg);
-				($status, $msg, $seq_crc) = DNALC::Pipeline::App::Utils->process_fasta_file({
+				($status, $msg, $seq_crc, $seq_length) = DNALC::Pipeline::App::Utils->process_fasta_file({
 						file => $sample_file,
 						common_name => $trimmed_common_name . '_' . $proj->id,
 						output_file => $output_file,
@@ -150,6 +151,7 @@ if ($r->method eq 'POST') {
 				}
 
 				$proj->crc($seq_crc);
+				$proj->sequence_length($seq_length);
 				$proj->update;
 				# set workflow
 				my $wfm = DNALC::Pipeline::App::WorkflowManager->new( $proj );
@@ -241,7 +243,7 @@ else {
 </div>
 % }
     <div id="container_projectblurb">
-      <p>Blurb for my project</p>
+      <p>To start a NEW PROJECT, enter the information requested, then click CONTINUE.</p>
       <p>&nbsp;</p>
     </div>
     
@@ -310,11 +312,11 @@ else {
 	<label>Class:</label>
 	<div style="padding-left: 10px;float:left;">
 		<input class="resetradio" type="radio" name="group" id="gm" value="m" <% $group eq 'm' ? 'checked="checked"' : ''%>/>
-		<span class="small">Monocotyledon</span><br/>
+		<span class="small">Monocotyledons</span><br/>
+		<input class="resetradio" type="radio" name="group" id="gd" value="d" <% $group eq 'd' ? 'checked="checked"' : ''%>/>
+		<span class="small">Dicotyledons</span> <br/> 
 		<input class="resetradio" type="radio" name="group" id="go" value="o" <% $group eq 'o' ? 'checked="checked"' : ''%>/>
 		<span class="small">Other</span><br/>
-		<input class="resetradio" type="radio" name="group" id="gd" value="d" <% $group eq 'd' ? 'checked="checked"' : ''%>/>
-		<span class="small">Dicotyledon</span> <br/> 
 		<input class="resetradio" type="radio" name="group" id="gu" value="u" <% $group eq 'u' ? 'checked="checked"' : ''%>/>
 		<span class="small">I don't know</span>
 	</div>

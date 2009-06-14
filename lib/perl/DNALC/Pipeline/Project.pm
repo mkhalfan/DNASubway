@@ -17,7 +17,7 @@ use Class::DBI::Plugin::Pager;
 __PACKAGE__->table('project');
 __PACKAGE__->columns(Primary => qw/project_id/);
 __PACKAGE__->columns(Essential => qw/user_id name organism common_name 
-								clade sample crc created/);
+								clade sample crc sequence_length created/);
 __PACKAGE__->sequence('project_project_id_seq');
 
 __PACKAGE__->add_trigger(before_create => sub {

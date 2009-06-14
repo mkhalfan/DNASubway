@@ -23,7 +23,7 @@ use Time::Piece ();
 sub save_upload {
 	#print STDERR "save_upload: ", Dumper( \@_), $/;
 	my ($class, $args) = @_;
-	my ($status, $msg, $path, $crc);
+	my ($status, $msg, $path, $crc, $seq_length);
 
 	my $r = $args->{r};
 	my $param_name  = $args->{param_name};
@@ -53,20 +53,21 @@ sub save_upload {
 
 	# check/fix content 
 	unless ($msg) {
-		($status, $msg, $crc) = $class->process_fasta_file({
+		($status, $msg, $crc, $seq_length) = $class->process_fasta_file({
 					fh => $u->fh,
 					common_name => $args->{common_name},
 					output_file => $path,
 				});
 	}
 
-	return { status => $status, message => $msg, path => $path, crc => $crc };
+	return { status => $status, message => $msg, path => $path, crc => $crc, seq_length => $seq_length };
 }
 
 sub process_fasta_file {
 	my ($class, $args) = @_;
 	my $file = $args->{file} if defined $args->{file};
 	my $fh = $args->{fh} if defined $args->{fh};
+	my $seq_length = 0;
 
 	my $common_name = $args->{common_name} || 'my_specie';
 	my $output_file = $args->{output_file};;
@@ -104,6 +105,7 @@ sub process_fasta_file {
 		else {
 			$fasta_seq->seq( uc $seq->seq, 'dna' );
 		}
+		$seq_length = $fasta_seq->length;
 		
 		my $ctx = Digest::MD5->new;
 		$ctx->add($fasta_seq->seq);
@@ -118,7 +120,7 @@ sub process_fasta_file {
 		$msg = 'File content is not valid.';
 	}
 	
-	return ($status, $msg, $crc);
+	return ($status, $msg, $crc, $seq_length);
 }
 
 sub _is_upload_ok {
@@ -126,7 +128,7 @@ sub _is_upload_ok {
 	my $config = DNALC::Pipeline::Config->new;
 	my $mimes = $config->cf('PIPELINE')->{upload_mime_types};
 	my $mt = $u->type;
-	print STDERR  "Upload MIME = $mt", $/;
+	#print STDERR  "Upload MIME = $mt", $/;
 	my $ok = 0;
 
 	for my $t (@{ $mimes }) {
