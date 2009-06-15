@@ -1105,9 +1105,6 @@ a.tt:hover span.bottom{
 	position:relative;
 	margin-left: 2px;
 	}
-.launch_gbrowse a:hover{
-	background: url("/images/v0/launch_gbrowseUp.png") no-repeat left;
-	}
 	
 .launch_apollo {
 	width:108px;
@@ -1124,9 +1121,6 @@ a.tt:hover span.bottom{
 	background: url("/images/v0/launch_apolloDown.png") no-repeat left;
 	position:relative;
 	margin-left: 2px;
-	}
-.launch_apollo a:hover{
-	background: url("/images/v0/launch_apolloUp.png") no-repeat left;
 	}
 	
 
@@ -1145,11 +1139,6 @@ a.tt:hover span.bottom{
 	position:relative;
 	float:left;
 	margin-left: 2px;
-	}
-.launch_exporter a:hover{
-	background: url("/images/v0/launch_exporterUp.png") no-repeat left;
-	position:relative;
-	float:left;
 	}
 
 /*////MEMBER page 3 CONSOLE --END--END---////*/
