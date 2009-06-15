@@ -171,19 +171,30 @@ function launch_apollo() {
 
 }
 
-function activate_console_link() {
-	var d = $('backtoconsole_head');
-	//backtoconsole_head
-	d.style.color = '000000';
-	var a = new Element('a');
-	a..update('CONSOLE');
-	a.onclick = close_windows();
-	d.appendChild(a);
+function close_windows() {
+	for (var i = 0; i < windows.length; i++) {
+		windows[i].close();
+	}
+	windows = [];
+	toggle_console_link();
 }
 
-function close_windows() {
-	alert(123)
+function toggle_console_link() {
+
+	var d = $('backtoconsole_head');
+	d.update();
+	if (windows.length) {
+		var a = new Element('a', {href:'javascript:;'}).update('CONSOLE');
+		a.style.color = 'black';
+		Event.observe(a, 'click', function(){close_windows()});
+		//Event.observe(a, 'mouseover', function(){this.style.color});
+		d.appendChild(a);
+	}
+	else {
+		d.update('CONSOLE');
+	}
 }
+
 
 function openWindow(url) {
 	UI.defaultWM.options.blurredWindowsDontReceiveEvents = true;
@@ -200,8 +211,8 @@ function openWindow(url) {
 	w.setPosition(78, p.left-2);
 	w.show();
 	w.focus();
-	//windows.push(w);
-	//activate_console_link();
+	windows.push(w);
+	toggle_console_link();
 }
 
 function launch(what, where) {

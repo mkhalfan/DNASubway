@@ -107,7 +107,7 @@ $trimmed_common_name =~ s/-/_/g;
 </tr>
 <tr>
 	<td class="tdprojectlabel">Sequence size (bp)</td>
-	<td class="tdprojectinfo">: <% $proj->sequence_length %> &nbsp;<a href="javascript:;" onclick="launch(null, '<& './.comp/filepath_to_web', file => $proj->fasta_file &>')">view</a></td>
+	<td class="tdprojectinfo" style="">: <% $proj->sequence_length %> &nbsp;<a href="javascript:;" onclick="launch(null, '<& './.comp/filepath_to_web', file => $proj->fasta_file &>')"><img src="/images/v0/button_viewDown.png" alt="open sequence" style="border: 0px" /></a></td>
 </tr>
 </table>
 <!--   ----   -->
