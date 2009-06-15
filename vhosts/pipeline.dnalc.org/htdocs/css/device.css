@@ -1663,6 +1663,10 @@ width:320px;
 margin:2px 0 20px 10px;
 }
 
+input.stylizedupload {
+	padding: 0;
+}
+
 input.stylized {
 	width: 140px; 
 	padding: 0;
