@@ -243,7 +243,6 @@ else {
 </div>
 % }
     <div id="container_projectblurb">
-      <p>To start a NEW PROJECT, enter the information requested, then click CONTINUE.</p>
       <p>&nbsp;</p>
     </div>
     
@@ -272,7 +271,7 @@ else {
 	<div class="spacer"></div>
 
 	<div><!-- end of enter a sequence -->
-		<input type="radio" name="seq_src" value="paste" <% $seq_src eq 'paste' ? 'checked="checked"' : ''%> />Enter a Sequence:
+		<input type="radio" name="seq_src" value="paste" <% $seq_src eq 'paste' ? 'checked="checked"' : ''%> disabled="disabled" />Enter a Sequence:
 		<textarea name="sequence" class="stylized" id="notebox" rows="5" cols="35" onfocus="this.value=''">Paste your sequence here...</textarea>
 	</div><!-- end of enter a sequence -->
   <br/>

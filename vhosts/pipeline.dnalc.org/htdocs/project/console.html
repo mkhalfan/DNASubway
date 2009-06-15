@@ -78,8 +78,10 @@ $trimmed_common_name =~ s/-/_/g;
 	</div>
 
 	<div id="container_commandertitle"><% $proj->name |html%></div>
+% if (0) {
 	<div id="container_commanderblurb"><p>Use the console to perform DNA analysis routines on the loaded sequence. To begin, "Prepare Sequence." This key pre-requisite analysis identifies and masks simple repeats and transposons, thus removing sequence that may clutter subsequent analyses. Next, run any or all of the analysis algorithms under "Predict Genes" and/or "Conduct <em>Blast</em> Searches." Finally, launch “GBrowse” viewer or the "<em>Apollo</em>" editor to further analyze and annotate the sequence.</p>
 	</div>
+% }
 	<div id="container_project">
 		<div class="commandertitle_member">Project</div>
 % if (1) {
@@ -132,7 +134,7 @@ $trimmed_common_name =~ s/-/_/g;
 
 
 <div id="container_analyses">
-	<div class="commandertitle_member">Analyse</div>
+	<div class="commandertitle_member">Analyze</div>
 % if (1) {
 	<div id="container_analyses1">
 		<div class="analysesTexttitle"><img src="/images/v0/dot_blue.png" />&nbsp;<span class="p2">Prepare Sequence</span></div>

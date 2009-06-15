@@ -10,10 +10,9 @@
 	
  	<div id="container_pagehead">
     <div id="container_pagetitle">:: PROJECTS ::</div>
-     <div id="container_membername">User: Guest</div>
+		<div id="container_membername">User: Guest</div>
     </div>
     <div id="container_projectblurb">
-      <p>To continue working on an existing project, select it under "Action."</p>
       <p>&nbsp;</p>
     </div>
     

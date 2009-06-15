@@ -202,7 +202,7 @@ A:hover {
 	
 #container_pagetitle{
 	width:456px;
-	height:14px;
+	height:16px;
 	border-bottom: 2px solid #000000;
 	float: left;
 	margin: 0 auto;
@@ -213,7 +213,7 @@ A:hover {
 	}
 #container_membername{
 	width:400px;
-	height:14px;
+	height:16px;
 	border-bottom: 2px solid #000000;
 	float: right;
 	margin: 0 auto;
@@ -689,7 +689,7 @@ input#project{
 	width:856px;
 	height:20px;
 	position:absolute;
-	top:20px;
+	top:30px;
 	padding: 4px 28px 0px 28px;
 	color:#993300;
 	font-size: 1em;
