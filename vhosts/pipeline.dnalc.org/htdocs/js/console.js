@@ -2,7 +2,7 @@
 
 var dbg, sent;
 var intervalID = {};
-var routines = ['augustus', 'fgenesh', 'snap', 'blastn', 'blastx', 'gbrowse', 'apollo'];
+var routines = ['augustus', 'fgenesh', 'snap', 'blastn', 'blastx', 'gbrowse', 'apollo', 'exporter'];
 var windows = [];
 
 function check_status (pid, op, h) {
@@ -199,13 +199,21 @@ function toggle_console_link() {
 function openWindow(url) {
 	UI.defaultWM.options.blurredWindowsDontReceiveEvents = true;
 
-	var w = new UI.URLWindow({
+	
+	var options = {
 		width: 916, 
 		height: 496,
 		shadow: true,
 		draggable: false,
-		//theme: "mac_os_x",
-		url: url }).center();
+		resizable: false,
+		url: url
+	};
+	if (navigator.userAgent.indexOf('MSIE') != -1) {
+		// IE doen't like this option!!!
+		delete options['resizable'];
+	}
+
+	var w = new UI.URLWindow( options ).center();
 
 	var p = w.getPosition();
 	w.setPosition(78, p.left-2);
@@ -219,9 +227,14 @@ function launch(what, where) {
 	
 	var urls = {
 			gbrowse: '/project/prepare_chadogbrowse?pid=',
-			apollo: '/project/prepare_editor.html?pid='
+			apollo: '/project/prepare_editor.html?pid=',
+			exporter: '/project/prepare_exporter.html?pid='
 		};
 
+	if (what && !urls[what]) {
+		alert('Nothing to load!!');
+		return;
+	}
 	/*if (what && what == 'apollo') {
 		launch_apollo();
 		return;

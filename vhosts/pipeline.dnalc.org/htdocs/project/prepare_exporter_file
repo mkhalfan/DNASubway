@@ -1,0 +1,60 @@
+<%args>
+	$pid => 0
+</%args>
+<%once>
+	use DNALC::Pipeline::Project ();
+	use DNALC::Pipeline::Config ();
+	use Data::Dumper;
+	my $pcf = DNALC::Pipeline::Config->new->cf('PIPELINE');
+</%once>
+<%init>
+	$m->session->{pipeline} ||= {};
+	my $s = $m->session->{pipeline};
+	$r->content_type('text/plain');
+
+	my $proj = DNALC::Pipeline::Project->retrieve($pid);
+	unless ($proj) {
+		$m->comp('/_message_add', 'Project not found!', 'error');
+		$m->redirect('/project/');
+	}
+
+
+	my $gff3_files = $proj->get_available_gff3_files || [];
+	my @params = ();
+	for my $gff (@$gff3_files) {
+		push @params, ('-g', $gff);
+	}
+
+	if ( @params) {
+		my $gff_merger = $pcf->{EXE_PATH} . '/gff3_merger.pl';
+		my $gff_file = $proj->work_dir . '/gff3.gff';
+		my @args = ($gff_merger, @params, '-f', $proj->fasta_file, '-o', $gff_file);
+
+		system (@args) && die "Error: $!\n";
+		#print $gff_file, $/;
+		if (-f $gff_file) {
+			$r->headers_out->add('Content-Disposition' => 'attachment;filename=gff3.gff');
+			my ($sample) = grep {$_->{id} == $proj->sample} @{ $pcf->{samples} }; 
+			my $col1 = $sample->{location} . ':' . $sample->{position};
+			my $in = IO::File->new;
+			if ($in->open($gff_file, 'r')) {
+				while ( my $line = <$in> ){
+					$line =~ s/^.*?\t/$col1\t/;
+					$line =~ s/>.*/>$col1/;
+					print $line;
+				}
+			}
+			undef $in;
+		}
+		else {
+			print "Error: File not found!";
+		}
+	}
+	else {
+		print "Error: No gff3 file was found! Perhaps no routine has been called.";
+	}
+</%init>
+
+<%flags>
+	inherit => undef
+</%flags>

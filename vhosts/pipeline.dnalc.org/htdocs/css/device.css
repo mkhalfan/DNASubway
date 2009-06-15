@@ -247,7 +247,6 @@ A:hover {
 #container_existproject{
 	width:278px;
 	height:400px;
-	height:400px;
 	position:absolute;
 	top:90px;
 	left: 314px;
@@ -1473,7 +1472,7 @@ input.done {
 .done {
 	width:120px;
 	height:20px;
-	background-image: url("/images/v0/button_done.png");
+	background-image: url("/images/v0/button_doneUp.png");
 	display: block;
 	position:relative;
 	float:left;
@@ -1481,6 +1480,7 @@ input.done {
 	text-decoration: none;
 }
 .done:hover {
+	background-image: url("/images/v0/button_doneDown.png");
 	filter:alpha(opacity=80);
 	opacity: 0.80;
 }

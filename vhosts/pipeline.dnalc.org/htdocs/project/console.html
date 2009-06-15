@@ -132,7 +132,7 @@ $trimmed_common_name =~ s/-/_/g;
 
 
 <div id="container_analyses">
-	<div class="commandertitle_member">Analyses</div>
+	<div class="commandertitle_member">Analyse</div>
 % if (1) {
 	<div id="container_analyses1">
 		<div class="analysesTexttitle"><img src="/images/v0/dot_blue.png" />&nbsp;<span class="p2">Prepare Sequence</span></div>
@@ -191,7 +191,7 @@ $trimmed_common_name =~ s/-/_/g;
 
 
 	<div class="analysesTexttitle"></div>
-	<div class="analysesTexttitle"><img src="/images/v0/dot_blue.png" />&nbsp;<span class="p2">Search Databases</span></div>
+	<div class="analysesTexttitle"><img src="/images/v0/dot_blue.png" />&nbsp;<span class="p2">Search UniProt and UniGene Databases</span></div>
 
 	<table width="390" border="0px" cellpadding="1">
 	  <tr>
@@ -269,8 +269,7 @@ $trimmed_common_name =~ s/-/_/g;
 	<div class="commandertitle_member">Launch</div>
 	<div style="height:40px">&nbsp;</div>
 
-	<div class="container_launch1"><img src="/images/v0/dot_blue.png" /><span class="p2">&nbsp;Browser</span>
-		<div class="spacer"></div><br />
+	<div class="container_launch1">
 		<div class="launch_gbrowse">
 			<a id="gbrowse_btn" class="<% $rm_status ne 'done' ? 'disabled' : '' %>" \
 			onclick="<% $rm_status eq 'done' ? "launch('gbrowse')" : '' %>" \
@@ -279,9 +278,6 @@ $trimmed_common_name =~ s/-/_/g;
 	</div>    
 
 	<div class="container_launch1">
-		<img src="/images/v0/dot_blue.png" /><span class="p2">&nbsp;Editor</span>
-		<div class="spacer"></div>
-		    <br />
 
 		<div class="launch_apollo">
 			<a id="apollo_btn" class="<% $rm_status ne 'done' ? 'disabled' : '' %>" \
@@ -294,12 +290,12 @@ $trimmed_common_name =~ s/-/_/g;
 	</div>
 
 % if ($proj->sample) {
-	<br />
-	<div class="container_launch1"><img src="/images/v0/dot_blue.png" />
-		<span class="p2">&nbsp;Exporter</span>
-		<div class="spacer"></div>
-		    <br />
-		<div class="launch_exporter"><a href="#"></a></div>
+	<div class="container_launch1">
+		<div class="launch_exporter">
+			<a id="exporter_btn" class="<% $rm_status ne 'done' ? 'disabled' : '' %>" \
+				onclick="<% $rm_status eq 'done' ? "launch('exporter')" : '' %>"
+				href="javascript:;"></a>
+		</div>
 	</div>
 % }
 
