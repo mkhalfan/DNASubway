@@ -1,3 +1,4 @@
+% if (0) {
 <div id="topnavi">
 	<a href="/">Home</a>
 	<a href="/project/">Project selector</a>
@@ -7,6 +8,7 @@
 		<a href="/">Login</a>
 % }
 </div>
+% }
 % $m->call_next;
 <%init>
 	$m->session->{pipeline} ||= {};
