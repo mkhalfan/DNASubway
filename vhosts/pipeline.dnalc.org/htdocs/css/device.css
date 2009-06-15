@@ -1048,13 +1048,18 @@ a.tt:hover span.bottom{
 
 .container_launch1{
 	width:120px;
-	height:100px;
+	height:70px;
 	position:relative;
 	float:left;
 	margin: 0 auto;
-	padding: 2px 0px 0px 10px;
-	line-height: .8em;	
+	padding: 2px 0px 0px 8px;
+	font-size: .9em;
+	line-height: .8em;
+	text-align: left;	
 	}
+
+
+	/*
 .launch_button{
 	width:104px;
 	height:28px;
@@ -1083,6 +1088,69 @@ a.tt:hover span.bottom{
 	color:#CC6633;
 	filter:alpha(opacity=80); /* IE's opacity*/
 	opacity: 0.80;
+	}
+*/
+
+.launch_gbrowse {
+	width:108px;
+	height:28px;
+	display:block;
+	float:left;
+	margin-left: 2px;
+	}
+.launch_gbrowse a{
+	width:108px;
+	height:28px;
+	display:block;
+	background: url("/images/v0/launch_gbrowseDown.png") no-repeat left;
+	position:relative;
+	margin-left: 2px;
+	}
+.launch_gbrowse a:hover{
+	background: url("/images/v0/launch_gbrowseUp.png") no-repeat left;
+	}
+	
+.launch_apollo {
+	width:108px;
+	height:28px;
+	display:block;
+	float:left;
+	margin-left: 2px;
+    	
+	}
+.launch_apollo a{
+	width:108px;
+	height:28px;
+	display:block;
+	background: url("/images/v0/launch_apolloDown.png") no-repeat left;
+	position:relative;
+	margin-left: 2px;
+	}
+.launch_apollo a:hover{
+	background: url("/images/v0/launch_apolloUp.png") no-repeat left;
+	}
+	
+
+.launch_exporter {
+	width:108px;
+	height:28px;
+	display:block;
+	float:left;
+	margin-left: 2px;
+	}
+.launch_exporter a{
+	width:108px;
+	height:28px;
+	display:block;
+	background: url("/images/v0/launch_exporterDown.png") no-repeat left;
+	position:relative;
+	float:left;
+	margin-left: 2px;
+	}
+.launch_exporter a:hover{
+	background: url("/images/v0/launch_exporterUp.png") no-repeat left;
+	position:relative;
+	float:left;
 	}
 
 /*////MEMBER page 3 CONSOLE --END--END---////*/
@@ -1435,7 +1503,7 @@ input.done {
 .processing {
 	width:120px;
 	height:20px;
-	background-image: url("/images/v0/button_running.png");
+	background-image: url("/images/v0/button_running.gif");
 	display: block;
 	position:relative;
 	float:left;
