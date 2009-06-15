@@ -1,6 +1,9 @@
 <%args>
 	$pid => 0
 </%args>
+<%once>
+	use DNALC::Pipeline::Project();
+</%once>
 <%init>
 my $proj = DNALC::Pipeline::Project->retrieve($pid);
 unless ($proj) {
