@@ -1461,17 +1461,12 @@ input.done {
 .done {
 	width:120px;
 	height:20px;
-	background-image: url("/images/v0/button_doneUp.png");
+	background-image: url("/images/v0/button_doneDown.png");
 	display: block;
 	position:relative;
 	float:left;
 	margin:0 auto;
 	text-decoration: none;
-}
-.done:hover {
-	background-image: url("/images/v0/button_doneDown.png");
-	filter:alpha(opacity=80);
-	opacity: 0.80;
 }
 
 .error {
