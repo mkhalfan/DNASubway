@@ -258,18 +258,19 @@ while( my $result = $parser->next_result ) {
                 $feature->add_tag_value('ID', $name);
         }
 
-	    $feature->location(&$locfunc($proxyfor,$otherf));
 	    #  strand for feature is always going to be product of
 	    #  query & hit strands so that target can always be just
 	    #  '+'
-	    $feature->strand ( $proxyfor->strand * $otherf->strand);
+		my $strand=($proxyfor->strand || 1)*($otherf->strand || 1);
+		$feature->location(&$locfunc($proxyfor,$otherf));
+	    $feature->strand ($strand);
 	    if( $sourcetag ) { 
 		$feature->source_tag($sourcetag);
 	    } else {
 		$feature->source_tag($proxyfor->source_tag);
 	    }
 	    $feature->score(&$scorefunc($proxyfor));
-	    $feature->frame($proxyfor->frame);
+		#$feature->frame($proxyfor->frame);
 	    $feature->seq_id($proxyfor->seq_id );
 	    $feature->primary_tag($methodtag);
             # add annotation if encoded in the query description
@@ -287,7 +288,7 @@ while( my $result = $parser->next_result ) {
 	    my $matchf = Bio::SeqFeature::Generic->new
 		(-start => $min{$type},
 		 -end   => $max{$type},
-		 -strand=> $hit->strand($type)*$hit->strand($other),
+		 -strand=> ($hit->strand($type) || 1)*($hit->strand($other) || 1),
 		 -primary_tag => 'match',
 		 -source_tag  => $st,
 		 -score => $hit->bits,
