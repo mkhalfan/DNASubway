@@ -61,9 +61,9 @@ $trimmed_common_name =~ s/-/_/g;
 %#-------------------------------------------------
 <div id="container_devicebg2"></div>
 <div id="container_top">
-	<div id="learn_head"><a href="/learnlearn.html" style="padding-left: 10px;">Learn</a></div>
-	<!--<div id="logout_head"><a href="home.html" style="padding-left: 10px;">Log Out</a></div>-->
-    <div id="backhome"><a href="index.html"></a></div>
+	<!--<div id="learn_head"><a href="/learnlearn.html" style="padding-left: 10px;">Learn</a></div>
+	<div id="logout_head"><a href="home.html" style="padding-left: 10px;">Log Out</a></div>-->
+    <div id="backhome"></div>
     <div id="backtoconsole_head">CONSOLE</div>
     <div id="backtoloader_head"><a href="/project/browse">PROJECTS</a></div>
     
@@ -193,11 +193,11 @@ $trimmed_common_name =~ s/-/_/g;
 
 
 	<div class="analysesTexttitle"></div>
-	<div class="analysesTexttitle"><img src="/images/v0/dot_blue.png" />&nbsp;<span class="p2">Search UniProt and UniGene Databases</span></div>
+	<div class="analysesTexttitle"><img src="/images/v0/dot_blue.png" />&nbsp;<span class="p2">Search Databases</span></div>
 
 	<table width="390" border="0px" cellpadding="1">
 	  <tr>
-		<td class="tdtext">BlastX UniProt</td>
+		<td class="tdtext">BlastX UniProt for protein homologs</td>
 		<td class="tdinfo"><a href="#" class="tt">i<span class="tooltip"><span class="top"></span><span class="middle">Info about this routine will be available soon. Thank you for your patience.</span><span class="bottom"></span></span></a></td>
 		<td class="">
 					<& '.routine', routine => 'blastx', project => $proj, delay => 15,
@@ -205,7 +205,7 @@ $trimmed_common_name =~ s/-/_/g;
 		</td>
 	  </tr>
 	   <tr>
-		<td class="tdtext">BlastN UniGene</td>
+		<td class="tdtext">BlastN UniGene for RNA evidence (cDNA/EST)</td>
 		<td class="tdinfo"><a href="#" class="tt">i<span class="tooltip"><span class="top"></span><span class="middle">Info about this routine will be available soon. Thank you for your patience.</span><span class="bottom"></span></span></a></td>
 		<td class="">
 					<& '.routine', routine => 'blastn', project => $proj, delay => 15,
