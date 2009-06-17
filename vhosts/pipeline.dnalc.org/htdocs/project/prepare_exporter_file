@@ -36,6 +36,17 @@
 			$r->headers_out->add('Content-Disposition' => 'attachment;filename=gff3.gff');
 			my ($sample) = grep {$_->{id} == $proj->sample} @{ $pcf->{samples} }; 
 			my $col1 = $sample->{location} . ':' . $sample->{position};
+			print q{[gene:AUGUSTUS]
+glyph = gene
+sub_part = CDS
+
+[gene:SNAP]
+glyph = gene
+
+[gene:FGenesH]
+glyph = gene
+
+}, "\n";
 			my $in = IO::File->new;
 			if ($in->open($gff_file, 'r')) {
 				while ( my $line = <$in> ){
