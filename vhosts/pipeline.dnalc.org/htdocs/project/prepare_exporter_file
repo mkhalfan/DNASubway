@@ -4,6 +4,8 @@
 <%once>
 	use DNALC::Pipeline::Project ();
 	use DNALC::Pipeline::Config ();
+	#use DNALC::Pipeline::Chado::Utils ();
+	use IO::File ();
 	use Data::Dumper;
 	my $pcf = DNALC::Pipeline::Config->new->cf('PIPELINE');
 </%once>
@@ -26,6 +28,29 @@
 	}
 
 	if ( @params) {
+
+		my $user_annot_file = $proj->work_dir . '/user_data.gff';
+
+		my $trimmed_common_name = $proj->common_name;
+		$trimmed_common_name =~ s/\s+/_/g;
+		$trimmed_common_name =~ s/-/_/g;
+		$trimmed_common_name = $trimmed_common_name . '_' . $pid;
+	
+		#print STDERR  "Trying to dum annotations in ", $user_annot_file, $/;
+
+		my $rc = system ($pcf->{EXE_PATH} . '/dump_user_annotations.pl', 
+						'--username', $proj->username,
+						'--seqid', $trimmed_common_name,
+						'--file', $user_annot_file
+					);
+		#print STDERR  "RC = ", $rc , $/;
+
+		if ($rc == 0 && -f $user_annot_file) {
+			#print STDERR  "User file = ", $user_annot_file, $/;
+			push @params, ('-g', $user_annot_file);
+		}
+	
+
 		my $gff_merger = $pcf->{EXE_PATH} . '/gff3_merger.pl';
 		my $gff_file = $proj->work_dir . '/gff3.gff';
 		my @args = ($gff_merger, @params, '-f', $proj->fasta_file, '-o', $gff_file);
@@ -46,16 +71,23 @@ glyph = gene
 [gene:FGenesH]
 glyph = gene
 
+[gene:user]
+glyph = gene
+
 }, "\n";
+			print "##gff-version 3\n";
+
 			my $in = IO::File->new;
 			if ($in->open($gff_file, 'r')) {
 				while ( my $line = <$in> ){
+					next if $line =~ /^##gff/;
 					$line =~ s/^.*?\t/$col1\t/;
 					$line =~ s/>.*/>$col1/;
 					print $line;
 				}
 			}
 			undef $in;
+
 		}
 		else {
 			print "Error: File not found!";

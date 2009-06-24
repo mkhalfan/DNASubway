@@ -5,6 +5,7 @@ use warnings;
 
 use Bio::GMOD::Config ();
 use Bio::GMOD::DB::Config ();
+use Bio::DB::Das::Chado ();
 use File::Temp ();
 use Cwd;
 use File::Path;
@@ -43,14 +44,14 @@ it under the same terms as Perl itself.
 =cut
 
 my %algorithm_params = (
-    AUGUSTUS            => '--noexon',
-    BLASTN              => '',
-    BLASTX              => '',  
-    FGENESH             => '--noexon',
+    AUGUSTUS            => '-a --noexon',
+    BLASTN              => '-a',
+    BLASTX              => '-a',  
+    FGENESH             => '-a --noexon',
     REPEAT_MASKER       => '',
     REPEAT_MASKER2      => '',
-    SNAP                => '--noexon',
-    TRNA_SCAN           => '',
+    SNAP                => '-a --noexon',
+    TRNA_SCAN           => '-a',
 );
 
 
@@ -808,10 +809,12 @@ sub load_analysis_results {
 
 	return unless -f $file;
 
-    my $param = $self->additional_load_parameters(uc $alg) || '';
+    warn uc $alg;
+
+    my $param = $self->additional_load_parameters(uc $alg) || '-a';
 
     my $profile = $self->profile;
-    my $command = "/usr/local/bin/gmod_bulk_load_gff3.pl $param -a --dbprof $profile -g $file";
+    my $command = "/usr/local/bin/gmod_bulk_load_gff3.pl $param --dbprof $profile -g $file";
     print STDERR "$command\n";
     system($command) == 0 or do {
 		print STDERR  "Failed to load file: ", $file, $/;
@@ -1166,5 +1169,6 @@ sub remove_lock_file {
     unlink "/var/www/.apollo/chado-adapter.xml";
     return;
 }
+
 
 1;
