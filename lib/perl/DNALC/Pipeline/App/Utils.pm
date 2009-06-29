@@ -69,8 +69,8 @@ sub process_fasta_file {
 	my $fh = $args->{fh} if defined $args->{fh};
 	my $seq_length = 0;
 
-	my $common_name = $args->{common_name} || 'my_specie';
-	my $output_file = $args->{output_file};;
+	my $common_name = $args->{common_name} || 'my_species';
+	my $output_file = $args->{output_file};
 	unless ($output_file) {
 		return ('fail', 'Unable to store sequence file.');
 	}
@@ -121,6 +121,50 @@ sub process_fasta_file {
 	}
 	
 	return ($status, $msg, $crc, $seq_length);
+}
+
+
+sub process_input_file {
+	my ($class, $file) = @_;
+
+	unless ($file) {
+		return {status => 'error', msg => 'Inpus file is missing!'};
+	}
+
+	print STDERR  "IN = file: ", $file, $/ if $file;
+
+	my ($in, $status, $msg) = (undef, 'fail', '');
+	if ($file) {
+		$in = Bio::SeqIO->new(-file => $file, -format => "Fasta");
+	}
+	unless ($in) {
+		return {status => 'fail', msg => 'Unable to process sequence file.'};
+	}
+
+	my $config = DNALC::Pipeline::Config->new;
+	my $fasta_seq;
+
+	my $seq = $in->next_seq;
+	if ($seq && $seq->alphabet eq 'dna') {
+		# make sure the sequence is not longer then maximum allowed
+		my $max_seq_length = $config->cf('PIPELINE')->{sequence_length} || 50_000;
+
+		$fasta_seq = Bio::Seq->new;
+		if ($seq->length > $max_seq_length) {
+			$fasta_seq->seq( uc $seq->subseq(1, $max_seq_length), 'dna' );
+		}
+		else {
+			$fasta_seq->seq( uc $seq->seq, 'dna' );
+		}
+		
+		$status = 'success';
+	}
+	else {
+		$status = 'fail';
+		$msg = 'File content is not valid.';
+	}
+	
+	return { status => $status, msg => $msg, seq => $fasta_seq};
 }
 
 sub _is_upload_ok {

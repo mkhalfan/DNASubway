@@ -5,6 +5,7 @@
 	$organism => ''
 	$common_name => ''
 	$group => ''
+	$sequence => ''
 </%args>
 <%once>
 	use DNALC::Pipeline::Config ();
@@ -15,6 +16,7 @@
 	use DNALC::Pipeline::Utils qw(random_string);
 	use Carp;
 	use Gearman::Client ();
+	use IO::File ();
 	use Data::Dumper;
 </%once>
 
@@ -30,7 +32,7 @@ my @err = ();
 
 if ($r->method eq 'POST') {
 
-	my ($uploaded_file, $sample_file, $seq_crc, $seq_length) = ('', '', '', 0);
+	my ($uploaded_file, $file2process, $seq_crc, $seq_length) = ('', '', '', 0);
 
 	for ($name, $organism, $common_name) {
 		$_ =~ s/\s+/ /g;
@@ -49,19 +51,26 @@ if ($r->method eq 'POST') {
 		push @err, "Organism name may contain only letters, digits and spaces";
 	}
 
-	if (!@err && $seq_src eq 'sample') {
-		my $samples_dir = $pcf->{samples_dir};
-		my ($sample) = grep {$_->{id} == $specie} @$samples; 
-		# checks: organism... group (monocots|dicots)
-		if (!$sample || $sample->{organism} ne $organism || $sample->{common_name} ne $common_name) {
-			push @err, "Sample organism was not found!!";
-		} 
-		else {
-			$sample_file = $samples_dir . '/' . $sample->{id} . '/fasta.fa';
+	if (!@err) {
+		if ($seq_src eq 'sample') {
+			my $samples_dir = $pcf->{samples_dir};
+			my ($sample) = grep {$_->{id} == $specie} @$samples; 
+			# checks: organism... group (monocots|dicots)
+			if (!$sample || $sample->{organism} ne $organism || $sample->{common_name} ne $common_name) {
+				push @err, "Sample organism was not found!!";
+			} 
+			else {
+				$file2process = $samples_dir . '/' . $sample->{id} . '/fasta.fa';
+			}
 		}
-		print STDERR  "---------------------------------", $/;
-		print STDERR  "TODO: JUST COPY SAMPLE's FASTA FILE....", $/;
-		print STDERR  "---------------------------------", $/;
+		elsif ($seq_src eq 'paste') {
+			$file2process = $pcf->{upload_dir} . '/' . random_string(7,7);
+			my $in = IO::File->new;
+			if ($in->open($file2process, 'w')) {
+				print $in $sequence;
+				undef $in;
+			}
+		}
 	}
 
 	my @subnames = split /\s/, $organism;
@@ -113,14 +122,14 @@ if ($r->method eq 'POST') {
 				}
 				print STDERR 'save_upload status = ', Dumper( $st), $/;
 			}
-			elsif ($seq_src eq 'sample') {
+			elsif ($seq_src eq 'sample' || $seq_src eq 'paste') {
 				my $upl_dir = $pcf->{upload_dir};
 				my $rand_s = random_string(8,8);
 			    my $output_file = $upl_dir . '/' . $rand_s;
 
 				my ($status, $msg);
 				($status, $msg, $seq_crc, $seq_length) = DNALC::Pipeline::App::Utils->process_fasta_file({
-						file => $sample_file,
+						file => $file2process,
 						common_name => $trimmed_common_name . '_' . $proj->id,
 						output_file => $output_file,
 					});
@@ -271,8 +280,8 @@ else {
 	<div class="spacer"></div>
 
 	<div><!-- end of enter a sequence -->
-		<input type="radio" name="seq_src" value="paste" <% $seq_src eq 'paste' ? 'checked="checked"' : ''%> disabled="disabled" />Enter a Sequence:
-		<textarea name="sequence" class="stylized" id="notebox" rows="5" cols="35" onfocus="this.value=''">Paste your sequence here...</textarea>
+		<input type="radio" name="seq_src" id="seq_src_paste" value="paste" <% $seq_src eq 'paste' ? 'checked="checked"' : ''%> /> Enter a Sequence:
+		<textarea name="sequence" class="stylized" id="notebox" rows="4" cols="30" onfocus="set_source('paste');"><% $sequence |html %></textarea>
 	</div><!-- end of enter a sequence -->
   <br/>
   <div class="spacer"></div>
@@ -280,7 +289,7 @@ else {
 	  <input type="radio" name="seq_src" id="seq_src_sample" value="sample" onclick="select_source(this)" <% $seq_src eq 'sample' ? 'checked="checked"' : ''%> />
 		Select a Sample Sequence:
 		<select class="stylized" id="specie" name="specie" size="6" style="width: 420px;"
-				onchange="set_source('sample');show_sample_info()">
+				onchange="set_source('sample');">
 % for my $sample (@$samples) {
 %	my $sel = $seq_src eq 'sample' && $sample->{id} == $specie ? 'selected="selected"' : '';
 			<option id="o<%$sample->{id}%>" value="<% $sample->{id} %>" \

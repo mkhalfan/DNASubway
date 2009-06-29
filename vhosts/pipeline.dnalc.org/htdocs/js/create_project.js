@@ -1,15 +1,28 @@
 var dbg;
 
 function step_one() {
-	if (! $('seq_src_upload').checked && !$('seq_src_sample').checked) {
-		alert("Source not selected!");
+	if (! $('seq_src_upload').checked && !$('seq_src_sample').checked && !$('seq_src_paste').checked) {
+		//alert("Source not selected!");
+		show_errors("Sequence source not selected!");
 		return;
 	}
 
 	var f = $('forma1');
 	var has_file = $('seq_src_upload').checked && ( $('seq_file').value != '' );
 	var has_sample = $('seq_src_sample').checked && $('specie').selectedIndex != -1;
-	if (!has_file && !has_sample) {
+	var has_actg = false;
+	
+	if ($('seq_src_paste').checked) {
+		if (pasted_data_ok()) {
+			has_actg = true;
+		}
+		else {
+			show_errors('We only acctept [ACGTN] letters!');
+			return;
+		}
+	}
+
+	if (!has_file && !has_sample && !has_actg) {
 		alert("You must select a file to upload or a sample organism!");
 		return;
 	}
@@ -32,13 +45,6 @@ function select_source(el) {
 	populate_fields(el.value);
 }
 
-function show_sample_info() {
-	return;
-	var si = $('sample_info');
-	var species = $('specie');
-	var extra = species.options[species.selectedIndex].getAttribute('extra');
-	si.update(extra);
-}
 
 function set_source(s) {
 	var el = $('seq_src_' + s);
@@ -86,7 +92,7 @@ function show_errors(html) {
 	var options = {	
 			resizable: false,
         	width: 400,
-	        height: 300,
+	        height: 200,
 	        shadow: true,
 	        draggable: false
 		};
@@ -95,9 +101,25 @@ function show_errors(html) {
 		delete options['resizable'];
 	}
 	var w = new UI.Window(options).center();
+	html = "<div class=\"message-error\" style=\"vertical-align: middle\">" + html + "</div>";
 	w.setContent(html);
 	w.show(true);
 }
+
+function pasted_data_ok() {
+	var t = $('notebox').value;
+	t.replace(/^\s+/,'');
+	t.replace(/s+$/,'');
+	if (t.length == 0) {
+		return false;
+	}
+	var re = /[^actgn\s]/;
+	t = $('notebox').value;
+	t = t.replace(/>.*/, '');
+	//t.match(re, 'm');
+	return re.test(t) == false;
+}
+
 
 Event.observe(window, 'load', function() {
 	var err = $("error_list");
@@ -106,6 +128,5 @@ Event.observe(window, 'load', function() {
 	var html = err.innerHTML;
 	if (!html)
 		return;
-	html = "<div class=\"message-error\">" + html + "</div>";
 	show_errors(html);
 });
