@@ -9,16 +9,20 @@ use DNALC::Pipeline::App::Utils ();
 use Data::Dumper;
 
 my $uid = 54;
+$ENV{GMOD_ROOT} = '/usr/local/gmod';
 #-----------------------------------------------------------------------------
 my $input_file = '/home/cornel/work/10k/A.fasta';
-my $organism = 'Narcissus pseudonarcissus';
+my $organism = 'Arabidopsis thaliana';
 #my $common_name = 'daffodil';
 my $common_name = 'mouse-ear cress';
 #-----------------------------------------------------------------------------
-my $p_name = 'Some test2';
-my $p_clade= 'd';
-my $sample = '';
+my $p_name	= 'Some test41212121200009';
+my $p_clade = 'd';
+my $seq_src = 'paste';
+my $sample_id = '3';
 
+my $pm = DNALC::Pipeline::ProjectManager->new;
+my $samples = $pm->config->{samples};
 
 ## data/fasta sources
 #1. upload => save to a local file
@@ -28,8 +32,18 @@ my $sample = '';
 
 
 my $data_file = $input_file;
+if ($seq_src eq 'sample') {
+	my $samples_dir = $pm->config->{samples_dir};
+	my ($sample) = grep {$_->{id} == $sample_id} @$samples;
+	if (!$sample || $sample->{organism} ne $organism || $sample->{common_name} ne $common_name) {
+		die "Sample organism was not found!!\n";
+	}
+	$data_file = $samples_dir . '/' . $sample->{id} . '/fasta.fa';
+}
+elsif ($seq_src eq 'paste') {
+	#save data into a file...
+}
 
-my $pm = DNALC::Pipeline::ProjectManager->new;
 
 # process file
 my $rc = DNALC::Pipeline::App::Utils->process_input_file($data_file);
@@ -40,10 +54,11 @@ if ($rc->{status} eq 'success') {
 				name => $p_name,
 				organism => $organism,
 				common_name => $common_name,
-				sample => $sample,
+				sample => $sample_id,
 				clade => $p_clade,
 			});
-	print STDERR Dumper( $x ), $/;
+	#print STDERR Dumper( $x ), $/;
+	print STDERR  "New PID = ", $pm->project, $/;
 }
 
-print STDERR Dumper( $pm ), $/;
+#print STDERR Dumper( $pm ), $/;

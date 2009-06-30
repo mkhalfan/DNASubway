@@ -66,6 +66,7 @@ sub fasta_file {
 	my ($self) = @_;
 	
 	my $ff = $self->work_dir . '/fasta.fa';
+	print STDERR  "Fasta File = ", $ff, $/;
 	return $ff if -e $ff;
 }
 
@@ -74,12 +75,14 @@ sub fasta_file {
 sub fasta_masked_nolow {
 	my ($self) = @_;
 	my $ff = $self->work_dir . '/REPEAT_MASKER2/output/fasta.fa.masked';
-	return $ff if -e $ff;
+	return $self->fasta_file unless -e $ff;
+	return $ff;
 }
 sub fasta_masked_xsmall {
 	my ($self) = @_;
 	my $ff = $self->work_dir . '/REPEAT_MASKER/output/fasta.fa.masked';
-	return $ff if -e $ff;
+	return $self->fasta_file unless -e $ff;
+	return $ff;
 }
 #-------------------------------
 # TODO: Move into ProjectManager.pm

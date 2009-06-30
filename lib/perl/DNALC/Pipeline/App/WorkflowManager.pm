@@ -414,7 +414,7 @@ use Carp;
 			if ($input_file) {
 				$self->set_status('snap', 'Processing');
 				$snap->run(
-					input => $input_file,
+						input => $input_file,
 					);
 			}
 			if (defined $snap->{exit_status} && $snap->{exit_status} == 0) {

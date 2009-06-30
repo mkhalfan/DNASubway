@@ -13,42 +13,21 @@ use strict;
 $ENV{GMOD_ROOT} = '/usr/local/gmod';
 
 #-----------------------------------------------------------------------------
-<<<<<<< .mine
 my $input_file = '/home/ghiban/work/100k/B.fasta';
-=======
-my $input_file = '/home/cain/005E/fasta.fa';
->>>>>>> .r58
 my $organism = 'Narcissus pseudonarcissus';
 my @subnames = split /\s/, $organism;
 my $common_name = 'daffodil';
 #-----------------------------------------------------------------------------
 
-<<<<<<< .mine
 die "Input file not found: $input_file", $/ unless (-f $input_file);
 
 my $username = $ARGV[0] || 'guest';
-=======
-my $username = $ARGV[0] || 'guest';
->>>>>>> .r58
 if (!$username || $username =~ /[^a-z0-9_-]/i) {
 	print STDERR  "Username missing or not well formated.", $/;
 	exit 0;
 }
 
 my ($u) = DNALC::Pipeline::User->search( username => $username);
-
-if ($u) {
-	print STDERR  "User already exists.", $/;
-}
-else {
-	$u = DNALC::Pipeline::User->create({
-			username => $username,
-			password => '123',
-			email => 'ghiban@cshl.edu',
-			name_first => 'Cornel',
-			name_last => 'Ghiban'
-		});
-}
 
 #create project
 my $proj = eval {

@@ -9,18 +9,27 @@ use Carp;
 use DNALC::Pipeline::User ();
 use DNALC::Pipeline::Config ();
 use DNALC::Pipeline::Project ();
+use DNALC::Pipeline::App::WorkflowManager();
+use DNALC::Pipeline::Chado::Utils ();
 
 #-----------------------------------------------------------------------------
 sub new {
-	my ($class, $pid)	 = @_;
+	my ($class, $project) = @_;
 
-	my $self = bless {}, __PACKAGE__;
-	if ($pid) {
-		my $project = DNALC::Pipeline::Project->retrieve($pid);
-		unless ($project) {
-			print STDERR  "Project $pid not found!", $/;
+	my $self = bless {
+					config => DNALC::Pipeline::Config->new->cf('PIPELINE')
+				}, __PACKAGE__;
+	if ($project) {
+		if (ref $project eq '' && $project =~ /^\d+$/) {
+			my $proj = DNALC::Pipeline::Project->retrieve($project);
+			unless ($proj) {
+				print STDERR  "Project with id=$project wasn't found!", $/;
+			}
+			else {
+				$self->project($proj);
+			}
 		}
-		else {
+		else { # we assume it's an instance of a project
 			$self->project($project);
 		}
 	}
@@ -28,6 +37,12 @@ sub new {
 	$self;
 }
 
+#-----------------------------------------------------------------------------
+sub config {
+	my ($self) = @_;
+
+	$self->{config};
+}
 #-----------------------------------------------------------------------------
 
 sub create_project {
@@ -50,8 +65,12 @@ sub create_project {
 	my $seq_length = $seq->length;
 	my $crc = $self->compute_crc($seq);
 
+	my $proj = DNALC::Pipeline::Project->search(user_id => $user_id, name => $name);
+	if ($proj) {
+		return {status => 'fail', msg => "There is already a project named \"$name\"."};
+	}
 	# create project
-	my $proj = eval { DNALC::Pipeline::Project->create({
+	$proj = eval { DNALC::Pipeline::Project->create({
 						user_id => $user_id,
 						name => $name,
 						organism => $organism,
@@ -83,15 +102,25 @@ sub create_project {
 	# write fasta file
 	$common_name =~ tr/A-Z/a-z/;
 	$common_name =~ s/[-\s]+/_/g;
-	#$common_name =~ s/-/_/g;
+	$common_name .= '_' . $proj->id;
 
 	$seq->display_id($common_name);
 
 	my $fasta_file = $self->work_dir . '/fasta.fa';
 	my $out = Bio::SeqIO->new(-file => "> $fasta_file", -format => 'Fasta');
 	$out->write_seq( $seq );
+	
+	# set the workflow history
+	my $wfm = DNALC::Pipeline::App::WorkflowManager->new( $proj );
+	if ($self->fasta_file) {
+		$wfm->set_status('upload_fasta','Done');
+	}
+	else {
+		$wfm->set_status('upload_fasta','Error');
+	}
 
-	$self->create_gbrowse_config;
+
+	$self->init_chado;
 
 	return {status => 'success', msg => $msg};
 }
@@ -127,15 +156,17 @@ sub work_dir {
 		confess "Project is missing...\n";
 	}
 
-	my $config = DNALC::Pipeline::Config->new->cf('PIPELINE');
-	return $config->{project_dir} . '/' . sprintf("%04X", $proj->id);
+	return $self->config->{project_dir} . '/' . sprintf("%04X", $proj->id);
 }
 
 #-----------------------------------------------------------------------------
 sub username {
 	my ($self) = @_;
-	my $u = DNALC::Pipeline::User->retrieve($self->project->user_id);
-	return $u ? $u->username : '';
+	unless ($self->{username}) {
+		my $u = DNALC::Pipeline::User->retrieve($self->project->user_id);
+		$self->{username} = $u ? $u->username : '';
+	}
+	$self->{username};
 }
 #-----------------------------------------------------------------------------
 
@@ -169,9 +200,50 @@ sub create_work_dir {
 }
 #-----------------------------------------------------------------------------
 
-sub create_gbrowse_config {
-	print STDERR  "\n => should create GBrowse config file..\n", $/;
+sub init_chado {
+	my ($self) = @_;
+
+	unless (ref $self) {
+		confess "Improper use of create_gbrowse_config()\n";
+		return;
+	}
+
+	my $project  = $self->project;
+	unless ($project) {
+		confess "init_chado: Project is missing.\n";
+	}
+	my $organism_str = join('_', split /\s+/, $project->organism)
+						. '_' . $project->common_name;
+
+	my $cutils = DNALC::Pipeline::Chado::Utils->new(
+					username => $self->username,
+					dumppath => $self->config->{GMOD_DUMPFILE},
+					profile => $self->config->{GMOD_PROFILE},
+					organism_string => $organism_str,
+					gbrowse_template => $self->config->{GBROWSE_TEMPLATE},
+					gbrowse_confdir  => $self->config->{GBROWSE_CONF_DIR},
+				);
+	eval {
+		$cutils->create_db(1);
+	};
+	if ($@)  {
+		print STDERR  "CHADO DB already exists. skipping...", $/;
+	}
+	my $conffile_ok = $cutils->create_conf_file( $project->id );
+	print STDERR "Created CHADO CONF file = ", $conffile_ok, $/;
+
+	# read data from new file
+	$cutils->profile($self->chado_user_profile);
+	$cutils->insert_organism;
+	$cutils->load_fasta($self->fasta_file);
 }
+#-----------------------------------------------------------------------------
+sub chado_user_profile {
+	my ($self) = @_;
+	
+	sprintf("%s_%d", $self->username, $self->project->id);
+}
+#-----------------------------------------------------------------------------
 #-----------------------------------------------------------------------------
 
 1;

@@ -1,7 +1,7 @@
 <%args>
 	$name => ''
 	$seq_src => ''
-	$specie => ''
+	$species => ''
 	$organism => ''
 	$common_name => ''
 	$group => ''
@@ -9,13 +9,13 @@
 </%args>
 <%once>
 	use DNALC::Pipeline::Config ();
-	use DNALC::Pipeline::Chado::Utils ();
 	use DNALC::Pipeline::App::Utils ();
-	use DNALC::Pipeline::Project ();
-	use DNALC::Pipeline::App::WorkflowManager ();
+	use DNALC::Pipeline::ProjectManager ();
+	#use DNALC::Pipeline::Project ();
+	#use DNALC::Pipeline::App::WorkflowManager ();
+	#use DNALC::Pipeline::Chado::Utils ();
 	use DNALC::Pipeline::Utils qw(random_string);
 	use Carp;
-	use Gearman::Client ();
 	use IO::File ();
 	use Data::Dumper;
 </%once>
@@ -32,7 +32,7 @@ my @err = ();
 
 if ($r->method eq 'POST') {
 
-	my ($uploaded_file, $file2process, $seq_crc, $seq_length) = ('', '', '', 0);
+	my $file2process;
 
 	for ($name, $organism, $common_name) {
 		$_ =~ s/\s+/ /g;
@@ -51,13 +51,12 @@ if ($r->method eq 'POST') {
 		push @err, "Organism name may contain only letters, digits and spaces";
 	}
 
-	if (!@err) {
+	unless (@err) {
 		if ($seq_src eq 'sample') {
 			my $samples_dir = $pcf->{samples_dir};
-			my ($sample) = grep {$_->{id} == $specie} @$samples; 
-			# checks: organism... group (monocots|dicots)
+			my ($sample) = grep {$_->{id} == $species} @$samples; 
 			if (!$sample || $sample->{organism} ne $organism || $sample->{common_name} ne $common_name) {
-				push @err, "Sample organism was not found!!";
+				push @err, "Sample organism was not found!";
 			} 
 			else {
 				$file2process = $samples_dir . '/' . $sample->{id} . '/fasta.fa';
@@ -71,13 +70,27 @@ if ($r->method eq 'POST') {
 				undef $in;
 			}
 		}
-	}
+		elsif ($seq_src eq 'upload') {
 
-	my @subnames = split /\s/, $organism;
-	unless (2 == @subnames) {
-		push @err, "Organism name should contain only two words: genus and specie";
+			my $st = DNALC::Pipeline::App::Utils->save_upload( {
+						r => $r, 
+						param_name => 'seq_file',
+					});
+
+			if ($st->{status} eq 'fail') {
+				push @err, "Unable to upload file: ". $st->{message};
+			}
+			else {
+				$file2process = $st->{path};
+			}
+		}
+
+		my @subnames = split /\s/, $organism;
+		unless (2 == @subnames) {
+			push @err, "Organism name should contain only two words: genus and species";
+		}
+		#push @err, "Clade is missing!" unless $group;
 	}
-	#push @err, "Clade is missing!" unless $group;
 
 	my $proj = DNALC::Pipeline::Project->search(user_id => $s->{user_id}, name => $name);
 	if ($proj) {
@@ -85,149 +98,49 @@ if ($r->method eq 'POST') {
 	}
 	# create the project 
 	unless (@err) {
-		$common_name =~ tr/A-Z/a-z/;
-		my $trimmed_common_name = $common_name;
-		$trimmed_common_name =~ s/\s+/_/g;
-		$trimmed_common_name =~ s/-/_/g;
-		$proj = eval { DNALC::Pipeline::Project->create({
-								user_id => $s->{user_id},
-								name => $name,
-								organism => $organism,
-								common_name => $common_name,
-								sample => $specie,
-								clade => $group || 'u', # unknown if $clade is unset
-								crc => '',
-							});
-						};
-		if ($@) {
-			push @err, "Error creating the project: $@";
+		my $pm = DNALC::Pipeline::ProjectManager->new;
+		my $rc = DNALC::Pipeline::App::Utils->process_input_file( $file2process );
+		if ($rc->{status} eq 'success') {
+			
+	 		my $st = $pm->create_project ({                                       
+                user_id => $s->{user_id},
+                seq => $rc->{seq},
+                name => $name,
+                organism => $organism,
+                common_name => $common_name,
+                sample => $species,
+                clade => $group,
+            });
+	    	#print STDERR Dumper( $st ), $/;
+			if ($st->{status} eq 'success') {
+				print STDERR  "New PID = ", $pm->project, $/;
+				$proj = $pm->project;
+			}
+		}
+		else {
+			push @err, "Unable to process sequence data!";
+			$proj = undef;
+		}
+   
+		unless ($proj) {
+			push @err, "Error creating the project.";
 		}
 		else {
 			print STDERR "project_created: id = ", $proj, ",\tname = ", $proj->name, $/;
 
-			if ($seq_src eq 'upload') {
-				my $st = DNALC::Pipeline::App::Utils->save_upload( {
-						r => $r, 
-						param_name => 'seq_file',
-						common_name => $trimmed_common_name . '_' . $proj->id,
-					});
+			#TODO: do some cleaning.. rm any temporary file.. uploaded/pasted..
+			#if ($) { 
+			#	# remove temporary file
+			#	unlink $uploaded_file;
+			#}
 
-				if ($st->{status} eq 'fail') {
-					push @err, "Unable to upload file: ". $st->{message};
-				}
-				else {
-					$seq_length = $st->{seq_length};
-					$uploaded_file = $st->{path};
-					$seq_crc = $st->{crc};
-				}
-				print STDERR 'save_upload status = ', Dumper( $st), $/;
-			}
-			elsif ($seq_src eq 'sample' || $seq_src eq 'paste') {
-				my $upl_dir = $pcf->{upload_dir};
-				my $rand_s = random_string(8,8);
-			    my $output_file = $upl_dir . '/' . $rand_s;
-
-				my ($status, $msg);
-				($status, $msg, $seq_crc, $seq_length) = DNALC::Pipeline::App::Utils->process_fasta_file({
-						file => $file2process,
-						common_name => $trimmed_common_name . '_' . $proj->id,
-						output_file => $output_file,
-					});
-				if ($status eq 'fail') {
-					push @err, $msg;
-				}
-				$uploaded_file = $output_file;
-			}
-
-
-			unless (-f $uploaded_file) {
-				print STDERR "Fasta file is missing:, ", $uploaded_file, $/;
-			}
-
-			#####
-			if (@err) {
-			print STDERR  "\n**** DELETING PROJ = ", $proj->id, $/;
-				$proj->delete if $proj;
-			}
-			else {
-				# create projects work directory
-				if ($proj->create_work_dir) {
-					print STDERR "project's work_dir: ", $proj->work_dir, $/;
-				}
-				else {
-					warn "Failed to create work_dir for project [$proj]", $/;
-					#push @err, "Failed to create working directory for project!";
-				}
-
-				$proj->crc($seq_crc);
-				$proj->sequence_length($seq_length);
-				$proj->update;
-				# set workflow
-				my $wfm = DNALC::Pipeline::App::WorkflowManager->new( $proj );
-
-				# the fasta file may be available not only via upload
-				my $fasta = $wfm->upload_sequence($uploaded_file);
-				print STDERR  "\nFASTA = ", $fasta, $/;
-
-				if ($fasta) {
-					# remove temporary file
-					unlink $uploaded_file;
-
-					# create project files
-					my $cutils = DNALC::Pipeline::Chado::Utils->new(
-						username => $s->{username},
-						dumppath => $pcf->{GMOD_DUMPFILE},
-						profile => $pcf->{GMOD_PROFILE},
-						organism_string => join('_', @subnames). '_' . $common_name,
-						gbrowse_template => $pcf->{GBROWSE_TEMPLATE},
-						gbrowse_confdir  => $pcf->{GBROWSE_CONF_DIR},
-					);
-					if (1) {
-						eval {
-							$cutils->create_db(1);
-						};
-						if ($@)  {
-							print STDERR  "CHADO DB already exists. skipping...", $/;
-						}
-
-						my $conffile_ok = $cutils->create_conf_file( $proj->id );
-						print STDERR "Created CHADO CONF file = ", $conffile_ok, $/;
-						my $new_profile = sprintf("%s_%d", $s->{username}, $proj->id);
-						# read data from new file
-
-						$cutils->profile($new_profile);
-						$cutils->insert_organism;
-						$cutils->load_fasta($fasta);
-					}
-
-				}
-
-			if (0) {
-				#set this as running
-				$wfm->set_status('repeat_masker', 'Processing');
-
-				# launch RM job
-				my $client = Gearman::Client->new;
-				$client->job_servers('127.0.0.1');
-				my $h = $client->dispatch_background( 'repeat_masker' => $proj->id);
-				# TODO save this handler into session so we can later check upon it..
-			}
-
-				# redirect user to dashboard
-				#$m->comp('/_message_add', "Project created successfully!");
-				$m->redirect('./console.html?pid=' . $proj->id);
-			} ####
+			# redirect user to dashboard
+			#$m->comp('/_message_add', "Project created successfully!");
+			$m->redirect('./console.html?pid=' . $proj->id);
 			
 		} #end else
 	} #end unless
 } #end if POST
-else {
-	#print STDERR  "GET", $/;
-	#for ( sort { $a cmp $b } keys %ENV) {
-	#	print STDERR  $_, " => ", $ENV{$_}, $/;
-	#}
-}
-
 
 </%init>
 
@@ -288,10 +201,10 @@ else {
   <div>
 	  <input type="radio" name="seq_src" id="seq_src_sample" value="sample" onclick="select_source(this)" <% $seq_src eq 'sample' ? 'checked="checked"' : ''%> />
 		Select a Sample Sequence:
-		<select class="stylized" id="specie" name="specie" size="6" style="width: 420px;"
+		<select class="stylized" id="specie" name="species" size="6" style="width: 420px;"
 				onchange="set_source('sample');">
 % for my $sample (@$samples) {
-%	my $sel = $seq_src eq 'sample' && $sample->{id} == $specie ? 'selected="selected"' : '';
+%	my $sel = $seq_src eq 'sample' && $sample->{id} == $species ? 'selected="selected"' : '';
 			<option id="o<%$sample->{id}%>" value="<% $sample->{id} %>" \
 			extra="location: <% $sample->{location}%>, position: <% $sample->{position}%>, source: <% $sample->{source}%>, release: <%$sample->{release} %>" clade="<% $sample->{clade} ? $sample->{clade} : 'o' %>"\
 			<% $sel %>><%$sample->{organism}%> (<%$sample->{common_name}%>) <% $sample->{location} %>, 100 kb</option>

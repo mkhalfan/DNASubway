@@ -4,26 +4,20 @@ use strict;
 use warnings;
 
 use Apache2::Upload;
-use Data::Dumper;
 use Bio::SeqIO ();
-
+use IO::File ();
 use DNALC::Pipeline::Config ();
 use DNALC::Pipeline::Utils qw(random_string);
-
 use Digest::MD5 ();
 use Time::Piece ();
 
-=head1 TODO
-
-=item * upload
-
-
-=cut
+use Data::Dumper;
 
 sub save_upload {
 	#print STDERR "save_upload: ", Dumper( \@_), $/;
 	my ($class, $args) = @_;
-	my ($status, $msg, $path, $crc, $seq_length);
+	my ($status, $msg, $path);
+	$status = 'fail';
 
 	my $r = $args->{r};
 	my $param_name  = $args->{param_name};
@@ -38,29 +32,40 @@ sub save_upload {
 
 	unless ($u) {
 		$msg = 'Upload file is missing!';
-		$status = 'fail';
 	}
 	elsif (! _is_upload_ok($u)) {
 		$msg = "Uploaded file should be a text file!";
-		$status = 'fail';
 	}
 	else {
 		my $upl_dir = $config->cf('PIPELINE')->{upload_dir};
-		my $rand_s = random_string();
 
-		$path = $upl_dir . '/' . $rand_s;
+		$path = $upl_dir . '/' . random_string();
+		print STDERR  "UPLOAD saved to: ", $path, $/;
+		my $out = IO::File->new;
+		if ($out->open($path, 'w')) {
+			$status = 'success';
+			my $fh = $u->fh;
+			while (my $line = <$fh>) {
+				print STDERR  $line, $/;
+				print $out $line;
+			}
+			undef $out;
+		}
+		else {
+			$msg = 'Unable to save uploaded file!';
+		}
 	}
 
-	# check/fix content 
-	unless ($msg) {
-		($status, $msg, $crc, $seq_length) = $class->process_fasta_file({
-					fh => $u->fh,
-					common_name => $args->{common_name},
-					output_file => $path,
-				});
-	}
+	## check/fix content 
+	#unless ($msg) {
+	#	($status, $msg, $crc, $seq_length) = $class->process_fasta_file({
+	#				fh => $u->fh,
+	#				common_name => $args->{common_name},
+	#				output_file => $path,
+	#			});
+	#}
 
-	return { status => $status, message => $msg, path => $path, crc => $crc, seq_length => $seq_length };
+	return { status => $status, message => $msg, path => $path };
 }
 
 sub process_fasta_file {
