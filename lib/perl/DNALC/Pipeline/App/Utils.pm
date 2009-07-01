@@ -46,7 +46,6 @@ sub save_upload {
 			$status = 'success';
 			my $fh = $u->fh;
 			while (my $line = <$fh>) {
-				print STDERR  $line, $/;
 				print $out $line;
 			}
 			undef $out;

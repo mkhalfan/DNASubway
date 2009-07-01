@@ -10,10 +10,7 @@
 <%once>
 	use DNALC::Pipeline::Config ();
 	use DNALC::Pipeline::App::Utils ();
-	use DNALC::Pipeline::ProjectManager ();
-	#use DNALC::Pipeline::Project ();
-	#use DNALC::Pipeline::App::WorkflowManager ();
-	#use DNALC::Pipeline::Chado::Utils ();
+	use DNALC::Pipeline::App::ProjectManager ();
 	use DNALC::Pipeline::Utils qw(random_string);
 	use Carp;
 	use IO::File ();
@@ -92,13 +89,13 @@ if ($r->method eq 'POST') {
 		#push @err, "Clade is missing!" unless $group;
 	}
 
-	my $proj = DNALC::Pipeline::Project->search(user_id => $s->{user_id}, name => $name);
+	my $pm = DNALC::Pipeline::App::ProjectManager->new;
+	my $proj = $pm->search(user_id => $s->{user_id}, name => $name);
 	if ($proj) {
 		push @err, "You already have a project named [$name]";
 	}
 	# create the project 
 	unless (@err) {
-		my $pm = DNALC::Pipeline::ProjectManager->new;
 		my $rc = DNALC::Pipeline::App::Utils->process_input_file( $file2process );
 		if ($rc->{status} eq 'success') {
 			
@@ -121,18 +118,19 @@ if ($r->method eq 'POST') {
 			push @err, "Unable to process sequence data!";
 			$proj = undef;
 		}
-   
+
+		#do some cleaning.. rm any temporary file.. uploaded/pasted..
+		if ($seq_src ne 'sample') { 
+			# remove temporary file
+			print STDERR  "Removing file: ", $file2process, $/;
+			unlink $file2process;
+		}
+
 		unless ($proj) {
 			push @err, "Error creating the project.";
 		}
 		else {
 			print STDERR "project_created: id = ", $proj, ",\tname = ", $proj->name, $/;
-
-			#TODO: do some cleaning.. rm any temporary file.. uploaded/pasted..
-			#if ($) { 
-			#	# remove temporary file
-			#	unlink $uploaded_file;
-			#}
 
 			# redirect user to dashboard
 			#$m->comp('/_message_add', "Project created successfully!");

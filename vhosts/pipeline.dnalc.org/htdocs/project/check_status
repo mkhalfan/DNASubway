@@ -12,7 +12,7 @@
 %#-------------------------------------------------
 <%once>
 	use Gearman::Client ();
-	use DNALC::Pipeline::Project ();
+	use DNALC::Pipeline::App::ProjectManager ();
 	use DNALC::Pipeline::App::WorkflowManager ();
 	use Data::Dumper;
 
@@ -36,7 +36,8 @@
 		print "{'status':'error', 'message': 'Unknown error.'}";
 		return;
 	}
-	my $proj = DNALC::Pipeline::Project->retrieve($pid);
+	my $pm = DNALC::Pipeline::App::ProjectManager->new($pid);
+	my $proj = $pm->project; 
 	unless ($proj) {
 		print "{'status':'error', 'message':'Project unknown.'}";
 		return;
@@ -50,8 +51,8 @@
 					running => $task_status->name eq 'Processing' ? 1 : 0,
 					known => $task_status->name eq 'Processing' ? 1 : 0
 				};
-		print STDERR  "STAT = ", $proj->get_gff3_file($t), $/;
-		$output = $task_status->name eq 'Done' ? $proj->get_gff3_file($t) : '';
+		print STDERR  "STAT = ", $pm->get_gff3_file($t), $/;
+		$output = $task_status->name eq 'Done' ? $pm->get_gff3_file($t) : '';
 	}
 	else {
 		my $client = Gearman::Client->new;
@@ -67,7 +68,7 @@
 			my $wfm = DNALC::Pipeline::App::WorkflowManager->new( $proj );
 			my $task_status = $wfm->get_status($t);
 			if ($task_status && $task_status->name eq 'Done' ) {
-				$output = $proj->get_gff3_file($t);
+				$output = $pm->get_gff3_file($t);
 			}
 			else {
 				$success = 'error';

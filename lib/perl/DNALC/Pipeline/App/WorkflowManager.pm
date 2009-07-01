@@ -7,6 +7,7 @@ use DNALC::Pipeline::Config ();
 use DNALC::Pipeline::Project ();
 use DNALC::Pipeline::CacheMD5 ();
 
+use DNALC::Pipeline::App::ProjectManager ();
 use DNALC::Pipeline::Process::RepeatMasker ();
 use DNALC::Pipeline::Process::RepeatMasker2 ();
 use DNALC::Pipeline::Process::TRNAScan ();
@@ -44,6 +45,7 @@ use Carp;
 		}
 
 		$self->{project} = $project;
+		$self->{pmanager} = DNALC::Pipeline::App::ProjectManager->new($project);
 
 		bless $self, __PACKAGE__;
 		$self->_init;
@@ -69,7 +71,12 @@ use Carp;
 	#-------------------------------------------------------------------------
 	sub project {
 		my ($self) = @_;
-		return $self->{project};
+		$self->{project};
+	}
+
+	sub pmanager {
+		my ($self) = @_;
+		$self->{pmanager};
 	}
 
 	#-------------------------------------------------------------------------
@@ -88,7 +95,7 @@ use Carp;
 		if ($wf) {
 			# make a history of this wf
 			my $wfh = DNALC::Pipeline::WorkflowHistory->create({
-						project_id => $wf->project->id,
+						project_id => $self->project->id,
 						task_id => $wf->task->id,
 						status_id => $wf->status_id,
 						duration => $wf->duration,
@@ -156,7 +163,7 @@ use Carp;
 		my ($self, $source_file) = @_;
 
 		my $rc;
-		my $upload_file = $self->project->work_dir . '/' . 'fasta.fa';
+		my $upload_file = $self->pmanager->work_dir . '/' . 'fasta.fa';
 		
 		my $sample_id = $self->project->sample;
 		if ($sample_id) {
@@ -164,7 +171,7 @@ use Carp;
 			return unless $sample;
 
 			$rc = $sample->copy_fasta({
-					project_dir => $self->project->work_dir,
+					project_dir => $self->pmanager->work_dir,
 					common_name => $self->project->common_name,
 					project_id => $self->project->id,
 				});
@@ -196,6 +203,7 @@ use Carp;
 		my $status = { success => 0 };
 	
 		my $proj = $self->project;
+		my $pm   = $self->pmanager;
 
 		if ($proj->sample) {
 			my $st = $self->run_fake('repeat_masker');
@@ -207,27 +215,27 @@ use Carp;
 
 		}
 
-		my $rep_mask  = DNALC::Pipeline::Process::RepeatMasker->new( $proj->work_dir, $proj->clade );
-		my $rep_mask2 = DNALC::Pipeline::Process::RepeatMasker2->new( $proj->work_dir, $proj->clade );
+		my $rep_mask  = DNALC::Pipeline::Process::RepeatMasker->new( $pm->work_dir, $proj->clade );
+		my $rep_mask2 = DNALC::Pipeline::Process::RepeatMasker2->new( $pm->work_dir, $proj->clade );
 		if ($rep_mask && $rep_mask2) {
 
 			$self->set_status('repeat_masker', 'Processing');
 
 			#my $crc = $self->crc($rep_mask->get_options);
 			# TODO
-			# search for cachemd5($self->project->id, $task_name, $crc);
+			# search for cachemd5($proj->id, $task_name, $crc);
 			# if cache_found {
 			#	$self->copy_results(....);
 			#	return {success => 1, gff_file => '...', elapsed => 0.01, 
 			# }
 			$rep_mask->run(
-					input => $proj->fasta_file,
+					input => $pm->fasta_file,
 					debug => 1,
 				);
 			if (defined $rep_mask->{exit_status} && $rep_mask->{exit_status} == 0) {
 				print STDERR  "Time 1 = ", $rep_mask->{elapsed}, $/;
 
-				$rep_mask2->run( input => $proj->fasta_file, debug => 1);
+				$rep_mask2->run( input => $pm->fasta_file, debug => 1);
 				if (defined $rep_mask2->{exit_status} && $rep_mask2->{exit_status} == 0) {
 					print STDERR "REPEAT_MASKER: success\n";
 					$status->{success} = 1;
@@ -259,6 +267,7 @@ use Carp;
 		my $status = { success => 0 };
 	
 		my $proj = $self->project;
+		my $pm   = $self->pmanager;
 
 		if ($proj->sample) {
 			my $st = $self->run_fake('augustus');
@@ -270,10 +279,10 @@ use Carp;
 
 		}
 
-		my $augustus = DNALC::Pipeline::Process::Augustus->new( $proj->work_dir, $proj->clade );
+		my $augustus = DNALC::Pipeline::Process::Augustus->new( $pm->work_dir, $proj->clade );
 		if ( $augustus) {
 
-			my $input_file = $proj->fasta_masked_nolow;
+			my $input_file = $pm->fasta_masked_nolow;
 			if ($input_file) {
 				print STDERR  "AUGUSTUS options = ", join('', $augustus->get_options), $/;
 				$self->set_status('augustus', 'Processing');
@@ -307,6 +316,7 @@ use Carp;
 		
 		my $status = { success => 0 };	
 		my $proj = $self->project;
+		my $pm   = $self->pmanager;
 
 		if ($proj->sample) {
 			my $st = $self->run_fake('trna_scan');
@@ -318,13 +328,13 @@ use Carp;
 
 		}
 
-		my $trna_scan = DNALC::Pipeline::Process::TRNAScan->new( $proj->work_dir );
+		my $trna_scan = DNALC::Pipeline::Process::TRNAScan->new( $pm->work_dir );
 		if ($trna_scan ) {
 			my $crc = $self->crc($trna_scan->get_options);
 
 			$self->set_status('trna_scan', 'Processing');
 			$trna_scan->run(
-					input => $proj->fasta_file,
+					input => $pm->fasta_file,
 				);
 			if (defined $trna_scan->{exit_status} && $trna_scan->{exit_status} == 0) {
 				print STDERR "TRNA_SCAN: success\n";
@@ -351,6 +361,7 @@ use Carp;
 		my $status = { success => 0 };
 	
 		my $proj = $self->project;
+		my $pm   = $self->pmanager;
 
 		if ($proj->sample) {
 			my $st = $self->run_fake('fgenesh');
@@ -360,10 +371,10 @@ use Carp;
 			}
 		}
 
-		my $fgenesh = DNALC::Pipeline::Process::FGenesH->new( $proj->work_dir, $proj->clade );
+		my $fgenesh = DNALC::Pipeline::Process::FGenesH->new( $pm->work_dir, $proj->clade );
 		if ( $fgenesh) {
 
-			my $input_file = $proj->fasta_masked_nolow;
+			my $input_file = $pm->fasta_masked_nolow;
 			if ($input_file) {
 				$self->set_status('fgenesh', 'Processing');
 				$fgenesh->run(
@@ -398,6 +409,7 @@ use Carp;
 		
 		my $status = { success => 0 };	
 		my $proj = $self->project;
+		my $pm   = $self->pmanager;
 
 		if ($proj->sample) {
 			my $st = $self->run_fake('snap');
@@ -407,10 +419,10 @@ use Carp;
 			}
 		}
 
-		my $snap = DNALC::Pipeline::Process::Snap->new( $proj->work_dir, $proj->clade );
+		my $snap = DNALC::Pipeline::Process::Snap->new( $pm->work_dir, $proj->clade );
 		if ($snap) {
 
-			my $input_file = $proj->fasta_masked_nolow;
+			my $input_file = $pm->fasta_masked_nolow;
 			if ($input_file) {
 				$self->set_status('snap', 'Processing');
 				$snap->run(
@@ -441,6 +453,7 @@ use Carp;
 		
 		my $status = { success => 0 };	
 		my $proj = $self->project;
+		my $pm   = $self->pmanager;
 
 		if ($proj->sample) {
 			my $st = $self->run_fake('blastn');
@@ -451,10 +464,10 @@ use Carp;
 			}
 		}
 
-		my $blastn = DNALC::Pipeline::Process::Blast->new( $proj->work_dir, 'blastn' );
+		my $blastn = DNALC::Pipeline::Process::Blast->new( $pm->work_dir, 'blastn' );
 		if ($blastn) {
 
-			my $input_file = $proj->fasta_masked_xsmall;
+			my $input_file = $pm->fasta_masked_xsmall;
 			if ($input_file) {
 				$self->set_status('blastn', 'Processing');
 				$blastn->run( input => $input_file, debug => 1 );
@@ -483,6 +496,7 @@ use Carp;
 		
 		my $status = { success => 0 };	
 		my $proj = $self->project;
+		my $pm   = $self->pmanager;
 
 		if ($proj->sample) {
 			my $st = $self->run_fake('blastx');
@@ -493,10 +507,10 @@ use Carp;
 			}
 		}
 
-		my $blastx = DNALC::Pipeline::Process::Blast->new( $proj->work_dir, 'blastx' );
+		my $blastx = DNALC::Pipeline::Process::Blast->new( $pm->work_dir, 'blastx' );
 		if ($blastx) {
 
-			my $input_file = $proj->fasta_masked_xsmall;
+			my $input_file = $pm->fasta_masked_xsmall;
 			if ($input_file) {
 				$self->set_status('blastx', 'Processing');
 				$blastx->run( input => $input_file, debug => 1 );
@@ -526,6 +540,8 @@ use Carp;
 		my $status = {success => 0};
 
 		my $proj = $self->project;
+		my $pm   = $self->pmanager;
+
 		my $sample_id = $proj->sample;
 		if ($sample_id) {
 			my $sample = DNALC::Pipeline::Sample->new($sample_id);
@@ -533,22 +549,22 @@ use Carp;
 
 			my $rc = $sample->copy_results({
 						routine => $routine,
-						project_id => $self->project->id,
-						project_dir => $proj->work_dir,
-						common_name => $proj->common_name,
+						project_id => $proj->id,
+						project_dir => $pm->work_dir,
+						common_name => $pm->common_name,
 					});
 			if ($rc) {
 				$status->{success} = 1;
 				$status->{elapsed} = 1.59;
-				$status->{gff_file}= $proj->get_gff3_file($routine);
+				$status->{gff_file}= $pm->get_gff3_file($routine);
 				$self->set_status($routine, 'Done', $status->{elapsed});
 				#copy  masked fasta files
 				if ($routine eq 'repeat_masker') {
 					for my $mask (qw/repeat_masker repeat_masker2/) {
 						$rc = $sample->copy_fasta({
-							project_dir => $self->project->work_dir,
-							project_id => $self->project->id,
-							common_name => $self->project->common_name,
+							project_dir => $proj->work_dir,
+							project_id => $proj->id,
+							common_name => $proj->common_name,
 							masker => $mask
 						});
 					}
@@ -589,7 +605,7 @@ use Carp;
 	sub load_analysis_results {
 		my ($self, $gff_file, $routine) = @_;
 
-		my $username = $self->project->username;
+		my $username = $self->pmanager->username;
 		return unless -f $gff_file && defined $username;
 		my $profile = sprintf("%s_%d", $username, $self->project->id);
 		my $cmd = '/var/www/bin/load_analysis_results.pl';

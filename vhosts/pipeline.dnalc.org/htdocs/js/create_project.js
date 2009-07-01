@@ -113,8 +113,7 @@ function pasted_data_ok() {
 	if (t.length == 0) {
 		return false;
 	}
-	var re = /[^actgn\s]/;
-	t = $('notebox').value;
+	var re = /[^actgn\s]/i;
 	t = t.replace(/>.*/, '');
 	//t.match(re, 'm');
 	return re.test(t) == false;

@@ -6,7 +6,7 @@
 %#-------------------------------------------------
 <%once>
 	use Data::Dumper; 
-	use DNALC::Pipeline::Project ();
+	use DNALC::Pipeline::App::ProjectManager ();
 	use DNALC::Pipeline::App::WorkflowManager ();
 	use DNALC::Pipeline::App::Utils ();
 
@@ -32,7 +32,8 @@
 $m->session->{pipeline} ||= {};
 my $s = $m->session->{pipeline};
 
-my $proj = DNALC::Pipeline::Project->retrieve($pid);
+my $pm = DNALC::Pipeline::App::ProjectManager->new($pid);
+my $proj = $pm->project;
 unless ($proj) {
 	$m->comp('/_message_add', 'Project not found!', 'error');
 	$m->redirect('/project/');
@@ -48,10 +49,7 @@ for ('repeat_masker', map {$_->{name}} @routines ) {
 	$status{$_} = $status_name;
 }
 my $rm_status = $status{repeat_masker};
-
-my $trimmed_common_name = $proj->common_name . '_' . $proj->id;
-$trimmed_common_name =~ s/\s+/_/g;
-$trimmed_common_name =~ s/-/_/g;
+my $trimmed_common_name = $pm->cleaned_common_name;
 
 
 #print STDERR Dumper( \%status ), $/;
@@ -109,7 +107,7 @@ $trimmed_common_name =~ s/-/_/g;
 </tr>
 <tr>
 	<td class="tdprojectlabel" style="vertical-align: top">Sequence size</td>
-	<td class="tdprojectinfo"><span style="vertical-align: top">: <% $proj->sequence_length %> &nbsp;</span><a href="javascript:;" onclick="launch(null, '<& './.comp/filepath_to_web', file => $proj->fasta_file &>')"><img id="view_seq_btn" src="/images/v0/button_viewDown.png" alt="open sequence" style="border: 0px; margin-top: -3px" /></a></td>
+	<td class="tdprojectinfo"><span style="vertical-align: top">: <% $proj->sequence_length %> &nbsp;</span><a href="javascript:;" onclick="launch(null, '<& './.comp/filepath_to_web', file => $pm->fasta_file &>')"><img id="view_seq_btn" src="/images/v0/button_viewDown.png" alt="open sequence" style="border: 0px; margin-top: -3px" /></a></td>
 </tr>
 </table>
 <!--   ----   -->
@@ -146,7 +144,7 @@ $trimmed_common_name =~ s/-/_/g;
 				<a href="#" class="tt">i<span class="tooltip"><span class="top"></span><span class="middle">Info about this routine will be available soon. Thank you for your patience.</span><span class="bottom"></span></span></a>
 			</td>
 			<td class="">
-				<& '.routine', routine => 'repeat_masker', project => $proj,
+				<& '.routine', routine => 'repeat_masker', pmanager => $pm,
 								status => $status{repeat_masker}, delay => 15 &>
 			</td>
 		  </tr>
@@ -159,7 +157,7 @@ $trimmed_common_name =~ s/-/_/g;
 			<td class="tdtext">Augustus gene predictor</td>
 			<td class="tdinfo"><a href="#" class="tt">i<span class="tooltip"><span class="top"></span><span class="middle">Info about this routine will be available soon. Thank you for your patience.</span><span class="bottom"></span></span></a></td>
 			<td class="">
-				<& '.routine', routine => 'augustus', project => $proj,
+				<& '.routine', routine => 'augustus', pmanager => $pm,
 								status => $status{augustus}, delay => 20, rm_status => $rm_status &>
 			</td>
 		  </tr>
@@ -167,7 +165,7 @@ $trimmed_common_name =~ s/-/_/g;
 			<td class="tdtext">FGenesH gene predictor</td>
 			<td class="tdinfo"> <a href="#" class="tt">i<span class="tooltip"><span class="top"></span><span class="middle">Info about this routine will be available soon. Thank you for your patience.</span><span class="bottom"></span></span></a></td>
 			<td class="" style="border:none">
-				<& '.routine', routine => 'fgenesh', project => $proj,
+				<& '.routine', routine => 'fgenesh', pmanager => $pm,
 								status => $status{fgenesh}, rm_status => $rm_status &>
 		  </tr>
 
@@ -175,7 +173,7 @@ $trimmed_common_name =~ s/-/_/g;
 			<td class="tdtext">SNAP gene predictor</td>
 			<td class="tdinfo"><a href="#" class="tt">i<span class="tooltip"><span class="top"></span><span class="middle">Info about this routine will be available soon. Thank you for your patience.</span><span class="bottom"></span></span></a></td>
 			<td class="">
-				<& '.routine', routine => 'snap', project => $proj,
+				<& '.routine', routine => 'snap', pmanager => $pm,
 				status => $status{snap}, rm_status => $rm_status &>
 			</td>
 		  </tr>
@@ -185,7 +183,7 @@ $trimmed_common_name =~ s/-/_/g;
 				<a href="#" class="tt">i<span class="tooltip"><span class="top"></span><span class="middle">Info about this routine will be available soon. Thank you for your patience.</span><span class="bottom"></span></span></a>
 			</td>
 			<td class="">
-				<& '.routine', routine => 'trna_scan', project => $proj,
+				<& '.routine', routine => 'trna_scan', pmanager => $pm,
 								status => $status{trna_scan}, rm_status => $rm_status &>
 			</td>
 		  </tr>
@@ -200,7 +198,7 @@ $trimmed_common_name =~ s/-/_/g;
 		<td class="tdtext">BlastX UniProt for protein homologs</td>
 		<td class="tdinfo"><a href="#" class="tt">i<span class="tooltip"><span class="top"></span><span class="middle">Info about this routine will be available soon. Thank you for your patience.</span><span class="bottom"></span></span></a></td>
 		<td class="">
-					<& '.routine', routine => 'blastx', project => $proj, delay => 15,
+					<& '.routine', routine => 'blastx', pmanager => $pm, delay => 15,
 					status => $status{blastx}, rm_status => $rm_status &>
 		</td>
 	  </tr>
@@ -208,58 +206,12 @@ $trimmed_common_name =~ s/-/_/g;
 		<td class="tdtext">BlastN UniGene for RNA evidence (cDNA/EST)</td>
 		<td class="tdinfo"><a href="#" class="tt">i<span class="tooltip"><span class="top"></span><span class="middle">Info about this routine will be available soon. Thank you for your patience.</span><span class="bottom"></span></span></a></td>
 		<td class="">
-					<& '.routine', routine => 'blastn', project => $proj, delay => 15,
+					<& '.routine', routine => 'blastn', pmanager => $pm, delay => 15,
 					status => $status{blastn}, rm_status => $rm_status &>
 		</td>
 	  </tr> 
 	</table>
 
-
-% if (0) {
-<ul id="routines" style="clear:both">
-%#------------------------------------	
-	<li><span style="font-weight:bold">Repeat Masker</span>&nbsp;
-%	if ($rm_status !~ /Done|Processing/) {
-%#	if ($rm_status ne 'Processing') 
-<input type="button" id="repeat_masker_btn" value="Run" onclick="run('repeat_masker')" />
-%	}
-<span class="<%lc $rm_status %>" id="repeat_masker" delay="10" status="<%$rm_status%>">
-%	if ($rm_status eq 'Done') {
-%		my $path = $m->comp('./.comp/filepath_to_web', file => $proj->get_gff3_file('repeat_masker') || '#', just_return => 1);
-%		if ($path) {
-			<a target="_blank" href="<% $path %>">View output</a>
-%		}
-%   } else {
-	<% $rm_status %>\
-%	}
-		</span>
-	</li>
-%#------------------------------------	
-% for my $rt (@routines) {
-%	last;
-%	my $rname = $rt->{name};
-%	my $rt_status = $wfm->get_status($rname)->name;
-%	my $disabled = $rname ne 'trna_scan' && $rm_status ne 'Done';
-	<li><span style="font-weight:bold"><% $rt->{label} %></span>&nbsp;
-%#	if ($rt_status !~ /Done|Processing/)
-%	if ($rt_status ne 'Processing') {
-<input type="button" id="<% $rname %>_btn" value="Run" onclick="run('<% $rname %>')" <% $disabled ? 'disabled="disabled"' : '' %>/>
-%	}
-<span class="<%lc $rt_status %>" id="<% $rname %>" delay="<% $rt->{delay} || 5 %>" status="<%$rt_status%>">
-%	if ($rt_status eq 'Done') {
-%		my $path = $m->comp('./.comp/filepath_to_web', file => $proj->get_gff3_file($rname) || '', just_return => 1);
-%		if ($path) {
-			<a target="_blank" href="<% $path %>">View output</a>
-%		}
-%   } else {
-	<% $rt_status %>\
-%	}
-		</span>
-	</li>
-% }
-
-</ul>
-% } # end_if
 </div> <!-- #container_analyses1 -->
 % }
 </div> <!-- #container_analyses -->
@@ -314,7 +266,7 @@ $trimmed_common_name =~ s/-/_/g;
 	$routine => ''
 	$rm_status => 'not-processed'
 	$status => 'disabled'
-	$project => undef
+	$pmanager => undef
 	$delay => 5
 </%args>
 <%init>
@@ -329,7 +281,7 @@ if ($status eq 'processing') {
 	$title = 'Processing';
 }
 elsif ($status eq 'done') {
-	my $url = $m->comp('./.comp/filepath_to_web', file => $project->get_gff3_file($routine) || '#', just_return => 1); 
+	my $url = $m->comp('./.comp/filepath_to_web', file => $pmanager->get_gff3_file($routine) || '#', just_return => 1); 
 	$action = qq{onclick="launch(null, '$url')"};
 	$target = '';
 	$title  = 'Click to view results';

@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use DNALC::Pipeline::ProjectManager ();
+use aliased 'DNALC::Pipeline::App::ProjectManager';
 use DNALC::Pipeline::App::Utils ();
 
 use Data::Dumper;
@@ -16,12 +16,12 @@ my $organism = 'Arabidopsis thaliana';
 #my $common_name = 'daffodil';
 my $common_name = 'mouse-ear cress';
 #-----------------------------------------------------------------------------
-my $p_name	= 'Some test41212121200009';
+my $p_name	= 'Some test41212121200011';
 my $p_clade = 'd';
 my $seq_src = 'paste';
 my $sample_id = '3';
 
-my $pm = DNALC::Pipeline::ProjectManager->new;
+my $pm = ProjectManager->new;
 my $samples = $pm->config->{samples};
 
 ## data/fasta sources
@@ -48,7 +48,7 @@ elsif ($seq_src eq 'paste') {
 # process file
 my $rc = DNALC::Pipeline::App::Utils->process_input_file($data_file);
 if ($rc->{status} eq 'success') {
-	my $x = $pm->create_project ({
+	my $st = $pm->create_project ({
 				user_id => $uid,
 				seq => $rc->{seq},
 				name => $p_name,
@@ -57,8 +57,13 @@ if ($rc->{status} eq 'success') {
 				sample => $sample_id,
 				clade => $p_clade,
 			});
-	#print STDERR Dumper( $x ), $/;
-	print STDERR  "New PID = ", $pm->project, $/;
+	#print STDERR Dumper( $st ), $/;
+	if ($st->{status} ne 'success') {
+		print STDERR  'Error: ', $st->{msg}, $/;
+	}
+	else {
+		print STDERR  "New PID = ", $pm->project, $/;
+	}
 }
 
 #print STDERR Dumper( $pm ), $/;
