@@ -286,7 +286,6 @@ sub fasta_masked_xsmall {
 }
 #-----------------------------------------------------------------------------
 sub get_available_gff3_files {
-	print STDERR 'Project::get_available_gff3_files is obsolete...', $/;
 	my ($self) = @_;
 
 	my @files = ();

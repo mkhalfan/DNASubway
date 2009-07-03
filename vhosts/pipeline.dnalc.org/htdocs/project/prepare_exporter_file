@@ -2,26 +2,24 @@
 	$pid => 0
 </%args>
 <%once>
-	use DNALC::Pipeline::Project ();
-	use DNALC::Pipeline::Config ();
-	#use DNALC::Pipeline::Chado::Utils ();
+	use DNALC::Pipeline::App::ProjectManager ();
 	use IO::File ();
-	use Data::Dumper;
-	my $pcf = DNALC::Pipeline::Config->new->cf('PIPELINE');
 </%once>
 <%init>
 	$m->session->{pipeline} ||= {};
 	my $s = $m->session->{pipeline};
 	$r->content_type('text/plain');
 
-	my $proj = DNALC::Pipeline::Project->retrieve($pid);
+	my $pm = DNALC::Pipeline::App::ProjectManager->new($pid);
+	my $proj = $pm->project;
 	unless ($proj) {
 		$m->comp('/_message_add', 'Project not found!', 'error');
 		$m->redirect('/project/');
 	}
 
+	my $pcf = $pm->config;
 
-	my $gff3_files = $proj->get_available_gff3_files || [];
+	my $gff3_files = $pm->get_available_gff3_files || [];
 	my @params = ();
 	for my $gff (@$gff3_files) {
 		push @params, ('-g', $gff);
@@ -29,17 +27,12 @@
 
 	if ( @params) {
 
-		my $user_annot_file = $proj->work_dir . '/user_data.gff';
+		my $user_annot_file = $pm->work_dir . '/user_data.gff';
 
-		my $trimmed_common_name = $proj->common_name;
-		$trimmed_common_name =~ s/\s+/_/g;
-		$trimmed_common_name =~ s/-/_/g;
-		$trimmed_common_name = $trimmed_common_name . '_' . $pid;
-	
-		#print STDERR  "Trying to dum annotations in ", $user_annot_file, $/;
+		my $trimmed_common_name = $pm->cleaned_common_name;
 
 		my $rc = system ($pcf->{EXE_PATH} . '/dump_user_annotations.pl', 
-						'--username', $proj->username,
+						'--profile', $pm->chado_user_profile,
 						'--seqid', $trimmed_common_name,
 						'--file', $user_annot_file
 					);
@@ -52,8 +45,8 @@
 	
 
 		my $gff_merger = $pcf->{EXE_PATH} . '/gff3_merger.pl';
-		my $gff_file = $proj->work_dir . '/gff3.gff';
-		my @args = ($gff_merger, @params, '-f', $proj->fasta_file, '-o', $gff_file);
+		my $gff_file = $pm->work_dir . '/gff3.gff';
+		my @args = ($gff_merger, @params, '-f', $pm->fasta_file, '-o', $gff_file);
 
 		system (@args) && die "Error: $!\n";
 		#print $gff_file, $/;

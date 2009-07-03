@@ -551,7 +551,7 @@ use Carp;
 						routine => $routine,
 						project_id => $proj->id,
 						project_dir => $pm->work_dir,
-						common_name => $pm->common_name,
+						common_name => $proj->common_name,
 					});
 			if ($rc) {
 				$status->{success} = 1;

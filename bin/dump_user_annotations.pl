@@ -3,10 +3,11 @@ use warnings;
 use strict;
 
 use Bio::DB::Das::Chado ();
+use Bio::GMOD::Config ();
+use Bio::GMOD::DB::Config ();
 use IO::File ();
 use Getopt::Long;
 use Pod::Usage;
-use Data::Dumper;
 
 =head1 NAME
 
@@ -28,10 +29,10 @@ it under the same terms as Perl itself.
 =cut
 
 
-my ($USERNAME, $FILE, $SEQID, $HELP);
+my ($PROFILE, $FILE, $SEQID, $HELP);
 
 GetOptions(
-  'username=s'	=> \$USERNAME,
+  'profiles=s'	=> \$PROFILE,
   'file=s'		=> \$FILE,
   'seqid=s'		=> \$SEQID,
   'help'		=> \$HELP,
@@ -39,10 +40,9 @@ GetOptions(
 
 pod2usage (-verbose => 2, -exitval => 1) if $HELP;
 
-die 'Username is missing.' unless $USERNAME;
+die 'Profile is missing.' unless $PROFILE;
 die 'File is missing' unless $FILE;
-die 'Sequence id is missing' unless $SEQID;
-
+die 'Sequence ID is missing' unless $SEQID;
 
 my $fh = IO::File->new;
 unless ($fh->open($FILE, 'w')) {
@@ -50,16 +50,23 @@ unless ($fh->open($FILE, 'w')) {
 	exit 0;
 }
 
+my $gmod_conf = Bio::GMOD::Config->new();
+my $db_conf   = Bio::GMOD::DB::Config->new($gmod_conf, $PROFILE);
+
+my $driver = $db_conf->driver || 'Pg';
+my $dsn = "dbi:$driver:dbname=".$db_conf->name();
+$dsn .= ";host=".$db_conf->host if $db_conf->host;
+$dsn .= ";port=".$db_conf->port if $db_conf->port;
+
 my $db = Bio::DB::Das::Chado->new(
-            -dsn  => 'dbi:Pg:dbname=' . $USERNAME,
-            -user => 'cain',
+            -dsn  => $dsn,
+            -user => $db_conf->user || '',
+            -pass => $db_conf->password || '',
             -inferCDS => 1,
          );
-#my $seq_id = 'mouse_ear_cress_411';
 my @features = $db->features(-type   =>'gene:user',
-                             -seq_id => $SEQID,);
-#                             -start  => 1,
-#                             -end    => 20000,);
+                             -seq_id => $SEQID,
+						 );
 
 for my $f (@features) {
 	$f->seq_id($SEQID);
