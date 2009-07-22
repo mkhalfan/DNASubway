@@ -10,6 +10,7 @@
 <%once>
 	use DNALC::Pipeline::Config ();
 	use DNALC::Pipeline::App::Utils ();
+	use DNALC::Pipeline::Utils qw/nicebasepairs/;
 	use DNALC::Pipeline::App::ProjectManager ();
 	use DNALC::Pipeline::Utils qw(random_string);
 	use Carp;
@@ -49,6 +50,8 @@ if ($r->method eq 'POST') {
 	}
 
 	unless (@err) {
+		$common_name = lc $common_name;
+
 		if ($seq_src eq 'sample') {
 			my $samples_dir = $pcf->{samples_dir};
 			my ($sample) = grep {$_->{id} == $species} @$samples; 
@@ -202,10 +205,11 @@ if ($r->method eq 'POST') {
 		<select class="stylized" id="specie" name="species" size="6" style="width: 420px;"
 				onchange="set_source('sample');">
 % for my $sample (@$samples) {
+%	my ($start, $end) = split /\D+/, $sample->{position};
 %	my $sel = $seq_src eq 'sample' && $sample->{id} == $species ? 'selected="selected"' : '';
 			<option id="o<%$sample->{id}%>" value="<% $sample->{id} %>" \
 			extra="location: <% $sample->{location}%>, position: <% $sample->{position}%>, source: <% $sample->{source}%>, release: <%$sample->{release} %>" clade="<% $sample->{clade} ? $sample->{clade} : 'o' %>"\
-			<% $sel %>><%$sample->{organism}%> (<%$sample->{common_name}%>) <% $sample->{location} %>, 100 kb</option>
+			<% $sel %>><%$sample->{organism}%> (<%$sample->{common_name}%>) <% $sample->{location} %>, <% nicebasepairs($end - $start +1) %></option>
 % }
 		</select>
    </div>

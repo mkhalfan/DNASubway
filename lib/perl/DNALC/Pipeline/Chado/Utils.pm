@@ -1002,6 +1002,9 @@ sub create_chado_config {
     my $self      = shift;
     my $project_id= shift;
 
+	# For now this works. We only use one chado DB...
+	return if -f "/var/www/.apollo/chado-adapter.xml";
+
     my $conffile  = glob("/usr/local/gmod/conf/*_$project_id.conf");
     $conffile     =~ s!/usr/local/gmod/conf/!!;  #strip off the path
     $conffile     =~ s!\.conf!!;                 #strip off .conf
@@ -1019,7 +1022,7 @@ sub create_chado_config {
     #check for lockfile and create lock file
     my $count = 0;
     while (-e "/var/www/.apollo/chado-adapter.xml" and $count < 30) {
-        print "Waiting for other Apollo processes to finish...<br>\n";
+        print STDERR "Waiting for other Apollo processes to finish...<br>\n";
         sleep(1);
     }
   
@@ -1166,6 +1169,8 @@ END
 }
 
 sub remove_lock_file {
+	print STDERR  "Not removing the chado adapter.xml", $/;
+	return;
     unlink "/var/www/.apollo/chado-adapter.xml";
     return;
 }

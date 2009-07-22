@@ -9,6 +9,7 @@
 	use DNALC::Pipeline::App::ProjectManager ();
 	use DNALC::Pipeline::App::WorkflowManager ();
 	use DNALC::Pipeline::App::Utils ();
+	use DNALC::Pipeline::Utils qw/nicebasepairs/;
 
 	my @routines = (
 			{ name => 'trna_scan', label => 'tRNA Scan'},
@@ -107,7 +108,7 @@ my $trimmed_common_name = $pm->cleaned_common_name;
 </tr>
 <tr>
 	<td class="tdprojectlabel" style="vertical-align: top">Sequence size</td>
-	<td class="tdprojectinfo"><span style="vertical-align: top">: <% $proj->sequence_length %> &nbsp;</span><a href="javascript:;" onclick="launch(null, '<& './.comp/filepath_to_web', file => $pm->fasta_file &>')"><img id="view_seq_btn" src="/images/v0/button_viewDown.png" alt="open sequence" style="border: 0px; margin-top: -3px" /></a></td>
+	<td class="tdprojectinfo"><span style="vertical-align: top">: <% nicebasepairs($proj->sequence_length) %> &nbsp;</span><a href="javascript:;" onclick="launch(null, '<& './.comp/filepath_to_web', file => $pm->fasta_file &>')"><img id="view_seq_btn" src="/images/v0/button_viewDown.png" alt="open sequence" style="border: 0px; margin-top: -3px" /></a></td>
 </tr>
 </table>
 <!--   ----   -->

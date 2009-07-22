@@ -23,6 +23,9 @@
  			{id => 3, organism=>'Arabidopsis thaliana', common_name => 'mouse-ear cress',
  				location => 'Chr3', position => '18862001-18962000', clade => 'd',
  				source => 'TAIR', release => 'Tair8', date => '2009-05-20'},
+			{id => 10, organism=>'Arabidopsis thaliana', common_name => 'mouse-ear cress',
+ 				location => 'Chr1', position => '3777001-3780400', clade => 'd',
+ 				source => 'TAIR', release => 'Tair8', date => '2009-05-20'},
 
 			{id => 4, organism=>'Oryza sativa', common_name => 'rice',
 				location => 'Chr1', position => '200000-299999', clade => 'm',

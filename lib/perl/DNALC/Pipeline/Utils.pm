@@ -28,6 +28,7 @@ use vars qw(
                     html_escape
                     md5_salt
                     month_name
+					nicebasepairs
                     nicebytes
                     nicenumbers
                     path2args
@@ -67,6 +68,17 @@ sub nicenumbers {
     $no =~ s/\.(\d{$digits})\d+/\.$1/g if $digits;
 	$no =~ s/\.0+(?=\D|$)//g;
     return $no;
+}
+
+sub nicebasepairs {
+    my $bytes = shift || 0;
+    return "$bytes b" if $bytes < 1000;
+    my $kilo = $bytes / 1000;
+    return sprintf "%02.02f kb", $kilo if $kilo < 1000;
+    my $mega = $kilo / 1000;
+    return sprintf "%02.02f mb", $mega if $mega < 1000;
+    my $giga = $mega / 1000;
+    return sprintf "%02.02f gb", $giga;
 }
 
 sub nicebytes {
