@@ -1,17 +1,20 @@
 package DNALC::Pipeline::App::ProjectManager;
 
 use strict;
-use warnings;
 
 use File::Path;
+use File::Copy qw/move/;
 use Carp;
 
 use DNALC::Pipeline::User ();
 use DNALC::Pipeline::Config ();
 use DNALC::Pipeline::Project ();
-use DNALC::Pipeline::App::WorkflowManager();
+#use DNALC::Pipeline::App::WorkflowManager();
 use DNALC::Pipeline::Chado::Utils ();
 use Bio::SeqIO ();
+use Data::Dumper; 
+
+use warnings;
 
 #-----------------------------------------------------------------------------
 sub new {
@@ -114,20 +117,72 @@ sub create_project {
 	$out->write_seq( $seq );
 	
 	# set the workflow history
-	my $wfm = DNALC::Pipeline::App::WorkflowManager->new( $proj );
-	if ($self->fasta_file) {
-		$wfm->set_status('upload_fasta','Done');
-	}
-	else {
-		$wfm->set_status('upload_fasta','Error');
-	}
-
+	#my $wfm = DNALC::Pipeline::App::WorkflowManager->new( $proj );
+	#if ($self->fasta_file) {
+	#	$wfm->set_status('upload_fasta','Done');
+	#}
+	#else {
+	#	$wfm->set_status('upload_fasta','Error');
+	#}
 
 	$self->init_chado;
 
 	return {status => 'success', msg => $msg};
 }
 
+#-----------------------------------------------------------------------------
+sub add_evidence {
+	my ($self, $r, $type) = @_;
+	unless ($type =~ /^evid_(?:nt|prot)$/) {
+		return {status => 'fail', message => 'Invalid params.'}
+	}
+	unless ($r->upload($type)) {
+		return {status => 'fail', message => 'Missing the upload file.'}
+	}
+	my @errors = ();
+	my $filepath;
+	my $evidence_dir;
+
+	my $st = DNALC::Pipeline::App::Utils->save_upload( { r => $r, param_name => $type});
+	print STDERR Dumper( $st), $/;
+
+	if ($st->{status} eq 'fail') {
+		push @errors, "Unable to upload file: ". $st->{message};
+	}
+	else {
+		$filepath = $st->{path};
+
+		$evidence_dir = $self->evidence_dir;
+		eval { mkpath( $evidence_dir ) };
+		if ($@) {
+			push @errors, "Couldn't create $evidence_dir: $@", $/;
+		}
+	}
+
+	unless (@errors) {
+		# set the workflow history
+		#my $wfm = DNALC::Pipeline::App::WorkflowManager->new( $self->project );
+		#if ($self->fasta_file) {
+		#	$wfm->set_status('upload_fasta','Done');
+		#}
+
+		my $file = $evidence_dir . '/' . $type;
+		move $filepath, $file;
+
+		my $ftype = $type eq 'evid_nt' ? 'F' : 'T';
+		my $cmd = "/usr/bin/formatdb -i $file -p $ftype -o T -l $file" . '_log.txt 2>/dev/null';
+		print STDERR  "CMD: ", $cmd, $/;
+		if (system($cmd) == 0) {
+			print STDERR  "Format DB = success for ", $type, $/;
+			return {status => 'success'};
+		}
+		else {
+			print STDERR  "Error formatting the DB: ", $type, $/;
+			push @errors, "Error formatting the evidence DB.";
+		};
+	}
+	return {status => 'fail', message => join(' ', @errors)}
+}
 #-----------------------------------------------------------------------------
 sub project {
 	my ($self, $project) = @_;
@@ -162,6 +217,11 @@ sub compute_crc {
 }
 
 #-----------------------------------------------------------------------------
+sub evidence_dir {
+	my ($self) = @_;
+
+	return $self->work_dir . '/evidence';
+}#-----------------------------------------------------------------------------
 sub work_dir {
 	my ($self) = @_;
 	return unless ref $self eq __PACKAGE__;

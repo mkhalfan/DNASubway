@@ -8,11 +8,11 @@
 	$sequence => ''
 </%args>
 <%once>
+	use DNALC::Pipeline::Utils qw/nicebasepairs random_string/;
 	use DNALC::Pipeline::Config ();
 	use DNALC::Pipeline::App::Utils ();
-	use DNALC::Pipeline::Utils qw/nicebasepairs/;
 	use DNALC::Pipeline::App::ProjectManager ();
-	use DNALC::Pipeline::Utils qw(random_string);
+	use DNALC::Pipeline::App::WorkflowManager ();
 	use Carp;
 	use IO::File ();
 	use Data::Dumper;
@@ -100,7 +100,7 @@ if ($r->method eq 'POST') {
 	# create the project 
 	unless (@err) {
 		my $rc = DNALC::Pipeline::App::Utils->process_input_file( $file2process );
-		if ($rc->{status} eq 'success') {
+		if ($rc->{status} eq "success") {
 			
 	 		my $st = $pm->create_project ({                                       
                 user_id => $s->{user_id},
@@ -129,10 +129,14 @@ if ($r->method eq 'POST') {
 			unlink $file2process;
 		}
 
+		
 		unless ($proj) {
 			push @err, "Error creating the project.";
+			#$wfm->set_status('upload_fasta', 'Error');
 		}
 		else {
+			my $wfm = DNALC::Pipeline::App::WorkflowManager->new( $proj );
+			$wfm->set_status('upload_fasta', 'Done');
 			print STDERR "project_created: id = ", $proj, ",\tname = ", $proj->name, $/;
 
 			# redirect user to dashboard

@@ -2,7 +2,9 @@
 
 var dbg, sent;
 var intervalID = {};
-var routines = ['augustus', 'fgenesh', 'snap', 'blastn', 'blastx', 'gbrowse', 'apollo', 'exporter'];
+var routines = ['augustus', 'fgenesh', 'snap', 'blastn', 'blastx', 
+				'blastn_user', 'blastx_user', 
+				'gbrowse', 'apollo', 'exporter'];
 var windows = [];
 
 function check_status (pid, op, h) {

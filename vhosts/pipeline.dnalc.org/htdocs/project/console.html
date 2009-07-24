@@ -1,63 +1,4 @@
 
-<%args>
-	$pid => 0
-	$debug => 0
-</%args>
-%#-------------------------------------------------
-<%once>
-	use Data::Dumper; 
-	use DNALC::Pipeline::App::ProjectManager ();
-	use DNALC::Pipeline::App::WorkflowManager ();
-	use DNALC::Pipeline::App::Utils ();
-	use DNALC::Pipeline::Utils qw/nicebasepairs/;
-
-	my @routines = (
-			{ name => 'trna_scan', label => 'tRNA Scan'},
-			{ name => 'augustus', label => 'Augustus', delay => 15},
-			{ name => 'fgenesh', 'label' => 'FgenesH'},
-			#{ name => 'repeat_masker', label => 'Repeat Masker', delay => 10},
-			{ name => 'snap', label => 'Snap'},
-			{ name => 'blastn', label => 'BlastN'},
-			{ name => 'blastx', label => 'BlastX'},
-		);
-	my %clades = (
-			d => 'Eudicotyledons',
-			m => 'Monocotyledons',
-			u => 'Undefined',
-			o => 'Other'
-		);
-</%once>
-%#-------------------------------------------------
-<%init>
-
-$m->session->{pipeline} ||= {};
-my $s = $m->session->{pipeline};
-
-my $pm = DNALC::Pipeline::App::ProjectManager->new($pid);
-my $proj = $pm->project;
-unless ($proj) {
-	$m->comp('/_message_add', 'Project not found!', 'error');
-	$m->redirect('/project/');
-}
-
-my $wfm = DNALC::Pipeline::App::WorkflowManager->new( $proj );
-my $history = $wfm->get_history;
-
-my %status = ();
-for ('repeat_masker', map {$_->{name}} @routines ) {
-	my $status_name = lc $wfm->get_status($_)->name;
-	$status_name =~ s/\s/-/;
-	$status{$_} = $status_name;
-}
-my $rm_status = $status{repeat_masker};
-my $trimmed_common_name = $pm->cleaned_common_name;
-
-
-#print STDERR Dumper( \%status ), $/;
-# TODO : set in session when you're starting to run a routine, 
-# and reset this flash after you get info about the execution of the routine
-</%init>
-%#-------------------------------------------------
 <div id="container_devicebg2"></div>
 <div id="container_top">
 	<!--<div id="learn_head"><a href="/learnlearn.html" style="padding-left: 10px;">Learn</a></div>
@@ -194,7 +135,7 @@ my $trimmed_common_name = $pm->cleaned_common_name;
 	<div class="analysesTexttitle"></div>
 	<div class="analysesTexttitle"><img src="/images/v0/dot_blue.png" />&nbsp;<span class="p2">Search Databases</span></div>
 
-	<table width="390" border="0px" cellpadding="1">
+	<table width="390px" border="0" cellpadding="1">
 	  <tr>
 		<td class="tdtext">BlastX UniProt for protein homologs</td>
 		<td class="tdinfo"><a href="#" class="tt">i<span class="tooltip"><span class="top"></span><span class="middle">Info about this routine will be available soon. Thank you for your patience.</span><span class="bottom"></span></span></a></td>
@@ -203,14 +144,54 @@ my $trimmed_common_name = $pm->cleaned_common_name;
 					status => $status{blastx}, rm_status => $rm_status &>
 		</td>
 	  </tr>
-	   <tr>
+	  <tr>
 		<td class="tdtext">BlastN UniGene for RNA evidence (cDNA/EST)</td>
 		<td class="tdinfo"><a href="#" class="tt">i<span class="tooltip"><span class="top"></span><span class="middle">Info about this routine will be available soon. Thank you for your patience.</span><span class="bottom"></span></span></a></td>
 		<td class="">
 					<& '.routine', routine => 'blastn', pmanager => $pm, delay => 15,
 					status => $status{blastn}, rm_status => $rm_status &>
 		</td>
+	  </tr>
+% my $nt_evid = lc $wfm->get_status("upload_evid_nt")->name;
+% my $prot_evid = lc $wfm->get_status("upload_evid_prot")->name;
+% if ( $nt_evid ne "done" || $prot_evid ne "done") {
+	  <tr>
+		<td colspan="3">
+		<div id="add_evidence" style="display:block; background: pink">
+			<form enctype="multipart/form-data" method="post">
+%	if ($nt_evid ne "done") {
+				<div>Add Nucleotide based evidence: 
+					<input type="file" name="evid_nt" value="xxx" />
+				</div>
+%	}
+%	if ($prot_evid ne "done") {
+				<div>Add Proteine based evidence: 
+					<input type="file" name="evid_prot" value="" />
+				</div>
+%	}
+			</form>
+		</div>
+		<a href="javascript:void(0);" onclick="javascript:$('add_evidence').toggle()">add evidence</a>
+		</td>
 	  </tr> 
+% } else {
+	<tr>
+		<td class="tdtext">BlastN my evidence</td>
+		<td class="tdinfo">&nbsp;</td>
+		<td class=""><% $status{blastn_user} %>
+					<& '.routine', routine => 'blastn_user', pmanager => $pm, delay => 15,
+					status => $status{blastn_user}, rm_status => $rm_status &>
+		</td>
+	  </tr>
+	  <tr>
+		<td class="tdtext">BlastX my evidence</td>
+		<td class="tdinfo">&nbsp;</td>
+		<td class=""><% $status{blastx_user} %>
+					<& '.routine', routine => 'blastx_user', pmanager => $pm, delay => 15,
+					status => $status{blastx_user}, rm_status => $rm_status &>
+		</td>
+	  </tr>
+% }
 	</table>
 
 </div> <!-- #container_analyses1 -->
@@ -260,6 +241,96 @@ my $trimmed_common_name = $pm->cleaned_common_name;
 </div> <!-- #container_launch -->
 </div> <!-- #container_content_member3 -->
 
+
+<%args>
+	$pid => 0
+	$debug => 0
+</%args>
+%#-------------------------------------------------
+<%once>
+	use Data::Dumper; 
+	use DNALC::Pipeline::App::ProjectManager ();
+	use DNALC::Pipeline::App::WorkflowManager ();
+	use DNALC::Pipeline::App::Utils ();
+	use DNALC::Pipeline::Utils qw/nicebasepairs/;
+
+	my @routines = (
+			{ name => 'trna_scan', label => 'tRNA Scan'},
+			{ name => 'augustus', label => 'Augustus', delay => 15},
+			{ name => 'fgenesh', 'label' => 'FgenesH'},
+			#{ name => 'repeat_masker', label => 'Repeat Masker', delay => 10},
+			{ name => 'snap', label => 'Snap'},
+			{ name => 'blastn', label => 'BlastN'},
+			{ name => 'blastx', label => 'BlastX'},
+			{ name => 'blastn_user', label => 'User BlastN'},
+			{ name => 'blastx_user', label => 'User BlastX'},
+		);
+	my %clades = (
+			d => 'Eudicotyledons',
+			m => 'Monocotyledons',
+			u => 'Undefined',
+			o => 'Other'
+		);
+</%once>
+%#-------------------------------------------------
+<%init>
+
+$m->session->{pipeline} ||= {};
+my $s = $m->session->{pipeline};
+
+my $pm = DNALC::Pipeline::App::ProjectManager->new($pid);
+my $proj = $pm->project;
+unless ($proj) {
+	$m->comp('/_message_add', 'Project not found!', 'error');
+	$m->redirect('/project/');
+}
+
+my %status = ();
+my ($history, $rm_status, $trimmed_common_name);
+my $wfm = DNALC::Pipeline::App::WorkflowManager->new( $proj );
+
+if ($r->method eq "POST") {
+
+	if ($ARGS{evid_nt} || $ARGS{evid_prot}) {
+		my $wfm = DNALC::Pipeline::App::WorkflowManager->new( $proj );
+		for (qw/evid_nt evid_prot/) {
+			if ($ARGS{$_}) {
+				my $st = $pm->add_evidence($r, $_);
+				if ($st->{status} eq "success") {
+					$m->comp("/_message_add", $_ . " evidence added.");
+					$wfm->set_status("upload_$_", 'Done');
+				}
+				else {
+					$m->comp("/_message_add", 
+						$_ . ": error formatting the evidence database." . $st->{message}, 
+						"error");
+					$wfm->set_status("upload_$_", 'Error');
+				}
+			}
+		}
+	}
+	else {
+		$m->comp('/_message_add', 'No evidence added.', 'error');
+	}
+	$m->redirect('/project/console.html?pid=' . $pid);
+}
+else { # most likely is GET
+	$history = $wfm->get_history;
+
+	for ("repeat_masker", map {$_->{name}} @routines ) {
+		my $status_name = lc $wfm->get_status($_)->name;
+		$status_name =~ s/\s/-/;
+		$status{$_} = $status_name;
+	}
+	$rm_status = $status{repeat_masker};
+	$trimmed_common_name = $pm->cleaned_common_name;
+}
+
+#print STDERR Dumper( \%status ), $/;
+# TODO : set in session when you're starting to run a routine, 
+# and reset this flash after you get info about the execution of the routine
+</%init>
+%#-------------------------------------------------
 
 %#----------------------------------------------------------------------------
 <%def .routine>

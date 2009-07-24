@@ -2,7 +2,6 @@ package DNALC::Pipeline::Process::Blast;
 
 use base q(DNALC::Pipeline::Process);
 use IO::File ();
-use Bio::Tools::Fgenesh ();
 
 use Data::Dumper;
 use strict;
@@ -13,9 +12,20 @@ use strict;
 
 		$prog ||= 'blastn';
 		my $self = __PACKAGE__->SUPER::new(uc($prog), $project_dir);
-		$ENV{BLASTDB}=$self->{conf}{blastdb};
+		if ($prog =~ /_user$/) {
+			$ENV{BLASTDB} = $project_dir . '/evidence';
+			my $db = 'evid_prot';
+			if ($prog eq 'blastn_user') {
+				$db = 'evid_nt';
+			}
+			push @{$self->{work_options}}, ('-d', $db, '-i');
+		}
+		else {
+			$ENV{BLASTDB} = $self->{conf}{blastdb};
+		}
 		$ENV{BLASTMAT}=$self->{conf}{blastmat};
-		$self->{prog} = $prog;
+		#$self->{prog} = $prog;
+		print STDERR  '$ENV{BLASTDB} = ', $ENV{BLASTDB}, $/;
 
 		return $self;
 	}
@@ -32,7 +42,7 @@ use strict;
 		opendir(DIR, $dir) or die "Can't opendir $dir: $!";
 		my @f = grep { /$self->{conf}->{file_to_parse}/ && -f "$dir/$_" } readdir(DIR);
 		unless (@f == 1) {
-			print STDERR "BLAST: output file is missing.", $/;
+			print STDERR $self->{type} . ": output file is missing.", $/;
 			return;
 		}
 		closedir DIR;
