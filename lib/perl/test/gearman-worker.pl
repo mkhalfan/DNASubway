@@ -93,6 +93,27 @@ sub run_blastx {
    return freeze $st;
 }
 
+sub run_blastn_user {
+   my $gearman = shift;
+   my $pid = $gearman->arg;
+   my $proj = DNALC::Pipeline::Project->retrieve( $pid );
+   return unless $proj;
+
+   my $wfm = DNALC::Pipeline::App::WorkflowManager->new( $proj );
+   my $st = $wfm->run_blastn_user;
+   return freeze $st;
+}
+
+sub run_blastx_user {
+   my $gearman = shift;
+   my $pid = $gearman->arg;
+   my $proj = DNALC::Pipeline::Project->retrieve( $pid );
+   return unless $proj;
+
+   my $wfm = DNALC::Pipeline::App::WorkflowManager->new( $proj );
+   my $st = $wfm->run_blastx_user;
+   return freeze $st;
+}
 #-------------------------------------------------
 
 my $worker = Gearman::Worker->new;
@@ -104,5 +125,7 @@ $worker->register_function("snap", \&run_snap);
 $worker->register_function("fgenesh", \&run_fgenesh);
 $worker->register_function("blastn", \&run_blastn);
 $worker->register_function("blastx", \&run_blastx);
+$worker->register_function("blastn_user", \&run_blastn_user);
+$worker->register_function("blastx_user", \&run_blastx_user);
 
 $worker->work while 1;

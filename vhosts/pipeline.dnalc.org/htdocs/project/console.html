@@ -10,7 +10,6 @@
 </div> <!-- #container_top  -->
 
 <div id="container_content_member3">
-	<& "/_messages" &>
 <input type="hidden" id="pid" value="<% $pid %>"/>
 	<div id="container_pagehead">
 		<div id="container_pagetitle">:: CONSOLE ::</div>
@@ -18,10 +17,10 @@
 	</div>
 
 	<div id="container_commandertitle"><% $proj->name |html%></div>
-% if (0) {
-	<div id="container_commanderblurb"><p>Use the console to perform DNA analysis routines on the loaded sequence. To begin, "Prepare Sequence." This key pre-requisite analysis identifies and masks simple repeats and transposons, thus removing sequence that may clutter subsequent analyses. Next, run any or all of the analysis algorithms under "Predict Genes" and/or "Conduct <em>Blast</em> Searches." Finally, launch “GBrowse” viewer or the "<em>Apollo</em>" editor to further analyze and annotate the sequence.</p>
+	<div id="container_commanderblurb">	
+		<& "/_messages" &>
 	</div>
-% }
+
 	<div id="container_project">
 		<div class="commandertitle_member">Project</div>
 % if (1) {
@@ -68,7 +67,7 @@
 % }
 </ul>
 </div><!-- history end -->
-<div id="debug" style="display:<% $debug ? 'block' : 'none'%>"></div>
+<div id="debug" style="display:<% $debug ? "block" : "none"%>"></div>
 % }
 </div> <!-- #container_project -->
 
@@ -154,10 +153,28 @@
 	  </tr>
 % my $nt_evid = lc $wfm->get_status("upload_evid_nt")->name;
 % my $prot_evid = lc $wfm->get_status("upload_evid_prot")->name;
+% if ($nt_evid eq "done") {
+	<tr>
+		<td class="tdtext">BlastN my evidence</td>
+		<td class="tdinfo">&nbsp;</td>
+		<td class=""><& '.routine', routine => 'blastn_user', pmanager => $pm, delay => 15,
+					status => $status{blastn_user}, rm_status => $rm_status &>
+		</td>
+	  </tr>
+% }
+% if ($prot_evid eq "done") {
+	  <tr>
+		<td class="tdtext">BlastX my evidence</td>
+		<td class="tdinfo">&nbsp;</td>
+		<td class=""><& '.routine', routine => 'blastx_user', pmanager => $pm, delay => 15,
+					status => $status{blastx_user}, rm_status => $rm_status &>
+		</td>
+	  </tr>
+% }
 % if ( $nt_evid ne "done" || $prot_evid ne "done") {
 	  <tr>
 		<td colspan="3">
-		<div id="add_evidence" style="display:block; background: pink">
+		<div id="add_evidence" style="display:none; background: pink; text-align: right;">
 			<form enctype="multipart/form-data" method="post">
 %	if ($nt_evid ne "done") {
 				<div>Add Nucleotide based evidence: 
@@ -169,28 +186,13 @@
 					<input type="file" name="evid_prot" value="" />
 				</div>
 %	}
+		<a id="hide_evidence_link" href="javascript:void(0);" onclick="javascript:$('add_evidence').hide();$('add_evidence_link').show();">cancel</a>
+			<input type="submit" value="Upload" />
 			</form>
 		</div>
-		<a href="javascript:void(0);" onclick="javascript:$('add_evidence').toggle()">add evidence</a>
+		<a id="add_evidence_link" href="javascript:void(0);" onclick="javascript:$('add_evidence').show();$('add_evidence_link').hide();">add evidence</a>
 		</td>
 	  </tr> 
-% } else {
-	<tr>
-		<td class="tdtext">BlastN my evidence</td>
-		<td class="tdinfo">&nbsp;</td>
-		<td class=""><% $status{blastn_user} %>
-					<& '.routine', routine => 'blastn_user', pmanager => $pm, delay => 15,
-					status => $status{blastn_user}, rm_status => $rm_status &>
-		</td>
-	  </tr>
-	  <tr>
-		<td class="tdtext">BlastX my evidence</td>
-		<td class="tdinfo">&nbsp;</td>
-		<td class=""><% $status{blastx_user} %>
-					<& '.routine', routine => 'blastx_user', pmanager => $pm, delay => 15,
-					status => $status{blastx_user}, rm_status => $rm_status &>
-		</td>
-	  </tr>
 % }
 	</table>
 
@@ -207,8 +209,8 @@
 
 	<div class="container_launch1">
 		<div class="launch_gbrowse">
-			<a id="gbrowse_btn" class="<% $rm_status ne 'done' ? 'disabled' : '' %>" \
-			onclick="<% $rm_status eq 'done' ? "launch('gbrowse')" : '' %>" \
+			<a id="gbrowse_btn" class="<% $rm_status ne "done" ? "disabled" : "" %>" \
+			onclick="<% $rm_status eq "done" ? q{launch('gbrowse')} : "" %>" \
 			href="javascript:;"></a>
 		</div>
 	</div>    

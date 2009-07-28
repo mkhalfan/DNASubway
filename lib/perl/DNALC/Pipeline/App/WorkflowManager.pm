@@ -528,11 +528,80 @@ use Carp;
 				print STDERR "BLASTX: fail\n";
 				$self->set_status('blastx', 'Error');
 			}
-			print STDERR 'BLASTN: duration: ', $blastx->{elapsed}, $/;
+			print STDERR 'BLASTX: duration: ', $blastx->{elapsed}, $/;
 		}
 		return $status;
 	}
 
+	#-------------------------------------------------------------------------
+	sub run_blastn_user {
+
+		my ($self) = @_;
+		
+		my $status = { success => 0 };	
+		my $proj = $self->project;
+		my $pm   = $self->pmanager;
+
+		# no deed to check for canned results in this case
+
+		my $blastn = DNALC::Pipeline::Process::Blast->new( $pm->work_dir, 'blastn_user' );
+		if ($blastn) {
+
+			my $input_file = $pm->fasta_masked_xsmall;
+			if ($input_file) {
+				$self->set_status('blastn_user', 'Processing');
+				$blastn->run( input => $input_file, debug => 1 );
+			}
+			if (defined $blastn->{exit_status} && $blastn->{exit_status} == 0) {
+				print STDERR "BLASTN_USER: success\n";
+				$status->{success} = 1;
+				$status->{elapsed} = $blastn->{elapsed};
+				$status->{gff_file}= $blastn->get_gff3_file;
+				my $rc = $self->load_analysis_results($status->{gff_file}, 'blastn_user');
+				$self->set_status('blastn_user', 'Done', $blastn->{elapsed});
+				#$self->set_cache('blastn', $self->crc($blastn->get_options));
+			}
+			else {
+				print STDERR "BLASTN_USER:: fail\n";
+				$self->set_status('blastn_user', 'Error');
+			}
+			print STDERR 'BLASTN_USER: duration: ', $blastn->{elapsed}, $/;
+		}
+		return $status;
+	}
+	#-------------------------------------------------------------------------
+	sub run_blastx_user {
+
+		my ($self) = @_;
+		
+		my $status = { success => 0 };	
+		my $proj = $self->project;
+		my $pm   = $self->pmanager;
+
+		my $blastx = DNALC::Pipeline::Process::Blast->new( $pm->work_dir, 'blastx_user' );
+		if ($blastx) {
+			my $input_file = $pm->fasta_masked_xsmall;
+			if ($input_file) {
+				$self->set_status('blastx_user', 'Processing');
+				$blastx->run( input => $input_file, debug => 1 );
+			}
+			if (defined $blastx->{exit_status} && $blastx->{exit_status} == 0) {
+				print STDERR "BLASTX_USER: success\n";
+				$status->{success} = 1;
+				$status->{elapsed} = $blastx->{elapsed};
+				$status->{gff_file}= $blastx->get_gff3_file;
+				my $rc = $self->load_analysis_results($status->{gff_file}, 'blastx_user');
+				$self->set_status('blastx_user', 'Done', $blastx->{elapsed});
+				#$self->set_cache('blastx_user', $self->crc($blastx->get_options));
+			}
+			else {
+				print STDERR "BLASTX_USER:: fail\n";
+				$self->set_status('blastx_user', 'Error');
+			}
+			print STDERR 'BLASTX_USER: duration: ', $blastx->{elapsed}, $/;
+		}
+		return $status;
+	}
 	#-------------------------------------------------------------------------
 	sub run_fake {
 		my ($self, $routine) = @_;
@@ -607,6 +676,10 @@ use Carp;
 
 		my $username = $self->pmanager->username;
 		return unless -f $gff_file && defined $username;
+		if (-s $gff_file < 20) {
+			print STDERR  "SKIPPING FILE (too small): ", $gff_file, $/;
+			return;
+		}
 		my $profile = sprintf("%s_%d", $username, $self->project->id);
 		my $cmd = '/var/www/bin/load_analysis_results.pl';
 		my @args = ('--username', $username, 
@@ -614,7 +687,7 @@ use Carp;
 				'--algorithm', $routine,
 				'--gff', $gff_file);
 		print STDERR  "\n\nLOADING DATA:\n", $cmd, " ", "@args", $/;
-		print STDERR 'EXIT CODE = ', system($cmd, @args), $/;
+		system($cmd, @args);
 		return 1;
 	}
 	#-------------------------------------------------------------------------

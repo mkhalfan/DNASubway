@@ -12,7 +12,9 @@ use strict;
 
 		$prog ||= 'blastn';
 		my $self = __PACKAGE__->SUPER::new(uc($prog), $project_dir);
-		if ($prog =~ /_user$/) {
+		return unless $self;
+
+		if ($prog =~ /_user$/i) {
 			$ENV{BLASTDB} = $project_dir . '/evidence';
 			my $db = 'evid_prot';
 			if ($prog eq 'blastn_user') {
