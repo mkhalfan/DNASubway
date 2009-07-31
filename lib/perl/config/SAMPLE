@@ -1,0 +1,4 @@
+{
+	samples_common_name => qr/__%SPECIESNAMEHERE%__/,
+	samples_dir => '/var/www/vhosts/pipeline.dnalc.org/var/samples',
+}

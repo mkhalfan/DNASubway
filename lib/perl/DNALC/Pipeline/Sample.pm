@@ -1,53 +1,76 @@
-#
-#===============================================================================
-#
-#         FILE:  Sample.pm
-#
-#  DESCRIPTION:  
-#
-#        FILES:  ---
-#         BUGS:  ---
-#        NOTES:  ---
-#       AUTHOR:  Cornel Ghiban (), ghiban@cshl.edu
-#      COMPANY:  DNALC, Cold Spring Harbor
-#      VERSION:  1.0
-#      CREATED:  05/29/09 10:38:31
-#     REVISION:  ---
-#===============================================================================
-
 package DNALC::Pipeline::Sample;
 
-use DNALC::Pipeline::Config ();
 use strict;
+use warnings;
+
 use Carp;
+use POSIX ();
+use DNALC::Pipeline::Config ();
+
+use base qw(DNALC::Pipeline::DBI);
+
+__PACKAGE__->table('sample');
+__PACKAGE__->columns(Primary => qw/sample_id/);
+__PACKAGE__->columns(Essential => qw/organism common_name clade sequence_length/);
+__PACKAGE__->columns(Other => qw/sequence_data created updated/);
+
+__PACKAGE__->sequence('sample_sample_id_seq');
+
+__PACKAGE__->has_many(sources => 'DNALC::Pipeline::SampleSource');
+
+__PACKAGE__->add_trigger(before_create => sub {
+    $_[0]->{created} ||= POSIX::strftime "%Y-%m-%d %H:%M:%S", localtime(+time);
+    $_[0]->{updated} ||= $_[0]->{created};
+});
+
+__PACKAGE__->add_trigger(before_update => sub {
+    $_[0]->{updated} ||= POSIX::strftime "%Y-%m-%d %H:%M:%S", localtime(+time);
+});
+
+
 
 sub new {
 	my ($class, $sample_id) = @_;
 
-	my $cf = DNALC::Pipeline::Config->new;
-	my $pcf = $cf->cf('PIPELINE');
-	my ($sample) = grep { $_->{id} == $sample_id } @{ $pcf->{samples} };
+	my ($sample) = grep { $_->{id} == $sample_id } @{ $class->config->{samples} };
+	#my $sample = __PACKAGE__->retrieve($sample_id);
 
 	return unless $sample;
-	my $sample_dir = $pcf->{samples_dir} . '/' . $sample_id;
-	
+
+	my $sample_dir = $sample->sample_id;
 	return unless -d $sample_dir  && -f $sample_dir . '/' . 'fasta.fa';
 
-	return bless {
-					samples_common_name => $pcf->{samples_common_name},
-					sample_dir => $sample_dir, 
-					sample => $sample
-				}, $class;
+	return $sample;
+	#return bless {
+	#				samples_common_name => $class->config->{samples_common_name},
+	#				sample_dir => $sample_dir, 
+	#				sample => $sample
+	#			}, $class;
 }
 
-sub organism {
-	my $self = shift;
-	return $self->{sample}->{organism} if $self->{sample};
+sub config {
+	my $cf = DNALC::Pipeline::Config->new;
+	return $cf->('SAMPLE');
 }
 
-sub common_name {
-	my $self = shift;
-	return $self->{sample}->{common_name} if $self->{sample};
+# sub organism {
+# 	my ($self) = @_;
+# 	# FIXME
+# 	return $self->{sample}->{organism} if $self->{sample};
+# }
+# 
+# sub common_name {
+# 	my ($self) = @_;
+# 	# FIXME
+# 	return $self->{sample}->{common_name} if $self->{sample};
+# }
+
+sub sample_dir {
+	my ($self) = @_;
+
+	my $cf = $self->config;
+	
+	return $cf->{samples_dir} . '/' . $self->id;
 }
 
 sub copy_results {

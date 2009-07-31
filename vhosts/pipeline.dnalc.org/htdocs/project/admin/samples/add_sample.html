@@ -1,0 +1,128 @@
+<& "/_messages" &>
+<div id="stylized" class="myform">
+<form id="form" name="form" method="post" >
+<h1>Add sample</h1>
+<p>This is the basic look of my form without table</p>
+
+<label>Organism
+<!--<span class="small">Genus species</span>-->
+</label>
+<input type="text" name="organism" id="organism" value="<% $organism | html %>"/>
+
+<label>Common name
+<!--<span class="small"></span>-->
+</label>
+<input type="text" name="common_name" id="common_name" value="<% $common_name |html%>"/>
+
+<label>Clade
+<span class="small">Nomenclature</span>
+</label>
+<div style="float:left;">
+% for (qw/dicotyledons monocotyledons other/) {
+%	my $i = substr $_, 0, 1;
+%	my $sel = $i eq $clade ? 'checked="checked"' : '';
+	<div><input type="radio" name="clade" value="<% $i %>" <%$sel%>/> <% $_ %></div>
+% }
+</div>
+<div class="spacer"></div>
+<label>Sequence data<span class="small">max 100kbp</span></label>
+<textarea name="sequence_data" value="<% $sequence_data|html%>"></textarea>
+
+<button type="submit">Add</button>
+<div class="spacer"></div>
+
+</form>
+</div>
+
+%#------------------------------------------------------------------------------
+<%args>
+	$organism => ''
+	$common_name => ''
+	$sequence_data => ''
+	$clade => ''
+</%args>
+%#------------------------------------------------------------------------------
+<%once>
+	use DNALC::Pipeline::Config ();
+	use DNALC::Pipeline::Utils qw/random_string/;
+	use DNALC::Pipeline::App::Utils ();
+	use DNALC::Pipeline::Sample ();
+	use Data::Dumper;
+</%once>
+%#------------------------------------------------------------------------------
+<%init>
+
+#test if admin
+
+if ($r->method eq "POST") {
+	my $cf = DNALC::Pipeline::Config->new;
+	my $pcf = $cf->cf("PIPELINE");
+	my $scf = $cf->cf("SAMPLE");
+	my $file2process;
+	my $smpl;
+
+	my $ok = 1;
+
+	for (qw/organism common_name clade sequence_data/) {
+		unless ($ARGS{$_}) {
+			my $lbl = ucfirst $_;
+			$lbl =~ s/_/ /g;
+			$m->comp('/_message_add', "$lbl is missing!", 'error');
+			$ok = 0;
+		}
+	}
+	if (length ($sequence_data) > 100000) {
+		$ok = 0;
+		$m->comp('/_message_add', "Sequence data is too large!", 'error');
+	}
+
+	if ($ok) {
+		
+		$file2process = $pcf->{upload_dir} . "/" . random_string(7,7);
+		my $in = IO::File->new;
+		if ($in->open($file2process, 'w')) {
+			print $in $sequence_data;
+			undef $in;
+		}
+		
+		my $rc = DNALC::Pipeline::App::Utils->process_input_file( $file2process );
+		#print STDERR Dumper($rc), $/;
+		if ($rc->{status} eq "success") {
+		
+			$smpl = eval {
+						DNALC::Pipeline::Sample->create({
+							organism => $organism,
+							common_name => $common_name,
+							clade => $clade,
+							sequence_length => length($sequence_data),
+							sequence_data => $sequence_data,
+						});
+					};
+			if ($@) {
+				print STDERR $@, $/;
+			}
+			print STDERR "sample = ", $smpl, $/;
+		}
+		
+		if ($smpl) {
+			$rc->{seq}->display_id($scf->{samples_common_name});
+			my $smpl_dir = $scf->{samples_dir} . "/" . ($smpl->id + 100);
+			my $smpl_file = $smpl_dir . "/fasta.fa";
+			unless (-e $smpl_dir) {
+				mkdir $smpl_dir;
+			}
+			my $seq_out = Bio::SeqIO->new( -format => 'Fasta', 
+											-file => "> $smpl_file");
+			$seq_out->write_seq($rc->{seq});
+			$m->comp('/_message_add', "Sample added successfully!");
+			$m->redirect('./edit_sample.html?sid=' . $smpl->id);
+		}
+		$m->comp('/_message_add', "Unable to process the sequence data!", 'error');
+		
+	}
+}
+
+</%init>
+%#------------------------------------------------------------------------------
+
+%#------------------------------------------------------------------------------
