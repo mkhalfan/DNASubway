@@ -1,12 +1,11 @@
 <& "/_messages" &>
+
 <div id="stylized" class="myform" style="float:left">
 <form id="form" name="form" method="post" >
 <h1>Edit sample</h1>
-<p>This is the basic look of my form without table</p>
+<p></p>
 
-<label>Organism
-<!--<span class="small">Genus species</span>-->
-</label>
+<label>Organism</label>
 <input type="text" name="organism" id="organism" value="<% $organism | html %>"/>
 
 <label>Common name
@@ -25,13 +24,34 @@
 % }
 </div>
 <div class="spacer"></div>
-<label>Sequence data<span class="small">max 100kbp</span></label>
-<div style="float:left;padding: 5px 0px 5px 10px;"><a href="#">view</a>
-<a href="#" onclick="$('sequence_data').show()">update</a>
+<label>Sequence data<span class="small">paste the sequence<br/>max 100kbp</span></label>
+<div style="float:left;padding: 5px 0px 5px 10px;">
+%#<a href="<& '../../.comp/filepath_to_web', file => $sample->sample_dir,just_return => 0 &>" target="_blank">view</a>
+<a href="#" onclick="$('sequence_data').show();$('sequence_message').hide();">update</a>
 <br/>
-<textarea style="display:non; float:none"
+<div id="sequence_message">Not shown</div>
+<textarea style="display:none; float:none"
 	name="sequence_data" id="sequence_data" value="<% $sequence_data|html%>"></textarea>
 </div>
+<br clear="both"/>
+<label>Source name </label>
+	<input type="text" name="source_name" id="source_name" value="<% $source_name | html %>"/>
+	<br clear="both"/>
+	<label>Source release</label>
+	<input type="text" name="source_release" id="source_release" value="<% $source_release  | html %>"/>
+	<br clear="both"/>
+	<label>Source url<span class="small">Link to source</span></label>
+	<input type="text" name="source_url" id="source_url" value="<% $source_url | html %>"/>
+	<br clear="both"/>
+	<label>Segment <span class="small">e.g. chr1, ref02</span></label>
+	<input type="text" name="segment" id="segment" value="<% $segment | html %>"/>
+	<br clear="both"/>
+	<label>Start <span class="small">e.g. positive integer</span></label>
+	<input type="text" name="start" id="start" value="<% $start | html %>"/>
+	<br clear="both"/>
+	<label>Stop <span class="small">positiv integer &gt; Start</span></label>
+	<input type="text" name="stop" id="stop" value="<% $stop | html %>"/>
+	<br clear="both"/>
 
 <button type="submit">Update</button>
 <div class="spacer"></div>
@@ -40,37 +60,25 @@
 </form>
 </div>
 
-<div id="stylized" class="myform" style="float:left; margin-left: 2px;">
-	<form id="form" name="form" method="post" >
-	<h1>Add sample source</h1>
-	
-	<label>Source name </label>
-	<input type="text" name="source_name" id="source_name" value="<% $source_name | html %>"/>
-	<br clear="both"/>
-	<label>Source release</label>
-	<input type="text" name="source_release" id="source_release" value="<% $source_release  | html %>"/>
-	<br clear="both"/>
-%#	<label>Release date <span class="small">e.g. 11/20/2001</span></label>
-%#	<input type="text" name="release_date" id="release_date" value="<% $release_date | html %>"/>
-%#	<br clear="both"/>
-	<label>Segment <span class="small">e.g. chr1, ref02</span></label>
-	<input type="text" name="segment" id="segment" value="<% $segment | html %>"/>
-	<br clear="both"/>
-	<label>Start <span class="small">e.g. positive integer</span></label>
-	<input type="text" name="start" id="start" value="<% $start | html %>"/>
-	<br clear="both"/>
-	<label>Stop <span class="small">positiv integer > Stop</span></label>
-	<input type="text" name="stop" id="stop" value="<% $stop | html %>"/>
-	<br clear="both"/>
+<div id="stylized" class="myform" style="float:left; margin-left: 5px;">
+<form id="form" name="form" method="post" action="./edit_link">
+<input type="hidden" id="op" name="op" value="add" />
+<input type="hidden" id="sid" name="sid" value="<% $sample->id %>" />
+<h1>View in other borwsers</h1>
+<p>Links to other GBrowse portals..</p>
+% for (@links) {
+	<div><a href="<% $_->link_url|u%>"><% $_->link_name |html%></a> 
+	<a href="./edit_link?sid=<%$sid%>;lid=<%$_->id%>;op=remove" onclick="return confirm('Really remove this link?');" title="delete link">x</a></div>
+% }
+<p></p>
+<h1>Add new link</h1>
+<label>Name</label>
+<input type="text" name="link_name" id="link_name" value="<% $link_name | html %>"/>
+<label>Link<!--<span class="small"></span>--></label>
+<input type="text" name="link_url" id="link_url" value="<% $link_url | html %>"/>
+<button type="submit">Add link</button>
 
-	<label>Link<span class="small">Link to G.Browser</span></label>
-	<input type="text" name="source_url" id="source_url" value="<% $source_url | html %>"/>
-	<br clear="both"/>
-
-	<button type="submit">Add</button>
-	<input type="hidden" id="op" name="op" value="add_source" />
-	<div class="spacer"></div>
-	</form>
+</form>
 </div>
 <br clear="both"/>
 %#------------------------------------------------------------------------------
@@ -88,6 +96,9 @@
 	$segment => ''
 	$release_date => ''
 	
+	$link_url => ''
+	$link_name => ''
+	
 	$op => ''
 	$sid => 0
 </%args>
@@ -97,13 +108,11 @@
 	use DNALC::Pipeline::Utils qw/random_string/;
 	use DNALC::Pipeline::App::Utils ();
 	use DNALC::Pipeline::Sample ();
-	use DNALC::Pipeline::SampleSource ();
 	use Regexp::Common qw/URI/;
 	use Data::Dumper;
 </%once>
 %#------------------------------------------------------------------------------
 <%init>
-
 
 my $sample = $sid ? DNALC::Pipeline::Sample->retrieve($sid) : 0;
 unless ($sample) {
@@ -115,6 +124,7 @@ unless ($sample) {
 my $cf = DNALC::Pipeline::Config->new;
 my $pcf = $cf->cf("PIPELINE");
 my $scf = $cf->cf("SAMPLE");
+my @links = $sample->links;
 
 #test if admin
 if ($r->method eq "GET") {
@@ -122,43 +132,24 @@ if ($r->method eq "GET") {
 	$common_name = $sample->common_name;
 	#$sequence_data = $sample->sequence_data;
 	$clade = $sample->clade;
+	
+	$source_name = $sample->source_name;
+	$source_release = $sample->source_release;
+	$segment = $sample->segment;
+	$start = $sample->start;
+	$stop = $sample->stop;
+	$source_url = $sample->source_url;
 }
 elsif ( $r->method eq "POST") {
 	my $ok = 1;
-	
-	if ($op eq "add_source") {
-		for (qw/source_name source_release source_url stop start segment/) {
-			unless ($ARGS{$_}) {
-				my $lbl = ucfirst $_;
-				$lbl =~ s/_/ /g;
-				$m->comp('/_message_add', "$lbl is missing!", 'error');
-				$ok = 0;
-			}
-		}
-		
-		if ($source_url && $source_url !~ /$RE{URI}{HTTP}/) {
-			$m->comp('/_message_add', "Link is invalid!", 'error');
-			$ok = 0;
-		}
-		if ($ok) {
-			my $ss = DNALC::Pipeline::SampleSource->create({
-				src_sample_id => $sample->id,
-				src_name => $source_name,
-				src_release => $source_release,
-				segment => $segment,
-				start => $start,
-				stop =>$stop,
-				url => $source_url,
-			});
-			print STDERR $ss, $/;
-		}
-	}
-	elsif ($op eq "edit_sample") {
+
+	if ($op eq "edit_sample") {
 	
 		my $file2process;
-		my $smpl;
 
-		for (qw/organism common_name clade sequence_data/) {
+		for (qw/organism common_name clade source_name source_release 
+				source_url stop start segment/) 
+		{
 			unless ($ARGS{$_}) {
 				my $lbl = ucfirst $_;
 				$lbl =~ s/_/ /g;
@@ -166,53 +157,74 @@ elsif ( $r->method eq "POST") {
 				$ok = 0;
 			}
 		}
-		if (length ($sequence_data) > 100000) {
+		if (length ($sequence_data) > 110000) {
 			$ok = 0;
 			$m->comp('/_message_add', "Sequence data is too large!", 'error');
 		}
-
-		if (0 && $ok) {
-			
-			$file2process = $pcf->{upload_dir} . "/" . random_string(7,7);
-			my $in = IO::File->new;
-			if ($in->open($file2process, "w")) {
-				print $in $sequence_data;
-				undef $in;
-			}
-			
-			my $rc = DNALC::Pipeline::App::Utils->process_input_file( $file2process );
-			#print STDERR Dumper($rc), $/;
-			if (0 && $rc->{status} eq "success") {
-				$rc->{seq}->display_id($scf->{samples_common_name});
-				$smpl = eval {
-							DNALC::Pipeline::Sample->create({
-								organism => $organism,
-								common_name => $common_name,
-								clade => $clade,
-								sequence_length => $rc->{seq}->length,
-								sequence_data => $rc->{seq}->seq,
-							});
-						};
-				if ($@) {
-					print STDERR $@, $/;
-				}
-				print STDERR "sample = ", $smpl, $/;
-			}
-			
-			if ($smpl) {
-				my $smpl_dir = $scf->{samples_dir} . "/" . ($smpl->id + 100);
-				my $smpl_file = $smpl_dir . "/fasta.fa";
-				unless (-e $smpl_dir) {
-					mkdir $smpl_dir;
-				}
-				my $seq_out = Bio::SeqIO->new( -format => 'Fasta', 
-												-file => "> $smpl_file");
-				$seq_out->write_seq($rc->{seq});
-				$m->comp('/_message_add', "Sample added successfully!");
-			}
-			$m->comp('/_message_add', "Unable to process the sequence data!", 'error');
-			
+		if ($start >= $stop) {
+			$ok = 0;
+			$m->comp('/_message_add', "Stop should be > Start!", 'error');
 		}
+
+		if ($ok) {
+			
+			if ( $sequence_data && $sample->sequence_data ne $sequence_data) {
+				$sequence_data =~ s/^\s+//g;
+				$sequence_data =~ s/s+$//g;
+			
+				$file2process = $pcf->{upload_dir} . "/" . random_string(7,7);
+				my $in = IO::File->new;
+				if ($in->open($file2process, "w")) {
+					print $in $sequence_data;
+					undef $in;
+				}
+				my $rc = DNALC::Pipeline::App::Utils->process_input_file( $file2process );
+				if ($rc->{status} eq "success") {
+					$rc->{seq}->display_id($scf->{samples_common_name});
+
+					my $smpl_dir = $scf->{samples_dir} . "/" . ($sample->id);
+					my $smpl_file = $smpl_dir . "/fasta.fa";
+					unless (-e $smpl_dir) {
+						mkdir $smpl_dir;
+					}
+					my $seq_out = Bio::SeqIO->new( -format => 'Fasta', 
+												-file => "> $smpl_file");
+					$seq_out->write_seq($rc->{seq});
+					
+					my $seq_length = $rc->{seq}->length;
+					if ($seq_length != $sample->sequence_length) {
+						$sample->sequence_length($seq_length);
+					}
+					$sample->sequence_data( $sequence_data );
+				}
+				else {
+					$ok = 0;
+				}
+			}
+
+			if ($ok) {
+				$sample->organism($organism) if $sample->organism ne $organism;
+				$sample->common_name($common_name) if $sample->common_name ne $common_name;
+				$sample->clade($clade) if $sample->clade ne $clade;
+				$sample->source_name($source_name) if $sample->source_name ne $source_name;
+				$sample->source_release($source_release);
+				$sample->segment($segment);
+				$sample->start( $start );
+				$sample->stop($stop);
+				$sample->source_url ($source_url);
+				eval {
+					$sample->update;
+				};
+				if ($@) {
+					$m->comp("/_message_add", "Error: $@", "error");
+				}
+				else {
+					$m->comp('/_message_add', "Sample updated successfully!");
+					$m->redirect("edit_sample.html?sid=" . $sample->id);
+				}
+			}
+		}
+		
 	}
 }
 

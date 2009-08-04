@@ -2,7 +2,6 @@
 <div id="stylized" class="myform">
 <form id="form" name="form" method="post" >
 <h1>Add sample</h1>
-<p>This is the basic look of my form without table</p>
 
 <label>Organism
 <!--<span class="small">Genus species</span>-->
@@ -28,6 +27,25 @@
 <label>Sequence data<span class="small">max 100kbp</span></label>
 <textarea name="sequence_data" value="<% $sequence_data|html%>"></textarea>
 
+	<label>Source name </label>
+	<input type="text" name="source_name" id="source_name" value="<% $source_name | html %>"/>
+	<br clear="both"/>
+	<label>Source release</label>
+	<input type="text" name="source_release" id="source_release" value="<% $source_release  | html %>"/>
+	<br clear="both"/>
+	<label>Source url<span class="small">Link to source</span></label>
+	<input type="text" name="source_url" id="source_url" value="<% $source_url | html %>"/>
+	<br clear="both"/>
+	<label>Segment <span class="small">e.g. chr1, ref02</span></label>
+	<input type="text" name="segment" id="segment" value="<% $segment | html %>"/>
+	<br clear="both"/>
+	<label>Start <span class="small">e.g. positive integer</span></label>
+	<input type="text" name="start" id="start" value="<% $start | html %>"/>
+	<br clear="both"/>
+	<label>Stop <span class="small">positiv integer &gt; Start</span></label>
+	<input type="text" name="stop" id="stop" value="<% $stop | html %>"/>
+	<br clear="both"/>
+
 <button type="submit">Add</button>
 <div class="spacer"></div>
 
@@ -40,6 +58,14 @@
 	$common_name => ''
 	$sequence_data => ''
 	$clade => ''
+
+	$source_name => ''
+	$source_release => ''
+	$source_url => ''
+	$stop => ''
+	$start => ''
+	$segment => ''
+
 </%args>
 %#------------------------------------------------------------------------------
 <%once>
@@ -58,12 +84,12 @@ if ($r->method eq "POST") {
 	my $cf = DNALC::Pipeline::Config->new;
 	my $pcf = $cf->cf("PIPELINE");
 	my $scf = $cf->cf("SAMPLE");
-	my $file2process;
-	my $smpl;
-
+	my ($smpl, $rc);
 	my $ok = 1;
 
-	for (qw/organism common_name clade sequence_data/) {
+	for (qw/organism common_name clade source_name source_release 
+				source_url segment stop start /
+	) {
 		unless ($ARGS{$_}) {
 			my $lbl = ucfirst $_;
 			$lbl =~ s/_/ /g;
@@ -71,42 +97,53 @@ if ($r->method eq "POST") {
 			$ok = 0;
 		}
 	}
-	if (length ($sequence_data) > 100000) {
+	if (length ($sequence_data) > 110000) {
 		$ok = 0;
-		$m->comp('/_message_add', "Sequence data is too large!", 'error');
+		$m->comp('/_message_add', "Sequence data is too large! Accepting max. 100kb", 'error');
 	}
 
 	if ($ok) {
-		
-		$file2process = $pcf->{upload_dir} . "/" . random_string(7,7);
+		my $file2process = $pcf->{upload_dir} . "/" . random_string(7,7);
 		my $in = IO::File->new;
-		if ($in->open($file2process, 'w')) {
+		if ($in->open($file2process, "w")) {
 			print $in $sequence_data;
 			undef $in;
 		}
 		
-		my $rc = DNALC::Pipeline::App::Utils->process_input_file( $file2process );
+		$rc = DNALC::Pipeline::App::Utils->process_input_file( $file2process );
 		#print STDERR Dumper($rc), $/;
-		if ($rc->{status} eq "success") {
-		
-			$smpl = eval {
-						DNALC::Pipeline::Sample->create({
-							organism => $organism,
-							common_name => $common_name,
-							clade => $clade,
-							sequence_length => length($sequence_data),
-							sequence_data => $sequence_data,
-						});
-					};
-			if ($@) {
-				print STDERR $@, $/;
-			}
-			print STDERR "sample = ", $smpl, $/;
+		unless ($rc->{status} eq "success") {
+			$ok = 0;
+			$m->comp('/_message_add', $rc->{message}, 'error');
 		}
+	}
+
+	if ($ok) { # if still $ok == 1
+	
+		$smpl = eval {
+					DNALC::Pipeline::Sample->create({
+						organism => $organism,
+						common_name => $common_name,
+						clade => $clade,
+						sequence_length => $rc->{seq}->length,
+						#sequence_data => $sequence_data,
+						source_name => $source_name,
+						source_release => $source_release,
+						source_url => $source_url,
+						segment => $segment,
+						start => $start,
+						stop =>$stop,
+					});
+				};
+		if ($@) {
+			print STDERR $@, $/;
+		}
+		print STDERR "sample = ", $smpl, $/;
 		
 		if ($smpl) {
+
 			$rc->{seq}->display_id($scf->{samples_common_name});
-			my $smpl_dir = $scf->{samples_dir} . "/" . ($smpl->id + 100);
+			my $smpl_dir = $scf->{samples_dir} . "/" . $smpl->id;
 			my $smpl_file = $smpl_dir . "/fasta.fa";
 			unless (-e $smpl_dir) {
 				mkdir $smpl_dir;
@@ -114,6 +151,10 @@ if ($r->method eq "POST") {
 			my $seq_out = Bio::SeqIO->new( -format => 'Fasta', 
 											-file => "> $smpl_file");
 			$seq_out->write_seq($rc->{seq});
+			
+			# store the sequence in the db
+			$smpl->sequence_data($rc->{seq}->seq);
+			
 			$m->comp('/_message_add', "Sample added successfully!");
 			$m->redirect('./edit_sample.html?sid=' . $smpl->id);
 		}

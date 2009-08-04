@@ -611,37 +611,35 @@ use Carp;
 		my $proj = $self->project;
 		my $pm   = $self->pmanager;
 
-		my $sample_id = $proj->sample;
-		if ($sample_id) {
-			my $sample = DNALC::Pipeline::Sample->new($sample_id);
-			return $status unless $sample;
+		my $sample = DNALC::Pipeline::Sample->new($proj->sample);
+		#print STDERR 'FAKE:....', Dumper( $sample ), $/;
+		return $status unless $sample;
 
-			my $rc = $sample->copy_results({
-						routine => $routine,
+		my $rc = $sample->copy_results({
+					routine => $routine,
+					project_id => $proj->id,
+					project_dir => $pm->work_dir,
+					common_name => $proj->common_name,
+				});
+		if ($rc) {
+			$status->{success} = 1;
+			$status->{elapsed} = 1.59;
+			$status->{gff_file}= $pm->get_gff3_file($routine);
+			$self->set_status($routine, 'Done', $status->{elapsed});
+			#copy  masked fasta files
+			if ($routine eq 'repeat_masker') {
+				for my $mask (qw/repeat_masker repeat_masker2/) {
+					$rc = $sample->copy_fasta({
+						project_dir => $proj->work_dir,
 						project_id => $proj->id,
-						project_dir => $pm->work_dir,
 						common_name => $proj->common_name,
+						masker => $mask
 					});
-			if ($rc) {
-				$status->{success} = 1;
-				$status->{elapsed} = 1.59;
-				$status->{gff_file}= $pm->get_gff3_file($routine);
-				$self->set_status($routine, 'Done', $status->{elapsed});
-				#copy  masked fasta files
-				if ($routine eq 'repeat_masker') {
-					for my $mask (qw/repeat_masker repeat_masker2/) {
-						$rc = $sample->copy_fasta({
-							project_dir => $proj->work_dir,
-							project_id => $proj->id,
-							common_name => $proj->common_name,
-							masker => $mask
-						});
-					}
 				}
 			}
-			else {
-				print STDERR  "copy_results($routine) failed...", $/;
-			}
+		}
+		else {
+			print STDERR  "copy_results($routine) failed...", $/;
 		}
 
 		return $status;

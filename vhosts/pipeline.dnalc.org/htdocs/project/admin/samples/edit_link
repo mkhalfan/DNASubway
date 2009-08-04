@@ -1,0 +1,60 @@
+<%args>
+	$op => ''
+	$sid => 0
+	$lid => 0
+	$link_name => ''
+	$link_url => ''
+</%args>
+%#------------------------------------------------------------------------------
+<%once>
+	use DNALC::Pipeline::Sample ();
+	use DNALC::Pipeline::SampleLink ();
+	use Regexp::Common qw/URI/;
+</%once>
+%#------------------------------------------------------------------------------
+%#------------------------------------------------------------------------------
+<%init>
+my $status = 'error';
+my $msg = '';
+my $sample = $sid ? DNALC::Pipeline::Sample->retrieve($sid) : 0;
+unless ($sample) {
+	$m->comp('/_message_add', "No sample was found for sample id = $sid!", 'error');
+	$m->redirect('./index.html');
+}
+if ($op eq 'remove' && $lid) {
+	my ($link) = DNALC::Pipeline::SampleLink->search(sample_id => $sid, link_id => $lid);
+	if ($link) {
+		$link->delete;
+		$m->comp('/_message_add', "Link removed.");
+	} 
+	else {
+		$m->comp('/_message_add', "Link not found.", 'error');
+	}
+	$m->redirect('./edit_sample.html?sid=' . $sid);
+}
+if ($link_url eq '' || $link_url != /$RE{URI}{HTTP}/) {
+	$m->comp('/_message_add', "Link url is missing or not well formatted", 'error');
+	$m->redirect('./edit_sample.html?sid=' . $sid);
+}
+
+if (!$link_name) {
+	$m->comp('/_message_add', "Link name is missing.", 'error');
+	$m->redirect('./edit_sample.html' . $sid);
+}
+
+# else
+my $l = $sample->add_to_links({
+	sample_id => $sid,
+	link_name => $link_name,
+	link_url => $link_url
+});
+if ($l) {
+	$m->comp('/_message_add', "Link added successfully. ");
+	$m->redirect('./edit_sample.html?sid=' . $sid);
+}
+
+</%init>
+
+<%flags>
+	inherit => undef
+</%flags>

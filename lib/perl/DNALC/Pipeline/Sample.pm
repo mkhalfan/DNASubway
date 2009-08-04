@@ -11,12 +11,15 @@ use base qw(DNALC::Pipeline::DBI);
 
 __PACKAGE__->table('sample');
 __PACKAGE__->columns(Primary => qw/sample_id/);
-__PACKAGE__->columns(Essential => qw/organism common_name clade sequence_length/);
-__PACKAGE__->columns(Other => qw/sequence_data created updated/);
+__PACKAGE__->columns(Essential => qw/organism common_name clade sequence_length
+							source_name source_release source_url 
+							segment start stop
+		/);
+__PACKAGE__->columns(Other => qw/active created updated/);
+
+__PACKAGE__->has_many(links => 'DNALC::Pipeline::SampleLink', { order_by => 'link_id' });
 
 __PACKAGE__->sequence('sample_sample_id_seq');
-
-__PACKAGE__->has_many(sources => 'DNALC::Pipeline::SampleSource');
 
 __PACKAGE__->add_trigger(before_create => sub {
     $_[0]->{created} ||= POSIX::strftime "%Y-%m-%d %H:%M:%S", localtime(+time);
@@ -31,39 +34,45 @@ __PACKAGE__->add_trigger(before_update => sub {
 
 sub new {
 	my ($class, $sample_id) = @_;
+	#TODO: check if the file exists, else create it using the data in DB
+	#print STDERR  "@_", $/;
+	$class->retrieve($sample_id);
+}
 
-	my ($sample) = grep { $_->{id} == $sample_id } @{ $class->config->{samples} };
-	#my $sample = __PACKAGE__->retrieve($sample_id);
 
-	return unless $sample;
+__PACKAGE__->set_sql('update_sequence', q{
+	UPDATE __TABLE__
+	SET sequence_data = ?
+	WHERE sample_id = ?
+});
+__PACKAGE__->set_sql('get_sequence', q{
+	SELECT sequence_data 
+	FROM __TABLE__
+	WHERE sample_id = ?
+});
 
-	my $sample_dir = $sample->sample_id;
-	return unless -d $sample_dir  && -f $sample_dir . '/' . 'fasta.fa';
+sub sequence_data {
+	my ($self, $data) = @_;
 
-	return $sample;
-	#return bless {
-	#				samples_common_name => $class->config->{samples_common_name},
-	#				sample_dir => $sample_dir, 
-	#				sample => $sample
-	#			}, $class;
+	my $sth;
+	if (defined $data) {
+		$sth = $self->sql_update_sequence;
+		$sth->execute($data, $self->id);
+	}
+	else {
+		my $sth = $self->sql_get_sequence;
+		$sth->execute($self->id);
+
+		($data) = $sth->fetchrow_array;
+	}
+	return $data;
 }
 
 sub config {
 	my $cf = DNALC::Pipeline::Config->new;
-	return $cf->('SAMPLE');
+	return $cf->cf('SAMPLE');
 }
 
-# sub organism {
-# 	my ($self) = @_;
-# 	# FIXME
-# 	return $self->{sample}->{organism} if $self->{sample};
-# }
-# 
-# sub common_name {
-# 	my ($self) = @_;
-# 	# FIXME
-# 	return $self->{sample}->{common_name} if $self->{sample};
-# }
 
 sub sample_dir {
 	my ($self) = @_;
@@ -73,6 +82,8 @@ sub sample_dir {
 	return $cf->{samples_dir} . '/' . $self->id;
 }
 
+
+#-------------------------------------------------------------
 sub copy_results {
 	my ($self, $args) = @_;
 
@@ -116,7 +127,7 @@ sub copy_results {
 		}
 	}
 
-	my $sample_gff_file = $self->{sample_dir} . '/' . uc ($routine) . '/' . $rcf->{gff3_file};
+	my $sample_gff_file = $self->sample_dir . '/' . uc ($routine) . '/' . $rcf->{gff3_file};
 	unless (-f $sample_gff_file) {
 		print STDERR  "SAMPLE GFF is missing for: ", $routine, $/;
 		return;
@@ -169,7 +180,7 @@ sub copy_fasta {
 	$common_name =~ s/-/_/g;
 	$common_name .= '_' . $project_id;
 
-	my $sample_fasta = $self->{sample_dir} . '/fasta.fa';
+	my $sample_fasta = $self->sample_dir . '/fasta.fa';
 	my $out_fasta = $project_dir . '/fasta.fa';
 	if (defined $masker && $masker) {
 		my $masker_dir = $project_dir . '/' . uc $masker;
@@ -183,7 +194,7 @@ sub copy_fasta {
 			}
 		}
 
-		$sample_fasta = $self->{sample_dir} . '/' . uc ($masker) . '/output/fasta.fa.masked';
+		$sample_fasta = $self->sample_dir . '/' . uc ($masker) . '/output/fasta.fa.masked';
 		$out_fasta = $masker_dir . '/output/fasta.fa.masked';
 	}
 	print STDERR  "Fasta sample = ", $sample_fasta, $/;
@@ -205,5 +216,8 @@ sub copy_fasta {
 	
 	return 1; #ok
 }
+
+
 1;
+
 

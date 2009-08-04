@@ -4,26 +4,28 @@
 <%once>
 	use DNALC::Pipeline::Project ();
 	use DNALC::Pipeline::Config ();
+	use DNALC::Pipeline::Sample ();
 	my $pcf = DNALC::Pipeline::Config->new->cf('PIPELINE');
 </%once>
 <%init>
 my $proj = DNALC::Pipeline::Project->retrieve($pid);
-my ($ref, $start, $stop);
+my ($ref, $start, $stop, $sample);
 
 if ($proj) {
 	my $trimmed_common_name = $proj->common_name . '_' . $proj->id;
 	$trimmed_common_name =~ s/\s+/_/g;
 	$trimmed_common_name =~ s/-/_/g;
 
-	my ($sample) = grep {$_->{id} == $proj->sample} @{ $pcf->{samples} };
+	#($sample) = grep {$_->{id} == $proj->sample} @{ $pcf->{samples} };
+	$sample = DNALC::Pipeline::Sample->new($proj->sample);
 	unless ($sample) {
 		$proj = undef;
 	}
 	else {
-		my @position = split/-/, $sample->{position};
-		$ref = $sample->{location};		
-		$start = $position[0];
-		$stop = $position[1];
+		#my @position = split/-/, $sample->{position};
+		$ref = $sample->segment;	
+		$start = $sample->start;
+		$stop = $sample->stop;
 	}
 }
 
@@ -41,9 +43,14 @@ if ($proj) {
 <div id="">
 % if ($proj) { 
 <div id="blurb">
-	<p>Access the .gff data file for the annotation results <a href="/project/prepare_exporter_file?pid=<% $pid %>">here</a> and save it to the desktop.</p>
-	<p>Then, open the Genome Browser at the website of “The Arabidopsis Information Source” (TAIR) <a href="http://www.arabidopsis.org/cgi-bin/gbrowse/arabidopsis/?start=<%$start%>;stop=<%$stop%>;ref=<% $ref %>;width=800;version=100;cache=on;drag_and_drop=on;show_tooltips=on;grid=on;label=ProteinCoding-cDNA-EST-tDNAs">here</a>.</p>
-	<p>To view the annotation results within the TAIR browser use the “Add your own tracks” facility at the bottom of that page.</p>
+	<p>Access the .gff data file for the annotation results 
+	<a href="/project/prepare_exporter_file?pid=<% $pid %>">here</a> and save it to the desktop.</p>
+	<p>Then, open the Genome Browser at the website of:
+% for ($sample->links) {
+	<div><a href="<% $_->link_url%>"><% $_->link_name %></a></div>
+% }
+	<p>To view the annotation results within any of the above browsers use the “Add your own tracks” 
+	facility at the bottom of that page.</p>
 </div>
 % } else {
 <p id="message" style="color: red">
