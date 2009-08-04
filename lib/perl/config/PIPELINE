@@ -48,7 +48,5 @@
 				source => 'genoscope/INRA', release => '2007', date => '2009-05-20'},
 		],
 
-	samples_common_name => qr/__%SPECIESNAMEHERE%__/,
-	samples_dir => '/var/www/vhosts/pipeline.dnalc.org/var/samples',
 	sequence_length => 100_000,
 }
