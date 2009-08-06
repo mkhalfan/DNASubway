@@ -52,6 +52,10 @@ if ($r->method eq 'POST') {
 		push @err, "Organism name may contain only letters, digits and spaces";
 	}
 
+	if ($seq_src eq "sample" && !defined $sequence) {
+			push @err, "Sequence is missing", $/;
+	}
+
 	unless (@err) {
 		$common_name = lc $common_name;
 
@@ -65,6 +69,13 @@ if ($r->method eq 'POST') {
 			}
 		}
 		elsif ($seq_src eq "paste") {
+		
+			$sequence =~ s/^\s+//;
+			$sequence =~ s/\s+$//;
+			unless ($sequence =~ /^>/) {
+				push @err, "The sequence is not in FASTA format.";
+			}
+
 			$file2process = $pcf->{upload_dir} . '/' . random_string(7,7);
 			my $in = IO::File->new;
 			if ($in->open($file2process, "w")) {
@@ -189,18 +200,19 @@ if ($r->method eq 'POST') {
   
 <!-- form start -->
   
-    <div class="selectortitle_h2">Select Sequence Source</div>
+    <div class="selectortitle_h2">Select DNA Sequence Source</div>
     <div class="spacer"></div>
  <div>
     <input class="selectortitle_h2" type="radio" name="seq_src" id="seq_src_upload" value="upload" onclick="select_source(this)" <% $seq_src eq 'upload' ? 'checked="checked"' : ''%> />
-	Upload a Sequence File: (max 100kb) <br/>
+	Upload a Sequence File in <a href="http://en.wikipedia.org/wiki/FASTA_format#Format">FASTA format</a>: (max 100kb) <br/>
 		<input class="stylizedupload" type="file" id="seq_file" name="seq_file" \
 		onchange="set_source('upload')" onclick="set_source('upload')"  />
  </div>
 	<div class="spacer"></div>
 
 	<div><!-- end of enter a sequence -->
-		<input type="radio" name="seq_src" id="seq_src_paste" value="paste" <% $seq_src eq 'paste' ? 'checked="checked"' : ''%> /> Enter a Sequence:
+		<input type="radio" name="seq_src" id="seq_src_paste" value="paste" <% $seq_src eq 'paste' ? 'checked="checked"' : ''%> /> 
+		Enter a Sequence in <a href="http://en.wikipedia.org/wiki/FASTA_format#Format">FASTA format</a>:
 		<textarea name="sequence" class="stylized" id="notebox" rows="4" cols="30" onfocus="set_source('paste');"><% $sequence |html %></textarea>
 	</div><!-- end of enter a sequence -->
   <br/>

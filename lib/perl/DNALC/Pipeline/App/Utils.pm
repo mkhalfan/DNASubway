@@ -41,17 +41,28 @@ sub save_upload {
 
 		$path = $upl_dir . '/' . random_string();
 		print STDERR  "UPLOAD saved to: ", $path, $/;
-		my $out = IO::File->new;
-		if ($out->open($path, 'w')) {
-			$status = 'success';
-			my $fh = $u->fh;
-			while (my $line = <$fh>) {
-				print $out $line;
-			}
-			undef $out;
+		my $seq_data = '';
+		my $fh = $u->fh;
+		while (my $line = <$fh>) {
+			#print $out $line;
+			$seq_data .= $line;
+		}
+		$seq_data =~ s/^\s+//;
+		$seq_data =~ s/\s+$//;
+
+		unless ( $seq_data =~ /^>/) {
+			$msg = "Uploaded file is not in FASTA format.";
 		}
 		else {
-			$msg = 'Unable to save uploaded file!';
+			my $out = IO::File->new;
+			if ($out->open($path, 'w')) {
+				$status = 'success';
+				print $out $seq_data;
+				undef $out;
+			}
+			else {
+				$msg = 'Unable to save uploaded file!';
+			}
 		}
 	}
 
@@ -85,10 +96,10 @@ sub process_fasta_file {
 
 	my ($in, $status, $msg) = (undef, 'fail', '');
 	if ($file) {
-		$in = Bio::SeqIO->new(-file => $file, -format => "Fasta");
+		$in = Bio::SeqIO->new(-file => $file, -format => "fasta");
 	}
 	elsif ($fh) {
-		$in = Bio::SeqIO->new(-fh => $fh, -format => "Fasta");
+		$in = Bio::SeqIO->new(-fh => $fh, -format => "fasta");
 	}
 	unless ($in) {
 		return ('fail', 'Unable to process sequence file.');
@@ -115,7 +126,7 @@ sub process_fasta_file {
 		$ctx->add($fasta_seq->seq);
 		$crc = $ctx->hexdigest;
 
-		my $out = Bio::SeqIO->new(-file => "> $output_file", -format => 'Fasta');
+		my $out = Bio::SeqIO->new(-file => "> $output_file", -format => 'fasta');
 		$out->write_seq( $fasta_seq );
 		$status = 'ok';
 	}
@@ -139,7 +150,7 @@ sub process_input_file {
 
 	my ($in, $status, $msg) = (undef, 'fail', '');
 	if ($file) {
-		$in = Bio::SeqIO->new(-file => $file, -format => "Fasta");
+		$in = Bio::SeqIO->new(-file => $file, -format => "fasta");
 	}
 	unless ($in) {
 		return {status => 'fail', msg => 'Unable to process sequence file.'};

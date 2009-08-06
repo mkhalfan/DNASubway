@@ -64,7 +64,7 @@
 <form id="form" name="form" method="post" action="./edit_link">
 <input type="hidden" id="op" name="op" value="add" />
 <input type="hidden" id="sid" name="sid" value="<% $sample->id %>" />
-<h1>View in other borwsers</h1>
+<h1>Export in other borwsers</h1>
 <p>Links to other GBrowse portals..</p>
 % for (@links) {
 	<div><a href="<% $_->link_url|u%>"><% $_->link_name |html%></a> 
@@ -157,29 +157,48 @@ elsif ( $r->method eq "POST") {
 				$ok = 0;
 			}
 		}
-		if (length ($sequence_data) > 110000) {
-			$ok = 0;
-			$m->comp('/_message_add', "Sequence data is too large!", 'error');
-		}
-		if ($start >= $stop) {
-			$ok = 0;
-			$m->comp('/_message_add', "Stop should be > Start!", 'error');
-		}
 
 		if ($ok) {
-			
+			if ($organism =~ /[^a-z0-9\s]/i || $common_name =~ /[^a-z0-9\s-]/i) {
+				$m->comp("/_message_add", "Organism name may contain only letters, digits and spaces", "error");
+				$ok = 0;
+			}
+			if ($start >= $stop) {
+				$ok = 0;
+				$m->comp('/_message_add', "Stop should be > Start!", 'error');
+			}
+			if ($source_url !~ /$RE{URI}{HTTP}/) {
+				$m->comp('/_message_add', "Source url is not well formatted!", 'error');
+				$ok = 0;
+			}
+			if (length ($sequence_data) > 110000) {
+				$ok = 0;
+				$m->comp('/_message_add', "Sequence is too large!", 'error');
+			}
+		}
+		
+
+		
+		if ($ok) {
+
 			if ( $sequence_data && $sample->sequence_data ne $sequence_data) {
+				my $rc = undef;
 				$sequence_data =~ s/^\s+//g;
-				$sequence_data =~ s/s+$//g;
-			
-				$file2process = $pcf->{upload_dir} . "/" . random_string(7,7);
-				my $in = IO::File->new;
-				if ($in->open($file2process, "w")) {
-					print $in $sequence_data;
-					undef $in;
+				$sequence_data =~ s/\s+$//g;
+				if ($sequence_data =~ /^>/) {
+					$file2process = $pcf->{upload_dir} . "/" . random_string(7,7);
+					my $in = IO::File->new;
+					if ($in->open($file2process, "w")) {
+						print $in $sequence_data;
+						undef $in;
+					}
+					$rc = DNALC::Pipeline::App::Utils->process_input_file( $file2process );
 				}
-				my $rc = DNALC::Pipeline::App::Utils->process_input_file( $file2process );
-				if ($rc->{status} eq "success") {
+				else {
+					$m->comp("/_message_add", "Sequence is not in FASTA format!", "error");
+				}
+				
+				if ($rc && $rc->{status} eq "success") {
 					$rc->{seq}->display_id($scf->{samples_common_name});
 
 					my $smpl_dir = $scf->{samples_dir} . "/" . ($sample->id);
@@ -187,7 +206,7 @@ elsif ( $r->method eq "POST") {
 					unless (-e $smpl_dir) {
 						mkdir $smpl_dir;
 					}
-					my $seq_out = Bio::SeqIO->new( -format => 'Fasta', 
+					my $seq_out = Bio::SeqIO->new( -format => "fasta",
 												-file => "> $smpl_file");
 					$seq_out->write_seq($rc->{seq});
 					
@@ -195,7 +214,9 @@ elsif ( $r->method eq "POST") {
 					if ($seq_length != $sample->sequence_length) {
 						$sample->sequence_length($seq_length);
 					}
-					$sample->sequence_data( $sequence_data );
+					$sample->sequence_data( 
+						$scf->{samples_common_name} . "\n" . $rc->{seq}->seq
+					);
 				}
 				else {
 					$ok = 0;
@@ -203,6 +224,7 @@ elsif ( $r->method eq "POST") {
 			}
 
 			if ($ok) {
+				$common_name = lc $common_name;
 				$sample->organism($organism) if $sample->organism ne $organism;
 				$sample->common_name($common_name) if $sample->common_name ne $common_name;
 				$sample->clade($clade) if $sample->clade ne $clade;

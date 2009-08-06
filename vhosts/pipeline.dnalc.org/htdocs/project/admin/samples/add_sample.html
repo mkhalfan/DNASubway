@@ -25,7 +25,7 @@
 </div>
 <div class="spacer"></div>
 <label>Sequence data<span class="small">max 100kbp</span></label>
-<textarea name="sequence_data" value="<% $sequence_data|html%>"></textarea>
+<textarea name="sequence_data"><% $sequence_data|html%></textarea>
 
 	<label>Source name </label>
 	<input type="text" name="source_name" id="source_name" value="<% $source_name | html %>"/>
@@ -73,6 +73,7 @@
 	use DNALC::Pipeline::Utils qw/random_string/;
 	use DNALC::Pipeline::App::Utils ();
 	use DNALC::Pipeline::Sample ();
+	use Regexp::Common qw/URI/;
 	use Data::Dumper;
 </%once>
 %#------------------------------------------------------------------------------
@@ -97,12 +98,36 @@ if ($r->method eq "POST") {
 			$ok = 0;
 		}
 	}
+
+	if ($ok) {
+		if ($organism =~ /[^a-z0-9\s]/i || $common_name =~ /[^a-z0-9\s-]/i) {
+			$m->comp("/_message_add", "Organism name may contain only letters, digits and spaces", "error");
+			$ok = 0;
+		}
+		if ($start >= $stop) {
+			$ok = 0;
+			$m->comp('/_message_add', "Stop should be > Start!", 'error');
+		}
+		#if ($source_url !~ /$RE{URI}{HTTP}/) {
+		#	$m->comp('/_message_add', "Source url is not well formatted!", 'error');
+		#	$ok = 0;
+		#}
+	}
+
 	if (length ($sequence_data) > 110000) {
 		$ok = 0;
 		$m->comp('/_message_add', "Sequence data is too large! Accepting max. 100kb", 'error');
 	}
 
 	if ($ok) {
+		$sequence_data =~ s/^\s+//g;
+		$sequence_data =~ s/\s+$//g;
+		unless ($sequence_data =~ /^>/) {
+			$m->comp('/_message_add', "Sequence is not in FASTA format!", 'error');
+			$ok = 0;
+		}
+	}
+	if ($ok) { # if still ok..
 		my $file2process = $pcf->{upload_dir} . "/" . random_string(7,7);
 		my $in = IO::File->new;
 		if ($in->open($file2process, "w")) {
@@ -133,6 +158,7 @@ if ($r->method eq "POST") {
 						segment => $segment,
 						start => $start,
 						stop =>$stop,
+						
 					});
 				};
 		if ($@) {
@@ -153,7 +179,9 @@ if ($r->method eq "POST") {
 			$seq_out->write_seq($rc->{seq});
 			
 			# store the sequence in the db
-			$smpl->sequence_data($rc->{seq}->seq);
+			$smpl->sequence_data(
+				$scf->{samples_common_name} . "\n" . $rc->{seq}->seq
+			);
 			
 			$m->comp('/_message_add', "Sample added successfully!");
 			$m->redirect('./edit_sample.html?sid=' . $smpl->id);

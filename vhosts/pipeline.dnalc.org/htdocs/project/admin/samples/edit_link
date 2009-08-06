@@ -32,7 +32,7 @@ if ($op eq 'remove' && $lid) {
 	}
 	$m->redirect('./edit_sample.html?sid=' . $sid);
 }
-if ($link_url eq '' || $link_url != /$RE{URI}{HTTP}/) {
+unless ($link_url && $link_url =~ /$RE{URI}{HTTP}/) {
 	$m->comp('/_message_add', "Link url is missing or not well formatted", 'error');
 	$m->redirect('./edit_sample.html?sid=' . $sid);
 }
