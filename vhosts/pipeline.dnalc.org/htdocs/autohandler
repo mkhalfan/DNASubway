@@ -17,9 +17,9 @@
 <!--[if IE]>
 <script type="text/javascript" src="/js/firebug-lite-compressed.js"></script>
 <![endif]-->
-%#<link type='text/css' rel='stylesheet' href='/css/device.css' />
-%#<link type='text/css' rel='stylesheet' href='/css/style.css' />
-% if ($m->request_comp->attr_if_exists('css') && @{$m->request_comp->attr('css')}) { 
+<link type="text/css" rel="stylesheet" href="/css/general.css" />
+<link type="text/css" rel="stylesheet" href="/css/content.css" />
+% if (0 && $m->request_comp->attr_if_exists('css') && @{$m->request_comp->attr('css')}) { 
 %	foreach my $css (@{$m->request_comp->attr('css')}) {
 %		next unless $css;
 <link type='text/css' rel='stylesheet' href='/css/<% $css %>' />
@@ -37,12 +37,33 @@
 
 </head>
 <body>
-<div id="container_main">
+<div id="mainContainer">
+  <div id="headerContainer"><!--START of ID headerContainer-->  		
+	<div id="header_leftButton"><!--START of ID header_leftButton-->
+		<div class="header_left"><a href="#" title="">About</a></div>
+		<div class="header_left"><a href="#" title="">Learn</a></div>
+		<div class="header_log"><a href="#" title="">Log Out</a></div>
+	</div> <!--END of ID header_leftButton-->
+	<div id="header_rightButton"><!--START of ID header_rightButton-->
+		<!--<div class="header_back"><a href="#" title="">go BACK</a></div>-->
+		<!--<div class="header_right"><a href="#" title="" class="current"><span class="textSpace1">CONSOLE</span></a></div>-->
+		<div class="header_right"><a href="/project/browse" title="" >PROJECTS</a></div> 
+	</div>
+  </div>
+
+  <div id="conBody">
 
 % $m->call_next;
 
-<div id="container_footer">Copyright 2009, Cold Spring Harbor Laboratory. All rights reserved.</div>
-</div> <!-- #container_main  -->
+	<div style="clear: both;">&nbsp;</div> 
+  </div> <!-- end conBody -->  
+  <div id="bottomContainer"></div>
+</div> <!-- #mainContainer  -->
+<div id="footerContainer">
+	<div id="footerContainer_middle">
+		<div id="footer_copyright">All content is © 2009 by the iPlant Collaborative</div>
+	</div>
+</div><!--END of ID footerContainerr-->
 </body>
 </html>
 %#---------------------------------
@@ -51,7 +72,7 @@
 %#---------------------------------
 <%attr>
 	js => []
-	css => ['device.css']
+	css => []
 	load_window_ui => 0
 </%attr>
 %#---------------------------------

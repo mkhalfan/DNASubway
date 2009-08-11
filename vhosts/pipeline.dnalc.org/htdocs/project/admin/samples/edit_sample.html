@@ -1,7 +1,7 @@
 <& "/_messages" &>
 
 <div id="stylized" class="myform" style="float:left">
-<form id="form" name="form" method="post" >
+<form id="form" name="form" method="post" onsubmit="ch=$('active').checked; if (!ch) return confirm('Non active samples will not be available for creating projects!\n\nContinue?')">
 <h1>Edit sample</h1>
 <p></p>
 
@@ -52,6 +52,12 @@
 	<label>Stop <span class="small">positiv integer &gt; Start</span></label>
 	<input type="text" name="stop" id="stop" value="<% $stop | html %>"/>
 	<br clear="both"/>
+	<label></label>
+	<input type="checkbox" name="active" id="active" value="1" <% $active ? "checked=\"checked\"" : "" %>/>
+	Active sample?
+	<div>
+		<br clear="both"/>
+	</div>
 
 <button type="submit">Update</button>
 <div class="spacer"></div>
@@ -99,6 +105,8 @@
 	$link_url => ''
 	$link_name => ''
 	
+	$active => 0
+	
 	$op => ''
 	$sid => 0
 </%args>
@@ -132,6 +140,7 @@ if ($r->method eq "GET") {
 	$common_name = $sample->common_name;
 	#$sequence_data = $sample->sequence_data;
 	$clade = $sample->clade;
+	$active = $sample->active;
 	
 	$source_name = $sample->source_name;
 	$source_release = $sample->source_release;
@@ -176,8 +185,6 @@ elsif ( $r->method eq "POST") {
 				$m->comp('/_message_add', "Sequence is too large!", 'error');
 			}
 		}
-		
-
 		
 		if ($ok) {
 
@@ -234,6 +241,8 @@ elsif ( $r->method eq "POST") {
 				$sample->start( $start );
 				$sample->stop($stop);
 				$sample->source_url ($source_url);
+				$sample->active($active) if $sample->active($active) != $active;
+				print STDERR "active = $active\n";
 				eval {
 					$sample->update;
 				};

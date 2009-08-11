@@ -1,61 +1,56 @@
 
-<div id="container_devicebg2"></div>
-<div id="container_top">
-	<!--<div id="learn_head"><a href="/learnlearn.html" style="padding-left: 10px;">Learn</a></div>
-	<div id="logout_head"><a href="home.html" style="padding-left: 10px;">Log Out</a></div>-->
-    <div id="backhome"></div>
-    <div id="backtoconsole_head">CONSOLE</div>
-    <div id="backtoloader_head"><a href="/project/browse">PROJECTS</a></div>
-    
-</div> <!-- #container_top  -->
+<div id="conTop_button"> 
+	<div id="conTop_title"><h2>CONSOLE</h2></div>
+	<div id="conTitle_content"><% $proj->name |html %></div>
+	<div id="conMember_name">USER: Guest</div>    
+</div><!--END of ID conTop_button-->
 
-<div id="container_content_member3">
+<div class="blurbxxx">
+	parent padding is not set, parent padding is not set, parent padding is not set, parent padding is not set,
+	parent padding is not set, parent padding is not set, parent padding is not set, parent padding is not set, 	
+</div>
+
 <input type="hidden" id="pid" value="<% $pid %>"/>
-	<div id="container_pagehead">
-		<div id="container_pagetitle">:: CONSOLE ::</div>
-		<div id="container_membername">User: Guest</div>
-	</div>
 
-	<div id="container_commandertitle"><% $proj->name |html%></div>
-	<div id="container_commanderblurb">	
-		<& "/_messages" &>
-	</div>
+<div class="blurb">	
+	<& "/_messages" &>
+</div>
 
-	<div id="container_project">
-		<div class="commandertitle_member">Project</div>
-% if (1) {
+
+<div id="conConsole_left"> <!--span conConsole_left start-->
+<h3>PROJECT</h3>
 <!-- ---------------------------------------- -->
-	<div style="height:40px">&nbsp;</div>
-<table border="0" cellpadding="1" style="margin-left: 20px;margin-right: auto; width: 278px">
-  <tr >
-    <td class="tdprojectlabel">User</td>
-    <td class="tdprojectinfo">: Guest</td>
-</tr>
-<tr>
-	<td class="tdprojectlabel">Group/Affiliation</td>
-    <td class="tdprojectinfo">: DNALC</td>
-</tr>
-<tr>
-	<td class="tdprojectlabel">Project ID</td>
-	<td class="tdprojectinfo">: <% $proj->id %></td>
-<tr>
-  	<td class="tdprojectlabel">Organism</td>
-	<td class="tdprojectinfo">: <% $proj->common_name %></td>
-</tr>
-<tr>
-	<td class="tdprojectlabel">Classification</td>
-	<td class="tdprojectinfo">: <% $clades{$proj->clade} %></td>
-</tr>
-<tr>
-	<td class="tdprojectlabel" style="vertical-align: top">Sequence size</td>
-	<td class="tdprojectinfo"><span style="vertical-align: top">: <% nicebasepairs($proj->sequence_length) %> &nbsp;</span><a href="javascript:;" onclick="launch(null, '<& './.comp/filepath_to_web', file => $pm->fasta_file &>')"><img id="view_seq_btn" src="/images/v0/button_viewDown.png" alt="open sequence" style="border: 0px; margin-top: -3px" /></a></td>
-</tr>
-</table>
-<!--   ----   -->
+<div class="conConsole_leftRow">
+	<span class="conConsole_leftCell1">User</span>
+	<span class="conConsole_leftCell2">: Guest</span>
+</div>
+<div class="conConsole_leftRow">
+	<span class="conConsole_leftCell1">Group/Affiliation</span>
+	<span class="conConsole_leftCell2">: DNALC</span>
+</div>
+<div class="conConsole_leftRow">
+	<span class="conConsole_leftCell1">Project ID</span>
+	<span class="conConsole_leftCell2">: <% $proj->id %></span>
+</div>
+<div class="conConsole_leftRow">
+	<span class="conConsole_leftCell1">Organism</span>
+	<span class="conConsole_leftCell2">: <% $proj->common_name %></span>
+</div>
+<div class="conConsole_leftRow">
+	<span class="conConsole_leftCell1">Classification</span>
+	<span class="conConsole_leftCell2">: <% $clades{$proj->clade} %></span>
+</div>
+<div class="conConsole_leftRow">
+	<span class="conConsole_leftCell1">Sequence size</span>
+	<span class="conConsole_leftCell3">: <% nicebasepairs($proj->sequence_length) %></span>
+	<span class="conConsole_leftCellBT"><a href="javascript:;" onclick="javascript:launch(null, '<& './.comp/filepath_to_web', file => $pm->fasta_file &>')" title="">VIEW</a></span>
+</div>
 
-<div class="historylist"> <!-- history start -->
-<div class="tdproject_empty"><img src="/images/v0/dot_blue.png" />&nbsp;History</div>
-<ul>
+<!-- history start ----------------------------------------------------------->
+<div class="conConsole_leftHistory">HISTORY</div>
+ <div style="clear: both;">&nbsp;</div> 
+	<div class="conHistorylist">
+	<ul>
 % for my $h (@$history) {
 	<li class="closed">
 	<strong><% $h->{task_name} %></strong>,\
@@ -65,116 +60,106 @@
 	<% DNALC::Pipeline::App::Utils->format_datetime($h->{created}) %>
 	</li>
 % }
-</ul>
-</div><!-- history end -->
-<div id="debug" style="display:<% $debug ? "block" : "none"%>"></div>
-% }
-</div> <!-- #container_project -->
+	</ul>
+	</div><!-- conHistorylist -->
+	<div id="debug" style="display:<% $debug ? "block" : "none" %>"></div>
+</div><!--span conConsole_left END-->
 
-
-<div id="container_analyses">
-	<div class="commandertitle_member">Analyze</div>
+<div id="conConsole_middle"> <!--span conConsole_middle START-->
+	<h3>ANALYZE</h3>
 % if (1) {
-	<div id="container_analyses1">
-		<div class="analysesTexttitle"><img src="/images/v0/dot_blue.png" />&nbsp;<span class="p2">Prepare Sequence</span></div>
 
-        <table width="390" border="0px" cellpadding="1">
-		  <tr>
-  		    <td class="tdtext">Identify and mask Repetitive DNA &amp; transposons</td>
-			<td class="tdinfo">
-				<a href="#" class="tt">i<span class="tooltip"><span class="top"></span><span class="middle">Info about this routine will be available soon. Thank you for your patience.</span><span class="bottom"></span></span></a>
-			</td>
-			<td class="">
-				<& '.routine', routine => 'repeat_masker', pmanager => $pm,
-								status => $status{repeat_masker}, delay => 15 &>
-			</td>
-		  </tr>
-		</table>
+	<div class="conConsole_middleRow p"><img src="/images/v1/dot_blue.png"/>&nbsp;Prepare Sequence</div>
+	<div class="conConsole_middleRow">
+		<span class="conConsole_middleCell1">Identify and mask Repetitive DNA &amp; transposons</span>
+%#		<span class="conConsole_info"><a href="#" class="info">i<span class="infotip"><span class="top"></span><span class="middle">Info about this routine will be available soon. Thank you for your patience.</span><span class="bottom"></span></span></a></span>
+		<span class="conConsole_middleCell2">
+			<& '.routine', routine => 'repeat_masker', pmanager => $pm,
+						status => $status{repeat_masker}, delay => 15 &>
+		</span>                         
+	</div>
 
-		<div class="analysesTexttitle"></div>
-		<div class="analysesTexttitle"><img src="/images/v0/dot_blue.png" />&nbsp;<span class="p2">Predict Genes</span></div>
-        <table width="390" border="0px" cellpadding="1">
-		   <tr>
-			<td class="tdtext">Augustus gene predictor</td>
-			<td class="tdinfo"><a href="#" class="tt">i<span class="tooltip"><span class="top"></span><span class="middle">Info about this routine will be available soon. Thank you for your patience.</span><span class="bottom"></span></span></a></td>
-			<td class="">
-				<& '.routine', routine => 'augustus', pmanager => $pm,
-								status => $status{augustus}, delay => 20, rm_status => $rm_status &>
-			</td>
-		  </tr>
-		  <tr>
-			<td class="tdtext">FGenesH gene predictor</td>
-			<td class="tdinfo"> <a href="#" class="tt">i<span class="tooltip"><span class="top"></span><span class="middle">Info about this routine will be available soon. Thank you for your patience.</span><span class="bottom"></span></span></a></td>
-			<td class="" style="border:none">
-				<& '.routine', routine => 'fgenesh', pmanager => $pm,
-								status => $status{fgenesh}, rm_status => $rm_status &>
-		  </tr>
+	<div class="conConsole_middleRow p"></div>
+	<div class="conConsole_middleRow p"><img src="/images/v1/dot_blue.png"/>&nbsp;Predict Genes</div>
+	<div class="conConsole_middleRow">
+		<span class="conConsole_middleCell1">Augustus gene predictor</span>
+%#		<span class="conConsole_info"><a href="#" class="info">i<span class="infotip"><span class="top"></span><span class="middle">Info about this routine will be available soon. Thank you for your patience.</span><span class="bottom"></span></span></a></span>
+		<span class="conConsole_middleCell2">
+			<& '.routine', routine => 'augustus', pmanager => $pm,
+						status => $status{augustus}, delay => 20, rm_status => $rm_status &>
+		</span>
+	</div> 
+	
+	<div class="conConsole_middleRow">
+		<span class="conConsole_middleCell1">FGenesH gene predictor</span>
+%#		<span class="conConsole_info"><a href="#" class="info">i<span class="infotip"><span class="top"></span><span class="middle">Info about this routine will be available soon. Thank you for your patience.</span><span class="bottom"></span></span></a></span>
+		<span class="conConsole_middleCell2">
+			<& '.routine', routine => 'fgenesh', pmanager => $pm,
+						status => $status{fgenesh}, rm_status => $rm_status &>		
+		</span>
+	</div> 
+	<div class="conConsole_middleRow">
+		<span class="conConsole_middleCell1">SNAP gene predictor</span>
+%#		<span class="conConsole_info"><a href="#" class="info">i<span class="infotip"><span class="top"></span><span class="middle">Info about this routine will be available soon. Thank you for your patience.</span><span class="bottom"></span></span></a></span>
+		<span class="conConsole_middleCell2">
+			<& '.routine', routine => 'snap', pmanager => $pm,
+						status => $status{snap}, rm_status => $rm_status &>
+		</span>
+	</div> 
+	<div class="conConsole_middleRow">
+		<span class="conConsole_middleCell1">tRNA gene predictor</span>
+%#		<span class="conConsole_info"><a href="#" class="info">i<span class="infotip"><span class="top"></span><span class="middle">Info about this routine will be available soon. Thank you for your patience.</span><span class="bottom"></span></span></a></span>
+		<span class="conConsole_middleCell2 run">
+			<& '.routine', routine => 'trna_scan', pmanager => $pm,
+						status => $status{trna_scan}, rm_status => $rm_status &>
+		</span>
+	</div> 
+	
+	<div class="conConsole_middleRow p"></div>
+	<div class="conConsole_middleRow p"><img src="/images/v1/dot_blue.png"/>&nbsp;Search Databases</div>
 
-		   <tr>
-			<td class="tdtext">SNAP gene predictor</td>
-			<td class="tdinfo"><a href="#" class="tt">i<span class="tooltip"><span class="top"></span><span class="middle">Info about this routine will be available soon. Thank you for your patience.</span><span class="bottom"></span></span></a></td>
-			<td class="">
-				<& '.routine', routine => 'snap', pmanager => $pm,
-				status => $status{snap}, rm_status => $rm_status &>
-			</td>
-		  </tr>
-		 <tr>
-			<td class="tdtext">tRNA gene predictor</td>
-			<td class="tdinfo">
-				<a href="#" class="tt">i<span class="tooltip"><span class="top"></span><span class="middle">Info about this routine will be available soon. Thank you for your patience.</span><span class="bottom"></span></span></a>
-			</td>
-			<td class="">
-				<& '.routine', routine => 'trna_scan', pmanager => $pm,
-								status => $status{trna_scan}, rm_status => $rm_status &>
-			</td>
-		  </tr>
-		</table>
-
-
-	<div class="analysesTexttitle"></div>
-	<div class="analysesTexttitle"><img src="/images/v0/dot_blue.png" />&nbsp;<span class="p2">Search Databases</span></div>
-
-	<table width="390px" border="0" cellpadding="1">
-	  <tr>
-		<td class="tdtext">BlastX UniProt for protein homologs</td>
-		<td class="tdinfo"><a href="#" class="tt">i<span class="tooltip"><span class="top"></span><span class="middle">Info about this routine will be available soon. Thank you for your patience.</span><span class="bottom"></span></span></a></td>
-		<td class="">
-					<& '.routine', routine => 'blastx', pmanager => $pm, delay => 15,
-					status => $status{blastx}, rm_status => $rm_status &>
-		</td>
-	  </tr>
-	  <tr>
-		<td class="tdtext">BlastN UniGene for RNA evidence (cDNA/EST)</td>
-		<td class="tdinfo"><a href="#" class="tt">i<span class="tooltip"><span class="top"></span><span class="middle">Info about this routine will be available soon. Thank you for your patience.</span><span class="bottom"></span></span></a></td>
-		<td class="">
-					<& '.routine', routine => 'blastn', pmanager => $pm, delay => 15,
-					status => $status{blastn}, rm_status => $rm_status &>
-		</td>
-	  </tr>
+	<div class="conConsole_middleRow">
+		<span class="conConsole_middleCell1">BlastX UniProt for protein homologs</span>
+		<span class="conConsole_info"><a href="#" class="info">i<span class="infotip"><span class="top"></span><span class="middle">Info about this routine will be available soon. Thank you for your patience.</span><span class="bottom"></span></span></a></span>
+		<span class="conConsole_middleCell2 disabled">
+			<& '.routine', routine => 'blastx', pmanager => $pm, delay => 15,
+						status => $status{blastx}, rm_status => $rm_status &>		
+		</span>
+	</div> 
+	
+	<div class="conConsole_middleRow">
+		<span class="conConsole_middleCell1">BlastN UniGene for RNA evidence (cDNA/EST)</span>
+		<span class="conConsole_info"><a href="#" class="info">i<span class="infotip"><span class="top"></span><span class="middle">Info about this routine will be available soon. Thank you for your patience.</span><span class="bottom"></span></span></a></span>
+		<span class="conConsole_middleCell2 disabled">
+			<& '.routine', routine => 'blastn', pmanager => $pm, delay => 15,
+						status => $status{blastn}, rm_status => $rm_status &>
+		</span>
+	</div>
 % my $nt_evid = lc $wfm->get_status("upload_evid_nt")->name;
 % my $prot_evid = lc $wfm->get_status("upload_evid_prot")->name;
 % if ($nt_evid eq "done") {
-	<tr>
-		<td class="tdtext">BlastN my evidence</td>
-		<td class="tdinfo">&nbsp;</td>
-		<td class=""><& '.routine', routine => 'blastn_user', pmanager => $pm, delay => 15,
+	<div class="conConsole_middleRow">
+		<span class="conConsole_middleCell1">BlastN my evidence</span>
+		<span class="conConsole_info"><a href="#" class="info">i<span class="infotip"><span class="top"></span><span class="middle">Info about this routine will be available soon. Thank you for your patience.</span><span class="bottom"></span></span></a></span>
+		<span class="conConsole_middleCell2 disabled">
+		<& '.routine', routine => 'blastn_user', pmanager => $pm, delay => 15,
 					status => $status{blastn_user}, rm_status => $rm_status &>
-		</td>
-	  </tr>
+		</span>
+	</div>
 % }
 % if ($prot_evid eq "done") {
-	  <tr>
-		<td class="tdtext">BlastX my evidence</td>
-		<td class="tdinfo">&nbsp;</td>
-		<td class=""><& '.routine', routine => 'blastx_user', pmanager => $pm, delay => 15,
+	<div class="conConsole_middleRow">
+		<span class="conConsole_middleCell1">BlastX my evidence</span>
+		<span class="conConsole_info"><a href="#" class="info">i<span class="infotip"><span class="top"></span><span class="middle">Info about this routine will be available soon. Thank you for your patience.</span><span class="bottom"></span></span></a></span>
+		<span class="conConsole_middleCell2 disabled">
+		<& '.routine', routine => 'blastx_user', pmanager => $pm, delay => 15,
 					status => $status{blastx_user}, rm_status => $rm_status &>
-		</td>
-	  </tr>
+		</span>
+	</div>
 % }
 % if ( $nt_evid ne "done" || $prot_evid ne "done") {
-	  <tr>
-		<td colspan="3">
-		<div id="add_evidence" style="display:none; background: pink; text-align: right;">
+	<div class="conConsole_middleRowx">
+		<div id="add_evidence" style="display:none; text-align: right;">
 			<form enctype="multipart/form-data" method="post">
 %	if ($nt_evid ne "done") {
 				<div>Add Nucleotide based evidence: 
@@ -191,58 +176,36 @@
 			</form>
 		</div>
 		<a id="add_evidence_link" href="javascript:void(0);" onclick="javascript:$('add_evidence').show();$('add_evidence_link').hide();">add evidence</a>
-		</td>
-	  </tr> 
-% }
-	</table>
-
-</div> <!-- #container_analyses1 -->
-% }
-</div> <!-- #container_analyses -->
-
-
-
-
-<div id="container_launch">
-	<div class="commandertitle_member">Launch</div>
-	<div style="height:40px">&nbsp;</div>
-
-	<div class="container_launch1">
-		<div class="launch_gbrowse">
-			<a id="gbrowse_btn" class="<% $rm_status ne "done" ? "disabled" : "" %>" \
-			onclick="<% $rm_status eq "done" ? q{launch('gbrowse')} : "" %>" \
-			href="javascript:;"></a>
-		</div>
-	</div>    
-
-	<div class="container_launch1">
-
-		<div class="launch_apollo">
-			<a id="apollo_btn" class="<% $rm_status ne 'done' ? 'disabled' : '' %>" \
-				commonname="<% $trimmed_common_name %>" seq_length="<% $proj->sequence_length %>" \
-				onclick="<% $rm_status eq 'done' ? "launch('apollo')" : '' %>" href="javascript:;"></a>
-		</div>
-		<div id="apollo_status" style="padding-top:10px; height: 40px; display: none; background: yellow;">
-			Preparing files. stand by...
-		</div>
 	</div>
+% }
 
+% }
+	<div class="conConsole_middleRow p"></div> 
+</div> <!-- #conConsole_middle -->
+
+
+<div id="conConsole_right"><!--span conConsole_right START-->
+	<h3>LAUNCH</h3>
+	<div class="conBT_launch"><a id="gbrowse_btn" class="<% $rm_status ne "done" ? "disabled" : "" %>" \
+			onclick="<% $rm_status eq "done" ? "launch('gbrowse')" : "" %>" \
+			href="javascript:;">BROWSE</a></div>
+	<div class="conBT_launch"><a id="apollo_btn" class="<% $rm_status ne "done" ? "disabled" : "" %>" \
+			commonname="<% $trimmed_common_name %>" seq_length="<% $proj->sequence_length %>" \
+			onclick="<% $rm_status eq "done" ? "launch('apollo')" : "" %>" 
+			href="javascript:;">EDIT</a></div>
 % if ($proj->sample) {
-	<div class="container_launch1">
-		<div class="launch_exporter">
-			<a id="exporter_btn" class="<% $rm_status ne 'done' ? 'disabled' : '' %>" \
-				onclick="<% $rm_status eq 'done' ? "launch('exporter')" : '' %>"
-				href="javascript:;"></a>
-		</div>
-	</div>
+	<div class="conBT_launch"><a id="exporter_btn" class="<% $rm_status ne "done" ? "disabled" : "" %>" \
+			onclick="<% $rm_status eq "done" ? "launch('exporter')" : "" %>"
+			href="javascript:;">EXPORT</a></div>
 % }
+</div><!--span conConsole_right END-->
 
-<!--
-<div id="gbrowse" style="display:block"><a href="./prepare_gbrowse?pid=<% $proj->id%>">Browse</a></div>
--->
-</div> <!-- #container_launch -->
-</div> <!-- #container_content_member3 -->
+<div style="clear: both;">&nbsp;</div> 
 
+<div class="blurb">
+	some thing at the end, some thing at the end, some thing at the end,
+	some thing at the end, some thing at the end, some thing at the end,
+</div>
 
 <%args>
 	$pid => 0
@@ -337,48 +300,57 @@ else { # most likely is GET
 %#----------------------------------------------------------------------------
 <%def .routine>
 <%args>
-	$routine => ''
+	$routine => ""
 	$rm_status => 'not-processed'
 	$status => 'disabled'
 	$pmanager => undef
 	$delay => 5
 </%args>
 <%init>
-my $link = 'javascript:;';
+my $link   = 'javascript:;';
 my $target = 'target="_blank"';
 my $action = qq{onclick="run('$routine')"};
 my $title  = '';
+my $label  = '';
 
 if ($status eq 'processing') {
-	$action = '';
-	$target = '';
-	$title = 'Processing';
+	$action = "";
+	$target = "";
+	$title = $label = 'Processing';
 }
 elsif ($status eq 'done') {
 	my $url = $m->comp('./.comp/filepath_to_web', file => $pmanager->get_gff3_file($routine) || '#', just_return => 1); 
 	$action = qq{onclick="launch(null, '$url')"};
 	$target = '';
 	$title  = 'Click to view results';
+	$label  = 'View';
 } 
 else {
 	if ($rm_status ne 'done' && $routine !~ /trna_scan|repeat_masker/) {
 		$status = 'disabled';
-		$action = '';
+		$action = "";
 		$title = 'Identify repeats first';
+		$label = 'Disabled';
 	}
 	else {
+		if ($status eq 'error') {
+			$label = 'Failed/Run';
+		}
+		else {
+			$label = 'Run';
+		}
 		$title = 'Click to process';
 	}
-	$target = '';
+	$target = "";
 }
 </%init>
-<a id="<% $routine %>_btn" href="<% $link %>" class="<% $status %>" <% $target %>\
- status="<% $status %>" <% $action %> delay="<% $delay %>" title="<% $title %>" ></a>
+<a id="<% $routine %>_btn" href="<% $link %>" class="<% $status %>" <% $target %> \
+status="<% $status %>" <% $action %> delay="<% $delay %>" title="<% $title %>" ><% $label %></a>
 </%def>
 %#----------------------------------------------------------------------------
 <%attr>
 	js => ['console.js']
-	css => ['device.css']
+	css => []
 	load_window_ui => 1
 </%attr>
 

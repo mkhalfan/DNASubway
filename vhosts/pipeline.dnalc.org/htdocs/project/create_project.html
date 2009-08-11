@@ -1,3 +1,120 @@
+
+<div id="conTop_button"> 
+	<div id="conTop_title"><h2>PROJECTS</h2></div>
+		<div id="conTop_menu">
+			<ul id="conTop_menu">
+			<!--<li><a href="#" title="" class="current">New Project</a></li>-->
+			<!--<li><a href="#" title="">My Projects</a></li>-->
+			<li><a href="./browse" title="">Public Projects</a></li>
+			</ul>
+		</div>
+	<div id="conMember_name">USER: Cornel Ghiban</div>
+</div><!--END of ID conTop_button-->
+
+% if (@err) {
+<div style="display:none" id="error_list">
+%	foreach (@err) {
+<div><% $_ %></div>
+%	}
+</div>
+% }
+
+<div>
+	Blurb Blurb Blurb Blurb Blurb Blurb Blurb Blurb Blurb Blurb Blurb Blurb 
+	Blurb Blurb Blurb Blurb Blurb Blurb Blurb Blurb Blurb Blurb Blurb Blurb 
+	Blurb Blurb Blurb Blurb Blurb Blurb Blurb Blurb Blurb Blurb Blurb Blurb			
+</div>
+
+<form id="forma1" enctype="multipart/form-data" method="post">
+<!-- Left Content Start -->
+<div id="conProject_newLeft">
+	<div class="conNewPro_title">Select Sequence Source</div> 
+  
+	<div class="conNewPro_label1">	
+		<input class="conRadiobox_align" type="radio" name="seq_src" id="seq_src_upload" value="upload" onclick="select_source(this)" <% $seq_src eq "upload" ? "checked=\"checked\"" : ""%> />
+		Upload a Sequence File in <a href="http://en.wikipedia.org/wiki/FASTA_format#Format">FASTA format</a>: (max 100kb) <br/>
+		<input class="conStylized_box1" type="file" id="seq_file" name="seq_file" \
+		onchange="set_source('upload')" onclick="set_source('upload')"  />
+	</div>
+
+	<div style="clear: both;">&nbsp;</div>
+	<div class="conNewPro_label1">
+		<input class="conRadiobox_align" type="radio" name="seq_src" id="seq_src_paste" value="paste" <% $seq_src eq "paste" ? "checked=\"checked\"" : ""%> /> 
+		Enter a Sequence in <a href="http://en.wikipedia.org/wiki/FASTA_format#Format">FASTA format</a>:
+		<textarea name="sequence" class="conStylized_box2" id="notebox" rows="4" cols="30" onfocus="set_source('paste');"><% $sequence |html %></textarea>
+
+	</div>
+	<div style="clear: both;">&nbsp;</div>
+
+  <div>
+	  <input class="conRadiobox_align" type="radio" name="seq_src" id="seq_src_sample" value="sample" onclick="select_source(this)" <% $seq_src eq "sample" ? "checked=\"checked\"" : ""%> />
+		Select a Sample Sequence:
+		<select class="conStylized_box3" id="specie" name="species" size="6" style="width: 420px;"
+				onchange="set_source('sample');">
+% for my $ss (@samples) {
+%	my $sel = $seq_src eq "sample" && $ss->id == $species ? "selected=\"selected\"" : "";
+			<option id="o<%$ss->id%>" value="<% $ss->id %>" \
+			extra="" clade="<% $ss->{clade} ? $ss->{clade} : "o" %>"\
+			<% $sel %>><% $ss->organism %> (<% $ss->common_name %>) <% $ss->segment %>, <% nicebasepairs($ss->sequence_length) %></option>
+% }
+		</select>
+   </div>
+
+</div><!-- #conProject_newLeft -->
+
+<div id="conProject_newRight">
+    <div class="conNewPro_title">Name Your Project</div>   
+	<div class="conNewPro_label1">
+		<label>Project Title:</label>
+		<input class="conStylized_box4" type="text" name="name" id="name" value="<% $name|html%>" maxlength="128" />
+	</div>
+
+	<div style="clear: both;">&nbsp;</div>
+	<div class="conNewPro_title">Organism</div>   
+	<div class="conNewPro_label1">
+		<label>Scientific name (Genus Species):</label>
+		<input class="conStylized_box4" type="text" name="organism" id="organism" value="<% $organism |html%>" maxlength="128"  />
+	</div>
+
+	<div class="conNewPro_label1">
+	<label>Common name:</label>
+		<input class="conStylized_box4" type="text"name="common_name" id="common_name" value="<% $common_name |html%>" maxlength="128"   />
+	</div>
+	
+	<div class="conNewPro_label1">
+		<label>Class:</label>
+		<div class="conNewPro_label1">
+			<span class="conNewPro_smallContainer">
+				<input class="conRadiobox_align" type="radio" name="group" id="gm" value="m" <% $group eq "m" ? "checked=\"checked\"" : ""%>/>
+				Monocotyledons
+			</span>
+			<span class="conNewPro_smallContainer">
+				<input class="conRadiobox_align" type="radio" name="group" id="gd" value="d" <% $group eq "d" ? "checked=\"checked\"" : ""%>/>
+				Dicotyledons
+			</span>
+		</div>
+		<div class="conNewPro_label1">
+			<span class="conNewPro_smallContainer">
+				<input class="conRadiobox_align" type="radio" name="group" id="go" value="o" <% $group eq "o" ? "checked=\"checked\"" : ""%>/>
+				Other
+			</span>
+			<span class="conNewPro_smallContainer">
+				<input class="conRadiobox_align" type="radio" name="group" id="gu" value="u" <% $group eq "u" ? "checked=\"checked\"" : ""%>/>
+			I don't know
+			</span>
+		</div>
+	</div>
+	<div style="clear: both;">&nbsp;</div>
+	<div class="conBT_continue"><a href="#" title="Create project" onclick="javascript:step_one()">CONTINUE</a></div>
+</div><!-- #conProject_newRight -->
+<div style="clear: both;">&nbsp;</div>
+</form>
+
+<div>
+sasas asdklj hasfksdhf lkf
+</div>
+
+%#-----------------------------------------------------------------
 <%args>
 	$name => ''
 	$seq_src => ''
@@ -27,7 +144,8 @@ my $cf = DNALC::Pipeline::Config->new;
 my $pcf = $cf->cf('PIPELINE');
 
 # todo: order these by something..
-my @samples = DNALC::Pipeline::Sample->retrieve_all;
+#my @samples = DNALC::Pipeline::Sample->retrieve_all;
+my @samples = DNALC::Pipeline::Sample->search( active => 1, {order_by => "organism"});
 
 my @err = ();
 
@@ -162,117 +280,7 @@ if ($r->method eq 'POST') {
 
 </%init>
 
-<div id="container_devicebg1"></div>
-<div id="container_top">
-	<!--<div id="learn_head"><a href="learn.html">&nbsp;Learn</a></div>
-	<div id="logout_head"><a href="home.html">&nbsp;Log Out</a></div>-->
-	<div id="container_headbackto"></div>
-  
-</div>
-<div id="container_content_member1">
-	
- 	<div id="container_pagehead">
-		<div id="container_pagetitle">:: PROJECTS ::</div>
-		<div id="container_membername">User: Guest</div>
-	</div>
-% if (@err) {
-<div style="display:none" id="error_list">
-%	foreach (@err) {
-<div><% $_ %></div>
-%	}
-</div>
-% }
-    <div id="container_projectblurb">
-      <p>&nbsp;</p>
-    </div>
-    
-    <div id="container_hometab">
-    
-     <div class="button_newproject"><img src="/images/v0/bt_newprojectUp.png" alt="" /></div>
-     
-     <div class="button_publicproject"><a href="/project/browse"></a></div>
-    </div><!-- #container_hometab  -->
-
-  <div id="container_memberhomebottom">
-  <form id="forma1" enctype="multipart/form-data" method="post">
-    <div id="container_newprojectleft">
-    
-  
-<!-- form start -->
-  
-    <div class="selectortitle_h2">Select DNA Sequence Source</div>
-    <div class="spacer"></div>
- <div>
-    <input class="selectortitle_h2" type="radio" name="seq_src" id="seq_src_upload" value="upload" onclick="select_source(this)" <% $seq_src eq 'upload' ? 'checked="checked"' : ''%> />
-	Upload a Sequence File in <a href="http://en.wikipedia.org/wiki/FASTA_format#Format">FASTA format</a>: (max 100kb) <br/>
-		<input class="stylizedupload" type="file" id="seq_file" name="seq_file" \
-		onchange="set_source('upload')" onclick="set_source('upload')"  />
- </div>
-	<div class="spacer"></div>
-
-	<div><!-- end of enter a sequence -->
-		<input type="radio" name="seq_src" id="seq_src_paste" value="paste" <% $seq_src eq 'paste' ? 'checked="checked"' : ''%> /> 
-		Enter a Sequence in <a href="http://en.wikipedia.org/wiki/FASTA_format#Format">FASTA format</a>:
-		<textarea name="sequence" class="stylized" id="notebox" rows="4" cols="30" onfocus="set_source('paste');"><% $sequence |html %></textarea>
-	</div><!-- end of enter a sequence -->
-  <br/>
-  <div class="spacer"></div>
-  <div>
-	  <input type="radio" name="seq_src" id="seq_src_sample" value="sample" onclick="select_source(this)" <% $seq_src eq 'sample' ? 'checked="checked"' : ''%> />
-		Select a Sample Sequence:
-		<select class="stylized" id="specie" name="species" size="6" style="width: 420px;"
-				onchange="set_source('sample');">
-% for my $ss (@samples) {
-%	my $sel = $seq_src eq "sample" && $ss->id == $species ? "selected=\"selected\"" : "";
-			<option id="o<%$ss->id%>" value="<% $ss->id %>" \
-			extra="" clade="<% $ss->{clade} ? $ss->{clade} : 'o' %>"\
-			<% $sel %>><% $ss->organism %> (<% $ss->common_name %>) <% $ss->segment %>, <% nicebasepairs($ss->sequence_length) %></option>
-% }
-		</select>
-   </div>
-
-    </div>
-    <!-- #container_newprojectleft -->
-    <div id="container_newprojecttopright">
-    <div class="selectortitle_h2">Name Your Project</div>
-    <div class="spacer"></div>
-    
-    <label>Project Title:</label>
-	<input class="stylized" type="text" name="name" id="name" value="<% $name|html%>" maxlength="128" />
-	<div id="organism_info">
-		<div class="spacer"></div><br/>
-		<div class="selectortitle_h2">&nbsp;&nbsp;Organism</div>
-        <div class="spacer"></div>
-		<label>Scientific name:<br/><span class="small">(Genus Species)</span></label>
-	<input class="stylized" type="text" name="organism" id="organism" value="<% $organism |html%>" maxlength="128" />
-	
-	<label>Common name:</label>
-	<input class="stylized" type="text" name="common_name" id="common_name" value="<% $common_name |html%>" maxlength="128" />
-	
-	<label>Class:</label>
-	<div style="padding-left: 10px;float:left;">
-		<input class="resetradio" type="radio" name="group" id="gm" value="m" <% $group eq 'm' ? 'checked="checked"' : ''%>/>
-		<span class="small">Monocotyledons</span><br/>
-		<input class="resetradio" type="radio" name="group" id="gd" value="d" <% $group eq 'd' ? 'checked="checked"' : ''%>/>
-		<span class="small">Dicotyledons</span> <br/> 
-		<input class="resetradio" type="radio" name="group" id="go" value="o" <% $group eq 'o' ? 'checked="checked"' : ''%>/>
-		<span class="small">Other</span><br/>
-		<input class="resetradio" type="radio" name="group" id="gu" value="u" <% $group eq 'u' ? 'checked="checked"' : ''%>/>
-		<span class="small">I don't know</span>
-	</div>
-	</div>
-	<div class="spacer"></div>
-	<div class="gotoconsole"><a href="javascript:;" onclick="step_one()"></a></div>
-</div><!-- #container_newprojecttopright -->
-   
-
-<div></div>
-   
-	</div><!-- #container_newprojectright -->
-  </div><!-- #container_memberhomebottom  -->
-  </form>
-</div>
-
+%#-----------------------------------------------------------------
 <%attr>
 	js => ['create_project.js']
 	css => ['device.css']

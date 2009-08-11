@@ -11,8 +11,9 @@
 	<th>Src Name/Release</th><th>Src location</th><th>&nbsp;</th>
 </tr>
 % for (@samples) {
-<tr>
-	<td><% $_->organism %></td><td><% $_->common_name %></td>
+<tr class="<% $_->active ? "" : "sample-inactive"%>">
+	<td><% $_->organism %></td>
+	<td><% $_->common_name %></td>
 	<td><% uc $_->clade %></td>
 	<td><% nicebasepairs($_->sequence_length) %></td>
 	<td><a href="<% $_->source_url %>"><% $_->source_name %>/<% $_->source_release %></a></td>
@@ -33,5 +34,6 @@
 </%once>
 %#------------------------------------------------------------------------------
 <%init>
-	my @samples = DNALC::Pipeline::Sample->retrieve_all;
+	#my @samples = DNALC::Pipeline::Sample->retrieve_all;
+	my @samples = DNALC::Pipeline::Sample->search_like( organism => "%", {order_by => "active DESC, organism"});
 </%init>
