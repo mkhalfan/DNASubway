@@ -89,3 +89,7 @@ color:#FFFFFF;
 font-size:11px;
 font-weight:bold;
 }
+
+tr.sample-inactive td{
+	text-decoration:line-through;
+}

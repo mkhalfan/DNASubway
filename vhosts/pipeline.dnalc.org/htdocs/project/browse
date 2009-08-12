@@ -42,9 +42,8 @@
 
 </table>
 
-
-<& '/_pager', cur=>$page, pages => $pages + 10, 
-	suffix => '', prefix => '/project/browse/?page=' &>
+<& '/_pager', cur=>$page, pages => $pages, 
+	suffix => '', prefix => '/project/browse/' &>
 
 </div>
 
@@ -78,6 +77,14 @@ $r->content_type('text/html');
 $m->session->{pipeline} ||= {};
 my $s = $m->session->{pipeline};
 
+if ($r->uri =~ /\/(\d+)$/) {
+	$page = $1;
+}
+
+unless ($page =~ /^\d+$/) {
+	$page = 1;
+}
+
 my $orderby = [$sort];
 
 my $pager = DNALC::Pipeline::Project->pager;
@@ -94,8 +101,6 @@ my $pages = int($pager->total_entries/$epp) + ($pager->total_entries % $epp > 0 
 %#---------------------------------
 <%attr>
 	js => []
-	css => ['device.css']
-	load_window_ui => 0
 </%attr>
 %#---------------------------------
 

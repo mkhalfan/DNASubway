@@ -25,12 +25,6 @@ __PACKAGE__->add_trigger(before_create => sub {
     $_[0]->{created} ||= POSIX::strftime "%Y-%m-%d %H:%M:%S", localtime(+time);
 });
 
-#-----------------------------------------------------------------------------
-
-sub group {
-	warn "To be removed", $/;
-	return shift()->clade;
-}
 
 #---------------------------------------------------
 

@@ -1,0 +1,274 @@
+@charset "UTF-8";
+/* CSS Document */
+/*This page is only for HEADER, FOOTER, AND BACKGROUND. */
+/*SEE content.css document for CONTENT. */
+/*If the ID or CLASS name start with con, please see content.css document. */
+
+
+html {
+	margin: 0px;
+	padding: 0px;
+	height: 100%;
+	width: 100%;
+	font-family: arial, sans-serif;
+
+	background-repeat: repeat-x;
+	background-image: url("/images/v1/background_bg.png");
+	background-position: bottom;
+	}
+body {
+	background-repeat: no-repeat;
+	background-image: url("/images/v1/bg_extend.png");
+	background-position: top;
+	
+	}
+
+	
+#mainContainer {
+	width: 1028px;
+	margin-right: auto;
+	margin-left: auto;
+	margin-top: 0px;
+	/*z-index: 4;*/
+	position: relative;
+	}
+#headerContainer {
+	width: 1028px;
+	height: 100px;
+	margin-right: auto;
+	margin-left: auto;
+	margin-top: 0px;
+	background-image: url("/images/v1/header.png");
+	background-repeat: no-repeat;
+	background-position: center top;
+	position: relative;
+	}
+
+
+/* NOTE:see content.css for container for body */
+#bottomContainer {
+	width: 1028px;
+	height: 40px;
+	margin-right: auto;
+	margin-left: auto;
+	margin-top: 0px;
+	background-image: url("/images/v1/bg_bottom.png");
+	background-repeat: no-repeat;
+	background-position: center top;
+	position: relative;
+	}
+	
+#footerContainer {
+	height: 60px;
+	width: 100%;
+	background-image: url("/images/v1/footer_side_bg.png");
+	background-repeat: repeat-x;
+	background-position: center bottom;
+	height: 60px;
+	width: 100%;
+	position: fixed;
+	bottom: 0px;
+	z-index: 5;
+}
+
+
+#footerContainer_middle{
+	background-image: url("/images/v1/footer_bg.png");
+	background-repeat: no-repeat;
+	background-position: center bottom;
+	height: 60px;
+	width: 1028px;
+	bottom: 0px;
+	clear: both;
+	position: relative;
+	margin-left: auto;
+	margin-right: auto;
+	/*position: fixed;
+	*/
+}
+
+
+#footer_copyright{
+	height: 26px;
+	width: 300px;
+	bottom: 0px;
+	float: right;
+	margin: 38px 40px 0px 0px;
+	position: relative;
+	font-size: 0.75em;
+	color:#669900;
+	font-family: arial, sans-serif;	
+	text-align: right;
+	
+}
+/*//----------Header left buttons start------------------*/
+#header_leftButton {
+	width: 210px;
+	height: 86px;
+	margin: 14px 0px 0px 30px;;
+	float: left;
+	}
+
+.header_left {
+	width:65px;
+	height: 50px;
+	font-size: 0.8em;
+	font-family: arial, sans-serif;	
+	text-align: left;
+	list-style-type: none;
+	float: left;
+	position: relative;	
+}
+
+
+.header_left  a {
+	width: 65px;
+	height: 50px;
+	color: #555;
+	text-decoration: none;
+	vertical-align: text-bottom;
+	float: left;
+	background: url("/images/v1/topLeft_down.png") top left no-repeat;
+	display: block;
+	padding-top: 36px;
+	position: relative;
+	float: left;
+	
+}
+
+.header_left  a:hover {
+	color: #000000;
+	background: url("/images/v1/topLeft_up.png") top left no-repeat;
+
+}
+.header_left a.current {
+	color: #000000;
+	font-weight: bold;	
+	background: url("/images/v1/topLeft_up.png") top left no-repeat;
+
+	}
+	
+.header_log {
+	width:70px;
+	height:40px;
+	
+	display: block;
+	float: right;
+	position: relative;
+	text-decoration: none;
+	font-size: 0.8em;
+	font-family: arial, sans-serif;	
+	text-align:right;
+	color: #555;
+	}
+	
+.header_log a{
+	width:70px;
+	height:40px;
+	padding-top: 20px;
+	background: url("/images/v1/headLog_down.png") top left no-repeat;
+	position:relative;
+	display: block;
+	float: right;
+	text-decoration: none;
+	font-size: 0.8em;
+	font-family: arial, sans-serif;	
+	text-align: right;
+	color: #555;
+	}
+.header_log a:hover{
+	background: url("/images/v1/headLog_up.png") top left no-repeat;
+	color: #000000;
+	}
+
+/*//----------Header left buttons button END------------------*/
+
+/*//----------Header right buttons start------------------*/
+#header_rightButton {
+	width: 280px;
+	height: 60px;
+	margin: 34px 46px 0px 0px;
+	float: right;
+	}
+
+.header_right {
+	width: 102px;
+	height: 56px;
+	font-size: 0.75em;
+	font-family: arial, sans-serif;	
+	text-align: left;
+	list-style-type: none;
+	position: relative;
+	float: right;
+}
+
+.header_right  a {
+	width: 102px;
+	height: 56px;
+	color: #555;
+	text-decoration: none;
+	background: url("/images/v1/topRight_down.png") top right no-repeat;
+	display: block;
+	position: relative;
+	float: right;
+}
+
+.header_right a:hover {
+	color: #000000;
+	background: url("/images/v1/topRight_up.png") top right no-repeat;
+	
+}
+
+.header_right a.current {
+	color: #000000;
+	font-weight: bold;	
+	background: url("/images/v1/topRight_up.png") top right no-repeat;
+	
+
+}
+
+
+.header_back {
+	width:70px;
+	height:30px;
+	margin: 5px 0px 0px 2px;
+	position:relative;
+	display: block;
+	float: left;
+	text-decoration: none;
+	font-size: 0.75em;
+	font-family: arial, sans-serif;	
+	text-align: left;
+	color: #555;
+	}
+.header_back a{
+	width:70px;
+	height:30px;
+	margin: 5px 0px 0px 2px;
+	background: url(/images/v1/headerBack_down.png) top right no-repeat;
+	display: block;
+	float: left;
+	text-decoration: none;
+	font-size: 0.9em;
+	font-family: arial, sans-serif;	
+	text-align: left;
+	color: #555;
+	}
+.header_back a:hover{
+	background: url(/images/v1/headerBack_up.png) top right no-repeat;
+	color: #000000;
+	}
+	
+/*//----------Header right buttons button END------------------*/
+	
+.textSpace1 {
+	padding: 0px 0px 0px 10px;
+}
+.textSpace2{
+	vertical-align: text-bottom;
+}
+.textSpace3{
+	padding: 20px 0px 0px 0px;
+
+
+}

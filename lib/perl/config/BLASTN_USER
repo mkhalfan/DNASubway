@@ -22,9 +22,9 @@
 		'--version', 3,
 		'-m',
 		'--method', 'match_part',
-		'--coverage', '0.6',
-		'--identity', '0.95',
-		'--bits', '40',
+		'--coverage', '0',
+		'--identity', '0',
+		'--bits', '0',
 	],
 	gff3_file => 'output.gff',
 }

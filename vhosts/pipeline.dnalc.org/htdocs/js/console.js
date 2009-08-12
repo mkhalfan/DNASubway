@@ -40,6 +40,7 @@ function check_status (pid, op, h) {
 					b.addClassName('done');
 					b.onclick = function () { launch(null, file)};
 					b.title = 'Click to view results';
+					b.update('View');
 					if (op == 'repeat_masker') {
 						for (var i = 0; i < routines.length; i++) {
 							var rt = $(routines[i] + '_btn');
@@ -50,6 +51,7 @@ function check_status (pid, op, h) {
 								//Event.observe(routines[i], 'click', function() {
 								if (i < 5 ) {
 									rt.title = 'Click to process';
+									rt.update('Run');
 									rt.onclick = function () {
 												//console.log('enable btn.. ' + this.id);
 												var routine = this.id.replace('_btn','');
@@ -73,6 +75,7 @@ function check_status (pid, op, h) {
 				b.removeClassName('processing');
 				b.addClassName('error');
 				b.title = 'Click to try again';
+				b.update('Failed/Run');
 				b.onclick = function () {
 								run(op);
 							};
@@ -102,6 +105,7 @@ function run (op) {
 		b.removeClassName(b.className);
 		b.addClassName('processing');
 		b.title = 'Processing';
+		b.update('Processing');
 	}
 	var delay = b ? parseFloat(b.getAttribute('delay')) : 5;
 	delay = !isNaN(delay) ? delay * 1000 : 5000;
@@ -182,6 +186,8 @@ function close_windows() {
 }
 
 function toggle_console_link() {
+
+	return;
 
 	var d = $('backtoconsole_head');
 	d.update();

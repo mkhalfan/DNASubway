@@ -49,4 +49,13 @@
 		],
 
 	sequence_length => 100_000,
+
+	APOLLO_USERCONF_DIR => '/var/www/vhosts/pipeline.dnalc.org/var/apollo_userconf',
+	APOLLO_WRITE_DIR => '', # see $project->work_dir '/var/www/html/apollo/tmp',
+	APOLLO_UPLOAD_DIR => '', #see 'upload_dir', from above
+	APOLLO_HEADLESS => '/usr/local/apollo/bin/apollo',
+	APOLLO_PROJECT_HOME => 'http://pipeline.dnalc.org',
+	APOLLO_WEB_PATH => 'apollo/tmp',
+	APOLLO_VENDOR => 'Dolan DNA Learning Center',
+	APOLLO_DESC => 'DNALC Apollo Webstart',
 }
