@@ -1,5 +1,5 @@
 #!/usr/bin/perl -w
-use warnings;
+#use warnings;
 use strict;
 
 use Bio::DB::Das::Chado ();
@@ -8,14 +8,14 @@ use Bio::GMOD::DB::Config ();
 use IO::File ();
 use Getopt::Long;
 use Pod::Usage;
-
+use Data::Dumper;
 =head1 NAME
 
 dump_user_annotations.pl - Dumps user annotations for a certain seq_id
 
 =head1 SYNOPSIS
 
-  % dump_user_annotations.pl --username <name> --file <path> --seqid <seqence_id>
+  % dump_user_annotations.pl --username <name> --file <path> --seqid <seqence_id> [--type <all|user|FGenesH|SNAP>]
 
 =head1 AUTHORS
 
@@ -29,12 +29,13 @@ it under the same terms as Perl itself.
 =cut
 
 
-my ($PROFILE, $FILE, $SEQID, $HELP);
+my ($PROFILE, $FILE, $SEQID, $HELP, $TYPE);
 
 GetOptions(
   'profiles=s'	=> \$PROFILE,
   'file=s'		=> \$FILE,
   'seqid=s'		=> \$SEQID,
+  'type=s'		=> \$TYPE,
   'help'		=> \$HELP,
 ) or pod2usage(-verbose => 1, -exitval => 1);
 
@@ -44,10 +45,14 @@ die 'Profile is missing.' unless $PROFILE;
 die 'File is missing' unless $FILE;
 die 'Sequence ID is missing' unless $SEQID;
 
+$TYPE ||= 'all';
+my $type = $TYPE eq 'all' ? 'gene' : 'gene:' . $TYPE;
+#print STDERR  $type, $/;
+
 my $fh = IO::File->new;
 unless ($fh->open($FILE, 'w')) {
 	print STDERR  "FILE [$FILE] is not writable", $/;
-	exit 0;
+	exit 1;
 }
 
 my $gmod_conf = Bio::GMOD::Config->new();
@@ -64,11 +69,17 @@ my $db = Bio::DB::Das::Chado->new(
             -pass => $db_conf->password || '',
             -inferCDS => 1,
          );
-my @features = $db->features(-type   =>'gene:user',
-                             -seq_id => $SEQID,
-						 );
+
+my @features = $db->features(
+					-type   => $type,
+					-seq_id => $SEQID,
+				 );
+
+print $fh "###GFF3\n";
 
 for my $f (@features) {
+	#print Dumper( $f ), $/;
+	#last;
 	$f->seq_id($SEQID);
 
     print_gff($f, 'g');
@@ -79,11 +90,10 @@ for my $f (@features) {
     for my $m (@mrnas) {
         print_gff($m, 'm');
 
-        my @kids = $m->sub_SeqFeature();
-        for my $k (@kids) {
-            print_gff($k, 'k');
-
-        }
+		my @kids = $m->sub_SeqFeature();
+		for my $k (@kids) {
+		   print_gff($k, 'k');
+		}
     }
 }
 
@@ -103,7 +113,7 @@ sub print_gff {
 
     my $col9;
     if ($rank eq 'g') {
-        $col9 = "ID=$name";
+        $col9 = "ID=$name;Name=$name";
     }
     elsif ($rank eq 'm') {
         my $parent_name = $obj->parent->uniquename;

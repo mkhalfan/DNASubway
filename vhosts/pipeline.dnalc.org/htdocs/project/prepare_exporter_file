@@ -31,18 +31,19 @@
 
 		my $trimmed_common_name = $pm->cleaned_common_name;
 
-		my $rc = system ($pcf->{EXE_PATH} . '/dump_user_annotations.pl', 
+		my @cmd = ($pcf->{EXE_PATH} . '/dump_user_annotations.pl', 
 						'--profile', $pm->chado_user_profile,
 						'--seqid', $trimmed_common_name,
 						'--file', $user_annot_file
 					);
+		#print STDERR "@cmd", $/;
+		my $rc = system ( @cmd);
 		#print STDERR  "RC = ", $rc , $/;
 
 		if ($rc == 0 && -f $user_annot_file) {
 			#print STDERR  "User file = ", $user_annot_file, $/;
 			push @params, ('-g', $user_annot_file);
 		}
-	
 
 		my $gff_merger = $pcf->{EXE_PATH} . '/gff3_merger.pl';
 		my $gff_file = $pm->work_dir . '/gff3.gff';
@@ -52,8 +53,9 @@
 		#print $gff_file, $/;
 		if (-f $gff_file) {
 			$r->headers_out->add('Content-Disposition' => 'attachment;filename=gff3.gff');
-			my ($sample) = grep {$_->{id} == $proj->sample} @{ $pcf->{samples} }; 
-			my $col1 = $sample->{location} . ':' . $sample->{position};
+			#my ($sample) = grep {$_->{id} == $proj->sample} @{ $pcf->{samples} };
+			my $sample = DNALC::Pipeline::Sample->new($proj->sample);
+			my $col1 = $sample->segment . ':' . $sample->start . '..' . $sample->stop;
 			print q{[gene:AUGUSTUS]
 glyph = gene
 sub_part = CDS
@@ -75,7 +77,7 @@ glyph = gene
 				while ( my $line = <$in> ){
 					next if $line =~ /^##gff/;
 					$line =~ s/^.*?\t/$col1\t/;
-					$line =~ s/>.*/>$col1/;
+					$line =~ s/^>.*/>$col1/;
 					print $line;
 				}
 			}
