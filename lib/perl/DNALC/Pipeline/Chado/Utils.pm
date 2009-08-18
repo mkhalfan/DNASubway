@@ -1175,5 +1175,69 @@ sub remove_lock_file {
     return;
 }
 
+sub write_jnlp {
+
+	my ($self, $args) = @_;
+	my $jnlp = $args->{jnlp};
+	my $web_jnlp = $args->{web_jnlp};
+	my $hostname = $args->{hostname};
+	my $game_file = $args->{game_file};
+	my $vendor = $args->{vendor};
+	my $apollo_desc = $args->{apollo_desc};
+
+	#return <<END;
+	my $fh = new IO::File "> $jnlp";
+	if (defined $fh) {
+		print $fh <<END;
+<?xml version="1.0" encoding="UTF-8"?>
+<jnlp codebase="$hostname/files/apollo/webstart/" href="$hostname$web_jnlp" spec="1.0+">
+  <information>
+    <title>Apollo</title>
+    <vendor>$vendor</vendor>
+    <description>$apollo_desc</description>
+    <homepage href="$hostname/" />
+    <icon href="/images/head-of-apollo.gif" kind="shortcut"/>
+    <offline-allowed/>
+  </information>
+  <security>
+    <all-permissions/>
+  </security>
+  <resources>
+    <j2se initial-heap-size="64m" max-heap-size="500m" version="1.5+"/>
+    <jar href="jars/apollo.jar"/>
+    <jar href="jars/bbop.jar"/>
+    <jar href="jars/biojava.jar"/>
+    <jar href="jars/crimson.jar"/>
+    <jar href="jars/ecp1_0beta.jar"/>
+    <jar href="jars/ensj-compatibility-19.0.jar"/>
+    <jar href="jars/ensj.jar"/>
+    <jar href="jars/jakarta-oro-2.0.6.jar"/>
+    <jar href="jars/jaxp.jar"/>
+    <jar href="jars/jnlp.jar"/>
+    <jar href="jars/junit.jar"/>
+    <jar href="jars/log4j-1.2.14.jar"/>
+    <jar href="jars/macify-1.1.jar"/>
+    <jar href="jars/mysql-connector-java-3.1.8-bin.jar"/>
+    <jar href="jars/obo.jar"/>
+    <jar href="jars/oboedit.jar"/>
+    <jar href="jars/org.mortbay.jetty.jar"/>
+    <jar href="jars/patbinfree153.jar"/>
+    <jar href="jars/pg74.213.jdbc3.jar"/>
+    <jar href="jars/psgr2.jar"/>
+    <jar href="jars/servlet-tomcat.jar"/>
+    <jar href="jars/te-common.jar"/>
+    <jar href="jars/xerces.jar"/>
+  </resources>
+  <application-desc main-class="apollo.main.Apollo">
+    <argument>-i</argument>
+    <argument>game</argument>
+    <argument>-f</argument>
+    <argument>$hostname/$game_file</argument>
+  </application-desc>
+</jnlp>
+END
+;
+	}
+}
 
 1;

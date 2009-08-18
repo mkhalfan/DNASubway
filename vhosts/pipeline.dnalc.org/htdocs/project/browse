@@ -24,7 +24,6 @@
     <th width="264" scope="col">Organism</th>
     <th width="120" scope="col">Classification</th>
     <th width="62" scope="col">Status</th>
-%#  <th width="48" scope="col">Action</th>
   </tr>
 % for (@projects) {
 %	my $created = DNALC::Pipeline::App::Utils->format_datetime($_->created, undef, "%m/%d/%Y");
@@ -36,7 +35,6 @@
 	<td><% $clades{$_->clade}  %></td>
 	<!--<td><% $_->user_id %></td>-->
 	<td> public </td>
-%#	<td><a href="/project/console.html?pid=<% $_->id %>">load</a></td>
 </tr>
 % }
 

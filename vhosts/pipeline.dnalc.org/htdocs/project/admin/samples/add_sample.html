@@ -184,6 +184,7 @@ if ($r->method eq "POST") {
 			);
 			
 			$m->comp('/_message_add', "Sample added successfully!");
+			$m->comp('/_message_add', "The sample is not yet active!");
 			$m->redirect('./edit_sample.html?sid=' . $smpl->id);
 		}
 		$m->comp('/_message_add', "Unable to process the sequence data!", 'error');

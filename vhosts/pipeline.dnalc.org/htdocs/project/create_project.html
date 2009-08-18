@@ -46,7 +46,7 @@
 	</div>
 	<div style="clear: both;">&nbsp;</div>
 
-  <div>
+	<div class="conNewPro_label1">
 	  <input class="conRadiobox_align" type="radio" name="seq_src" id="seq_src_sample" value="sample" onclick="select_source(this)" <% $seq_src eq "sample" ? "checked=\"checked\"" : ""%> />
 		Select a Sample Sequence:
 		<select class="conStylized_box3" id="specie" name="species" size="6" style="width: 420px;"
@@ -58,8 +58,7 @@
 			<% $sel %>><% $ss->organism %> (<% $ss->common_name %>) <% $ss->segment %>, <% nicebasepairs($ss->sequence_length) %></option>
 % }
 		</select>
-   </div>
-
+	</div>
 </div><!-- #conProject_newLeft -->
 
 <div id="conProject_newRight">

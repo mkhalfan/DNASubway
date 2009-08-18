@@ -187,16 +187,17 @@
 <div id="conConsole_right"><!--span conConsole_right START-->
 	<h3>LAUNCH</h3>
 	<div class="conBT_launch"><a id="gbrowse_btn" class="<% $rm_status ne "done" ? "disabled" : "" %>" \
-			onclick="<% $rm_status eq "done" ? "launch('gbrowse')" : "" %>" \
-			href="javascript:;">BROWSE</a></div>
+		onclick="<% $rm_status eq "done" ? "launch('gbrowse')" : "" %>" \
+		href="javascript:;">BROWSE</a></div>
 	<div class="conBT_launch"><a id="apollo_btn" class="<% $rm_status ne "done" ? "disabled" : "" %>" \
-			commonname="<% $trimmed_common_name %>" seq_length="<% $proj->sequence_length %>" \
-			onclick="<% $rm_status eq "done" ? "launch('apollo')" : "" %>" 
-			href="javascript:;">EDIT</a></div>
+		commonname="<% $trimmed_common_name %>" seq_length="<% $proj->sequence_length %>" \
+		onclick="<% $rm_status eq "done" ? "launch('apollo')" : "" %>" 
+		href="javascript:;">EDIT</a></div>
+	<div style="padding-top: 10px; height: 25px;display: none;" id="apollo_status">loading apollo...</div>
 % if ($proj->sample) {
 	<div class="conBT_launch"><a id="exporter_btn" class="<% $rm_status ne "done" ? "disabled" : "" %>" \
-			onclick="<% $rm_status eq "done" ? "launch('exporter')" : "" %>"
-			href="javascript:;">EXPORT</a></div>
+		onclick="<% $rm_status eq "done" ? "launch('exporter')" : "" %>"
+		href="javascript:;">EXPORT</a></div>
 % }
 </div><!--span conConsole_right END-->
 

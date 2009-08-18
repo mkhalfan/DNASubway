@@ -106,6 +106,7 @@ function show_errors(html) {
 	html = "<div class=\"message-error\" style=\"vertical-align: middle\">" + html + "</div>";
 	w.setContent(html);
 	w.show(true);
+
 }
 
 function pasted_data_ok() {

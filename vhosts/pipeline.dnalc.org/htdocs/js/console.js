@@ -142,14 +142,14 @@ function run (op) {
 
 function launch_apollo() {
 	var abtn = $('apollo_btn');
+	abtn.parentNode.hide();
 	//alert(abtn.getAttribute('commonname'));
 	var status_div = $('apollo_status');
 	status_div.show();
 
-	var sel = abtn.getAttribute('commonname') + ':1..' + abtn.getAttribute('seq_length');
-	var params = { 'selection' : sel};
+	var params = { 'pid' : $('pid').value };
 	sent = params;
-	new Ajax.Request('/cgi-bin/create-jnpl.pl',{
+	new Ajax.Request('/project/dump_game_file',{
 		method:'get',
 		parameters: params, 
 		onSuccess: function(transport){
@@ -159,13 +159,14 @@ function launch_apollo() {
 			dbg = r;
 			//alert(r);
 			if (r.status == 'success') {
-				status_div.update(
-					new Element('a', {'href' : r.file}).update('Open Apollo.')
-				);
-				var upl = new Element('iframe', {src:'/project/upload.html', width: '100%', height:'50px'});
+				var a = new Element('a', {'href' : r.file, id: 'launch_a'}).update('Launch Apollo');
+				status_div.update( a );
+				//a.fire('click');
+				var upl = new Element('iframe', {src: r.file, width: '0px', height:'0px', style: 'display: none'});
 				status_div.appendChild(upl);
 			}
 			else  if (r.status == 'error') {
+				alert("There seem to be an error: " + r.message);
 			}
 			else {
 			}
@@ -207,10 +208,9 @@ function toggle_console_link() {
 function openWindow(url) {
 	UI.defaultWM.options.blurredWindowsDontReceiveEvents = true;
 
-	
 	var options = {
 		width: 916, 
-		height: 496,
+		height: 396,
 		shadow: true,
 		draggable: false,
 		resizable: false,
@@ -243,10 +243,10 @@ function launch(what, where) {
 		alert('Nothing to load!!');
 		return;
 	}
-	/*if (what && what == 'apollo') {
+	if (what && what == 'apollo') {
 		launch_apollo();
 		return;
-	}*/
+	}
 	var host = window.location.host;
 	var uri = what 
 					? 'http://' + host + urls[what] + $('pid').value

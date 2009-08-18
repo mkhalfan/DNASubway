@@ -1,0 +1,66 @@
+{'status':'<% $status %>', 'file':'<% $jnlp %>', 'message':'<% $err %>'}
+<%args>
+	$pid => 0
+</%args>
+<%once>
+	use DNALC::Pipeline::Chado::Utils ();
+	use DNALC::Pipeline::Config ();
+	use DNALC::Pipeline::App::ProjectManager ();
+	use Data::Dumper;
+</%once>
+<%init>
+	$r->content_type('text/plain');
+	my $err = '';
+	my $status = 'fail';
+	my ($jnlp, $web_game_file) = ('', '');
+
+	#$ENV{'GMOD_ROOT'} = '/usr/local/gmod';
+	my $config = DNALC::Pipeline::Config->new->cf('PIPELINE');
+	my $apollo      = $config->{APOLLO_HEADLESS};
+	my $write_dir   = $config->{APOLLO_WRITE_DIR};
+	my $web_path    = $config->{APOLLO_WEB_PATH};
+	#my $vendor      = $config->{APOLLO_VENDOR};
+	#my $apollo_desc = $config->{APOLLO_DESC};
+
+	#$pid = 473;
+	my $pmanager = DNALC::Pipeline::App::ProjectManager->new($pid);
+	unless ($pmanager->project) {
+		$err = "Project not found!";
+	}
+
+	unless ($err) {
+		print STDERR "common-name for pid = $pid = ", $pmanager->cleaned_common_name, $/;
+		
+		my $cutil = DNALC::Pipeline::Chado::Utils->new;
+		$cutil->profile( $pmanager->chado_user_profile );
+		my $conf_file = $cutil->create_chado_adapter($config->{APOLLO_USERCONF_DIR});
+
+		my $start = 1;
+		my $stop  = $pmanager->project->sequence_length;
+
+		my $req_region = $pmanager->cleaned_common_name . ":$start-$stop";
+		my $game_file  = $config->{APOLLO_WRITE_DIR} . "/$req_region.xml";
+		$web_game_file = $config->{APOLLO_WEB_PATH} . "/$req_region.xml";
+	
+		$jnlp = $config->{APOLLO_WEB_PATH} . "/$req_region.jnlp";
+		$cutil->write_jnlp({
+				jnlp 		=> $config->{APOLLO_WRITE_DIR} . "/$req_region.jnlp",
+				web_jnlp	=> $jnlp,
+				hostname	=> 'http://pipeline-dev.dnalc.org',
+				game_file 	=> $web_game_file,
+				vendor		=> $config->{APOLLO_VENDOR},
+				apollo_desc => $config->{APOLLO_DESC},
+			});
+		my $javacmd = "$apollo -H -w $game_file -o game -l $req_region -i chadoDB -C $conf_file > /dev/null";
+		print STDERR  $javacmd , $/;
+		print STDERR  "\njnlp = $jnlp\n", $/;
+		my $rc = system($javacmd);
+		if ($rc == 0 && -f $game_file) {
+			$status = 'success';
+		}
+	}
+
+</%init>
+<%flags>
+	inherit => undef
+</%flags>
