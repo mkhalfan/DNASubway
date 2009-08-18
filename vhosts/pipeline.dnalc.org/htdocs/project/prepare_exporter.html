@@ -2,19 +2,21 @@
 	$pid => 0
 </%args>
 <%once>
-	use DNALC::Pipeline::Project ();
+	use DNALC::Pipeline::App::ProjectManager ();
 	use DNALC::Pipeline::Config ();
 	use DNALC::Pipeline::Sample ();
 	my $pcf = DNALC::Pipeline::Config->new->cf('PIPELINE');
 </%once>
 <%init>
-my $proj = DNALC::Pipeline::Project->retrieve($pid);
-my ($ref, $start, $stop, $sample);
+
+$r->content_type('text/html');
+
+my $pm = DNALC::Pipeline::App::ProjectManager->new($pid);
+my $proj = $pm->project if $pm;
+my ($ref, $start, $stop, $sample, $eurl);
 
 if ($proj) {
-	my $trimmed_common_name = $proj->common_name . '_' . $proj->id;
-	$trimmed_common_name =~ s/\s+/_/g;
-	$trimmed_common_name =~ s/-/_/g;
+	my $trimmed_common_name = $pm->cleaned_common_name;
 
 	#($sample) = grep {$_->{id} == $proj->sample} @{ $pcf->{samples} };
 	$sample = DNALC::Pipeline::Sample->new($proj->sample);
@@ -26,6 +28,10 @@ if ($proj) {
 		$ref = $sample->segment;	
 		$start = $sample->start;
 		$stop = $sample->stop;
+		
+		$eurl = $r->get_server_name eq 'pipeline-dev.dnalc.org'
+					? "http://green.cshl.edu/project/prepare_exporter_file%3Fpid%3D$pid"
+					: "http://" . $r->get_server_name . "project/prepare_exporter_file%3Fpid%3D$pid";
 	}
 }
 
@@ -41,13 +47,13 @@ if ($proj) {
 </head>
 <body>
 <div id="">
-% if ($proj) { 
+% if ($proj) {
 <div id="blurb">
 	<p>Access the .gff data file for the annotation results 
 	<a href="/project/prepare_exporter_file?pid=<% $pid %>">here</a> and save it to the desktop.</p>
 	<p>Then, open the Genome Browser at the website of:
 % for ($sample->links) {
-	<div><a href="<% $_->link_url%>"><% $_->link_name %></a></div>
+	<div><a href="<% $_->link_url . ";eurl=" . $eurl %>"><% $_->link_name %></a></div>
 % }
 	<p>To view the annotation results within any of the above browsers use the “Add your own tracks” 
 	facility at the bottom of that page.</p>

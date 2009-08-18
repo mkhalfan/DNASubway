@@ -209,8 +209,8 @@ function openWindow(url) {
 	UI.defaultWM.options.blurredWindowsDontReceiveEvents = true;
 
 	var options = {
-		width: 916, 
-		height: 396,
+		width: 1024, 
+		height: 496,
 		shadow: true,
 		draggable: false,
 		resizable: false,
