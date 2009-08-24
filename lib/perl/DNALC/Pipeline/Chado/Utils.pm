@@ -1184,6 +1184,7 @@ sub write_jnlp {
 	my $game_file = $args->{game_file};
 	my $vendor = $args->{vendor};
 	my $apollo_desc = $args->{apollo_desc};
+	my $pid	= $args->{pid};
 
 	#return <<END;
 	my $fh = new IO::File "> $jnlp";
@@ -1233,6 +1234,8 @@ sub write_jnlp {
     <argument>game</argument>
     <argument>-f</argument>
     <argument>$hostname/$game_file</argument>
+	<argument>-N</argument>
+	<argument>$pid</argument>
   </application-desc>
 </jnlp>
 END
