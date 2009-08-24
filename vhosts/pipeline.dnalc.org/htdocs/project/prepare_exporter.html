@@ -5,7 +5,6 @@
 	use DNALC::Pipeline::App::ProjectManager ();
 	use DNALC::Pipeline::Config ();
 	use DNALC::Pipeline::Sample ();
-	my $pcf = DNALC::Pipeline::Config->new->cf('PIPELINE');
 </%once>
 <%init>
 
@@ -18,7 +17,6 @@ my ($ref, $start, $stop, $sample, $eurl);
 if ($proj) {
 	my $trimmed_common_name = $pm->cleaned_common_name;
 
-	#($sample) = grep {$_->{id} == $proj->sample} @{ $pcf->{samples} };
 	$sample = DNALC::Pipeline::Sample->new($proj->sample);
 	unless ($sample) {
 		$proj = undef;
@@ -31,7 +29,7 @@ if ($proj) {
 		
 		$eurl = $r->get_server_name eq 'pipeline-dev.dnalc.org'
 					? "http://green.cshl.edu/project/prepare_exporter_file%3Fpid%3D$pid"
-					: "http://" . $r->get_server_name . "project/prepare_exporter_file%3Fpid%3D$pid";
+					: "http://" . $r->get_server_name . "/project/prepare_exporter_file%3Fpid%3D$pid";
 	}
 }
 

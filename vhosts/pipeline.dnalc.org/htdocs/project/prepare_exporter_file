@@ -3,6 +3,7 @@
 </%args>
 <%once>
 	use DNALC::Pipeline::App::ProjectManager ();
+	use DNALC::Pipeline::Sample ();
 	use IO::File ();
 </%once>
 <%init>
@@ -18,45 +19,71 @@
 	}
 
 	my $pcf = $pm->config;
-
-	my $gff3_files = $pm->get_available_gff3_files || [];
-	my @params = ();
-	for my $gff (@$gff3_files) {
-		push @params, ('-g', $gff);
+	my $use_cache = 1;
+	
+	my $gff_file = $pm->work_dir . '/gff3.gff';
+	
+	# cache the data for 2 minutes.. it's way faster when browsing the data.
+	my $time  = time();
+	my $mtime = (stat($gff_file))[9];
+	$use_cache = 0 if $!; # drop cached data if error stat-ing file!
+	if ($use_cache && $time - 120 > $mtime) {
+		$use_cache = 0;
 	}
+	
+	#print STDERR "mtime = ", $mtime, $/;
+	#print STDERR "xtime = ", $time, $/;
+	#print STDERR "delta_t = ", ($time - $mtime), $/;
+	#print STDERR "use_cache = ", $use_cache, $/;
 
-	if ( @params) {
-
-		my $user_annot_file = $pm->work_dir . '/user_data.gff';
-
-		my $trimmed_common_name = $pm->cleaned_common_name;
-
-		my @cmd = ($pcf->{EXE_PATH} . '/dump_user_annotations.pl', 
-						'--profile', $pm->chado_user_profile,
-						'--seqid', $trimmed_common_name,
-						'--file', $user_annot_file
-					);
-		#print STDERR "@cmd", $/;
-		my $rc = system ( @cmd);
-		#print STDERR  "RC = ", $rc , $/;
-
-		if ($rc == 0 && -f $user_annot_file) {
-			#print STDERR  "User file = ", $user_annot_file, $/;
-			push @params, ('-g', $user_annot_file);
+	unless ($use_cache) {
+		my $gff3_files = $pm->get_available_gff3_files || [];
+		my @params = ();
+		for my $gff (@$gff3_files) {
+			push @params, ('-g', $gff);
 		}
 
-		my $gff_merger = $pcf->{EXE_PATH} . '/gff3_merger.pl';
-		my $gff_file = $pm->work_dir . '/gff3.gff';
-		my @args = ($gff_merger, @params, '-f', $pm->fasta_file, '-o', $gff_file);
+		if ( @params) {
 
-		system (@args) && die "Error: $!\n";
-		#print $gff_file, $/;
-		if (-f $gff_file) {
-			#$r->headers_out->add('Content-Disposition' => 'attachment;filename=gff3.gff');
-			#my ($sample) = grep {$_->{id} == $proj->sample} @{ $pcf->{samples} };
-			my $sample = DNALC::Pipeline::Sample->new($proj->sample);
-			my $col1 = $sample->segment . ':' . $sample->start . '..' . $sample->stop;
-			print q{[gene:AUGUSTUS]
+			my $user_annot_file = $pm->work_dir . '/user_data.gff';
+
+			my $trimmed_common_name = $pm->cleaned_common_name;
+
+			my @cmd = ($pcf->{EXE_PATH} . '/dump_user_annotations.pl', 
+							'--profile', $pm->chado_user_profile,
+							'--seqid', $trimmed_common_name,
+							'--file', $user_annot_file
+						);
+			#print STDERR "@cmd", $/;
+			my $rc = system ( @cmd);
+			#print STDERR  "RC = ", $rc , $/;
+
+			if ($rc == 0 && -f $user_annot_file) {
+				#print STDERR  "User file = ", $user_annot_file, $/;
+				push @params, ('-g', $user_annot_file);
+			}
+
+			my $gff_merger = $pcf->{EXE_PATH} . '/gff3_merger.pl';
+			
+			my @args = ($gff_merger, @params, '-f', $pm->fasta_file, '-o', $gff_file);
+
+			system (@args) && die "Error: $!\n";
+		}
+		else {
+			print "Error: No gff3 files ware found! Perhaps no routine has been called.";
+		}
+	}
+	else {
+		print STDERR "Using the 'cached' version...\n";
+	}
+
+	#print $gff_file, $/;
+	if (-f $gff_file) {
+		#$r->headers_out->add('Content-Disposition' => 'attachment;filename=gff3.gff');
+		#my ($sample) = grep {$_->{id} == $proj->sample} @{ $pcf->{samples} };
+		my $sample = DNALC::Pipeline::Sample->new($proj->sample);
+		my $col1 = $sample->segment . ':' . $sample->start . '..' . $sample->stop;
+		print q{[gene:AUGUSTUS]
 glyph = gene
 sub_part = CDS
 
@@ -70,27 +97,24 @@ glyph = gene
 glyph = gene
 
 }, "\n";
-			print "##gff-version 3\n";
+		print "##gff-version 3\n";
 
-			my $in = IO::File->new;
-			if ($in->open($gff_file, 'r')) {
-				while ( my $line = <$in> ){
-					next if $line =~ /^##gff/;
-					$line =~ s/^.*?\t/$col1\t/;
-					$line =~ s/^>.*/>$col1/;
-					print $line;
-				}
+		my $in = IO::File->new;
+		if ($in->open($gff_file, "r")) {
+			while ( my $line = <$in> ){
+				next if $line =~ /^##gff/;
+				$line =~ s/^.*?\t/$col1\t/;
+				$line =~ s/^>.*/>$col1/;
+				print $line;
 			}
-			undef $in;
+		}
+		undef $in;
 
-		}
-		else {
-			print "Error: File not found!";
-		}
 	}
 	else {
-		print "Error: No gff3 file was found! Perhaps no routine has been called.";
+		print "Error: GFF file not found!";
 	}
+
 </%init>
 
 <%flags>
