@@ -46,10 +46,11 @@
 		$cutil->write_jnlp({
 				jnlp 		=> $config->{APOLLO_WRITE_DIR} . "/$req_region.jnlp",
 				web_jnlp	=> $jnlp,
-				hostname	=> 'http://pipeline-dev.dnalc.org',
+				hostname	=> 'http://' . $r->get_server_name,
 				game_file 	=> $web_game_file,
 				vendor		=> $config->{APOLLO_VENDOR},
 				apollo_desc => $config->{APOLLO_DESC},
+				pid			=> $pid,
 			});
 		my $javacmd = "$apollo -H -w $game_file -o game -l $req_region -i chadoDB -C $conf_file > /dev/null";
 		print STDERR  $javacmd , $/;
