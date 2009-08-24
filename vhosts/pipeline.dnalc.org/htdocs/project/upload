@@ -1,0 +1,47 @@
+/
+<%once>
+   use DNALC::Pipeline::Chado::Utils ();
+   use DNALC::Pipeline::Config ();
+   use DNALC::Pipeline::App::ProjectManager ();
+   use Data::Dumper;
+   use Apache2::Upload;
+</%once>
+<%init>
+   my $pid = $r->param("projectname");
+   my $pmanager = DNALC::Pipeline::App::ProjectManager->new($pid);
+   unless ($pmanager->project) {
+         die "Project not found!";
+   }
+   my $wd = $pmanager->work_dir;
+   my $path = $wd . "/uploadedannotations.xml";
+   my $upload = $r->upload("apollo"); # apollo
+   my $name = $upload->filename;
+   my $fh = $upload->fh; my $data;
+   open(OUTPUT, "> ". $path);
+
+   while (my $line = <$fh>) {
+         print OUTPUT $line;
+   }
+   close(OUTPUT);
+
+   #$path = $upl_dir . '/' . random_string();
+   #print STDERR  "UPLOAD saved to: ", $path, $/;
+   #my $seq_data = '';
+   #my $fh = $u->fh;
+   #while (my $line = <$fh>) {
+   #      #print $out $line;
+   #      $seq_data .= $line;
+   #}
+   #------------------
+   #my $pmanager = DNALC::Pipeline::App::ProjectManager->new($pid);
+   #unless ($pmanager->project) {
+   #       $err = "Project not found!";
+   #}
+</%init>
+
+<%flags>
+   inherit => undef
+</%flags>
+UPLOADED: <% $name %>
+PID: <% $pid %>
+WD: <% $wd %>
