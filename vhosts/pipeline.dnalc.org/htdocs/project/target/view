@@ -1,0 +1,41 @@
+<%once>
+	use DNALC::Pipeline::TargetProject ();
+	use Data::Dumper;
+</%once>
+<%init>
+$r->content_type("text/html");
+my ($tpid, $status);
+my %files;
+
+my $path_info = $r->path_info;
+if ($path_info =~ m{^/(\d+)(?:\/index\.html)?$}) {
+	$tpid = $1;
+}
+my $tp = DNALC::Pipeline::TargetProject->retrieve($tpid);
+if ($tp) {
+	$status = $tp->status;
+	my $workdir = $tp->work_dir;
+	for (<$workdir/*>) {
+		my $file = $m->comp('../.comp/filepath_to_web', file => $_, just_return => 1);
+		if ($file =~ /\.(\w{2,4})$/) {
+			$files{$1} = $file;
+		}
+	}
+}
+</%init>
+%#id = <% $tpid %><br />
+
+% if ($tp) {
+	TP = <% $tp->name %><br />
+	status = <% $status %> <br />
+%	if ($status eq "done") {
+		files...:
+%		while (my ($ext, $file) = each %files) {
+		<a href="<% $file %>"><% $ext%></a>
+%		}
+%	} elsif ($status eq "done-empty") {
+		no tree could be computed for this project..
+%	}
+% } else {
+	invalid target project..
+% }

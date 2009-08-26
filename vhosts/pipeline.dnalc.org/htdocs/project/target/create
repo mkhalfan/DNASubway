@@ -1,0 +1,100 @@
+<%args>
+	$g => undef;
+</%args>
+<%once>
+	use DNALC::Pipeline::App::ProjectManager ();
+	use DNALC::Pipeline::TargetGenome ();
+	use DNALC::Pipeline::TargetProject ();
+	use Bio::SeqIO ();
+	use Gearman::Client();
+	use Data::Dumper;
+</%once>
+<%init>
+
+$r->content_type("text/html");
+my $path_info = $r->path_info;
+my ($pid, $start, $stop, $seq, $genomes, $err);
+if ($path_info =~ /_(\d+)\/(\d+)\/(\d+)/) {
+	$pid   = $1;
+	$start = $2;
+	$stop  = $3;
+}
+my $pm = DNALC::Pipeline::App::ProjectManager->new($pid);
+if ($pm->project) {
+
+	my $seqio = Bio::SeqIO->new( "-format" => "fasta" , -file => $pm->fasta_file);
+	my $seq_obj = $seqio->next_seq();
+	$seq = $seq_obj->subseq($start,$stop);
+
+	if ($r->method eq "POST") {
+		my $name = $pm->cleaned_common_name . ":$start..$stop";
+		print STDERR "g = $g", $/;
+		my $tp;
+		if ($g && '' eq ref $g) {
+			$g = [$g];
+		}
+		if ($g && @$g) {
+			my $tp = eval {
+					DNALC::Pipeline::TargetProject->create({
+						name => $name,
+						project_id => $pm->project->id,
+						organism => $pm->project->organism,
+						segment => $name,
+						seq => $seq,
+						type => 'd',
+						status => 'processing',
+					});
+				};
+			if ($@) {
+				print STDERR $@, $/;
+				$err = $@;
+			}
+
+			else {
+				print STDERR Dumper($g), $/;
+				for my $genome (@$g) {
+					$tp->add_to_genomes({
+							tpid => $tp,
+							genome_id => $genome
+						});
+				}
+				# start the processing
+				my $client = Gearman::Client->new;
+				my $sx = $client->job_servers('127.0.0.1');
+				my $h = $client->dispatch_background( target => $tp->id );
+
+				# redirect..
+				$m->redirect('/project/target/');
+			}
+		} else {
+			$err = 'There was no genome selected.';
+		}
+	}
+	# GET
+	if ($seq) {
+		$seq = ">" . $pm->cleaned_common_name . "\n" . $seq;
+	}
+	$genomes = DNALC::Pipeline::TargetGenome->retrieve_all;
+}
+</%init>
+
+<% $err %>
+
+% if ($seq) {
+<form method="post">
+	<div>
+	<textarea rows="5" cols="45"><% $seq %></textarea>
+	</div>
+
+	<div>
+	Select up to 3 of the following organisms:
+	<ul>
+% while (my $g = $genomes->next) {
+	<li><input readonly="readonly" type="checkbox" name="g" value="<% $g %>"/> <% $g->organism %> </li>
+% }
+	</ul>
+	<input type="submit" name="submit" value="Submit" />
+</form>
+% } else {
+	sequence not found...
+% }
