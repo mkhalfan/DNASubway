@@ -263,6 +263,18 @@ function createTargetPoject(sel) {
 		return;
 	}
 
+	var start = parseInt(m[2], 10);
+	var stop = parseInt(m[3], 10);
+	if (isNaN(start) || isNaN(stop) ) {
+		alert("Error!");
+		return;
+	}
+
+	if (stop <= start || stop - start > 10000 ) {
+		alert("Selection too large/small!");
+		return;
+	}
+
 	top.document.location.href = '/project/target/create/' + m[1] + '/' + m[2] + '/' +  m[3];
 }
 
