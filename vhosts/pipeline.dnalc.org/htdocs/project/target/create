@@ -28,13 +28,12 @@ if ($pm->project) {
 
 	if ($r->method eq "POST") {
 		my $name = $pm->cleaned_common_name . ":$start..$stop";
-		print STDERR "g = $g", $/;
 		my $tp;
 		if ($g && '' eq ref $g) {
 			$g = [$g];
 		}
 		if ($g && @$g) {
-			my $tp = eval {
+			$tp = eval {
 					DNALC::Pipeline::TargetProject->create({
 						name => $name,
 						project_id => $pm->project->id,
@@ -98,3 +97,4 @@ if ($pm->project) {
 % } else {
 	sequence not found...
 % }
+

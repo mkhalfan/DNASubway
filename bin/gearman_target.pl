@@ -38,7 +38,7 @@ sub run_target {
 
 	#print STDERR Dumper( $query ), $/;
 
-	my $xml_url = $server . '/Visitors/143_48_90_149/temp_0826130445.xml';
+	my $xml_url;# = $server . '/Visitors/143_48_90_149/temp_0826130445.xml';
 
 	unless ($xml_url) {
 		$res = $ua->post($post_url, $query);

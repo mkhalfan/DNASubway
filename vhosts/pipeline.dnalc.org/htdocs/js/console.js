@@ -255,6 +255,18 @@ function launch(what, where) {
 	openWindow( uri );
 }
 
+function createTargetPoject(sel) {
+	//close_windows();
+	var m = sel.match(/(\w+_\d+):(\d+)\.\.(\d+)/);
+	if (!m || m.length != 4) {
+		alert('hmm');
+		return;
+	}
+
+	top.document.location.href = '/project/target/create/' + m[1] + '/' + m[2] + '/' +  m[3];
+}
+
+
 function debug(msg) {
 	var d = $('debug');
 	if (d) d.update(msg);
