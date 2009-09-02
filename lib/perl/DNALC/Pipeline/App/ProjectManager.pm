@@ -272,7 +272,7 @@ sub init_chado {
 	my ($self) = @_;
 
 	unless (ref $self) {
-		confess "Improper use of create_gbrowse_config()\n";
+		confess "Improper use of init_chado()\n";
 		return;
 	}
 

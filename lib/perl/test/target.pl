@@ -11,7 +11,7 @@ use DNALC::Pipeline::Config();
 
 use Gearman::Client ();
 
-my $tpid = 6;
+my $tpid = 24;
 my $client = Gearman::Client->new;
 my $sx = $client->job_servers('127.0.0.1');
 

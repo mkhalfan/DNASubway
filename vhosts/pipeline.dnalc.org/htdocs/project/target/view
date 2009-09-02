@@ -17,7 +17,7 @@ if ($tp) {
 	my $workdir = $tp->work_dir;
 	for (<$workdir/*>) {
 		my $file = $m->comp('../.comp/filepath_to_web', file => $_, just_return => 1);
-		if ($file =~ /\.(\w{2,4})$/) {
+		if ($file =~ /\.(\w{2,5})$/) {
 			$files{$1} = $file;
 		}
 	}
@@ -33,12 +33,24 @@ if ($tp) {
 %#		while (my ($ext, $file) = each %files) {
 %#		<a href="<% $file %>"><% $ext%></a>
 %#		}
-%	if (defined $files{jpg}) {
-	<div><a href="<% $files{jpg} %>">view tree (image)</a></div>
-%	}
-%	if (defined $files{nw}) {
+%		if (defined $files{jpg}) {
+		<div><a href="<% $files{jpg} %>">view tree (image)</a></div>
+%		}
+%		if (defined $files{nw}) {
 	<div><a href="/files/phylowidget/bare.html?tree='http://<% $r->get_server_name . $files{nw} %>'">view tree (interactive)</a></div>
-%	}
+%		}
+%		if (defined $files{fasta}) {
+	<div>View alignment: 
+		<applet archive="/files/jalview/jalviewApplet.jar" name="Jalview_muscle_1" \
+		code="jalview.bin.JalviewLite" height="35" width="140">
+		<param name="file" value="<% $files{fasta} %>">
+		<param name="showAnnotation" value="true">
+		<param name="windowHeight" value="500">
+		<param name="windowWidth" value="650">
+		<param name="showFullId" value="false">
+		<param name="defaultColour" value="Clustal"></applet>
+	</div>
+%		}
 %	} elsif ($status eq "done-empty") {
 		we couldn't compute a tree for the data you submited..
 %	}

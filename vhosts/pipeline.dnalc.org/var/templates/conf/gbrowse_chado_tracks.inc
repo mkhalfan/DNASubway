@@ -1,41 +1,34 @@
 [DETAIL SELECT MENU]
 width = 250
-html  = <table style="width:100%">
-         <tr>
-           <th style="background:lightgrey;cell-padding:5">
+html  = <div style="width:100%">
+         <ul style="list-style: none; padding: 2px;">
+           <li style="background:lightgrey;">
              SELECTION
              <span style="right:0px;position:absolute;color:blue;cursor:pointer"
-                   onclick="SelectArea.prototype.cancelRubber()">
-               [X]
-             </span>
-           </th>
-         </tr>
-         <tr>
-           <td>
-             <span style="color:blue;cursor:pointer" onclick="SelectArea.prototype.clearAndSubmit()">
-              Zoom in
-             </span>
-           </td>
-         </tr>
-         <tr>
-           <td>
-             <span style="color:blue;cursor:pointer" onclick="SelectArea.prototype.clearAndRecenter()">
-               Recenter on this region
-             </span>
-           </td>
-         </tr>
-         <tr>
-           <td onmouseup="SelectArea.prototype.cancelRubber()">
+                   onclick="SelectArea.prototype.cancelRubber()"> [X] </span>
+           </li>
+           <li>
+             <span style="color:blue;cursor:pointer" onclick="SelectArea.prototype.clearAndSubmit()">Zoom in</span>
+           </li>
+           <li>
+             <span style="color:blue;cursor:pointer" onclick="SelectArea.prototype.clearAndRecenter()">Recenter on this region</span>
+           </li>
+           <li onmouseup="SelectArea.prototype.cancelRubber()">
              <a href="/cgi-bin/apollo_request_region.pl?selection=SELECTION">
               Open this section in Apollo
              </a>
-           </td>
-         </tr>
-       </table>
+           </li>
+           <li onmouseup="SelectArea.prototype.cancelRubber()">
+             <span style="color:blue;cursor:pointer" onclick="parent.createTargetPoject('SELECTION');//parent.close_windows()">
+				Submit to TARGeT
+			</span>
+           </li>
+       </ul>
+	   </div>
 
 
 
-[Augustus_Genes]
+[Augustus]
 feature      = gene:AUGUSTUS
 glyph        = gene
 base         = 1
@@ -44,10 +37,11 @@ base         = 1
 fgcolor      = green
 bgcolor      = lightgreen
 height       = 8
-key          = Augustus Genes
+das category = transcription
+key          = Augustus Predicted Genes
 balloon hover = <b>$name</b> is a predicted gene spanning $ref from $start to $end. Click for more details.
 
-[FgenesH]
+[FGenesH]
 feature      = gene:FGenesH_Monocots gene:FGenesH gene:FGenesH_Dicots
 glyph        = gene
 sub_part     = exon
@@ -56,7 +50,10 @@ bgcolor      = green
 label_transcripts = 1
 thin_utr     = 1
 pad_bottom   = 3
-key          = FGenesH
+das category = transcription
+balloon click width = 500
+balloon click = url:/project/gene_options?ref=$ref;name=$name;start=$start;end=$end;id=$id
+key          = FGenesH Predicted Genes
 
 [CDS]
 feature      = mRNA
@@ -74,12 +71,14 @@ bgcolor      = green
 label_transcripts = 1
 thin_utr     = 1
 pad_bottom   = 3
-key          = Snap
+das category = transcription
+key          = Snap Predicted Genes
 
 [tRNA]
 feature      = gene:tRNAScan-SE
 fgcolor      = black
 stranded     = 1
+das category = transcription
 key          = Predicted tRNAs
 
 [Repeats]
@@ -87,6 +86,7 @@ feature      = repeat_region
 glyph        = generic
 bgcolor      = black
 fgcolor      = black
+das category = repeat
 key          = Repeats
 
 [Translation]
@@ -96,6 +96,7 @@ height       = 40
 fgcolor      = purple
 strand       = +1
 translation  = 6frame
+das category = translation
 key          = 6-frame translation
 
 [DNA/GC Content]
@@ -118,12 +119,14 @@ description = sub {
         my ($desc) = $f->attributes('description');
         return $desc;
   }
+das category = transcription
 key          = Blastn
 
 [Blastx]
 feature      = match:BLASTX
 glyph        = segments
 fgcolor      = magenta
+das category = transcription
 key          = Blastx
 
 
@@ -142,4 +145,5 @@ key          = Blastx
 feature     = gene:user
 glyph       = gene
 bgcolor     = red
+das category = transcription
 key         = User created models

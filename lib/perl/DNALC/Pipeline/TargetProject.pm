@@ -23,6 +23,16 @@ __PACKAGE__->add_trigger(before_update => sub {
 __PACKAGE__->has_many(genomes => 'DNALC::Pipeline::TargetRole');
 
 
+sub retrieve_all {
+
+	__PACKAGE__->retrieve_from_sql ( q{
+			1 = 1
+			ORDER BY tpid asc
+		});
+}
+
+#-----------------------------------------------------------------------------
+
 sub work_dir {
 	my ($self) = @_;
 

@@ -314,6 +314,52 @@ LANGUAGE SQL;
 -- Name: public; Type: ACL; Schema: -; Owner: postgres
 --
 
+CREATE TABLE target_genome
+(
+  genome_id character varying(8) NOT NULL,
+  organism character varying(128) NOT NULL DEFAULT ''::character varying,
+  note character varying(255) NOT NULL DEFAULT ''::character varying,
+  active boolean DEFAULT true,
+  CONSTRAINT target_genome_pk PRIMARY KEY (genome_id)
+)
+WITHOUT OIDS;
+ALTER TABLE target_genome OWNER TO pipeline;
+
+CREATE TABLE target_project
+(
+  tpid serial NOT NULL,
+  project_id integer,
+  "name" character varying(128) NOT NULL DEFAULT ''::character varying,
+  organism character varying(128) NOT NULL DEFAULT ''::character varying,
+  segment character varying(128) NOT NULL DEFAULT ''::character varying,
+  "type" character(1) NOT NULL DEFAULT 'd'::bpchar,
+  "sequence" character varying(10000) NOT NULL DEFAULT ''::character varying,
+  status character varying(16) NOT NULL DEFAULT ''::character varying,
+  created timestamp without time zone,
+  updated timestamp without time zone,
+  CONSTRAINT target_project_pk PRIMARY KEY (tpid),
+  CONSTRAINT target_project_project_id_fk FOREIGN KEY (project_id)
+      REFERENCES project (project_id) MATCH SIMPLE
+      ON UPDATE CASCADE ON DELETE CASCADE
+)
+WITHOUT OIDS;
+ALTER TABLE target_project OWNER TO pipeline;
+
+
+CREATE TABLE target_project_genome
+(
+  genome_id character varying(8) NOT NULL,
+  tpid integer NOT NULL,
+  CONSTRAINT target_project_genome_pkey PRIMARY KEY (genome_id, tpid),
+  CONSTRAINT target_project_genome_genome_id_fkey FOREIGN KEY (genome_id)
+      REFERENCES target_genome (genome_id) MATCH SIMPLE
+      ON UPDATE NO ACTION ON DELETE NO ACTION,
+  CONSTRAINT target_project_genome_tpid_fkey FOREIGN KEY (tpid)
+      REFERENCES target_project (tpid) MATCH SIMPLE
+      ON UPDATE NO ACTION ON DELETE NO ACTION
+)
+WITHOUT OIDS;
+ALTER TABLE target_project_genome OWNER TO pipeline;
 
 
 REVOKE ALL ON SCHEMA public FROM PUBLIC;

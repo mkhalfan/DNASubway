@@ -31,7 +31,7 @@ image widths  = 640 800 1024
 
 # default width of detailed view (pixels)
 default width = 800
-default features = Augustus_Genes FgenesH Repeats tRNA Snap usergenes Blastx Blastn
+default features = Augustus FGenesH tRNA Snap usergenes Blastx Blastn
 
 # max and default segment sizes for detailed view
 max segment     = 100000
@@ -51,10 +51,14 @@ key bgcolor      = beige
 # "automatic" classes to try when an unqualified identifier is given
 automatic classes = gene
 
+
+search_instructions = &nbsp;
+navigation_instructions = &nbsp;
+
 language = en
 ### HTML TO INSERT AT VARIOUS STRATEGIC LOCATIONS ###
 # inside the <head></head> section
-head = 
+head = <script src="/gbrowse/js/geneDetails.js" type="text/javascript"></script>
 
 # at the top...
 header =
@@ -89,6 +93,8 @@ label density = 25
 bump density  = 10000
 link           =AUTO
 # database    = test_db
-balloon hover = <b>$name</b> is a $type spanning $ref from $start to $end. Click for more details.
+balloon hover = <b>$name</b> is a $type spanning $ref from $start to $end. Click for more options.
+balloon click width = 500
+balloon click = url:/project/gene_options?ref=$ref;name=$name;start=$start;end=$end;id=$id
 
 

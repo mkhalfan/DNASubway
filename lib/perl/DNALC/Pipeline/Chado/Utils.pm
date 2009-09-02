@@ -727,7 +727,7 @@ sub create_conf_file {
     my $conffile = sprintf("%s/%s_%d.conf", $confdir, $username, $project_id); 
 
     if (-f $conffile) {
-        warn "Configuration file for this user [$username] already exists.";
+		#warn "Configuration file for this user [$username] already exists.";
     }
     else {
 		my $in  = IO::File->new( $confdir . '/' . $self->profile . '.conf' );
@@ -900,7 +900,6 @@ sub create_gbrowse_conf {
 
 sub create_gbrowse_chado_conf {
     my ( $self, $project_id ) = @_;
-    print STDERR Dumper( $self ), $/;
 
     unless ($project_id && $project_id =~ /\d+/) {
         warn "Project ID is missing or invalid\n";
@@ -918,20 +917,15 @@ sub create_gbrowse_chado_conf {
 
     my $conffile = sprintf("%s/%s_db_%d.conf", $confdir, $username, $project_id);
 
-
-    print STDERR  "Config dir = ", $confdir, $/;
-    print STDERR  "Config file = ", $conffile, $/;
-
     return $conffile if -f $conffile;
 
+    print STDERR  "Config file = ", $conffile, $/;
     print STDERR $self->chado_gbrowse, $/;
+
     my $in  = IO::File->new( $confdir . '/' . $self->chado_gbrowse );
     my $out = IO::File->new( "> $conffile" );
     if (defined $in && $out) {
 
-		#these lines are breaking chado becuase it has spaces!
-		#$organism =~ s/\s+/_/g;
-		#$organism .= '_' . $project_id;
 		my $trimmed_organism = $organism;
 		$trimmed_organism =~ s/\s+/_/g;
 		$trimmed_organism =~ s/-/_/g;
