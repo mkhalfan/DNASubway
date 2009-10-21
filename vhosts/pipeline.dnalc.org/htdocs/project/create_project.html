@@ -1,4 +1,110 @@
 
+% if (@err) {
+<div style="display:none" id="error_list">
+%	foreach (@err) {
+<div><% $_ %></div>
+%	}
+</div>
+% }
+
+<form id="forma1" enctype="multipart/form-data" method="post">
+<div id="conRedlineLeft1"> 
+	<div id="conProject_newLeft"> 
+		<div class="conNewPro_title">Select Sequence Source</div> 
+
+		<div class="conNewPro_label1">
+			<input class="conRadiobox_align" type="radio" name="seq_src" id="seq_src_upload" value="upload" onclick="select_source(this)" <% $seq_src eq "upload" ? "checked=\"checked\"" : ""%>/>&nbsp; 
+			Upload a Sequence File in <a href="http://en.wikipedia.org/wiki/FASTA_format#Format">FASTA format</a> <small>(max 100kb)</small>:
+			<input class="conStylized_box1" type="file" id="seq_file" name="seq_file"  onchange="set_source('upload')" onclick="set_source('upload')"  />
+		</div>
+
+		<div style="clear: both;">&nbsp;</div> 
+		<div class="conNewPro_label1">
+			<input class="conRadiobox_align" type="radio" name="seq_src" id="seq_src_paste" value="paste" <% $seq_src eq "paste" ? "checked=\"checked\"" : ""%> />&nbsp; 
+			Enter a Sequence:
+			<textarea class="conStylized_box2" name="sequence" id="notebox" rows="5" cols="30" onfocus="set_source('paste');"></textarea>
+		</div>
+
+		<div style="clear: both;">&nbsp;</div> 
+		<div class="conNewPro_label1">
+			<input class="conRadiobox_align" type="radio" name="seq_src" id="seq_src_sample" value="sample" onclick="select_source(this)" <% $seq_src eq "sample" ? "checked=\"checked\"" : ""%>/>&nbsp; 
+		Select a Sample Sequence:  
+			<select class="conStylized_box3" id="specie" name="species" size="6" style="width: 380px;" onchange="set_source('sample');">
+% for my $ss (@samples) {
+%	my $sel = $seq_src eq "sample" && $ss->id == $species ? "selected=\"selected\"" : "";
+			<option id="o<%$ss->id%>" value="<% $ss->id %>" extra="" clade="<% $ss->{clade} ? $ss->{clade} : "o" %>"\
+			<% $sel %>><% $ss->organism %> (<% $ss->common_name %>) <% $ss->segment %>, <% nicebasepairs($ss->sequence_length) %></option>
+% }
+			</select>
+		</div>
+	</div>
+	  <!--END of ID conProject_newLeft-->
+
+</div><!--END of ID conRedlineLeft1-->
+
+<div id="conRedlineRight1">
+
+ <div id="conProject_newRight"> 
+            	<div class="conNewPro_title">Name Your Project</div>   
+            		 <div class="conNewPro_label1">
+						<label>Project Title:</label>
+								<input class="conStylized_box4" type="text" name="name" id="name" value="<% $name|html%>" maxlength="128" />
+ 				</div>
+       		<div style="clear: both;">&nbsp;</div>
+                 <div class="conNewPro_title">Organism</div>   
+            		 <div class="conNewPro_label1">
+						<label>Scientific name (Genus Species):</label>
+								<input class="conStylized_box4" type="text" name="organism" id="organism" value="<% $organism |html%>" maxlength="128"  />
+ 				 </div>  
+                 
+            		 <div class="conNewPro_label1">
+						<label>Common name:</label>
+								<input class="conStylized_box4" type="text"name="common_name" id="common_name" value="<% $common_name |html%>" maxlength="128"   />
+ 				 	</div> 
+             <div style="clear: both;">&nbsp;</div> 
+				<div class="conNewPro_label1">
+					<label>Class:</label>
+					<div style="clear: both;">&nbsp;</div>
+					<div class="conNewPro_label1">
+						<span class="conNewPro_smallContainer">
+						<input class="conRadiobox_align" type="radio" name="group" id="gm" value="m" <% $group eq "m" ? "checked=\"checked\"" : ""%>/>&nbsp; Monocotyledons</span>
+						<span class="conNewPro_smallContainer">
+						<input class="conRadiobox_align" type="radio" name="group" id="gd" value="d" <% $group eq "d" ? "checked=\"checked\"" : ""%>/>&nbsp; Dicotyledons</span>                     
+					</div>
+					<div class="conNewPro_label1">
+						<span class="conNewPro_smallContainer">
+						<input class="conRadiobox_align" type="radio" name="group" id="go" value="o" <% $group eq "o" ? "checked=\"checked\"" : ""%>/>&nbsp; Other</span>
+						<span class="conNewPro_smallContainer">
+						<input class="conRadiobox_align" type="radio" name="group" id="gu" value="u" <% $group eq "u" ? "checked=\"checked\"" : ""%>/>&nbsp; I don't know</span>
+					</div>
+ 				 </div>
+<!--
+                    <div style="clear: both;">&nbsp;
+                      <div class="conNewPro_label1">
+                        <label>Status:</label>
+                        <div style="clear: both;">&nbsp;</div>
+                        <div class="conNewPro_label1"> <span class="conNewPro_smallContainer">
+                          <input class="conRadiobox_align" type="radio" name="group" id="gm2" value="m"   />
+                          &nbsp; Private</span> <span class="conNewPro_smallContainer">
+                      <input class="conRadiobox_align" type="radio" name="group" id="gm2" value="m"   />
+                            &nbsp; Public</span> </div>
+                        <div class="conNewPro_label1"></div>
+                      </div>
+                    </div>
+-->
+              <div class="conBT_continue"><a href="#" onclick="javascript:step_one()">Continue</a></div>
+                        
+            </div><!--END of ID conProject_newRight-->
+
+</div><!--END of ID conRedlineRight1-->                    
+</form>
+%#----------------------------------------------------------------------------
+
+% if (0) {
+<div></div>
+<hr clear="both" />
+
+% if (0) {
 <div id="conTop_button"> 
 	<div id="conTop_title"><h2>PROJECTS</h2></div>
 		<div id="conTop_menu">
@@ -10,20 +116,7 @@
 		</div>
 	<div id="conMember_name">USER: Cornel Ghiban</div>
 </div><!--END of ID conTop_button-->
-
-% if (@err) {
-<div style="display:none" id="error_list">
-%	foreach (@err) {
-<div><% $_ %></div>
-%	}
-</div>
 % }
-
-<div>
-	Blurb Blurb Blurb Blurb Blurb Blurb Blurb Blurb Blurb Blurb Blurb Blurb 
-	Blurb Blurb Blurb Blurb Blurb Blurb Blurb Blurb Blurb Blurb Blurb Blurb 
-	Blurb Blurb Blurb Blurb Blurb Blurb Blurb Blurb Blurb Blurb Blurb Blurb			
-</div>
 
 <form id="forma1" enctype="multipart/form-data" method="post">
 <!-- Left Content Start -->
@@ -108,11 +201,7 @@
 </div><!-- #conProject_newRight -->
 <div style="clear: both;">&nbsp;</div>
 </form>
-
-<div>
-sasas asdklj hasfksdhf lkf
-</div>
-
+% }
 %#-----------------------------------------------------------------
 <%args>
 	$name => ''
@@ -284,6 +373,7 @@ if ($r->method eq 'POST') {
 	js => ['create_project.js']
 	css => ['device.css']
 	load_window_ui => 1
+	current_section => 'red'
 </%attr>
 
 %# vim: ft=mason

@@ -20,3 +20,8 @@ my $tprojects = DNALC::Pipeline::TargetProject->retrieve_all;
 	<a href="./view/<% $p->id %>"><% $p->name %></a> - <% $p->organism %> - <% $p->status %>
 </div>
 % }
+
+%#-----------------------------------------------------------------
+<%attr>
+	current_section => 'yellow'
+</%attr>

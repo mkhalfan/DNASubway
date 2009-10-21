@@ -7,7 +7,7 @@ use File::Path qw/rmtree/;
 use DNALC::Pipeline::App::ProjectManager ();
 
 $ENV{GMOD_ROOT} = '/usr/local/gmod';
-my $PID = 494;
+my $PID = 496;
 
 my $pm = DNALC::Pipeline::App::ProjectManager->new($PID);
 unless ($pm->project) {
@@ -28,11 +28,11 @@ my $cutils = DNALC::Pipeline::Chado::Utils->new(
 				profile => $pm->config->{GMOD_PROFILE},
 				gbrowse_confdir  => $pm->config->{GBROWSE_CONF_DIR},
 			);
-my $conffile = $cutils->create_conf_file( $PID );
+my $conffile = $cutils->gmod_conf_file( $PID );
 print STDERR  'to rm: ', $conffile, $/;
 unlink $conffile;
 
-my $gb_conf = $cutils->create_gbrowse_chado_conf( $PID );
+my $gb_conf = $cutils->gbrowse_chado_conf( $PID );
 print STDERR  'to rm: ', $gb_conf, $/;
 unlink $gb_conf;
 

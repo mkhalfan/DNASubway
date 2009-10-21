@@ -78,7 +78,7 @@ if ($@)  {
 }
 print STDERR Dumper( $cutils), $/;
 
-my $conffile_ok = $cutils->create_conf_file( $proj->id );
+my $conffile_ok = $cutils->gmod_conf_file( $proj->id );
 print STDERR "Created file = ", $conffile_ok, $/;
 my $new_profile = sprintf("%s_%d", $username, $proj->id);
 

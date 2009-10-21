@@ -4,10 +4,12 @@ use POSIX ();
 use File::Path;
 
 use base qw(DNALC::Pipeline::DBI);
+use DNALC::Pipeline::MasterProject ();
+#use Data::Dumper;
 
 __PACKAGE__->table('target_project');
 __PACKAGE__->columns(Primary => qw/tpid/);
-__PACKAGE__->columns(Essential => qw/name project_id type organism segment status/);
+__PACKAGE__->columns(Essential => qw/user_id name project_id type organism segment status/);
 __PACKAGE__->columns(Others => qw/seq created updated/);
 
 __PACKAGE__->sequence('target_project_tpid_seq');
@@ -18,6 +20,19 @@ __PACKAGE__->add_trigger(before_create => sub {
 
 __PACKAGE__->add_trigger(before_update => sub {
     $_[0]->updated( POSIX::strftime "%Y-%m-%d %H:%M:%S", localtime(+time));
+});
+
+__PACKAGE__->add_trigger(after_create => sub {
+	my $mp = eval {
+		DNALC::Pipeline::MasterProject->create({
+				user_id => $_[0]->user_id,
+				project_id => $_[0]->id,
+				project_type => 'target'
+			});
+	};
+	if ($@) {
+		print STDERR  $@, $/;
+	}
 });
 
 __PACKAGE__->has_many(genomes => 'DNALC::Pipeline::TargetRole');
@@ -32,6 +47,11 @@ sub retrieve_all {
 }
 
 #-----------------------------------------------------------------------------
+
+sub common_name {
+
+	return $_[0]->segment;
+}
 
 sub work_dir {
 	my ($self) = @_;

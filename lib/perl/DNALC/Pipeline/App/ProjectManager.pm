@@ -297,7 +297,7 @@ sub init_chado {
 	if ($@)  {
 		print STDERR  "CHADO DB already exists. skipping...", $/;
 	}
-	my $conffile_ok = $cutils->create_conf_file( $project->id );
+	my $conffile_ok = $cutils->gmod_conf_file( $project->id );
 	print STDERR "Created CHADO CONF file = ", $conffile_ok, $/;
 
 	# read data from new file

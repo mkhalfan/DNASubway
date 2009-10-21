@@ -29,7 +29,7 @@
 	);
 
 	# 1st create GBrowse conf file & DB dir for this project
-	$cutils->create_gbrowse_chado_conf($proj->id);
+	$cutils->gbrowse_chado_conf($proj->id);
 
 	$m->redirect($pcf->{GBROWSE_URL} . '/' . $s->{username} . '_db_' . $proj->id);
 </%init>

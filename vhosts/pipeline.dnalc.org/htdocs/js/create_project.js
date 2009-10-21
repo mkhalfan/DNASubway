@@ -33,6 +33,7 @@ function step_one() {
 		//return;
 	}
 	//$('continue').disabled = true;
+	show_errors("Creating project. Stand by..");
 	f.submit();
 }
 

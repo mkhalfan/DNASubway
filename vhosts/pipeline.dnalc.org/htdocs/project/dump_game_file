@@ -56,6 +56,7 @@
 		#my $javacmd = "$apollo -H -w $game_file -o game -l $req_region -i chadoDB -C $conf_file";
 		print STDERR  $javacmd , $/;
 		print STDERR  "\njnlp = $jnlp\n", $/;
+		print STDERR  "\ngame = $game_file\n", $/;
 		my $rc = system($javacmd);
 		if ($rc == 0 && -f $game_file) {
 			$status = 'success';

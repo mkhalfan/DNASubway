@@ -1,20 +1,6 @@
 
-<div id="conTop_button"> 
-	<div id="conTop_title"><h2>PROJECTS</h2></div>
-		<div id="conTop_menu">
-			<ul id="conTop_menu">
-			<li><a href="/project/create_project.html" title="">New Project</a></li>
-			<!--<li><a href="#" title="">My Projects</a></li>-->
-			<li><a href="./browse" title="" class="current">Public Projects</a></li>
-			</ul> 
-		</div>
-	<div id="conMember_name">USER: Cornel Ghiban</div>	
-</div>
-
-<div>BLaBLaBLaBLa 
-	<br/><br/> Search BOX &amp; Sort By BOX will be here....
-</div>
-
+<div id="container_pageTitle"> public projects</div>
+<br clear="all"/>
 <div id="container_mytablehome">
   <table class="conProject_table" summary="">
   <tr>
@@ -27,12 +13,16 @@
   </tr>
 % for (@projects) {
 %	my $created = DNALC::Pipeline::App::Utils->format_datetime($_->created, undef, "%m/%d/%Y");
+%	my $uri = "/project/console.html?pid=" . $_->id;
+%	if ($_->{type} eq "target") {
+%		$uri = "/project/target/view/" . $_->id;
+% 	}
 <tr>
 	<td><% $_->id %></td>
 	<td><% $created %></td>
-	<td><a href="/project/console.html?pid=<% $_->id %>"><%$_->name%></a></td>
+	<td><a href="<% $uri %>"><%$_->name |html%></a></td>
 	<td><% $_->organism %>, <% $_->common_name %></td>
-	<td><% $clades{$_->clade}  %></td>
+	<td><% $_->can("clade") ? $clades{$_->clade} : "" %></td>
 	<!--<td><% $_->user_id %></td>-->
 	<td> public </td>
 </tr>
@@ -51,11 +41,16 @@
 	$sort => 'created desc'
 </%args>
 <%once>
+	use DNALC::Pipeline::MasterProject ();
 	use DNALC::Pipeline::Project ();
+	use DNALC::Pipeline::TargetProject ();
 	use DNALC::Pipeline::User ();
 	use DNALC::Pipeline::Config ();
 	use DNALC::Pipeline::Utils qw(random_string);
 	use DNALC::Pipeline::App::Utils ();
+	
+	#use Switch 'Perl6';
+	
 	use Data::Dumper;
 
 	my %clades = (
@@ -83,16 +78,29 @@ unless ($page =~ /^\d+$/) {
 	$page = 1;
 }
 
-my $orderby = [$sort];
+#my $pager = DNALC::Pipeline::Project->pager;
+#$pager->per_page( $epp );
+#$pager->page( $page );
+#$pager->order_by( $sort );
+#my @projects = $pager->search_where;
 
-my $pager = DNALC::Pipeline::Project->pager;
+my $pager = DNALC::Pipeline::MasterProject->pager;
 $pager->per_page( $epp );
 $pager->page( $page );
-$pager->order_by( $sort );
+$pager->order_by( 'project_id' );
 
-my @projects = $pager->search_where;
+my @projects = grep { defined $_ } map {
+					my $pid = $_->project_id;
+					my $ptype = 'DNALC::Pipeline::Project';
+					if ($_->project_type eq "target") {
+						$ptype = 'DNALC::Pipeline::TargetProject';
+					}
+					my $p = $ptype->retrieve($pid);
+					$p->{type} = $_->project_type if $p;
+					$p;
+				} $pager->search_where;
+
 my $pages = int($pager->total_entries/$epp) + ($pager->total_entries % $epp > 0 ? 1 : 0);
-#print STDERR Dumper( $pager ), $/;
 
 </%init>
 

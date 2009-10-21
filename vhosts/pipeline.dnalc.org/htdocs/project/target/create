@@ -1,5 +1,86 @@
+<form method="post" id="forma">
+<div id="conYellowlineLeft1"> 
+	<div id="conProject_newLeft">
+	
+	<% join "<br/>", @err %>
+
+	<div class="conNewPro_title">Select Sequence Source</div>
+% if (0) {
+		<div class="conNewPro_label1">
+			<input class="conRadiobox_align" type="radio" name="seq_src" id="seq_src_upload" value="upload" onclick="select_source(this)"  />&nbsp; Upload a Sequence File: (max 100kb) 
+			<input class="conStylized_box1" type="file" id="seq_file" name="seq_file"  onchange="set_source('upload')" onclick="set_source('upload')"  />
+		</div>
+% }
+		<div style="clear: both;">&nbsp;</div>
+		<div class="conNewPro_label1">
+%#			<input class="conRadiobox_align" type="radio" name="seq_src" id="seq_src_paste" value="paste" <% $seq ne "" ? "checked=\"checked\"" : "" %> />&nbsp; 
+			Enter a Sequence in FASTA Format: 
+			<textarea class="conStylized_box2" name="seq" id="seq" rows="5" cols="30" onfocus="set_source('paste');"><% $seq |html%></textarea>
+		</div>
+		<div style="clear: both;">&nbsp;</div>
+% if (0 && !$seq) {
+		<div style="clear: both;">&nbsp;</div>
+		<div class="conNewPro_label1">
+			<input class="conRadiobox_align" type="radio" name="seq_src" id="seq_src_paste" value="paste"   />&nbsp; Select a Sample Sequence:  
+			<select class="conStylized_box3" id="specie" name="species" size="6" onchange="set_source('sample');">
+			</select>
+		</div>
+% }
+		<div class="conNewPro_label1">
+			<label>Sequence type:</label>
+			<div style="padding-left: 100px;">
+			<input class="conRadiobox_align" type="radio" name="type" id="type_d" value="d" <% "d" eq $type ? "checked=\"checked\"" : ""%> <% $disable_type ? "disabled=\"disabled\"" : ""%>/> DNA<br/>
+			<input class="conRadiobox_align" type="radio" name="type" id="type_p" value="p" <% "p" eq $type ? "checked=\"checked\"": ""%> <% $disable_type ? "disabled=\"disabled\"" : ""%>/> Protein
+			</div>
+		</div>
+	</div><!--END of ID conProject_newLeft-->
+</div><!--END of ID conRedlineLeft1-->
+
+<div id="conYellowlineRight1">
+	<div id="conProject_newRight"> 
+		<div class="conNewPro_title">Name Your Project</div>   
+		<div class="conNewPro_label1">
+			<label>Project Title:</label>
+			<input class="conStylized_box4" type="text" name="name" id="name" value="<% $name|html %>" maxlength="128" />
+		</div>
+		<div style="clear: both;">&nbsp;</div>
+		<div class="conNewPro_title">Organism</div>
+		<div class="conNewPro_label1">
+			<label>Scientific name (Genus Species):</label>
+			<input class="conStylized_box4" type="text" name="organism" id="organism" value="<% $organism |html%>" maxlength="128" />
+		</div>
+		<div class="conNewPro_label1">
+			<label>Common name:</label>
+			<input class="conStylized_box4" type="text"name="common_name" id="common_name" value="<% $common_name |html %>" maxlength="128" />
+		</div>
+		<div style="clear: both;">&nbsp;</div>
+		<div class="conNewPro_title">Gene/Protein</div>   
+		<div class="conNewPro_label1">
+			<label>Name:</label>
+			<input class="conStylized_box4" type="text" name="organismx" id="organismx" value="???" maxlength="128"  />
+		</div>  
+		<div class="conNewPro_label1">
+			<label>Class:</label>
+			<input class="conStylized_box4" type="text"name="common_name1" id="common_name1" value="???" maxlength="128"   />
+		</div> 
+		<div class="conNewPro_label1">
+			<label>Function:</label>
+			<input class="conStylized_box4" type="text"name="common_name2" id="common_name2" value="???" maxlength="128"   />
+		</div> 
+		<div style="clear: both;">&nbsp;</div>
+		<div class="conBT_continue"><a href="javascript:;" onclick="document.forms['forma'].submit()"></a></div>
+	</div><!--END of ID conProject_newRight-->
+</div><!--END of ID conRedlineRight1-->
+                   
+</form>
+
 <%args>
-	$g => undef;
+	$g => undef
+	$organism => ""
+	$common_name => ""
+	$name => ""
+	$type => ""
+	$seq => ""
 </%args>
 <%once>
 	use DNALC::Pipeline::App::ProjectManager ();
@@ -7,13 +88,21 @@
 	use DNALC::Pipeline::TargetProject ();
 	use Bio::SeqIO ();
 	use Gearman::Client();
+	use DNALC::Pipeline::CacheMemcached ();
 	use Data::Dumper;
 </%once>
 <%init>
 
 $r->content_type("text/html");
+
+$m->session->{pipeline} ||= {};
+my $s = $m->session->{pipeline};
+
 my $path_info = $r->path_info;
-my ($pid, $start, $stop, $seq, $genomes, $err);
+my ($pid, $start, $stop, $disable_type);
+
+my @err = ();
+
 if ($path_info =~ /_(\d+)\/(\d+)\/(\d+)/) {
 	$pid   = $1;
 	$start = $2;
@@ -21,19 +110,72 @@ if ($path_info =~ /_(\d+)\/(\d+)\/(\d+)/) {
 }
 my $pm = DNALC::Pipeline::App::ProjectManager->new($pid);
 if ($pm->project) {
+	#my $seqio = Bio::SeqIO->new( "-format" => "fasta" , -file => $pm->fasta_file);
+	#my $seq_obj = $seqio->next_seq();
 
-	my $seqio = Bio::SeqIO->new( "-format" => "fasta" , -file => $pm->fasta_file);
-	my $seq_obj = $seqio->next_seq();
-	$seq = $seq_obj->subseq($start,$stop);
+	if ($r->method eq "GET") {
+	
+		my $seqio = Bio::SeqIO->new( "-format" => "fasta" , -file => $pm->fasta_file);
+		my $seq_obj = $seqio->next_seq();
+		$name ||= $pm->cleaned_common_name . ":$start..$stop";
+		$seq = ">" . $name . "\n" . $seq_obj->subseq($start,$stop);
+		
+		$organism ||= $pm->project->organism;
+		$common_name ||= $pm->project->common_name;
+		$name ||= $pm->cleaned_common_name . ":$start..$stop";
+	}
+	$type = 'd';
+	$disable_type = 1;
+}
 
 	if ($r->method eq "POST") {
-		my $name = $pm->cleaned_common_name . ":$start..$stop";
-		my $tp;
-		if ($g && '' eq ref $g) {
+		unless ($seq) {
+			push @err, "Sequence is missing.";
+		}
+		unless ($name) {
+			push @err, "Project title is missing.";
+		}
+		unless ($organism) {
+			push @err, "Organism is missing.";
+		}
+		unless ($common_name) {
+			push @err, "Common name is missing";
+		}
+		unless ($type) {
+			push @err, "Sequence type is missing.";
+		}
+
+		unless (@err) {
+
+			my $tp = eval {
+					DNALC::Pipeline::TargetProject->create({
+						name => $name,
+						user_id => $s->{user_id},
+						project_id => $pm->project ? $pm->project->id : undef,
+						organism => $organism,
+						segment => $common_name,
+						seq => $seq,
+						type => $type,
+						status => 'not processed',
+					});
+				};
+			if ($@) {
+				print STDERR $@, $/;
+				push @err, $@;
+			}
+			#print STDERR Dumper($s->{target_new_project}), $/;
+			# redirect..
+			$m->redirect('/project/target/view/' . $tp->id) unless @err;
+		}
+
+#-------------------------------------
+	if (0) {
+		if ($g && "" eq ref $g) {
 			$g = [$g];
 		}
 		if ($g && @$g) {
-			$tp = eval {
+			my $name = $pm->cleaned_common_name . ":$start..$stop";
+			my $tp = eval {
 					DNALC::Pipeline::TargetProject->create({
 						name => $name,
 						project_id => $pm->project->id,
@@ -46,7 +188,7 @@ if ($pm->project) {
 				};
 			if ($@) {
 				print STDERR $@, $/;
-				$err = $@;
+				push @err, $@;
 			}
 
 			else {
@@ -59,42 +201,30 @@ if ($pm->project) {
 				}
 				# start the processing
 				my $client = Gearman::Client->new;
-				my $sx = $client->job_servers('127.0.0.1');
+				my $sx = $client->job_servers(@{$pm->config->{GEARMAN_SERVERS}});
 				my $h = $client->dispatch_background( target => $tp->id );
+				
+				my $md = DNALC::Pipeline::CacheMemcached->new;
+				$md->set("target_" . $tp->id . "_status", "processing");
 
 				# redirect..
 				$m->redirect('/project/target/');
 			}
 		} else {
-			$err = 'There was no genome selected.';
+			push @err, 'There was no genome selected.';
 		}
 	}
-	# GET
-	if ($seq) {
-		$seq = ">" . $pm->cleaned_common_name . "\n" . $seq;
+#-------------------------------------
 	}
-	$genomes = DNALC::Pipeline::TargetGenome->retrieve_all;
-}
+
+	#if ($seq) {
+	#	$seq = ">" . $pm->cleaned_common_name . "\n" . $seq;
+	#}
+	#$genomes = DNALC::Pipeline::TargetGenome->retrieve_all;
+
 </%init>
 
-<% $err %>
-
-% if ($seq) {
-<form method="post">
-	<div>
-	<textarea rows="5" cols="45"><% $seq %></textarea>
-	</div>
-
-	<div>
-	Select up to 3 of the following organisms:
-	<ul>
-% while (my $g = $genomes->next) {
-	<li><input readonly="readonly" type="checkbox" name="g" value="<% $g %>"/> <% $g->organism %> </li>
-% }
-	</ul>
-	<input type="submit" name="submit" value="Submit" />
-</form>
-% } else {
-	sequence not found...
-% }
-
+%#-----------------------------------------------------------------
+<%attr>
+	current_section => 'yellow'
+</%attr>

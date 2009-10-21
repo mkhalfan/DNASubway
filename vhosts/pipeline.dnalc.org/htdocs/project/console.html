@@ -1,21 +1,194 @@
 
-<div id="conTop_button"> 
-	<div id="conTop_title"><h2>CONSOLE</h2></div>
-	<div id="conTitle_content"><% $proj->name |html %></div>
-	<div id="conMember_name">USER: Guest</div>    
-</div><!--END of ID conTop_button-->
-
-<div class="blurbxxx">
-	parent padding is not set, parent padding is not set, parent padding is not set, parent padding is not set,
-	parent padding is not set, parent padding is not set, parent padding is not set, parent padding is not set, 	
-</div>
-
 <input type="hidden" id="pid" value="<% $pid %>"/>
 
 <div class="blurb">	
 	<& "/_messages" &>
 </div>
 
+
+  <!--Left Content Start--------------> 
+     						  
+    <div id="conRedlineLeft2">
+     
+     <span class="conRedline_ConColumn">
+     		<span class="conRedline_ConCell">
+            		<div class="conIndicator_box"><div id="repeat_masker_st" class="conIndicator_<% $status{repeat_masker} %>"></div> </div>
+					<& '.routine', routine => 'repeat_masker', pmanager => $pm,
+						status => $status{repeat_masker}, delay => 15 &>
+            </span><!--END of span class conRedline_ConCell-->
+     </span><!--END of span class conRedline_ConColumn-->
+    
+    
+    <span class="conRedline_ConColumn">
+		<span class="conRedline_ConCell">
+		<span class="conIndicator_box"><div id="augustus_st" class="conIndicator_<% $status{repeat_masker} eq "done" ? $status{augustus} : "disabled" %>"></div> </span>
+%#		<span class="bt_run"><a href="#">Augustus</a></span>
+			<& '.routine', routine => 'augustus', pmanager => $pm,
+				status => $status{augustus}, delay => 20, rm_status => $rm_status &>
+		</span><!--END of span class conRedline_ConCell-->
+		<span class="conRedline_ConCell">
+			<span class="conIndicator_box"><div id="fgenesh_st" class="conIndicator_<% $status{repeat_masker} eq "done" ? $status{fgenesh} : "disabled" %>"></div> </span>
+%#			<span class="bt_run"><a href="#">FGenesH</a></span>
+			<& '.routine', routine => 'fgenesh', pmanager => $pm,
+						status => $status{fgenesh}, rm_status => $rm_status &>
+		</span><!--END of span class conRedline_ConCell-->
+		<span class="conRedline_ConCell">
+			<span class="conIndicator_box"><div id="snap_st" class="conIndicator_<% $status{repeat_masker} eq "done" ? $status{snap} : "disabled" %>"></div> </span>
+%#			<span class="bt_run"><a href="#">SNAP</a></span>
+			<& '.routine', routine => 'snap', pmanager => $pm,
+						status => $status{snap}, rm_status => $rm_status &>
+		</span><!--END of span class conRedline_ConCell-->
+		<span class="conRedline_ConCell">
+			<span class="conIndicator_box"><div id="trna_scan_st" class="conIndicator_<% $status{trna_scan} %>"></div> </span>
+%#			<span class="bt_run"><a href="#">tRNA</a></span>
+			<& '.routine', routine => 'trna_scan', pmanager => $pm,
+						status => $status{trna_scan}, rm_status => $rm_status &>
+		</span><!--END of span class conRedline_ConCell-->
+     </span><!--END of class conRedline_ConColumn-->
+
+	<span class="conRedline_ConColumn">     
+		<span class="conRedline_ConCell">
+			<span class="conIndicator_box"><div id="blastn_st" class="conIndicator_<% $status{repeat_masker} eq "done" ? $status{blastn} : "disabled" %>"></div> </span>
+%#			<span class="bt_run"><a href="#">BlastN UniGene</a></span>
+			<& '.routine', routine => 'blastn', pmanager => $pm, delay => 15,
+						status => $status{blastn}, rm_status => $rm_status &>
+		</span><!--END of span class conRedline_ConCell-->
+
+		<span class="conRedline_ConCell">
+			<span class="conIndicator_box"><div id="blastx_st" class="conIndicator_<% $status{repeat_masker} eq "done" ? $status{blastx} : "disabled" %>"></div></span>
+%#			<span class="bt_run"><a href="#">BlastX UniProt</a></span>
+			<& '.routine', routine => 'blastx', pmanager => $pm, delay => 15,
+						status => $status{blastx}, rm_status => $rm_status &>
+		</span><!--END of span class conRedline_ConCell-->
+		
+		
+% my $nt_evid = lc $wfm->get_status("upload_evid_nt")->name;
+% my $prot_evid = lc $wfm->get_status("upload_evid_prot")->name;
+% if ( $nt_evid eq "done") {
+		<span class="conRedline_ConCellAdd">
+			<span class="conIndicator_box"><div class="conIndicator_<% $status{blastn_user} %>"></div></span>
+			<& '.routine', routine => 'blastn_user', pmanager => $pm, delay => 15,
+					status => $status{blastn_user}, rm_status => $rm_status &>
+		</span><!--END of span class conRedline_ConCell-->
+% } else {
+	<span class="conRedline_ConCell"></span>
+% }
+		
+		
+% if ($prot_evid eq "done") {
+		<span class="conRedline_ConCellAdd"> <!-- conRedline_ConCell -->
+			<span class="conIndicator_box"><div class="conIndicator_<% $status{blastx_user} %>"></div></span>
+			<& '.routine', routine => 'blastx_user', pmanager => $pm, delay => 15,
+					status => $status{blastx_user}, rm_status => $rm_status &>
+		</span><!--END of span class conRedline_ConCell-->
+% } else {
+		<span class="conRedline_ConCell"></span>
+% }
+		
+
+% if ( $nt_evid ne "done" || $prot_evid ne "done") {
+		<span class="conRedline_ConCell2">
+			<span class="conIndicator_box"></span>
+			<span class="bt_run"><a id="add_evidence_link" href="javascript:void(0);" \
+			onclick="javascript:$('add_evidence').show();$('add_evidence_link').hide();">Upload Data</a></span>
+		</span><!--END of span class conRedline_ConCell-->
+		<div id="add_evidence" style="display:none; text-align: left; margin-top: -10px;">
+		1 2 3
+		<br/>
+		1 2 3
+			<form enctype="multipart/form-data" method="post">
+%	if ($nt_evid ne "done") {
+				<div>Add Nucleotide based evidence: 
+					<input type="file" name="evid_nt" value="" />
+				</div>
+%	}
+%	if ($prot_evid ne "done") {
+				<div>Add Proteine based evidence: 
+					<input type="file" name="evid_prot" value="" />
+				</div>
+%	}
+		<a id="hide_evidence_link" href="javascript:void(0);" onclick="javascript:$('add_evidence').hide();$('add_evidence_link').show();">cancel</a>
+			<input type="submit" value="Upload" />
+			</form>
+		</div>
+% }
+		
+	</span><!--END of class conRedline_ConColumn-->
+</div><!--END of ID conRedlineLeft2-->
+<!--right Content Start--------------> 
+<div id="conRedlineRight2">
+	<span id="conRedline_ConColumnR1"><span class="bt_browserBlue"><a id="apollo_btn" href="javascript:;" \
+		onclick="<% $rm_status eq "done" ? "launch('apollo')" : "" %>" \
+		commonname="<% $trimmed_common_name %>" seq_length="<% $proj->sequence_length %>">Apollo</a></span>
+		<div style="display: none;" id="apollo_status">loading apollo...</div>
+	</span>
+
+	<span id="conRedline_ConColumnR2">
+		<span class="bt_browserBlue"><a id="gbrowse_btn" href="javascript:;" onclick="<% $rm_status eq "done" ? "launch('gbrowse')" : "" %>">Local<br/>Browser</a></span>
+		<span class="bt_browserBlue">
+% 	if ( $proj->sample) {		
+		<a id="exporter_btn" href="javascript:;" onclick="<% $rm_status eq "done" ? "launch('exporter')" : "" %>">Phytozome<br/>Browser</a>
+% 	}
+		</span>
+		<span class="bt_browserYellow"><a href="javascript:;">Phylogenetic<br/>Tree</a></span>
+	</span>
+</div><!--END of ID conRedlineRight2-->
+<!--
+<div id="conRunAll">
+	<div class="bt_RunAll"><a href="#">RUN<br/> all analysis programs</a></div>
+</div>
+-->
+
+
+<div id="conProjectInfo">
+	<div id="conProjectInfo_header">
+		<div id="conProjectInfo_title">Project Information</div>
+		<div class="bt_History"><a href="#"></a></div>
+	</div>
+
+	<span class="conProjectInfo_column1">
+		<div class="conProjectInfo_Row">
+		<span class="conProjectInfo_Cell1">Project ID</span>
+		<span class="conProjectInfo_Cell2">: <% $proj->id %></span>
+		</div>
+		<div class="conProjectInfo_Row">
+		<span class="conProjectInfo_Cell1">User</span>
+		<span class="conProjectInfo_Cell2">: Cornel Ghiban</span>
+		</div>
+		<div class="conProjectInfo_Row">
+		<span class="conProjectInfo_Cell1">Affiliation</span>
+		<span class="conProjectInfo_Cell2">: DNALC</span>
+		</div>
+	</span><!--END of span conProjectInfo_column1-->
+
+	<span class="conProjectInfo_column2">
+		<div class="conProjectInfo_Row">
+			<span class="conProjectInfo_Cell1">Organism</span>
+			<span class="conProjectInfo_Cell2">: <% $proj->common_name %></span>
+		</div>
+		<div class="conProjectInfo_Row">
+			<span class="conProjectInfo_Cell1">Classification</span>
+			<span class="conProjectInfo_Cell2">: <% $clades{$proj->clade} %></span>
+		</div>
+		<div class="conProjectInfo_Row">
+			<span class="conProjectInfo_Cell1">Sequence</span>
+			<span class="conProjectInfo_Cell3">: <% nicebasepairs($proj->sequence_length) %></span>
+			<span class="conProjectInfo_CellBT"><a href="javascript:;" onclick="javascript:launch(null, '<& './.comp/filepath_to_web', file => $pm->fasta_file &>')">View</a></span>
+		</div>
+	</span><!--END of span conProjectInfo_column2-->
+
+	<span class="conProjectInfo_column2">
+		<div class="conProjectInfo_Row"></div>
+		<div class="conProjectInfo_Row">
+			<span class="conProjectInfo_Cell1">Status &nbsp; &nbsp; &nbsp; &nbsp;:</span>
+			<span class="conProjectInfo_Cell3"><input class="conRadiobox_align" type="radio" name="seq_src" id="seq_src_paste" value="paste"   />&nbsp; Private</span>
+			<span class="conProjectInfo_Cell3"><input class="conRadiobox_align" type="radio" name="seq_src" id="seq_src_paste" value="paste"   />&nbsp; Public</span>
+		</div>
+	</span> <!--END of span conProjectInfo_column2-->
+</div><!--END of ID conProjectInfo-->
+%#-------------------------------------------------
+
+% if (0) {
 
 <div id="conConsole_left"> <!--span conConsole_left start-->
 <h3>PROJECT</h3>
@@ -203,10 +376,9 @@
 
 <div style="clear: both;">&nbsp;</div> 
 
-<div class="blurb">
-	some thing at the end, some thing at the end, some thing at the end,
-	some thing at the end, some thing at the end, some thing at the end,
-</div>
+% }
+
+%#-------------------------------------------------
 
 <%args>
 	$pid => 0
@@ -214,22 +386,23 @@
 </%args>
 %#-------------------------------------------------
 <%once>
+	use utf8;
 	use Data::Dumper; 
 	use DNALC::Pipeline::App::ProjectManager ();
 	use DNALC::Pipeline::App::WorkflowManager ();
 	use DNALC::Pipeline::App::Utils ();
 	use DNALC::Pipeline::Utils qw/nicebasepairs/;
 
-	my @routines = (
-			{ name => 'trna_scan', label => 'tRNA Scan'},
-			{ name => 'augustus', label => 'Augustus', delay => 15},
-			{ name => 'fgenesh', 'label' => 'FgenesH'},
-			#{ name => 'repeat_masker', label => 'Repeat Masker', delay => 10},
-			{ name => 'snap', label => 'Snap'},
-			{ name => 'blastn', label => 'BlastN'},
-			{ name => 'blastx', label => 'BlastX'},
-			{ name => 'blastn_user', label => 'User BlastN'},
-			{ name => 'blastx_user', label => 'User BlastX'},
+	my %routines = (
+			'repeat_masker' => 'Repeat Masker',
+			'trna_scan' => 'tRNA Scan',
+			'augustus' => 'Augustus', delay => 15,
+			'fgenesh' => 'FgenesH',
+			'snap' => 'Snap',
+			'blastn' => 'BlastN',
+			'blastx' => 'BlastX',
+			'blastn_user' => 'User BlastN',
+			'blastx_user' => 'User BlastX',
 		);
 	my %clades = (
 			d => 'Eudicotyledons',
@@ -283,7 +456,7 @@ if ($r->method eq "POST") {
 else { # most likely is GET
 	$history = $wfm->get_history;
 
-	for ("repeat_masker", map {$_->{name}} @routines ) {
+	for ( keys %routines ) {
 		my $status_name = lc $wfm->get_status($_)->name;
 		$status_name =~ s/\s/-/;
 		$status{$_} = $status_name;
@@ -345,14 +518,16 @@ else {
 	$target = "";
 }
 </%init>
-<a id="<% $routine %>_btn" href="<% $link %>" class="<% $status %>" <% $target %> \
-status="<% $status %>" <% $action %> delay="<% $delay %>" title="<% $title %>" ><% $label %></a>
+<span class="bt_run"><a id="<% $routine %>_btn" href="<% $link %>" class="<% $status %>" <% $target %> \
+status="<% $status %>" <% $action %> delay="<% $delay %>" title="<% $title %>" ><% $routines{$routine} %></a>
+</span>
 </%def>
 %#----------------------------------------------------------------------------
 <%attr>
 	js => ['console.js']
 	css => []
 	load_window_ui => 1
+	current_section => 'red'
 </%attr>
 
 %# vim: ft=mason

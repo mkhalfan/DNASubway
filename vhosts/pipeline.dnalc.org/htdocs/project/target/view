@@ -1,59 +1,135 @@
+<div id="conYellowlineLeft2">
+<input type="hidden" id="tid" value="<% $tid %>" />
+<input type="hidden" id="tstatus" value="<% $tp ? $tp->status : "" %>" />
+ <span class="conYellowline_ConColumn1">
+	<span class="conYellowline_ConCellTitle">Mosses</span>
+%	for (sort {$a->{organism} cmp $b->{organism} } grep {$_->clade =~ /mosses/} @genomes) {
+%		my $gid = $_->id;
+	<span class="conYellowline_ConCell1"><input class="conRadiobox_align" type="checkbox" name="g" id="g_<% $_->id %>" value="<% $_->id %>" <% (grep {$_ eq $gid } @tp_genomes)  ? "checked=\"checked\"" : "" %> />&nbsp; <% $_->organism %></span>
+%	}
+	<span class="conYellowline_ConCell1"> &nbsp; </span>
+	<span class="conYellowline_ConCellTitle">Algi</span>
+%	for (sort {$a->{organism} cmp $b->{organism} } grep {$_->clade =~ /algi/} @genomes) {
+%		my $gid = $_->id;
+	<span class="conYellowline_ConCell1"><input class="conRadiobox_align" type="checkbox" name="g" id="g_<% $_->id %>" value="<% $_->id %>" <% (grep {$_ eq $gid } @tp_genomes)  ? "checked=\"checked\"" : "" %> />&nbsp; <% $_->organism %></span>
+%	}
+ </span><!--END of CLASS conYellowline_ConColumn1-->
+ <span class="conYellowline_ConColumn1">
+	<span class="conYellowline_ConCellTitle">Dicotyledones</span>
+%	for (sort {$a->{organism} cmp $b->{organism} } grep {$_->clade =~ /dicotyledones/} @genomes) {
+%		my $gid = $_->id;
+	<span class="conYellowline_ConCell1"><input class="conRadiobox_align" type="checkbox" name="g" id="g_<% $_->id %>" value="<% $_->id %>" <% (grep {$_ eq $gid } @tp_genomes)  ? "checked=\"checked\"" : "" %>/>&nbsp; <% $_->organism %></span>
+%	}
+</span><!--END of CLASS conYellowline_ConColumn1-->
+<span class="conYellowline_ConColumn1">
+	<span class="conYellowline_ConCellTitle">Monocotyledones</span>
+%	for (sort {$a->{organism} cmp $b->{organism} } grep {$_->clade =~ /monocotyledones/} @genomes) {
+%		my $gid = $_->id;
+	<span class="conYellowline_ConCell1"><input class="conRadiobox_align" type="checkbox" name="g" id="g_<% $_->id %>" value="<% $_->id %>" <% (grep {$_ eq $gid } @tp_genomes)  ? "checked=\"checked\"" : "" %> />&nbsp; <% $_->organism %></span>
+%	}
+ </span><!--END of CLASS conYellowline_ConColumn2-->
+</div><!--END of ID conYellowlineLeft2-->
+
+<div id="conYellowlineRight2">
+	<span class="bt_browserYellow" id="alignment_span">
+%	if (defined $files{fasta}) {
+		<applet archive="/files/jalview/jalviewApplet.jar" name="Jalview_muscle_1" code="jalview.bin.JalviewLite" height="35" width="110">
+			<param name="file" value="<% $files{fasta} %>">
+			<param name="showAnnotation" value="true">
+			<param name="windowHeight" value="500">
+			<param name="windowWidth" value="650">
+			<param name="showFullId" value="false">
+			<param name="label" value="View Alignment">
+			<param name="defaultColour" value="Clustal">
+		</applet>
+%	} else {
+	<a href="#">Multiple<br/>Alignment</a>
+%	}
+	</span>
+	<span class="bt_browserYellow"><a href="javascript:;" id="tree_btn" \
+% 	if ( $tree_url) {
+		onclick="window.open('/files/phylowidget/bare.html?tree=<% $tree_url %>', 'target_tree', 'status=0,height=500,width=600')"
+% 	}
+	>Phylogenetic<br/>Tree</a></span>
+% if ($tree_url && 0) {
+	<a href="javascript:;" onclick="launch_tree('<% $tree_url %>')">tree1</a>
+	<a href="/files/phylowidget/bare.html?tree=<% $tree_url %>" target="_blank">tree2</a>
+	<a href="#" onclick="window.open('/files/phylowidget/bare.html?tree=<% $tree_url %>', 'target_tree', 'status=0,height=600,width=600')">tree3</a>
+% }
+</div><!--END of ID conYellowlineRight2--> 
+
+<br clear="both"/>
+<div style="padding-left: 10px" id="message"><% $message %></div>
+% if ($tp) {
+<div id="conRun_yellowline">	
+	<div class="bt_Runyellowline"><a href="javascript:;" style="<% $tp && $tp->status eq "processing" ? "display:none" : "" %>" id="launch_btn" onclick="launch_target()">RUN</a></div>
+</div>
+% }
+
+
+
 <%once>
+	#use DNALC::Pipeline::App::ProjectManager ();
+	use DNALC::Pipeline::TargetGenome ();
 	use DNALC::Pipeline::TargetProject ();
 	use Data::Dumper;
 </%once>
 <%init>
-$r->content_type("text/html");
-my ($tpid, $status);
-my %files;
+	$r->content_type("text/html");
 
-my $path_info = $r->path_info;
-if ($path_info =~ m{^/(\d+)(?:\/index\.html)?$}) {
-	$tpid = $1;
-}
-my $tp = DNALC::Pipeline::TargetProject->retrieve($tpid);
-if ($tp) {
-	$status = $tp->status;
-	my $workdir = $tp->work_dir;
-	for (<$workdir/*>) {
-		my $file = $m->comp('../.comp/filepath_to_web', file => $_, just_return => 1);
-		if ($file =~ /\.(\w{2,5})$/) {
-			$files{$1} = $file;
+	$m->session->{pipeline} ||= {};
+	my $s = $m->session->{pipeline};
+	
+	my $path_info = $r->path_info;
+	my $tid = 0;
+	my $tree_url = '';
+	my @tp_genomes = ();
+	my %files;
+	
+	my $message = '';
+
+	if ($path_info =~ /\/(\d+)$/) {
+		$tid = $1;
+	}
+	
+	my @genomes = DNALC::Pipeline::TargetGenome->retrieve_all;
+	my $tp = DNALC::Pipeline::TargetProject->retrieve($tid);
+	unless ($tp) {
+		$message = "Project not found!";
+		$tid = 0;
+	}
+	else {
+		@tp_genomes = map {$_->genome_id->id } $tp->genomes;
+		if ($tp->status eq 'done-empty') {
+			$message = 'No homologs found. Try searching other genomes.';
+		}
+		elsif ($tp->status eq 'done') {
+			$message = 'Done. Check results.';
+			my $workdir = $tp->work_dir;
+			for (<$workdir/*>) {
+				my $file = $m->comp('../.comp/filepath_to_web', file => $_, just_return => 1);
+				if ($file =~ /\.(\w{2,5})$/) {
+					$files{$1} = $file;
+				}
+			}
+			if ($files{nw}) {
+				#$tree_url = "/files/phylowidget/bare.html?tree='http://<% $r->get_server_name . $files{nw} %>'";
+				$tree_url = "http://" . $r->get_server_name . "$files{nw}";
+			}
+		}
+		elsif ($tp->status eq 'processing') {
+			$message = 'Processing.';
+		}
+		elsif ($tp->status eq 'failed') {
+			$message = 'Failed.';
 		}
 	}
-}
-</%init>
-%#id = <% $tpid %><br />
 
-% if ($tp) {
-	TP = <% $tp->name %><br />
-	status = <% $status %> <br />
-%	if ($status eq "done") {
-		files...:
-%#		while (my ($ext, $file) = each %files) {
-%#		<a href="<% $file %>"><% $ext%></a>
-%#		}
-%		if (defined $files{jpg}) {
-		<div><a href="<% $files{jpg} %>">view tree (image)</a></div>
-%		}
-%		if (defined $files{nw}) {
-	<div><a href="/files/phylowidget/bare.html?tree='http://<% $r->get_server_name . $files{nw} %>'">view tree (interactive)</a></div>
-%		}
-%		if (defined $files{fasta}) {
-	<div>View alignment: 
-		<applet archive="/files/jalview/jalviewApplet.jar" name="Jalview_muscle_1" \
-		code="jalview.bin.JalviewLite" height="35" width="140">
-		<param name="file" value="<% $files{fasta} %>">
-		<param name="showAnnotation" value="true">
-		<param name="windowHeight" value="500">
-		<param name="windowWidth" value="650">
-		<param name="showFullId" value="false">
-		<param name="defaultColour" value="Clustal"></applet>
-	</div>
-%		}
-%	} elsif ($status eq "done-empty") {
-		we couldn't compute a tree for the data you submited..
-%	}
-% } else {
-	invalid target project..
-% }
+</%init>
+
+%#-----------------------------------------------------------------
+<%attr>
+	current_section => 'yellow'
+	js => ['target.js']
+	load_window_ui => 1
+</%attr>

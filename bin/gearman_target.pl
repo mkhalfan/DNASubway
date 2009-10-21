@@ -25,7 +25,7 @@ sub run_target {
 
 	my $res;
 	my $server = $cf->{TARGET_SERVER};
-	my $post_url = $server . $cf->{DNA_URL};
+	my $post_url = $server . ($tp->type eq 'd' ? $cf->{DNA_URL} : $cf->{PROTEIN_URL});
 
 	my $seq = $tp->seq;
 	my @genomes = map {$_->genome_id->id} $tp->genomes;
@@ -36,12 +36,13 @@ sub run_target {
 		'submit' => 'Tree'
 	};
 
-	#print STDERR Dumper( $query ), $/;
 
 	my $xml_url;# = $server . '/Visitors/143_48_90_149/temp_0828144132.xml';
+	#print STDERR Dumper( $query ), $/;
 
 	unless ($xml_url) {
 		$res = $ua->post($post_url, $query);
+		#print STDERR Dumper( $res ), $/;
 		unless ($res->is_success) {
 			print $res->status_line, "\n";
 			$tp->status('failed');

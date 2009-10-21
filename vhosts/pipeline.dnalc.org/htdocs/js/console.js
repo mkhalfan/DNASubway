@@ -9,7 +9,7 @@ var windows = [];
 
 function check_status (pid, op, h) {
 	var b = $(op + '_btn');
-
+	var ind = $(op + '_st');
 	/*alert(op + ' - ' + h);
 	if (!op || !h)
 		return;*/
@@ -40,20 +40,35 @@ function check_status (pid, op, h) {
 					b.addClassName('done');
 					b.onclick = function () { launch(null, file)};
 					b.title = 'Click to view results';
-					b.update('View');
+					//b.update('View');
+
+					ind.removeClassName(ind.className);
+					ind.addClassName('conIndicator_done');
+					ind.title = 'Done';
+
 					if (op == 'repeat_masker') {
 						for (var i = 0; i < routines.length; i++) {
 							var rt = $(routines[i] + '_btn');
+							var rt_ind = $(routines[i] + '_st');
+							
+							if (rt_ind && rt_ind.className == 'conIndicator_disabled') {
+								//console.log('IND enabling: ' + routines[i] + " // " + rt_ind.className);
+								rt_ind.removeClassName('conIndicator_disabled');
+								rt_ind.addClassName('conIndicator_not-processed');
+								if (i < 7 ) {
+									rt_ind.title = 'Not processed';
+								}
+								//console.log('IND enabled ' + routines[i]);
+							}
 							if (rt && rt.className == 'disabled') {
-								//console.log('enabling.. ' + routines[i]);
+								//console.log('RT enabling.. ' + routines[i]);
 								rt.removeClassName('disabled');
 								rt.addClassName('not-processed');
-								//Event.observe(routines[i], 'click', function() {
-								if (i < 5 ) {
+								if (i < 7 ) {
 									rt.title = 'Click to process';
-									rt.update('Run');
+									//rt.update('Run');
+									//console.log('RT enabled btn.. ' + this.id);
 									rt.onclick = function () {
-												//console.log('enable btn.. ' + this.id);
 												var routine = this.id.replace('_btn','');
 												run(routine);
 											};
@@ -67,6 +82,11 @@ function check_status (pid, op, h) {
 								}
 							}
 						}
+						$('apollo_btn').onclick = function () { launch('apollo'); };
+						$('gbrowse_btn').onclick = function () { launch('gbrowse'); };
+						if ($('exporter_btn')) {
+							$('exporter_btn').onclick = function () { launch('exporter'); };
+						}
 					}
 				} else {}
 			}
@@ -75,12 +95,13 @@ function check_status (pid, op, h) {
 				b.removeClassName('processing');
 				b.addClassName('error');
 				b.title = 'Click to try again';
-				b.update('Failed/Run');
+				//b.update('Failed/Run');
 				b.onclick = function () {
 								run(op);
 							};
-
-
+				ind.removeClassName(ind.className);
+				ind.addClassName('conIndicator_error');
+				ind.title = 'Error';
 			}
 			else {
 				//s.update('Unknown status!');
@@ -100,15 +121,23 @@ function run (op) {
 	//var s = $(op);
 	var b = $(op + '_btn');
 	var p = $('pid').value;
-	b.onclick = null;
+	var ind = $(op + '_st');
+
 	if (b) {
+		b.onclick = null;
 		b.removeClassName(b.className);
 		b.addClassName('processing');
 		b.title = 'Processing';
-		b.update('Processing');
+		//b.update('Processing');
 	}
-	var delay = b ? parseFloat(b.getAttribute('delay')) : 5;
-	delay = !isNaN(delay) ? delay * 1000 : 5000;
+	if (ind) {
+		ind.removeClassName(ind.className);
+		ind.addClassName('conIndicator_processing');
+		ind.title = 'Processing';
+	}
+	var delay = b ? parseFloat(b.getAttribute('delay')) : 10;
+	delay = !isNaN(delay) ? (delay * 1000) : 10000;
+	//console.info('delay for ' + op + ' = ' + delay);
 
 	new Ajax.Request('/project/launch_job',{
 		method:'get',
@@ -126,6 +155,10 @@ function run (op) {
 			else  if (r.status == 'error') {
 				b.removeClassName(b.className);
 				b.addClassName('error');
+				
+				ind.removeClassName(ind.className);
+				ind.addClassName('conIndicator_error');
+				ind.title = 'Error';
 			}
 			else {
 				//s.update('Unknown status!');
@@ -213,7 +246,7 @@ function openWindow(url) {
 		height: 496,
 		shadow: true,
 		draggable: false,
-		resizable: false,
+		resizable: true,
 		url: url
 	};
 	if (navigator.userAgent.indexOf('MSIE') != -1) {
@@ -224,7 +257,7 @@ function openWindow(url) {
 	var w = new UI.URLWindow( options ).center();
 
 	var p = w.getPosition();
-	w.setPosition(78, p.left-2);
+	w.setPosition(110, p.left);
 	w.show();
 	w.focus();
 	windows.push(w);

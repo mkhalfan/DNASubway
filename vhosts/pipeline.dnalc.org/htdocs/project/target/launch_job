@@ -1,0 +1,94 @@
+<%args>
+	$g => []
+	$tid => 0
+</%args>
+<%once>
+	use DNALC::Pipeline::App::ProjectManager ();
+	use DNALC::Pipeline::TargetGenome ();
+	use DNALC::Pipeline::TargetProject ();
+	use Gearman::Client();
+	use DNALC::Pipeline::CacheMemcached ();
+	use Data::Dumper;
+</%once>
+<%init>
+	$r->content_type("text/plain");
+
+	$m->session->{pipeline} ||= {};
+	my $s = $m->session->{pipeline};
+
+	if ($g && '' eq ref $g) {
+		$g = [$g];
+	}
+
+	my $tp = DNALC::Pipeline::TargetProject->retrieve($tid);
+	my $ok = 0;
+	#print STDERR Dumper($g), $/;
+	my $h = '';
+	my $message = '';
+
+	if ($tp && @$g && $tp->status ne "processing") {
+
+		$ok = 1;
+		# check if the genome list is different than the previous one
+		my $g1_str = join '_', sort {$a cmp $b} map {$_->genome_id} $tp->genomes;
+		my $g2_str = join '_', sort {$a cmp $b} @$g;
+		
+		#print STDERR "s1 = ", $g1_str, $/;
+		#print STDERR "s1 = ", $g2_str, $/;
+		if ($g1_str eq $g2_str) {
+			$ok = 0;
+			$message = 'Choose a different set of genomes.';
+		}
+	}
+	else {
+		$message = 'Cannot launch job;';
+	}
+
+	
+	if ($ok) {		
+	
+		$tp->status('processing');
+		$tp->update;
+
+		# remove all the genomes
+		#$tp->clear_genomes;
+		my @tp_genomes = $tp->genomes;
+		for (@tp_genomes) {
+			$_->delete;
+		}
+		
+		# remove previous files
+		my $workdir = $tp->work_dir;
+		for (<$workdir/*>) {
+			#my $file = $m->comp('../.comp/filepath_to_web', file => $_, just_return => 1);
+			print STDERR  "file to rm: ", $_, $/;
+			unlink $_ if -f;
+		}
+		
+		# add the new genomes
+		for my $genome (@$g) {
+			$tp->add_to_genomes({
+					tpid => $tp,
+					genome_id => $genome
+				});
+		}
+	
+		my $pm = DNALC::Pipeline::App::ProjectManager->new();
+		my $client = Gearman::Client->new;
+		my $sx = $client->job_servers(@{$pm->config->{GEARMAN_SERVERS}});
+		$h = $client->dispatch_background( target => $tp->id );
+		
+		my $md = DNALC::Pipeline::CacheMemcached->new;
+		$md->set("target_" . $tp->id . "_status", "processing");
+		print STDERR  "Launched [$tid], h = ", $h, $/;
+	}
+</%init>
+% if ($ok) {
+{'status':'success', 'h' : '<% $h %>'}
+% } else {
+{'status':'error', 'message':'<% $message %>'}
+% }
+%#-------------------------------------------------------------------
+<%flags>
+	inherit => undef
+</%flags>

@@ -694,8 +694,6 @@ value of db handler
 
 sub dbh {
     my $self = shift;
-	#my $dbh = shift if defined(@_);
-	#return $self->{'dbh'} = $dbh if defined($dbh);
 	return $self->{dbh} if defined $self->{dbh} && $self->{dbh}->ping;
 
 	return unless $self->profile();
@@ -705,7 +703,7 @@ sub dbh {
 	$self->{dbh} = $db_conf->dbh;
 }
 
-sub create_conf_file {
+sub gmod_conf_file {
     my ($self, $project_id) = @_;
 
 	unless ($project_id && $project_id =~ /\d+/) {
@@ -898,7 +896,7 @@ sub create_gbrowse_conf {
     return $conffile if (-f $conffile);
 }
 
-sub create_gbrowse_chado_conf {
+sub gbrowse_chado_conf {
     my ( $self, $project_id ) = @_;
 
     unless ($project_id && $project_id =~ /\d+/) {

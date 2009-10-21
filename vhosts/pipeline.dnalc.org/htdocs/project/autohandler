@@ -1,15 +1,76 @@
-% if (0) {
-<div id="topnavi">
-	<a href="/">Home</a>
-	<a href="/project/">Project selector</a>
-% if ($s->{logged_in}) {
-		<a href="/logout">Logout</a>
-% } else {
-		<a href="/">Login</a>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<title><& SELF:title &> DNA Subway - Fast Track to Gene Annotation and Genome Analysis</title>
+<link type="text/css" rel="stylesheet" href="/css/sgeneral.css" />
+<link type="text/css" rel="stylesheet" href="/css/scontent.css" />
+<script type="text/javascript" src="/js/prototype-1.6.1.js"></script>
+% if ($m->request_comp->attr_if_exists('js') && @{$m->request_comp->attr('js')}) {
+%	foreach my $js (@{$m->request_comp->attr('js')}) {
+%		next unless $js;
+<script type="text/javascript" src="/js/<% $ js %>"></script>
+%	}
 % }
-</div>
+% if ($m->request_comp->attr('load_window_ui')) {
+%#<script src="/files/window/lib/prototype.js" type="text/javascript"></script>
+<script src="/files/window/lib/effects.js" type="text/javascript"></script>  
+<script src="/files/window/dist/window.js" type="text/javascript"></script>
+
+<link href="/files/window/themes/window/window.css" rel="stylesheet" type="text/css" />
+<link href="/files/window/themes/window/alphacube.css" rel="stylesheet" type="text/css" />
 % }
+</head>
+<body>
+<div id="mainContainer">
+<div id="container_InsideHeader">
+<div id="home_header_topline">FAST TRACK TO GENE ANNOTATION AND GENOME ANALYSIS</div>
+	<div id="container_InsideH_bg">   
+		<div id="container_H_insideTop">
+			<div id="conMember_name">Cornel Ghiban</div>
+		</div>
+		<div id="container_H_insidebottom">
+			<span class="bt_LogOut"><a href="/#logout"></a></span>
+			<span class="bt_Map"><a href="/project/"></a></span>
+		</div>
+	</div> <!--END of ID container_InsideH_bgr-->
+</div> <!--END of ID container_InsideHeader-->
+
+<div id="containerBody">
+<div id="container_leftMenu">
+	<div id="spacer_btGlossary"></div>
+	<span class="bt_MyProjects"><a href="/project/browse"></a></span>
+	<span class="bt_PublicProjects"><a href="/project/browse"></a></span>
+	<span class="bt_redStart"><a href="/project/create_project.html" class="<% $class_r %>"></a></span>
+	<span class="bt_yellowStart"><a href="/project/target/create" class="<% $class_y %>"></a></span>
+	<span class="bt_blueStart"><a href="#member_blueline1.html" class="<% $class_b %>"></a></span>
+</div><!--END of ID container_leftMenu-->
+    
+<div id="container_rightContent">
+<!-- end header -->
+
 % $m->call_next;
+
+<!-- start footer -->
+    
+ </div><!--END of ID container_rightContent-->   
+ </div><!--END of ID containerBody-->   
+<!--Footer START-->    
+			<div id="footerContainer">
+				<span class="footerLink"><a href="#" title="">About</a></span>
+				<span class="footerLink"><a href="#" title="" class="current">Funded by</a></span>
+				<span class="footerLink"><a href="http://www.iplantcollaborative.org/" title="" class="current" target="_blank">iPlant Collaborative</a></span>
+
+				<span id="footerCopy">All content is © 2009 by the iPlant Collaborative</span>
+			</div>
+			<!--END of ID footerContainer-->
+
+
+
+</div><!--END of ID mainContainer-->
+</body>
+</html>
+%#---------------------------------
 <%init>
 	$m->session->{pipeline} ||= {};
 	my $s = $m->session->{pipeline};
@@ -24,6 +85,33 @@
 	}
 	$s->{last} = $now;
 	
+	my ($class_r, $class_y, $class_b) = ('', '', '');
+	my $section = $m->request_comp->attr('current_section');
+
+	if ($section eq 'red') {
+		$class_r = 'current';
+	}
+	elsif ($section eq 'yellow') {
+		$class_y = 'current';
+	}
+	elsif ($section eq 'blue') {
+		$class_b = 'current';
+	}
+	
 </%init>
+%#---------------------------------
+<%method title>\
+</%method>\
+%#---------------------------------
+<%attr>
+	js => []
+	css => []
+	load_window_ui => 0
+	current_section => ''
+</%attr>
+%#---------------------------------
+<%flags>
+	inherit => undef
+</%flags>
 
 %# vim: ft=mason
