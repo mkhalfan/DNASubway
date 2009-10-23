@@ -13,16 +13,18 @@
   </tr>
 % for (@projects) {
 %	my $created = DNALC::Pipeline::App::Utils->format_datetime($_->created, undef, "%m/%d/%Y");
+%	my $color = "#c1272d";
 %	my $uri = "/project/console.html?pid=" . $_->id;
-%	if ($_->{type} eq "target") {
+%	if ($_->{project_type} eq "target") {
 %		$uri = "/project/target/view/" . $_->id;
+%		$color = "#fdba3e"; #blue = "#3953A4"
 % 	}
 <tr>
-	<td><% $_->id %></td>
+	<td style="background-color: <% $color %>;"><% $_->id %></td>
 	<td><% $created %></td>
 	<td><a href="<% $uri %>"><%$_->name |html%></a></td>
 	<td><% $_->organism %>, <% $_->common_name %></td>
-	<td><% $_->can("clade") ? $clades{$_->clade} : "" %></td>
+	<td><% $_->can("clade") ? $clades{$_->clade} : $_->type eq "d" ? "DNA" : "Protein" %></td>
 	<!--<td><% $_->user_id %></td>-->
 	<td> public </td>
 </tr>
@@ -87,18 +89,24 @@ unless ($page =~ /^\d+$/) {
 my $pager = DNALC::Pipeline::MasterProject->pager;
 $pager->per_page( $epp );
 $pager->page( $page );
-$pager->order_by( 'project_id' );
+$pager->order_by( 'mp_id desc' );
 
+
+# this should be replaced by a join in DNALC::Pipeline::MasterProject???
+#if (0) {
 my @projects = grep { defined $_ } map {
-					my $pid = $_->project_id;
-					my $ptype = 'DNALC::Pipeline::Project';
-					if ($_->project_type eq "target") {
-						$ptype = 'DNALC::Pipeline::TargetProject';
-					}
-					my $p = $ptype->retrieve($pid);
-					$p->{type} = $_->project_type if $p;
-					$p;
-				} $pager->search_where;
+				my $pid = $_->project_id;
+				my $pclass = 'DNALC::Pipeline::Project';
+				if ($_->project_type eq "target") {
+					$pclass = 'DNALC::Pipeline::TargetProject';
+				}
+				my $p = $pclass->retrieve($pid);
+				$p->{project_type} = $_->project_type if $p;
+				$p;
+			} $pager->search_where;
+#}
+#my @projects = $pager->retrieve_all;
+#print STDERR Dumper(\@projects);
 
 my $pages = int($pager->total_entries/$epp) + ($pager->total_entries % $epp > 0 ? 1 : 0);
 

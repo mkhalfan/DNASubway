@@ -2,7 +2,7 @@
 	$pid => 0
 </%args>
 <%once>
-	use DNALC::Pipeline::Project ();
+	use DNALC::Pipeline::App::ProjectManager ();
 	use DNALC::Pipeline::Config ();
 	use DNALC::Pipeline::Chado::Utils ();
 	my $pcf = DNALC::Pipeline::Config->new->cf('PIPELINE');
@@ -12,7 +12,9 @@
 	$m->session->{pipeline} ||= {};
 	my $s = $m->session->{pipeline};
 
-	my $proj = DNALC::Pipeline::Project->retrieve($pid);
+	my $pm = DNALC::Pipeline::App::ProjectManager->new($pid);
+	#my $proj = DNALC::Pipeline::Project->retrieve($pid);
+	my $proj = $pm->project;
 	unless ($proj) {
 		$m->comp('/_message_add', 'Project not found!', 'error');
 		$m->redirect('/project/');
@@ -22,7 +24,7 @@
 
 	my $organism = join('_', split /\s+/, $proj->organism). '_' . $proj->common_name;
 	my $cutils = DNALC::Pipeline::Chado::Utils->new(
-		username => $s->{username},
+		username => $pm->username,
 		organism_string => $organism,
 		chado_gbrowse => 'gbrowse_chado.template',
 		gbrowse_confdir  => $pcf->{GBROWSE_CONF_DIR},
@@ -31,7 +33,7 @@
 	# 1st create GBrowse conf file & DB dir for this project
 	$cutils->gbrowse_chado_conf($proj->id);
 
-	$m->redirect($pcf->{GBROWSE_URL} . '/' . $s->{username} . '_db_' . $proj->id);
+	$m->redirect($pcf->{GBROWSE_URL} . '/' . $pm->username . '_db_' . $proj->id);
 </%init>
 <%flags>
 	inherit => undef

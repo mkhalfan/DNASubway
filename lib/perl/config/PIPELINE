@@ -13,7 +13,7 @@
 	upload_mime_types => ['text/plain', 'application/octet-stream'],
 	upload_max_size => 150 * 1024, # max 150 KB
 
-	GEARMAN_SERVERS => ['127.0.0.1'],
+	GEARMAN_SERVERS => ['127.0.0.1:7003'],
 	MEMCACHED_SERVERS => ['127.0.0.1:11211'],
 
 	'user_evidence_upload_max_size' => 0,

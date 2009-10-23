@@ -15,14 +15,14 @@
 %	}
  </span><!--END of CLASS conYellowline_ConColumn1-->
  <span class="conYellowline_ConColumn1">
-	<span class="conYellowline_ConCellTitle">Dicotyledones</span>
+	<span class="conYellowline_ConCellTitle">Dicotyledons</span>
 %	for (sort {$a->{organism} cmp $b->{organism} } grep {$_->clade =~ /dicotyledones/} @genomes) {
 %		my $gid = $_->id;
 	<span class="conYellowline_ConCell1"><input class="conRadiobox_align" type="checkbox" name="g" id="g_<% $_->id %>" value="<% $_->id %>" <% (grep {$_ eq $gid } @tp_genomes)  ? "checked=\"checked\"" : "" %>/>&nbsp; <% $_->organism %></span>
 %	}
 </span><!--END of CLASS conYellowline_ConColumn1-->
 <span class="conYellowline_ConColumn1">
-	<span class="conYellowline_ConCellTitle">Monocotyledones</span>
+	<span class="conYellowline_ConCellTitle">Monocotyledons</span>
 %	for (sort {$a->{organism} cmp $b->{organism} } grep {$_->clade =~ /monocotyledones/} @genomes) {
 %		my $gid = $_->id;
 	<span class="conYellowline_ConCell1"><input class="conRadiobox_align" type="checkbox" name="g" id="g_<% $_->id %>" value="<% $_->id %>" <% (grep {$_ eq $gid } @tp_genomes)  ? "checked=\"checked\"" : "" %> />&nbsp; <% $_->organism %></span>
@@ -59,14 +59,63 @@
 </div><!--END of ID conYellowlineRight2--> 
 
 <br clear="both"/>
-<div style="padding-left: 10px" id="message"><% $message %></div>
+<div id="message" style="color: orange;text-align:right; padding-right: 210px;"><% $message %></div>
 % if ($tp) {
-<div id="conRun_yellowline">	
+<div id="conRun_yellowline">
 	<div class="bt_Runyellowline"><a href="javascript:;" style="<% $tp && $tp->status eq "processing" ? "display:none" : "" %>" id="launch_btn" onclick="launch_target()">RUN</a></div>
 </div>
 % }
 
+<div id="conProjectInfo">
+	<div id="conProjectInfo_header">
+		<div id="conProjectInfo_title">Project Information</div>
+		<!--<div class="bt_History"><a href="#"></a></div>-->
+	</div>
 
+	<span class="conProjectInfo_column1">
+		<div class="conProjectInfo_Row">
+			<span class="conProjectInfo_Cell1">Project ID</span>
+			<span class="conProjectInfo_Cell2">: <% $tp ? $tp->id : "" %></span>
+		</div>
+		<div class="conProjectInfo_Row">
+			<span class="conProjectInfo_Cell1">User</span>
+			<span class="conProjectInfo_Cell2">: Anonymous Guest</span>
+		</div>
+		<div class="conProjectInfo_Row">
+			<span class="conProjectInfo_Cell1">Affiliation</span>
+			<span class="conProjectInfo_Cell2">: DNALC</span>
+		</div>
+	</span><!--END of span conProjectInfo_column1-->
+
+	<span class="conProjectInfo_column2">
+		<div class="conProjectInfo_Row">
+			<span class="conProjectInfo_Cell1">Organism</span>
+			<span class="conProjectInfo_Cell2">: <% $tp ? $tp->organism : "" %></span>
+		</div>
+		<!--<div class="conProjectInfo_Row">
+			<span class="conProjectInfo_Cell1">Classification</span>
+			<span class="conProjectInfo_Cell2">: Monocotyledons</span>
+		</div>-->
+		<div class="conProjectInfo_Row">
+			<span class="conProjectInfo_Cell1">Sequence</span>
+			<span class="conProjectInfo_Cell3">: 100kb</span>
+			<span class="conProjectInfo_CellBT"><a href="#">View</a></span>
+		</div>
+	</span><!--END of span conProjectInfo_column2-->
+	<span class="conProjectInfo_column2">
+		<div class="conProjectInfo_Row"></div>
+		<!--
+		<div class="conProjectInfo_Row">
+			<span class="conProjectInfo_Cell1">Status:</span>
+			<span class="conProjectInfo_Cell1x">
+				<input class="conRadiobox_align" type="radio" name="xx" id="" value="" />&nbsp; Private
+				<input class="conRadiobox_align" type="radio" name="xx" id="" value="" />&nbsp; Public
+			</span>
+		</div>
+		-->
+	</span> <!--END of span conProjectInfo_column2-->                   							
+
+</div><!--END of ID conProjectInfo-->      
 
 <%once>
 	#use DNALC::Pipeline::App::ProjectManager ();

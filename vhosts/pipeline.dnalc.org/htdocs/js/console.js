@@ -272,6 +272,9 @@ function launch(what, where) {
 			exporter: '/project/prepare_exporter.html?pid='
 		};
 
+	$('add_evidence').hide();
+	$('add_evidence_link').show();
+
 	if (what && !urls[what]) {
 		alert('Nothing to load!!');
 		return;

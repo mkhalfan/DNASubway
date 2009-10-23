@@ -5,12 +5,9 @@
 	<& "/_messages" &>
 </div>
 
-
-  <!--Left Content Start--------------> 
-     						  
-    <div id="conRedlineLeft2">
-     
-     <span class="conRedline_ConColumn">
+<!--Left Content Start--------------> 
+<div id="conRedlineLeft2">
+          <span class="conRedline_ConColumn">
      		<span class="conRedline_ConCell">
             		<div class="conIndicator_box"><div id="repeat_masker_st" class="conIndicator_<% $status{repeat_masker} %>"></div> </div>
 					<& '.routine', routine => 'repeat_masker', pmanager => $pm,
@@ -49,14 +46,12 @@
 	<span class="conRedline_ConColumn">     
 		<span class="conRedline_ConCell">
 			<span class="conIndicator_box"><div id="blastn_st" class="conIndicator_<% $status{repeat_masker} eq "done" ? $status{blastn} : "disabled" %>"></div> </span>
-%#			<span class="bt_run"><a href="#">BlastN UniGene</a></span>
 			<& '.routine', routine => 'blastn', pmanager => $pm, delay => 15,
 						status => $status{blastn}, rm_status => $rm_status &>
 		</span><!--END of span class conRedline_ConCell-->
 
 		<span class="conRedline_ConCell">
 			<span class="conIndicator_box"><div id="blastx_st" class="conIndicator_<% $status{repeat_masker} eq "done" ? $status{blastx} : "disabled" %>"></div></span>
-%#			<span class="bt_run"><a href="#">BlastX UniProt</a></span>
 			<& '.routine', routine => 'blastx', pmanager => $pm, delay => 15,
 						status => $status{blastx}, rm_status => $rm_status &>
 		</span><!--END of span class conRedline_ConCell-->
@@ -66,7 +61,7 @@
 % my $prot_evid = lc $wfm->get_status("upload_evid_prot")->name;
 % if ( $nt_evid eq "done") {
 		<span class="conRedline_ConCellAdd">
-			<span class="conIndicator_box"><div class="conIndicator_<% $status{blastn_user} %>"></div></span>
+			<span class="conIndicator_box"><div id="blastn_user_st" class="conIndicator_<% $status{blastn_user} %>"></div></span>
 			<& '.routine', routine => 'blastn_user', pmanager => $pm, delay => 15,
 					status => $status{blastn_user}, rm_status => $rm_status &>
 		</span><!--END of span class conRedline_ConCell-->
@@ -77,7 +72,7 @@
 		
 % if ($prot_evid eq "done") {
 		<span class="conRedline_ConCellAdd"> <!-- conRedline_ConCell -->
-			<span class="conIndicator_box"><div class="conIndicator_<% $status{blastx_user} %>"></div></span>
+			<span class="conIndicator_box"><div id="blastx_user_st" class="conIndicator_<% $status{blastx_user} %>"></div></span>
 			<& '.routine', routine => 'blastx_user', pmanager => $pm, delay => 15,
 					status => $status{blastx_user}, rm_status => $rm_status &>
 		</span><!--END of span class conRedline_ConCell-->
@@ -89,32 +84,37 @@
 % if ( $nt_evid ne "done" || $prot_evid ne "done") {
 		<span class="conRedline_ConCell2">
 			<span class="conIndicator_box"></span>
-			<span class="bt_run"><a id="add_evidence_link" href="javascript:void(0);" \
-			onclick="javascript:$('add_evidence').show();$('add_evidence_link').hide();">Upload Data</a></span>
-		</span><!--END of span class conRedline_ConCell-->
-		<div id="add_evidence" style="display:none; text-align: left; margin-top: -10px;">
-		1 2 3
-		<br/>
-		1 2 3
-			<form enctype="multipart/form-data" method="post">
-%	if ($nt_evid ne "done") {
-				<div>Add Nucleotide based evidence: 
-					<input type="file" name="evid_nt" value="" />
-				</div>
-%	}
-%	if ($prot_evid ne "done") {
-				<div>Add Proteine based evidence: 
-					<input type="file" name="evid_prot" value="" />
-				</div>
-%	}
-		<a id="hide_evidence_link" href="javascript:void(0);" onclick="javascript:$('add_evidence').hide();$('add_evidence_link').show();">cancel</a>
-			<input type="submit" value="Upload" />
-			</form>
-		</div>
+			<span class="bt_run">
+			
+			<span style="position:relative;">
+				<div id="add_evidence" class="popup">
+				<form enctype="multipart/form-data" method="post">
+% if ( $nt_evid ne "done") {
+					<div class="panel_container">Add Nucleotide based evidence:                     
+						<input class="conStylized_box1" type="file" id="evid_nt" name="evid_nt"/>
+					</div>
 % }
-		
+% if ( $prot_evid ne "done") {
+					<div class="panel_container">Add Proteine based evidence:                      
+						<input class="conStylized_box1" type="file" id="evid_prot" name="evid_prot"/>
+					</div>
+% }
+					<div class="panel_container1">
+						<input type="button" value="  Cancel  " class="input" onclick="javascript:$('add_evidence').hide();$('add_evidence_link').show();" /> &nbsp; &nbsp; &nbsp; &nbsp;
+						<input type="submit" value="  Upload  " class="input" />
+					</div>
+				</form>
+				</div>
+				<a id="add_evidence_link" href="javascript:void(0);" \
+				onclick="javascript:$('add_evidence').style.visibility='visible';$('add_evidence').style.display='block';$('add_evidence_link').hide();">Upload Data</a>
+			</span>
+
+		</span><!--END of span class conRedline_ConCell-->
+	</span>		
+% }
 	</span><!--END of class conRedline_ConColumn-->
 </div><!--END of ID conRedlineLeft2-->
+
 <!--right Content Start--------------> 
 <div id="conRedlineRight2">
 	<span id="conRedline_ConColumnR1"><span class="bt_browserBlue"><a id="apollo_btn" href="javascript:;" \
@@ -125,26 +125,29 @@
 
 	<span id="conRedline_ConColumnR2">
 		<span class="bt_browserBlue"><a id="gbrowse_btn" href="javascript:;" onclick="<% $rm_status eq "done" ? "launch('gbrowse')" : "" %>">Local<br/>Browser</a></span>
-		<span class="bt_browserBlue">
-% 	if ( $proj->sample) {		
-		<a id="exporter_btn" href="javascript:;" onclick="<% $rm_status eq "done" ? "launch('exporter')" : "" %>">Phytozome<br/>Browser</a>
-% 	}
+% 	if ( $proj->sample) {
+		<span class="bt_browserBlueAdd">
+			<a id="exporter_btn" href="javascript:;" onclick="<% $rm_status eq "done" ? "launch('exporter')" : "" %>">Phytozome<br/>Browser</a>
 		</span>
+% 	} else {
+		<span class="bt_browserBlueSpacer"></span>
+%	}
 		<span class="bt_browserYellow"><a href="javascript:;">Phylogenetic<br/>Tree</a></span>
 	</span>
 </div><!--END of ID conRedlineRight2-->
+
 <!--
 <div id="conRunAll">
 	<div class="bt_RunAll"><a href="#">RUN<br/> all analysis programs</a></div>
 </div>
 -->
 
-
 <div id="conProjectInfo">
 	<div id="conProjectInfo_header">
 		<div id="conProjectInfo_title">Project Information</div>
 		<div class="bt_History"><a href="#"></a></div>
 	</div>
+	
 
 	<span class="conProjectInfo_column1">
 		<div class="conProjectInfo_Row">
@@ -186,6 +189,7 @@
 		</div>
 	</span> <!--END of span conProjectInfo_column2-->
 </div><!--END of ID conProjectInfo-->
+
 %#-------------------------------------------------
 
 % if (0) {
@@ -405,7 +409,7 @@
 			'blastx_user' => 'User BlastX',
 		);
 	my %clades = (
-			d => 'Eudicotyledons',
+			d => 'Dicotyledons',
 			m => 'Monocotyledons',
 			u => 'Undefined',
 			o => 'Other'

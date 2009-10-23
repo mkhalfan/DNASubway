@@ -58,7 +58,8 @@ navigation_instructions = &nbsp;
 language = en
 ### HTML TO INSERT AT VARIOUS STRATEGIC LOCATIONS ###
 # inside the <head></head> section
-head = <script src="/gbrowse/js/geneDetails.js" type="text/javascript"></script>
+#head = <script src="/gbrowse/js/geneDetails.js" type="text/javascript"></script>
+head = 
 
 # at the top...
 header =
