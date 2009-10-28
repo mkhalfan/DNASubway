@@ -3,15 +3,19 @@
 use strict;
 use Gearman::Client ();
 use Data::Dumper;
-use Storable qw/thaw/;
+use Storable qw/thaw freeze/;
 
 my $client = Gearman::Client->new;
 my $sx = $client->job_servers('127.0.0.1');
 
 #my $h = $client->dispatch_background( augustus => 98 );
-my $h = $client->dispatch_background( trna_scan => 98 );
-print STDERR  "h = ", $h, $/;
-print STDERR  '--------------------------', $/;
+#my $h = $client->dispatch_background( trna_scan => 98 );
+#print STDERR  "h = ", $h, $/;
+#print STDERR  '--------------------------', $/;
+
+my $arguments = freeze([ 'guest', 'guest_512', 'snap', 
+				'/var/www/vhosts/pipeline.dnalc.org/var/projects/01FF/SNAP/snap.gff']);
+$client->dispatch_background( load_analysis_results =>  $arguments);
 
 __END__
 

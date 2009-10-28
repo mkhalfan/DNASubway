@@ -818,18 +818,27 @@ sub load_analysis_results {
 
 	return unless -f $file;
 
-    warn uc $alg;
+	my $param = $self->additional_load_parameters(uc $alg) || '-a';
 
-    my $param = $self->additional_load_parameters(uc $alg) || '-a';
+	my $profile = $self->profile;
+	my $command = "/usr/local/bin/gmod_bulk_load_gff3.pl $param --dbprof $profile -g $file";
+	print STDERR "command = $command\n";
+	print STDERR  "--------------------------------------------------", $/;
+    my $rc = system($command);
 
-    my $profile = $self->profile;
-    my $command = "/usr/local/bin/gmod_bulk_load_gff3.pl $param --dbprof $profile -g $file";
-    print STDERR "$command\n";
-    system($command) == 0 or do {
-		print STDERR  "Failed to load file: ", $file, $/;
-    };
+	if ($? == -1) {
+		print STDERR "failed to execute: $!\n";
+	}
+	elsif ($? & 127) {
+		print STDERR  "child died with signal %d, %s coredump\n",
+					($? & 127),  ($? & 128) ? 'with' : 'without', $/;
+	} else {
+		printf STDERR "child exited with value %d ~~ %d\n", $?, $? >> 8;
+	}
+	#print STDERR "rc = $rc ~ ", $? & 127, " ~ ", $? & 128 , "\n";
+	#print STDERR  "--------------------------------------------------", $/;
 
-    return;
+    return $rc;
 }
 
 sub create_gbrowse_conf {
@@ -982,9 +991,17 @@ sub load_fasta {
 
     #load
     my $dbprof = $self->profile;
-    system("/usr/local/bin/gmod_bulk_load_gff3.pl --dbprof $dbprof -g $filename") == 0 or die "fasta load failed";
+    my $rc = system("/usr/local/bin/gmod_bulk_load_gff3.pl --dbprof $dbprof -g $filename");
+	unless ($rc == 0) {
+		# try again if we have a lock.
+		if ($rc >> 8 == 254) {
+			print STDERR  "*** waiting...5 secs: rc = ", $rc, '==', $rc >> 8, $/;
+			sleep(5);
+			$rc = system("/usr/local/bin/gmod_bulk_load_gff3.pl --dbprof $dbprof -g $filename");
+		}
+	}
 
-    return;
+    return $rc == 0;
 }
 
 sub additional_load_parameters {

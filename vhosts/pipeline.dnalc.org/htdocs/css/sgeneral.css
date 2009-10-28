@@ -1,0 +1,670 @@
+@charset "UTF-8";
+/* CSS Document */
+/*This page is only for HEADER, FOOTER, AND BACKGROUND. */
+/*SEE content.css document for CONTENT. */
+/*If the ID or CLASS name start with con, please see content.css document. */
+
+* {margin: 0px auto ;}
+* a {outline: none;}
+html {
+	margin: 0px;
+	padding: 0px;
+	height: 100%;
+	width: 100%;
+	font-family: arial, sans-serif;
+    background-color: #333333;
+	/*background-repeat: repeat-x;
+	background-image: url("/images/v2/background_bg.png");
+	background-position: bottom;*/
+
+	}
+/*
+body {
+	background-repeat: no-repeat;
+	background-image: url("/images/v2/bg_extend.png");
+	background-position: top;
+	
+	}
+*/	
+h4{
+	text-align: center;
+	font-weight: bold;
+	font-size: .9em;
+	color: #336699;
+}
+	
+.p1{
+	color:#336699;
+	font-size: .8em;
+	text-align: left;
+	padding-left: 16px;
+}
+
+.p2{
+	color:#000;
+	font-size: .95em;
+	text-align: left;
+	line-height: 1em;
+}
+	
+#mainContainer {
+	width: 1000px;
+	height:auto;
+    margin-top: 4px;
+	/*z-index: 4;*/
+	position: relative;
+	background-color: white;
+
+	}
+#containerBody  {
+	width: 1000px;
+	height: auto;
+	overflow:auto;
+	min-height: 440px;
+	
+	/*background-image: url("/images/v2/bg_middle.png");
+	background-repeat: repeat-y;*/
+	position: relative;
+	}
+	
+#home_intro {
+	width: 600px;
+	height: 126px;
+	padding: 20px 200px 0px 200px;
+	background-color: #fff;
+	font-size: 1em;
+	font-family: helvetica, sans-serif;	
+	text-align: justify;
+	color: #000;
+	position: relative;
+	float: left;
+	}
+
+	
+/*//----------HOMEPAGE start------------------*/
+/*---home---------home---------home---------home---------home---------home---------home---------home------*/
+
+
+/*//----------HOMEPAGE Header start------------------*/
+#home_header {
+	width: 1000px;
+	height: 156px;
+	}
+#home_header_topline {
+	width: 1000px;
+	height: 12px;
+	padding-top: 2px;
+	background-color: #666666;
+	font-size: 0.70em;
+	letter-spacing: .3em;
+	font-family: helvetica, sans-serif;	
+	text-align: center;
+	color: #fff;
+	}
+#home_header_bottomline {
+	width: 1000px;
+	height: 8px;
+	background-color: #666666;
+	vertical-align: bottom;
+	}
+#home_header_left {
+	width: 300px;
+	height: 134px;
+	float: left;
+	position: relative;
+	background: url("/images/v2/home-headbg.jpg") top no-repeat;
+	}
+#home_header_middle {
+	width: 400px;
+	height: 134px;
+	background: url("/images/v2/home-logo.jpg") top no-repeat;
+	position: relative;
+	margin: 0 auto;
+	}
+#home_header_right {
+	width: 300px;
+	height: 134px;
+	float: right;
+	background: url("/images/v2/home-decoline.jpg") top no-repeat;
+	}
+/*//END-------HOMEPAGE Header END------------------*/	
+
+/*//----------Member Log in start------------------*/
+#memberForm{
+	width:174px;
+	height:128px;
+	margin: 4px 0px 0px 40px;
+	float: left;
+	position: relative;
+	}
+.memberRow1{
+	width:174px;
+	height: auto;
+	padding-bottom: 3px;
+	float: left;
+	position: relative;
+	}
+.memberRow2{
+	width:174px;
+	height:24px;
+	float: left;
+	position: relative;
+	}
+.memberLabel{
+	width: 64px;
+	height: 14px;
+	display:block;
+	float:left;
+	text-align: left;
+	font-family: helvetica, sans-serif;	
+	font-size: .75em;
+	color: #000;		
+	}
+
+.memberInput{
+    width: 172px;
+	height: 14px;
+	color: green;
+	background: white;
+	border: 1px solid #666;
+	margin-bottom: 2px;
+	}
+
+.memberEnter {
+	width: 70px;
+	height: 22px;
+	font-size: 0.8em;
+	font-family: helvetica, sans-serif;	
+	text-align: center;
+	color: #000;
+	background: #fff;
+	border: 1px solid #666;
+	list-style-type: none;
+	float: right;
+	position: relative;
+	padding-bottom: 2px;
+	margin-left: 0px;
+	margin-top: 4px;
+	
+
+}
+
+.memberEnter:hover {
+	background: #333;
+	color: #fff;
+
+}
+
+
+.forgotPassword {
+	width:auto;
+	height: 12px;
+	padding-top: 4px;
+	font-size: 0.7em;
+	font-family: helvetica, sans-serif;	
+	text-align: left;
+	color: #666699;
+	list-style-type: none;
+	position: relative;
+	float: left;	
+	
+
+}
+.forgotPassword a {
+	width:auto;
+	height: 12px;
+	color: #666699;
+	text-decoration: none;
+	text-align: left;
+	float: left;	
+	padding-top: 4px;
+	display: block;
+	position: relative;
+}
+.forgotPassword a:hover {
+	color: #0033FF;
+
+}
+	
+.registerBT {
+	width:80px;
+	height: 20px;
+	font-size: 0.8em;
+	font-family: helvetica, sans-serif;	
+	text-align: center;
+	background: #663399;
+	border: 1px solid #666;
+	list-style-type: none;
+	position: relative;	
+	float: left;
+	margin-top: 4px;
+
+}
+
+.registerBT a {
+	width:80px;
+	height: 20px;
+	color: #fff;
+	text-align: center;
+	text-decoration: none;
+	padding-top: 4px;
+	display: block;
+	position: relative;
+	
+}
+
+.registerBT a:hover {
+	color:#000;
+
+}
+
+.bt_LogOut {
+	width:114px;
+	height: 38px;
+	position: relative;	
+	
+
+}
+
+.bt_LogOut  a {
+	width:114px;
+	height: 38px;
+	background: url("/images/v2/bt_logout1.png") right no-repeat;
+	display: block;
+	position: relative;
+	float: left;
+	margin:0px 0px 0px 36px;
+}
+
+.bt_LogOut a:hover {
+	background: url("/images/v2/bt_logout2.png") right no-repeat;
+
+}
+
+/*//END-------Member Log in END------------------*/
+
+/*//-------HOME Map START-------START----------------------------START---------*/
+/*//-------HOME Map------------------*/
+#home_map {
+	width: 1000px;
+	height: 200px;
+	padding-top: 89px;
+	position: relative;
+	margin: 0px  auto;
+	}
+	
+#map_left {
+	width:150px;
+	height: 200px;
+	float: left;
+	position: relative;
+}
+
+#map_right {
+	width:850px;
+	height: 200px;
+	background: url("/images/v2/subway-map-right.jpg") top left no-repeat;
+	float: right;
+	position: relative;
+
+}
+#map_spacer {
+	width: 150px;
+	height: 28px;
+	display: block;
+	float:left;
+	position: relative;
+}
+
+
+/*//-------HOME Map Start BUTTONs------------------*/
+.bt_redStart {
+	width:150px;
+	height: 40px;
+	position: relative;	
+	float: left;
+	margin: 0px 0px 25px 0px;	
+
+}
+
+.bt_redStart  a {
+	width:150px;
+	height: 40px;
+	background: url("/images/v2/bt_redStart1.jpg") left no-repeat;
+	display: block;
+	position: relative;
+	float: left;
+	margin: 0px 0px 25px 0px;
+}
+
+.bt_redStart a:hover {
+	background: url("/images/v2/bt_redStart2.jpg") left no-repeat;
+
+}
+
+.bt_redStart a.current {
+	background: url("/images/v2/bt_redStart2.jpg") left no-repeat;
+
+}
+
+.bt_yellowStart {
+	width:150px;
+	height: 40px;
+	position: relative;
+	float: left;
+	margin: 0px 0px 25px 0px;		
+
+}
+
+.bt_yellowStart  a {
+	width:150px;
+	height: 40px;
+	background: url("/images/v2/bt_yellowStart1.jpg") left no-repeat;
+	display: block;
+	position: relative;
+	float: left;
+	margin: 0px 0px 25px 0px;
+}
+
+.bt_yellowStart a:hover {
+	background: url("/images/v2/bt_yellowStart2.jpg") left no-repeat;
+
+}
+
+.bt_yellowStart a.current{
+	background: url("/images/v2/bt_yellowStart2.jpg") left no-repeat;
+
+}
+
+.bt_blueStart {
+	width:150px;
+	height: 40px;
+	position: relative;
+	float: left;		
+
+}
+
+.bt_blueStart  a {
+	width:150px;
+	height: 40px;
+	background: url("/images/v2/bt_blueStart1.jpg") left no-repeat;
+	display: block;
+	position: relative;
+	float: left;
+	margin: 0px 0px 0px 0px;
+}
+
+.bt_blueStart a:hover {
+	background: url("/images/v2/bt_blueStart2.jpg") left no-repeat;
+
+}
+
+.bt_blueStart a.current {
+	background: url("/images/v2/bt_blueStart2.jpg") left no-repeat;
+
+}
+/*-----Home Map rollover info-----*/
+
+.containerHoz{
+	width: 780px;
+	height: 50px;
+	position: relative;
+	padding-top: 14px;
+	float: left;
+	
+}
+.rolloverMap {
+	width: 750px;
+	height: 50px;
+	list-style: none;
+	margin-left: 0px;
+	margin-top: 0px;
+	padding:0px;
+	position: relative;
+}
+
+.rolloverMap li {
+	float: left;
+}
+
+.top_menu1 span {
+	display: none;
+	position: relative;
+}
+
+
+.spacer1{
+	width: 100px;
+	height: 50px;
+	display: block;
+	position: relative;
+	float:left;
+}
+.spacer2{
+	width: 40px;
+	height: 50px;
+	display: block;
+	position: relative;
+	float:left;
+}
+
+.spacer3{
+	width:12px;
+	height: 50px;
+	display: block;
+	position: relative;
+	float:left;
+}
+
+.conConsole_info{
+	width: 130px;
+	height:50px;
+	display: block;	
+	position: relative;
+	float: left;
+	}
+
+.conConsole_info a{
+	width: 130px;
+	height:50px;
+	display: block;	
+	position: relative;
+	float: left;
+	}
+	
+a.info {
+	width: 120px;
+	height: 50px;
+	display: block;
+	font-size: .85em;
+	color:#FFFFFF;
+	text-decoration:none;
+	text-align: center;
+	position:relative;
+}
+
+a.info span{ 
+	display: none;
+}
+
+a.info:hover{ 
+	z-index:30; 
+}
+
+a.info:hover span.infotip {
+	width:182px;
+	height: 100%;
+	display:block;
+	position:absolute;
+	top:-60px;
+	left:-10px;
+	color: #000;
+	text-align: center;
+	font-size: .85em;
+}
+
+a.info:hover span.top{
+	width:182px;
+	height: 17px;
+	display: block;
+   	background: url("/images/v2/bubble_top.png") top no-repeat;
+}
+a.info:hover span.middle{
+	padding: 0px 20px 0px 20px;
+	display: block;
+	background: url("/images/v2/bubble_middle.png") repeat-y;
+}
+a.info:hover span.bottom{
+	width:182px;
+	height: 34px;
+	display: block;
+	background: url("/images/v2/bubble_bottom.png") bottom no-repeat;
+}
+/*--------end of rollover info------*/
+/*//END ----HOME Map START-------END----------------------------END---------*/
+
+/*---home---------home---------home---------home---------home---------home---------home---------home------*/
+/*//----------HOMEPAGE END------------------*/
+/*//--------------------------------------------------------------------------------*/
+
+/*---Header Inside  START------*/
+
+#container_InsideHeader {
+	width: 1000px;
+	height: 88px;
+	margin-top: 0px;
+}
+
+#container_InsideH_bg {
+	width: 1000px;
+	height: 74px;
+	margin-top: 0px;
+	background: url("/images/v2/header_upper.jpg") bottom right no-repeat;
+}
+
+#container_H_insideTop {
+	width: 1000px;
+	height: 28px;
+	position: relative;
+	
+	}
+#container_H_insidebottom {
+	width: 1000px;
+	height: 44px;
+	position: relative;
+	
+	}
+#conMember_name {
+	width: 440px;
+	height: 20px;
+	padding-top: 2px;
+	position: relative;
+	float: left;
+	font-size: 1.2em;
+	font-weight: bold;
+	font-family: Time, serif;	
+	text-align: right;
+	color: #663300;
+	
+	}
+.bt_Map {
+	width:114px;
+	height: 38px;
+	position: relative;	
+	
+
+}
+
+.bt_Map  a {
+	width:114px;
+	height: 38px;
+	background: url("/images/v2/bt_map1.png") right no-repeat;
+	display: block;
+	position: relative;
+	float: left;
+	margin:0px 0px 0px 24px;
+}
+
+.bt_Map a:hover {
+	background: url("/images/v2/bt_map2.png") right no-repeat;
+
+}
+
+#spacer_memberHome {
+	width: 850px;
+	height: 120px;
+	position: relative;
+	display: block;
+	
+	}
+
+/*//----------footer------------------footer-------------footer------------------------*/
+/*---footer START------*/
+
+#footerContainer {
+	width: 920px;
+	height: 26px;
+	background-color: #666666;
+	padding-left: 50px;
+	padding-right: 30px;
+	vertical-align: bottom;
+	position: relative;
+	
+	}
+#footerCopy {
+	width:300px;
+	height: 20px;
+	font-size: 0.75em;
+	font-family: helvetica, sans-serif;	
+	text-align: right;
+	font-weight: bold;
+	color: #000;
+	float: right;
+	position: relative;
+	padding-top: 6px;	
+
+}
+.footerLink {
+	width:auto;
+	height: 20px;
+	font-size: 0.8em;
+	font-family: helvetica, sans-serif;	
+	text-align: left;
+	list-style-type: none;
+	position: relative;		
+
+}
+
+
+.footerLink   a {
+	width:auto;
+	height: 20px;
+	color: #000;
+	text-decoration: none;
+	background: url("/images/v2/footer-button.png") left no-repeat;
+	display: block;
+	position: relative;
+	float: left;
+	padding: 6px 20px 0px 22px;	
+}
+
+.footerLink   a:hover {
+	color:#fff;
+
+}
+
+/*---footer END------*/
+
+/*//----------Header right buttons button END------------------*/
+	
+.textSpace1 {
+	padding: 0px 0px 0px 10px;
+}
+.textSpace2{
+	vertical-align: bottom;
+}
+.textSpace3{
+	padding: 20px 0px 0px 0px;
+
+
+}

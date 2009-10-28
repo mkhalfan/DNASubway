@@ -5,6 +5,9 @@ use FindBin;
 use lib "$FindBin::Bin/../lib/perl";
 
 use DNALC::Pipeline::Chado::Utils ();
+use DNALC::Pipeline::Config ();
+use Storable qw/freeze/;
+use Gearman::Client ();
 use Getopt::Long;
 use Pod::Usage;
 
@@ -51,9 +54,9 @@ The name of the GMOD conf file to use for database connection info (default:defa
 This script takes a user provided fasta file and creates a feature for it in the
 feature table and adds the sequence to it.
 
-=head1 AUTHOR
+=head1 AUTHORS
 
-Scott Cain E<lt>cain.cshl@gmail.orgE<gt>
+Scott Cain E<lt>cain.cshl@gmail.orgE<gt>, Cornel Ghiban E<lt>ghiban@cshl.eduE<gt>
 
 Copyright (c) 2009
 
@@ -62,22 +65,28 @@ it under the same terms as Perl itself.
 
 =cut
 
-my ($PROFILE, $FILE, $USERNAME, $HELP, $ALG);
+my ($PROFILE, $FILE, $USERNAME, $HELP, $ALG, $TRIES);
 
 GetOptions(
   'username=s'         => \$USERNAME,
   'gff=s'              => \$FILE,
   'profile=s'          => \$PROFILE,
   'algorithm=s'        => \$ALG,
+  'tries=s'            => \$TRIES,
   'help'               => \$HELP,
 ) or  pod2usage(-verbose => 1, -exitval => 1);
 
-pod2usage(-verbose => 2, -exitval => 1) if $HELP;
+pod2usage(-verbose => 2, -exitval => 0) if $HELP;
 
 die "Username is mising.\n" unless $USERNAME;
 die "GFF file is mising.\n" unless $FILE;
 
-$PROFILE         ||= 'default';
+$PROFILE	||= 'default';
+$TRIES		||= 1;
+
+unless ($TRIES =~ /^\d$/) {
+	$TRIES = 1;
+}
 
 my %args = (
   'username'        => $USERNAME,
@@ -88,6 +97,16 @@ $ENV{GMOD_ROOT} = '/usr/local/gmod';
 
 my $utils = DNALC::Pipeline::Chado::Utils->new(%args);
 
-$utils->load_analysis_results($FILE, $ALG);
+my $rc = $utils->load_analysis_results($FILE, $ALG);
+if ($rc >> 8 == 254 && $TRIES < 5) {
+	$TRIES++;
+	print STDERR  "*** LOADER POSTPONED: tries = $TRIES // rc = ", $rc, '==', $rc >> 8, $/;
+
+	my $config = DNALC::Pipeline::Config->new->cf('PIPELINE');
+	my $client = Gearman::Client->new;
+	$client->job_servers(@{$config->{GEARMAN_SERVERS}});
+	my $arguments = freeze([ $USERNAME, $PROFILE, $ALG, $FILE, $TRIES]);
+	$client->dispatch_background( load_analysis_results => $arguments);
+}
 
 exit(0);

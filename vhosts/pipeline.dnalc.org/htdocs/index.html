@@ -17,7 +17,7 @@
     
         <div id="home_header_left"> 
          <div id="memberForm">
- 
+ <!--
 			<label class="memberLabel" for="name">ID:</label><div class="forgotPassword"><a href="#" title="">Forgot ID?</a></div> 
  <br /><input type="text" maxlength="20" id class="memberInput" />
          		<br />
@@ -27,7 +27,21 @@
                  <input type="submit" value="Log In" class="memberEnter" />
             	 
                  <div class="registerBT"><a href="/project/" title="">Register</a></div>
-            
+-->
+			<span class="memberRow1">
+				<label class="memberLabel" for="name">ID:</label> 
+				<input type="text" maxlength="20" id class="memberInput" />
+			</span>
+			<span class="memberRow1">
+				<label class="memberLabel" for="password">Password:</label>
+				<input type="password" maxlength="12"  id class="memberInput" />
+			</span>
+			<div class="memberRow2">
+%#				<input type="submit" value="Log In" class="memberEnter" />
+				<div class="registerBT"><a href="/project/" title="">Get started</a></div>
+				<div class="registerBT"><a href="#" title="">Register</a></div>
+			</div>
+			<div class="forgotPassword"><a href="#" title="">Forgot ID or Password?</a></div>
      	 </div> <!--END of ID member form-->
       			
 	</div>	<!--END of ID home_header_left-->
@@ -86,15 +100,18 @@
     
     
       <div class="containerHoz">
-    <ul class="rolloverMap">
-    
+    <!--<ul class="rolloverMap">
     <li><span class="spacer1"></span></li>
     <li><span class="spacer2"></span></li>
     <li><span class="spacer2"></span></li>
     <li><span class="conConsole_info"><a href="#" class="info"><span class="infotip"><span class="top"></span><span class="middle">Definition about this step will be here. Thank you for your patience.</span><span class="bottom"></span></span></a></span></li>
+     </ul>-->
+
+	<span class="spacer1"></span>
+    <span class="spacer2"></span>
+    <span class="spacer2"></span>
+    <span class="conConsole_info"><a href="#" class="info"><span class="infotip"><span class="top"></span><span class="middle">Definition about this step will be here. Thank you for your patience.</span><span class="bottom"></span></span></a></span>
  
- 
-    </ul>
  	</div><!--END of CLASS containerHoz-->
                  
  		  </div> <!--END of ID map_right----->
@@ -124,7 +141,8 @@ analyze genome data.  Roll over any of the “stations” on the subway map to f
 
 </div><!--END of ID mainContainer-->
 </body>
-</html>
+</html><!--
 <%flags>
 	inherit => undef
 </%flags>
+-->

@@ -116,16 +116,12 @@ sub create_project {
 	my $out = Bio::SeqIO->new(-file => "> $fasta_file", -format => 'Fasta');
 	$out->write_seq( $seq );
 	
-	# set the workflow history
-	#my $wfm = DNALC::Pipeline::App::WorkflowManager->new( $proj );
-	#if ($self->fasta_file) {
-	#	$wfm->set_status('upload_fasta','Done');
-	#}
-	#else {
-	#	$wfm->set_status('upload_fasta','Error');
-	#}
+	my $rc = $self->init_chado;
 
-	$self->init_chado;
+	unless ($rc) {
+		$proj->delete;
+		return {status => 'fail', msg => "Unable to initialize the project!"};
+	}
 
 	return {status => 'success', msg => $msg};
 }
@@ -279,6 +275,7 @@ sub init_chado {
 	my $project  = $self->project;
 	unless ($project) {
 		confess "init_chado: Project is missing.\n";
+		return;
 	}
 	my $organism_str = join('_', split /\s+/, $project->organism)
 						. '_' . $project->common_name;
@@ -303,7 +300,8 @@ sub init_chado {
 	# read data from new file
 	$cutils->profile($self->chado_user_profile);
 	$cutils->insert_organism;
-	$cutils->load_fasta($self->fasta_file);
+	
+	return $cutils->load_fasta($self->fasta_file);
 }
 #-----------------------------------------------------------------------------
 sub chado_user_profile {
