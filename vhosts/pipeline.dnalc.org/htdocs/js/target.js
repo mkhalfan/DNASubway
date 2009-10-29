@@ -138,13 +138,53 @@ function launch_tree(nw) {
 	openWindow("/files/phylowidget/bare.html?tree=" +  nw);
 }
 
+
+function show_errors(html) {
+
+	if (!html || !UI) {
+		return;
+	}
+	var resizable = true;
+	var options = {	
+			resizable: false,
+        	width: 400,
+	        height: 200,
+	        shadow: true,
+	        draggable: false
+		};
+	if (navigator.userAgent.indexOf('MSIE') != -1) {
+		// IE doen't like this option!!!
+		delete options['resizable'];
+	}
+	var w = new UI.Window(options).center();
+	html = "<div class=\"conNewPro_title\" style=\"vertical-align: middle; padding: 20px\">" + html + "</div>";
+	w.setContent(html);
+	w.show(true);
+
+}
+
 //-------------
 // keep this at the end
 Event.observe(window, 'load', function() {
-	var tid = $('tid').value;
-	var spans = $$('span');
-	var btn = $('launch_btn');
-	if (btn && btn.style.display == 'none') {
-			intervalID = setInterval(check_status, 10000, tid, -1);
+	// check for errors
+	var err = $("error_list");
+	if (err) {
+		var html = err.innerHTML;
+		if (html) {
+			show_errors(html);
+		}
+	}
+
+	
+	// re-check processing routines' status
+	if ($('tid')) {
+		var tid = $('tid').value;
+		var spans = $$('span');
+		var btn = $('launch_btn');
+		if (btn && btn.style.display == 'none') {
+				intervalID = setInterval(check_status, 10000, tid, -1);
+		}
 	}
 });
+
+

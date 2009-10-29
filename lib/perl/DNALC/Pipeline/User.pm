@@ -7,7 +7,7 @@ use base qw(DNALC::Pipeline::DBI);
 
 use POSIX ();
 use Digest::MD5 ();
-use DNALC::Pipeline::Utils qw(md5_salt random_string);
+use DNALC::Pipeline::Utils qw(random_string);
 
 #use DNALC::Pipeline::UserProfile ();
 

@@ -104,7 +104,7 @@ function show_errors(html) {
 		delete options['resizable'];
 	}
 	var w = new UI.Window(options).center();
-	html = "<div class=\"message-error\" style=\"vertical-align: middle\">" + html + "</div>";
+	html = "<div class=\"conNewPro_title\" style=\"vertical-align: middle; padding: 20px\">" + html + "</div>";
 	w.setContent(html);
 	w.show(true);
 

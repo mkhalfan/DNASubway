@@ -2,8 +2,13 @@
 <div id="conYellowlineLeft1"> 
 	<div id="conProject_newLeft">
 	
-	<% join "<br/>", @err %>
-
+% if (@err) {
+<div style="display:none" id="error_list">
+%	foreach (@err) {
+	<div><% $_ %></div>
+%	}
+</div>
+% }
 	<div class="conNewPro_title">Select Sequence Source</div>
 % if (0) {
 		<div class="conNewPro_label1">
@@ -227,4 +232,6 @@ if ($pm->project) {
 %#-----------------------------------------------------------------
 <%attr>
 	current_section => 'yellow'
+	js => ['target.js']
+	load_window_ui => 1
 </%attr>

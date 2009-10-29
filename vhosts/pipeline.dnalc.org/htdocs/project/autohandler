@@ -27,7 +27,7 @@
 <div id="home_header_topline">FAST TRACK TO GENE ANNOTATION AND GENOME ANALYSIS</div>
 	<div id="container_InsideH_bg">   
 		<div id="container_H_insideTop">
-			<div id="conMember_name">Cornel Ghiban</div>
+			<div id="conMember_name"><% $s->{full_name} |html %></div>
 		</div>
 		<div id="container_H_insidebottom">
 			<span class="bt_LogOut"><a href="/#logout"></a></span>

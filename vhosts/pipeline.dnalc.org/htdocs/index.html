@@ -15,42 +15,40 @@
 <div id="home_header">
 	<div id="home_header_topline">FAST TRACK TO GENE ANNOTATION AND GENOME ANALYSIS</div>
     
-        <div id="home_header_left"> 
-         <div id="memberForm">
- <!--
-			<label class="memberLabel" for="name">ID:</label><div class="forgotPassword"><a href="#" title="">Forgot ID?</a></div> 
- <br /><input type="text" maxlength="20" id class="memberInput" />
-         		<br />
-				<label class="memberLabel" for="password">Password:</label><div class="forgotPassword"><a href="#" title="">Forgot Password?</a></div>
-<input type="password" maxlength="12"  id class="memberInput" />
-		 		 <br />
-                 <input type="submit" value="Log In" class="memberEnter" />
-            	 
-                 <div class="registerBT"><a href="/project/" title="">Register</a></div>
--->
-			<span class="memberRow1">
+	<div id="home_header_left">
+	<div id="memberForm">
+% if (! $s->{logged_in}) {
+		<form method="post">
+ 			<span class="memberRow1">
 				<label class="memberLabel" for="name">ID:</label> 
-				<input type="text" maxlength="20" id class="memberInput" />
+				<input type="text" maxlength="20" id="name" name="name" class="memberInput" value="<% $s->{username} %>"/>
 			</span>
 			<span class="memberRow1">
-				<label class="memberLabel" for="password">Password:</label>
-				<input type="password" maxlength="12"  id class="memberInput" />
+				<label class="memberLabel" for="passw">Password:</label>
+				<input type="password" maxlength="12" id="passw" name="passw" class="memberInput" />
 			</span>
-			<div class="memberRow2">
-%#				<input type="submit" value="Log In" class="memberEnter" />
-				<div class="registerBT"><a href="/project/" title="">Get started</a></div>
-				<div class="registerBT"><a href="#" title="">Register</a></div>
+			<div class="memberRow2" style="">
+%#				<div class="registerBT"><a href="#" title="">Register</a></div>
+%#				<div class="registerBT"><a href="/project/" title="">Get started</a></div>
+				<input type="submit" name="guest" value="As Guest" class="memberEnter" />
+%#				<input type="submit" name="login" value="Log In" class="memberEnter" />
 			</div>
-			<div class="forgotPassword"><a href="#" title="">Forgot ID or Password?</a></div>
-     	 </div> <!--END of ID member form-->
-      			
+			<div class="forgotPassword"><a href="#" title="">Forgot Password?</a>&nbsp;
+			&nbsp;<a href="#" title=""><strong>Register</strong></a>
+			</div>
+		</form>
+% } else {
+	logged in as <% $s->{username} %>
+	<a href="/project/">View map</a>
+% }
+	</div> <!--END of ID member form-->
 	</div>	<!--END of ID home_header_left-->
-   		 
-        <div id="home_header_right"> </div>
-        <div id="home_header_middle"> </div>
-        <div id="home_header_bottomline"></div>	
-    
-  </div> <!--END of IDhome_headerr-->
+
+	<div id="home_header_right"> </div>
+	<div id="home_header_middle"> </div>
+	<div id="home_header_bottomline"></div>	
+
+</div> <!--END of IDhome_headerr-->
 
 <!--END of ID HEADER--------------------------------------------------------------->
 
@@ -141,8 +139,65 @@ analyze genome data.  Roll over any of the “stations” on the subway map to f
 
 </div><!--END of ID mainContainer-->
 </body>
-</html><!--
+</html>
+
+%#-------------------------------------------------------------------
+<%args>
+	$name => ''
+	$passw => ''
+	$guest => ''
+	$login => ''
+</%args>
+%#-------------------------------------------------------------------
+<%once>
+	use DNALC::Pipeline::Utils qw/random_string/;
+	use DNALC::Pipeline::User ();
+</%once>
+%#-------------------------------------------------------------------
+<%init>
+$m->session->{pipeline} ||= { username => "", logged_in => 0};
+my $s = $m->session->{pipeline};
+
+print STDERR "name = $name\n";
+print STDERR "login = $login\n";
+print STDERR "guest = $guest\n";
+
+my @err = ();
+
+if ($r->method eq "POST") {
+	my $user;
+	
+	if ($guest) {
+		my $rand = lc random_string(6, 8);
+		$s->{username}  = "guest_$rand";
+		$s->{full_name} = "Guest " . ucfirst $rand;
+		
+		print STDERR "Generated user: ", $s->{username}, $/;
+		$user = eval {
+					DNALC::Pipeline::User->create({
+						username => $s->{username},
+						name_first => "Guest",
+						name_last => ucfirst $rand,
+						email => '',
+						password => random_string(8,8)
+					});
+			};
+		if ($@) {
+			push @err, $@;
+		}
+		else {
+			$s->{user_id} = $user->id;
+			$s->{logged_in} = 1 if $user;
+		}
+	}
+	
+	if ($s->{logged_in}) {
+		$m->redirect("/project/");
+	}
+}
+
+</%init>
+%#-------------------------------------------------------------------
 <%flags>
 	inherit => undef
 </%flags>
--->
