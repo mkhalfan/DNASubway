@@ -139,6 +139,25 @@ function launch_tree(nw) {
 }
 
 
+function launch_viewseq(tid) {
+	if (!tid)
+		return;
+
+	UI.defaultWM.options.blurredWindowsDontReceiveEvents = true;
+
+	function openWindow(url) {
+		new UI.URLWindow({
+			width: 1000, 
+			height: 600,
+			shadow: true,
+			url: url 
+		}).center().show();
+	}
+
+	openWindow("/project/target/view_seq/" +  tid);
+}
+
+
 function show_errors(html) {
 
 	if (!html || !UI) {
