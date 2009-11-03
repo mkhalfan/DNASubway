@@ -159,6 +159,8 @@ function run (op) {
 				ind.removeClassName(ind.className);
 				ind.addClassName('conIndicator_error');
 				ind.title = 'Error';
+				
+				show_errors(r.message);
 			}
 			else {
 				//s.update('Unknown status!');

@@ -1044,6 +1044,8 @@ sub create_chado_adapter {
 	if (-f $apollo_conf) {
 		return $apollo_conf;
 	}
+	#print STDERR  "**: apollo_conf: ", $apollo_conf, $/;
+	#print STDERR  "**: profile: ", $profile, $/;
 	my $apollo_chado_adapter = $apollo_conf_dir . '/' . $dbname . '.xml';
 	
     #create chado-adapter.xml
@@ -1163,6 +1165,9 @@ sub create_chado_adapter {
 
 END
 		$fh->close;
+	}
+	else {
+		print STDERR  "Chado::Utils::create_chado_adapter: unable to create the db adaptor..", $/;
 	}
 
 	if (-f $apollo_chado_adapter) {

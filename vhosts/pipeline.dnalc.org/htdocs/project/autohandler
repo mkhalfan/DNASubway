@@ -30,7 +30,7 @@
 			<div id="conMember_name"><% $s->{full_name} |html %></div>
 		</div>
 		<div id="container_H_insidebottom">
-			<span class="bt_LogOut"><a href="/#logout"></a></span>
+			<span class="bt_LogOut"><a href="/logout"></a></span>
 			<span class="bt_Map"><a href="/project/"></a></span>
 		</div>
 	</div> <!--END of ID container_InsideH_bgr-->
@@ -71,19 +71,25 @@
 </body>
 </html>
 %#---------------------------------
+<%once>
+	use Time::Duration qw/duration/;
+</%once>
+%#---------------------------------
 <%init>
 	$m->session->{pipeline} ||= {};
 	my $s = $m->session->{pipeline};
-	my $now = time();
 
-	if ($s->{logged_in}) {
-	}
-	else {
-		#pretend the user logged in already
-		$s->{user_id}  = 54;
-		$s->{username} = "guest";
+	my $now = time();
+	if ($s->{logged_in} && ($now - $s->{last} > 3600)) {
+		$m->comp("/_message_add", "It's been a while since your last visit: " . duration ($now - $s->{last}));
+		#$s->{logged_in} = 0;
+		delete $s->{logged_in};
+		delete $s->{user_id};
 	}
 	$s->{last} = $now;
+	unless ($s->{logged_in}) {
+		$m->redirect("/");
+	}
 	
 	my ($class_r, $class_y, $class_b) = ('', '', '');
 	my $section = $m->request_comp->attr('current_section');

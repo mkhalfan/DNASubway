@@ -102,7 +102,7 @@ function check_status (tid, h) {
 					$('message').update("No homologs found. Try searching other genomes.");
 				}
 				else if (r.status == "failed") {
-					$('message').update("Failed.");
+					$('message').update("Failed to get the results from Target.");
 				}
 				$('launch_btn').show();
 			}

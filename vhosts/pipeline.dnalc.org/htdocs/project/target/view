@@ -170,7 +170,7 @@
 			$message = 'Processing.';
 		}
 		elsif ($tp->status eq 'failed') {
-			$message = 'Failed.';
+			$message = 'Failed to get the results from Target.';
 		}
 	}
 

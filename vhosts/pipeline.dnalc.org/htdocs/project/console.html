@@ -156,7 +156,7 @@
 		</div>
 		<div class="conProjectInfo_Row">
 		<span class="conProjectInfo_Cell1">User</span>
-		<span class="conProjectInfo_Cell2">: Cornel Ghiban</span>
+		<span class="conProjectInfo_Cell2">: <% $user ? $user->full_name : "" |html%></span>
 		</div>
 		<div class="conProjectInfo_Row">
 		<span class="conProjectInfo_Cell1">Affiliation</span>
@@ -192,209 +192,17 @@
 
 %#-------------------------------------------------
 
-% if (0) {
-
-<div id="conConsole_left"> <!--span conConsole_left start-->
-<h3>PROJECT</h3>
-<!-- ---------------------------------------- -->
-<div class="conConsole_leftRow">
-	<span class="conConsole_leftCell1">User</span>
-	<span class="conConsole_leftCell2">: Guest</span>
-</div>
-<div class="conConsole_leftRow">
-	<span class="conConsole_leftCell1">Group/Affiliation</span>
-	<span class="conConsole_leftCell2">: DNALC</span>
-</div>
-<div class="conConsole_leftRow">
-	<span class="conConsole_leftCell1">Project ID</span>
-	<span class="conConsole_leftCell2">: <% $proj->id %></span>
-</div>
-<div class="conConsole_leftRow">
-	<span class="conConsole_leftCell1">Organism</span>
-	<span class="conConsole_leftCell2">: <% $proj->common_name %></span>
-</div>
-<div class="conConsole_leftRow">
-	<span class="conConsole_leftCell1">Classification</span>
-	<span class="conConsole_leftCell2">: <% $clades{$proj->clade} %></span>
-</div>
-<div class="conConsole_leftRow">
-	<span class="conConsole_leftCell1">Sequence size</span>
-	<span class="conConsole_leftCell3">: <% nicebasepairs($proj->sequence_length) %></span>
-	<span class="conConsole_leftCellBT"><a href="javascript:;" onclick="javascript:launch(null, '<& './.comp/filepath_to_web', file => $pm->fasta_file &>')" title="">VIEW</a></span>
-</div>
-
-<!-- history start ----------------------------------------------------------->
-<div class="conConsole_leftHistory">HISTORY</div>
- <div style="clear: both;">&nbsp;</div> 
-	<div class="conHistorylist">
-	<ul>
-% for my $h (@$history) {
-	<li class="closed">
-	<strong><% $h->{task_name} %></strong>,\
-% if ($h->{duration} > 0) {
-	<% $h->{duration}%> sec., 
-% }
-	<% DNALC::Pipeline::App::Utils->format_datetime($h->{created}) %>
-	</li>
-% }
-	</ul>
-	</div><!-- conHistorylist -->
-	<div id="debug" style="display:<% $debug ? "block" : "none" %>"></div>
-</div><!--span conConsole_left END-->
-
-<div id="conConsole_middle"> <!--span conConsole_middle START-->
-	<h3>ANALYZE</h3>
-% if (1) {
-
-	<div class="conConsole_middleRow p"><img src="/images/v1/dot_blue.png"/>&nbsp;Prepare Sequence</div>
-	<div class="conConsole_middleRow">
-		<span class="conConsole_middleCell1">Identify and mask Repetitive DNA &amp; transposons</span>
-%#		<span class="conConsole_info"><a href="#" class="info">i<span class="infotip"><span class="top"></span><span class="middle">Info about this routine will be available soon. Thank you for your patience.</span><span class="bottom"></span></span></a></span>
-		<span class="conConsole_middleCell2">
-			<& '.routine', routine => 'repeat_masker', pmanager => $pm,
-						status => $status{repeat_masker}, delay => 15 &>
-		</span>                         
-	</div>
-
-	<div class="conConsole_middleRow p"></div>
-	<div class="conConsole_middleRow p"><img src="/images/v1/dot_blue.png"/>&nbsp;Predict Genes</div>
-	<div class="conConsole_middleRow">
-		<span class="conConsole_middleCell1">Augustus gene predictor</span>
-%#		<span class="conConsole_info"><a href="#" class="info">i<span class="infotip"><span class="top"></span><span class="middle">Info about this routine will be available soon. Thank you for your patience.</span><span class="bottom"></span></span></a></span>
-		<span class="conConsole_middleCell2">
-			<& '.routine', routine => 'augustus', pmanager => $pm,
-						status => $status{augustus}, delay => 20, rm_status => $rm_status &>
-		</span>
-	</div> 
-	
-	<div class="conConsole_middleRow">
-		<span class="conConsole_middleCell1">FGenesH gene predictor</span>
-%#		<span class="conConsole_info"><a href="#" class="info">i<span class="infotip"><span class="top"></span><span class="middle">Info about this routine will be available soon. Thank you for your patience.</span><span class="bottom"></span></span></a></span>
-		<span class="conConsole_middleCell2">
-			<& '.routine', routine => 'fgenesh', pmanager => $pm,
-						status => $status{fgenesh}, rm_status => $rm_status &>		
-		</span>
-	</div> 
-	<div class="conConsole_middleRow">
-		<span class="conConsole_middleCell1">SNAP gene predictor</span>
-%#		<span class="conConsole_info"><a href="#" class="info">i<span class="infotip"><span class="top"></span><span class="middle">Info about this routine will be available soon. Thank you for your patience.</span><span class="bottom"></span></span></a></span>
-		<span class="conConsole_middleCell2">
-			<& '.routine', routine => 'snap', pmanager => $pm,
-						status => $status{snap}, rm_status => $rm_status &>
-		</span>
-	</div> 
-	<div class="conConsole_middleRow">
-		<span class="conConsole_middleCell1">tRNA gene predictor</span>
-%#		<span class="conConsole_info"><a href="#" class="info">i<span class="infotip"><span class="top"></span><span class="middle">Info about this routine will be available soon. Thank you for your patience.</span><span class="bottom"></span></span></a></span>
-		<span class="conConsole_middleCell2 run">
-			<& '.routine', routine => 'trna_scan', pmanager => $pm,
-						status => $status{trna_scan}, rm_status => $rm_status &>
-		</span>
-	</div> 
-	
-	<div class="conConsole_middleRow p"></div>
-	<div class="conConsole_middleRow p"><img src="/images/v1/dot_blue.png"/>&nbsp;Search Databases</div>
-
-	<div class="conConsole_middleRow">
-		<span class="conConsole_middleCell1">BlastX UniProt for protein homologs</span>
-		<span class="conConsole_info"><a href="#" class="info">i<span class="infotip"><span class="top"></span><span class="middle">Info about this routine will be available soon. Thank you for your patience.</span><span class="bottom"></span></span></a></span>
-		<span class="conConsole_middleCell2 disabled">
-			<& '.routine', routine => 'blastx', pmanager => $pm, delay => 15,
-						status => $status{blastx}, rm_status => $rm_status &>		
-		</span>
-	</div> 
-	
-	<div class="conConsole_middleRow">
-		<span class="conConsole_middleCell1">BlastN UniGene for RNA evidence (cDNA/EST)</span>
-		<span class="conConsole_info"><a href="#" class="info">i<span class="infotip"><span class="top"></span><span class="middle">Info about this routine will be available soon. Thank you for your patience.</span><span class="bottom"></span></span></a></span>
-		<span class="conConsole_middleCell2 disabled">
-			<& '.routine', routine => 'blastn', pmanager => $pm, delay => 15,
-						status => $status{blastn}, rm_status => $rm_status &>
-		</span>
-	</div>
-% my $nt_evid = lc $wfm->get_status("upload_evid_nt")->name;
-% my $prot_evid = lc $wfm->get_status("upload_evid_prot")->name;
-% if ($nt_evid eq "done") {
-	<div class="conConsole_middleRow">
-		<span class="conConsole_middleCell1">BlastN my evidence</span>
-		<span class="conConsole_info"><a href="#" class="info">i<span class="infotip"><span class="top"></span><span class="middle">Info about this routine will be available soon. Thank you for your patience.</span><span class="bottom"></span></span></a></span>
-		<span class="conConsole_middleCell2 disabled">
-		<& '.routine', routine => 'blastn_user', pmanager => $pm, delay => 15,
-					status => $status{blastn_user}, rm_status => $rm_status &>
-		</span>
-	</div>
-% }
-% if ($prot_evid eq "done") {
-	<div class="conConsole_middleRow">
-		<span class="conConsole_middleCell1">BlastX my evidence</span>
-		<span class="conConsole_info"><a href="#" class="info">i<span class="infotip"><span class="top"></span><span class="middle">Info about this routine will be available soon. Thank you for your patience.</span><span class="bottom"></span></span></a></span>
-		<span class="conConsole_middleCell2 disabled">
-		<& '.routine', routine => 'blastx_user', pmanager => $pm, delay => 15,
-					status => $status{blastx_user}, rm_status => $rm_status &>
-		</span>
-	</div>
-% }
-% if ( $nt_evid ne "done" || $prot_evid ne "done") {
-	<div class="conConsole_middleRowx">
-		<div id="add_evidence" style="display:none; text-align: right;">
-			<form enctype="multipart/form-data" method="post">
-%	if ($nt_evid ne "done") {
-				<div>Add Nucleotide based evidence: 
-					<input type="file" name="evid_nt" value="xxx" />
-				</div>
-%	}
-%	if ($prot_evid ne "done") {
-				<div>Add Proteine based evidence: 
-					<input type="file" name="evid_prot" value="" />
-				</div>
-%	}
-		<a id="hide_evidence_link" href="javascript:void(0);" onclick="javascript:$('add_evidence').hide();$('add_evidence_link').show();">cancel</a>
-			<input type="submit" value="Upload" />
-			</form>
-		</div>
-		<a id="add_evidence_link" href="javascript:void(0);" onclick="javascript:$('add_evidence').show();$('add_evidence_link').hide();">add evidence</a>
-	</div>
-% }
-
-% }
-	<div class="conConsole_middleRow p"></div> 
-</div> <!-- #conConsole_middle -->
-
-
-<div id="conConsole_right"><!--span conConsole_right START-->
-	<h3>LAUNCH</h3>
-	<div class="conBT_launch"><a id="gbrowse_btn" class="<% $rm_status ne "done" ? "disabled" : "" %>" \
-		onclick="<% $rm_status eq "done" ? "launch('gbrowse')" : "" %>" \
-		href="javascript:;">BROWSE</a></div>
-	<div class="conBT_launch"><a id="apollo_btn" class="<% $rm_status ne "done" ? "disabled" : "" %>" \
-		commonname="<% $trimmed_common_name %>" seq_length="<% $proj->sequence_length %>" \
-		onclick="<% $rm_status eq "done" ? "launch('apollo')" : "" %>" 
-		href="javascript:;">EDIT</a></div>
-	<div style="padding-top: 10px; height: 25px;display: none;" id="apollo_status">loading apollo...</div>
-% if ($proj->sample) {
-	<div class="conBT_launch"><a id="exporter_btn" class="<% $rm_status ne "done" ? "disabled" : "" %>" \
-		onclick="<% $rm_status eq "done" ? "launch('exporter')" : "" %>"
-		href="javascript:;">EXPORT</a></div>
-% }
-</div><!--span conConsole_right END-->
-
-<div style="clear: both;">&nbsp;</div> 
-
-% }
-
-%#-------------------------------------------------
-
 <%args>
 	$pid => 0
 	$debug => 0
 </%args>
 %#-------------------------------------------------
 <%once>
-	use utf8;
 	use Data::Dumper; 
 	use DNALC::Pipeline::App::ProjectManager ();
 	use DNALC::Pipeline::App::WorkflowManager ();
 	use DNALC::Pipeline::App::Utils ();
+	use DNALC::Pipeline::User ();
 	use DNALC::Pipeline::Utils qw/nicebasepairs/;
 
 	my %routines = (
@@ -428,13 +236,18 @@ unless ($proj) {
 	$m->redirect('/project/');
 }
 
+my $user = DNALC::Pipeline::User->retrieve($proj->user_id);
+
 my %status = ();
 my ($history, $rm_status, $trimmed_common_name);
 my $wfm = DNALC::Pipeline::App::WorkflowManager->new( $proj );
 
 if ($r->method eq "POST") {
-
-	if ($ARGS{evid_nt} || $ARGS{evid_prot}) {
+	
+	if (!$s->{logged_in} || $s->{user_id} != $proj->user_id) {
+		$m->comp('/_message_add', 'Only the owner of the project is allowed to do this!', 'error');
+	}
+	elsif ($ARGS{evid_nt} || $ARGS{evid_prot}) {
 		my $wfm = DNALC::Pipeline::App::WorkflowManager->new( $proj );
 		for (qw/evid_nt evid_prot/) {
 			if ($ARGS{$_}) {

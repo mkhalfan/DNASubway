@@ -22,6 +22,7 @@ sub run_target {
 	my $cf = DNALC::Pipeline::Config->new->cf('TARGET');
 	my $ua = LWP::UserAgent->new;
 	$ua->agent("pipeline.dnalc.org");
+	$ua->timeout(300); # 5 minutes
 
 	my $res;
 	my $server = $cf->{TARGET_SERVER};
@@ -44,7 +45,7 @@ sub run_target {
 		$res = $ua->post($post_url, $query);
 		#print STDERR Dumper( $res ), $/;
 		unless ($res->is_success) {
-			print $res->status_line, "\n";
+			print STDERR $res->status_line, "\n";
 			$tp->status('failed');
 		}
 		else {
@@ -63,7 +64,7 @@ sub run_target {
 		#print $xml_url, $/;
 		$res = $ua->get($xml_url);
 		unless ($res->is_success) {
-			print $res->status_line, "\n";
+			print STDERR $res->status_line, "\n";
 			$tp->status('failed');
 		}
 		else {

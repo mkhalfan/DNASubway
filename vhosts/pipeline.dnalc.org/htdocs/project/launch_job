@@ -31,17 +31,26 @@
 		print "{'status':'error', 'message':'Project unknown.'}";
 		return;
 	}
+
+	if (!$s->{logged_in} || $proj->user_id != $s->{user_id}) {
+		print "{'status':'error', 'message':'You are not logged in or this project belong to another user.'}";
+		return;
+	}
+
 	my $client = Gearman::Client->new;
 	$client->job_servers('127.0.0.1');
 	my $h = $client->dispatch_background( $t => $pid);
 	#print STDERR  "Launched [$t], h = ", $h, $/;
 </%init>
+%#-------------------------------------------------
 <%flags>
 	inherit => undef
 </%flags>
+%#-------------------------------------------------
 % if ($h) {
 {'status':'success', 'h':'<% $h %>'}
 % } else {
 {'status':'error', 'message':'Unable to submit job request.'}
 % }
+%#-------------------------------------------------
 %# vim: ft=mason
