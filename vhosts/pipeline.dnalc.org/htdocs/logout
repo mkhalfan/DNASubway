@@ -1,0 +1,15 @@
+<%init>
+	$m->session->{pipeline} ||= { username => "", logged_in => 0};
+	my $s = $m->session->{pipeline};
+	
+	if ($s->{logged_in}) {
+		delete $s->{user_id};
+		delete $s->{logged_in};
+	}
+	$m->redirect('/');
+</%init>
+% ############################################################################
+<%flags>
+	inherit => undef
+</%flags>
+%# vim:ft=mason
