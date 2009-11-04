@@ -1,68 +1,3 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml">
-<head>
-<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-<title>DNA Subway - Fast Track to Gene Annotation and Genome Analysis</title>
-
-<link type="text/css" rel="stylesheet" href="/css/sgeneral.css" />
-<link type="text/css" rel="stylesheet" href="/css/scontent.css" />
-</head>
-
-
-<body>
-<div id="mainContainer">
-
-<div id="home_header">
-	<div id="home_header_topline">FAST TRACK TO GENE ANNOTATION AND GENOME ANALYSIS</div>
-    
-	<div id="home_header_left">
-	<div id="memberForm">
-% if (! $s->{logged_in}) {
-		<form method="post">
- 			<span class="memberRow1">
-				<label class="memberLabel" for="name">ID:</label> 
-				<input type="text" maxlength="20" id="name" name="name" class="memberInput" value="<% $s->{username} %>"/>
-			</span>
-			<span class="memberRow1">
-				<label class="memberLabel" for="passw">Password:</label>
-				<input type="password" maxlength="12" id="passw" name="passw" class="memberInput" />
-			</span>
-			<div class="memberRow2" style="">
-%#				<div class="registerBT"><a href="#" title="">Register</a></div>
-%#				<div class="registerBT"><a href="/project/" title="">Get started</a></div>
-				<input type="submit" name="guest" value="As Guest" class="memberEnter" />
-%#				<input type="submit" name="login" value="Log In" class="memberEnter" />
-			</div>
-			<div class="forgotPassword"><a href="#" title="">Forgot Password?</a>&nbsp;
-			&nbsp;<a href="#" title=""><strong>Register</strong></a>
-			</div>
-		</form>
-% } else {
-	<!-- <a href="/project/">View map</a> -->
-	<div id="" style="margin-left: -20px;">
-		logged in as <strong><% $s->{full_name} %></strong>
-		<div id="container_H_insidebottom" style="margin-left: -10px;">
-			<span class="bt_LogOut"><a href="/logout"></a></span>
-			<span class="bt_Map"><a href="/project/"></a></span>
-		</div>
-	</div> <!--END of ID container_InsideH_bgr-->
-% }
-	</div> <!--END of ID member form-->
-	</div>	<!--END of ID home_header_left-->
-
-	<div id="home_header_right"> </div>
-	<div id="home_header_middle"> </div>
-	<div id="home_header_bottomline"></div>	
-
-</div> <!--END of IDhome_headerr-->
-
-<!--END of ID HEADER--------------------------------------------------------------->
-
-<!--BODY--------------------------------------------------------------->
- <div id="containerBody">
-	
-	<& "/_messages" &>
-
     	<div id="home_map">
 		  <div id="map_left">
 			<span id="map_spacer"></span>
@@ -129,26 +64,6 @@
 analyze genome data.  Roll over any of the “stations” on the subway map to find out more about the analysis steps. Start a project by selecting one of the three “subway lines” 
 (red, yellow, blue). Register and login if you want to save or share your results.</div>
 
-                        
-
-  </div><!--END of ID containerBody-->
- 
-<!--Footer START-->    
-			<div id="footerContainer">
-				<span class="footerLink"><a href="#" title="" class="current">About</a></span>
-				<span class="footerLink"><a href="#" title="" class="current">Funded by</a></span>
-				<span class="footerLink"><a href="#http://www.iplantcollaborative.org/" title="" class="current" target="_blank">iPlant Collaborative</a></span>
-
-				<span id="footerCopy">All content is © 2009 by the iPlant Collaborative</span>
-			</div>
-			<!--END of ID footerContainer-->
-
-
-
-</div><!--END of ID mainContainer-->
-</body>
-</html>
-
 %#-------------------------------------------------------------------
 <%args>
 	$name => ''
@@ -170,14 +85,6 @@ my $s = $m->session->{pipeline};
 print STDERR "name = $name//sess =$s->{username} \n";
 
 my @err = ();
-
-my $now = time();
-if ($s->{logged_in} && ($now - $s->{last} > 3600)) {
-	$m->comp("/_message_add", "It's been a while since your last visit: " . duration ($now - $s->{last}));
-	$s->{logged_in} = 0;
-}
-$s->{last} = $now;
-
 
 if ($r->method eq "POST") {
 
@@ -226,6 +133,4 @@ else {
 
 </%init>
 %#-------------------------------------------------------------------
-<%flags>
-	inherit => undef
-</%flags>
+

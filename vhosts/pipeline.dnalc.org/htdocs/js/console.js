@@ -368,7 +368,11 @@ Event.observe(window, 'load', function() {
 		if (stat == 'processing') {
 			var p = $('pid').value;
 			var op = as[i].id.replace('_btn', '');
-			intervalID[op] = setInterval(check_status, 10000, p, op, -1);
+			var delay = parseInt(as[i].readAttribute('delay'), 10);
+			if (isNaN(delay) || delay <= 10) {
+				delay = 10;
+			}
+			intervalID[op] = setInterval(check_status, delay * 1000, p, op, -1);
 		}
 	}
 });

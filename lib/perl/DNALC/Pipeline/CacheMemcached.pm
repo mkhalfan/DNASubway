@@ -26,8 +26,9 @@ sub get {
 }
 
 sub set {
-	my ($self, $key, $value) = @_;
-	$self->{_mc}->set($key, $value, $timeout);
+	my ($self, $key, $value, $tout) = @_;
+	$tout ||= $timeout;
+	$self->{_mc}->set($key, $value, $tout);
 }
 
 1;

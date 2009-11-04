@@ -6,6 +6,7 @@ use DNALC::Pipeline::Workflow ();
 use DNALC::Pipeline::Config ();
 use DNALC::Pipeline::Project ();
 use DNALC::Pipeline::CacheMD5 ();
+use DNALC::Pipeline::CacheMemcached ();
 
 use DNALC::Pipeline::App::ProjectManager ();
 use DNALC::Pipeline::Process::RepeatMasker ();
@@ -25,10 +26,10 @@ use Carp;
 
 {
 	my %status_map = (
-			"Not processed" => 1,
-			"Done"          => 2,
-			"Error"         => 3,
-			"Processing"    => 4
+			"not-processed" => 1,
+			"done"          => 2,
+			"error"         => 3,
+			"processing"    => 4
 		);
 	my %status_id_to_name = reverse %status_map;
 
@@ -44,6 +45,7 @@ use Carp;
 			return;
 		}
 
+		$self->{_mc} = DNALC::Pipeline::CacheMemcached->new;
 		$self->{project} = $project;
 		$self->{pmanager} = DNALC::Pipeline::App::ProjectManager->new($project);
 
@@ -87,6 +89,10 @@ use Carp;
 			croak "Unknown status: ", $status_name, $/;
 		}
 
+		my $mc_key = "status-$task_name-" . $self->project->id;
+		$self->{_mc}->set($mc_key, lc( $status_name ));
+		print STDERR  "set_status: $mc_key  ===>>> $status_name", $/;
+
 		my $wf = DNALC::Pipeline::Workflow->retrieve(
 					project_id => $self->project->id,
 					task_id => $self->{task_name_to_id}->{$task_name},
@@ -128,15 +134,23 @@ use Carp;
 
 	sub get_status {
 		my ($self, $task_name) = @_;
-		#print STDERR  "11. getting status for task_id = ", $self->{task_name_to_id}->{$task_name}, $/;
+
+		my $mc_key = "status-$task_name-" . $self->project->id;
+		my $mc_status = $self->{_mc}->get($mc_key);
+		if ($mc_status) {
+			print STDERR  " \@\@ 10. MC status for task_id = ", $task_name, ' == ', $mc_status, $/;
+			return DNALC::Pipeline::TaskStatus->retrieve( $status_map{$mc_status} );
+		}
+		
 		my ($wf) = DNALC::Pipeline::Workflow->search(
 					project_id => $self->project->id,
 					task_id => $self->{task_name_to_id}->{$task_name},
 				);
 
 		unless ($wf) {
-			return DNALC::Pipeline::TaskStatus->retrieve( $status_map{'Not processed'} );
+			return DNALC::Pipeline::TaskStatus->retrieve( $status_map{'not-processed'} );
 		}
+		#print STDERR  "11. getting status for task_id = ", $task_name, ' == ', $wf->status->name, $/;
 		$wf->status;
 	}
 	#-------------------------------------------------------------------------
@@ -188,10 +202,10 @@ use Carp;
 
 		my $s;
 		if ($rc) {
-			$s = $self->set_status('upload_fasta','Done');
+			$s = $self->set_status('upload_fasta','done');
 		}
 		else {
-			$s = $self->set_status('upload_fasta','Error');
+			$s = $self->set_status('upload_fasta','error');
 		}
 		return $upload_file if $rc;
 	}
@@ -219,7 +233,7 @@ use Carp;
 		my $rep_mask2 = DNALC::Pipeline::Process::RepeatMasker2->new( $pm->work_dir, $proj->clade );
 		if ($rep_mask && $rep_mask2) {
 
-			$self->set_status('repeat_masker', 'Processing');
+			$self->set_status('repeat_masker', 'processing');
 
 			#my $crc = $self->crc($rep_mask->get_options);
 			# TODO
@@ -244,16 +258,16 @@ use Carp;
 					my $rc = $self->load_analysis_results($status->{gff_file}, 'repeat_masker');
 					#$self->set_cache('repeat_masker', $crc);
 					print STDERR  "Time 2 = ", $rep_mask2->{elapsed}, $/;
-					$self->set_status('repeat_masker', 'Done', $status->{elapsed});
+					$self->set_status('repeat_masker', 'done', $status->{elapsed});
 				}
 				else {
 					print STDERR "REPEAT_MASKER: fail\n";
-					$self->set_status('repeat_masker', 'Error');
+					$self->set_status('repeat_masker', 'error');
 				}
 			}
 			else {
 				print STDERR "REPEAT_MASKER: fail\n";
-				$self->set_status('repeat_masker', 'Error');
+				$self->set_status('repeat_masker', 'error');
 			}
 		}
 
@@ -285,7 +299,7 @@ use Carp;
 			my $input_file = $pm->fasta_masked_nolow;
 			if ($input_file) {
 				print STDERR  "AUGUSTUS options = ", join('', $augustus->get_options), $/;
-				$self->set_status('augustus', 'Processing');
+				$self->set_status('augustus', 'processing');
 				$augustus->run(	input => $input_file );
 			}
 			if (defined $augustus->{exit_status} && $augustus->{exit_status} == 0) {
@@ -295,14 +309,14 @@ use Carp;
 				$status->{elapsed} = $augustus->{elapsed};
 				$status->{gff_file}= $augustus->get_gff3_file;
 				my $rc = $self->load_analysis_results($status->{gff_file}, 'augustus');
-				$self->set_status('augustus', 'Done', $augustus->{elapsed});
+				$self->set_status('augustus', 'done', $augustus->{elapsed});
 				#my $crc = $self->crc($augustus->get_options);
 				#print STDERR  "AUGUSTUS CRC = ", $crc, $/;
 				#$self->set_cache('augustus', $crc);
 			}
 			else {
 				print STDERR "AUGUSTUS: fail\n";
-				$self->set_status('augustus', 'Error', $augustus->{elapsed});
+				$self->set_status('augustus', 'error', $augustus->{elapsed});
 			}
 			print STDERR 'AUGUSTUS: duration: ', $augustus->{elapsed}, $/;
 		}
@@ -332,7 +346,7 @@ use Carp;
 		if ($trna_scan ) {
 			my $crc = $self->crc($trna_scan->get_options);
 
-			$self->set_status('trna_scan', 'Processing');
+			$self->set_status('trna_scan', 'processing');
 			$trna_scan->run(
 					input => $pm->fasta_file,
 				);
@@ -342,12 +356,12 @@ use Carp;
 				$status->{elapsed} = $trna_scan->{elapsed};
 				$status->{gff_file}= $trna_scan->get_gff3_file;
 				my $rc = $self->load_analysis_results($status->{gff_file}, 'trna_scan');
-				$self->set_status('trna_scan', 'Done', $trna_scan->{elapsed});
+				$self->set_status('trna_scan', 'done', $trna_scan->{elapsed});
 				$self->set_cache('trna_scan', $crc);
 			}
 			else {
 				print STDERR "TRNA_SCAN: fail\n";
-				$self->set_status('trna_scan', 'Error', $trna_scan->{elapsed});
+				$self->set_status('trna_scan', 'error', $trna_scan->{elapsed});
 				#print $trna_scan->{cmd}, $/;
 			}
 			print STDERR 'TS: duration: ', $trna_scan->{elapsed}, $/;
@@ -376,7 +390,7 @@ use Carp;
 
 			my $input_file = $pm->fasta_masked_nolow;
 			if ($input_file) {
-				$self->set_status('fgenesh', 'Processing');
+				$self->set_status('fgenesh', 'processing');
 				$fgenesh->run(
 						input => $input_file,
 						debug => 0,
@@ -389,13 +403,13 @@ use Carp;
 				$status->{elapsed} = $fgenesh->{elapsed};
 				$status->{gff_file}= $fgenesh->get_gff3_file;
 				my $rc = $self->load_analysis_results($status->{gff_file}, 'fgenesh');
-				$self->set_status('fgenesh', 'Done', $status->{elapsed});
+				$self->set_status('fgenesh', 'done', $status->{elapsed});
 				#my $crc = $self->crc($fgenesh->get_options);
 				#$self->set_cache('fgenesh', $crc);
 			}
 			else {
 				print STDERR "FGENESH: fail\n";
-				$self->set_status('fgenesh', 'Error', $fgenesh->{elapsed});
+				$self->set_status('fgenesh', 'error', $fgenesh->{elapsed});
 			}
 			print STDERR 'FGENESH: duration: ', $fgenesh->{elapsed}, $/;
 		}
@@ -424,7 +438,7 @@ use Carp;
 
 			my $input_file = $pm->fasta_masked_nolow;
 			if ($input_file) {
-				$self->set_status('snap', 'Processing');
+				$self->set_status('snap', 'processing');
 				$snap->run(
 						input => $input_file,
 					);
@@ -435,12 +449,12 @@ use Carp;
 				$status->{elapsed} = $snap->{elapsed};
 				$status->{gff_file}= $snap->get_gff3_file;
 				my $rc = $self->load_analysis_results($status->{gff_file}, 'snap');
-				$self->set_status('snap', 'Done', $snap->{elapsed});
+				$self->set_status('snap', 'done', $snap->{elapsed});
 				#$self->set_cache('snap', $self->crc($snap->get_options));
 			}
 			else {
 				print STDERR "SNAP: fail\n";
-				$self->set_status('snap', 'Error', $snap->{elapsed});
+				$self->set_status('snap', 'error', $snap->{elapsed});
 			}
 			print STDERR 'SNAP: duration: ', $snap->{elapsed}, $/;
 		}
@@ -469,7 +483,7 @@ use Carp;
 
 			my $input_file = $pm->fasta_masked_xsmall;
 			if ($input_file) {
-				$self->set_status('blastn', 'Processing');
+				$self->set_status('blastn', 'processing');
 				$blastn->run( input => $input_file, debug => 1 );
 			}
 			if (defined $blastn->{exit_status} && $blastn->{exit_status} == 0) {
@@ -478,12 +492,12 @@ use Carp;
 				$status->{elapsed} = $blastn->{elapsed};
 				$status->{gff_file}= $blastn->get_gff3_file;
 				my $rc = $self->load_analysis_results($status->{gff_file}, 'blastn');
-				$self->set_status('blastn', 'Done', $blastn->{elapsed});
+				$self->set_status('blastn', 'done', $blastn->{elapsed});
 				#$self->set_cache('blastn', $self->crc($blastn->get_options));
 			}
 			else {
 				print STDERR "BLASTN: fail\n";
-				$self->set_status('blastn', 'Error');
+				$self->set_status('blastn', 'error');
 			}
 			print STDERR 'BLASTN: duration: ', $blastn->{elapsed}, $/;
 		}
@@ -512,7 +526,7 @@ use Carp;
 
 			my $input_file = $pm->fasta_masked_xsmall;
 			if ($input_file) {
-				$self->set_status('blastx', 'Processing');
+				$self->set_status('blastx', 'processing');
 				$blastx->run( input => $input_file, debug => 1 );
 			}
 			if (defined $blastx->{exit_status} && $blastx->{exit_status} == 0) {
@@ -521,12 +535,12 @@ use Carp;
 				$status->{elapsed} = $blastx->{elapsed};
 				$status->{gff_file}= $blastx->get_gff3_file;
 				my $rc = $self->load_analysis_results($status->{gff_file}, 'blastx');
-				$self->set_status('blastx', 'Done', $blastx->{elapsed});
+				$self->set_status('blastx', 'done', $blastx->{elapsed});
 				#$self->set_cache('blastx', $self->crc($blastx->get_options));
 			}
 			else {
 				print STDERR "BLASTX: fail\n";
-				$self->set_status('blastx', 'Error');
+				$self->set_status('blastx', 'error');
 			}
 			print STDERR 'BLASTX: duration: ', $blastx->{elapsed}, $/;
 		}
@@ -549,7 +563,7 @@ use Carp;
 
 			my $input_file = $pm->fasta_masked_xsmall;
 			if ($input_file) {
-				$self->set_status('blastn_user', 'Processing');
+				$self->set_status('blastn_user', 'processing');
 				$blastn->run( input => $input_file, debug => 1 );
 			}
 			if (defined $blastn->{exit_status} && $blastn->{exit_status} == 0) {
@@ -558,12 +572,12 @@ use Carp;
 				$status->{elapsed} = $blastn->{elapsed};
 				$status->{gff_file}= $blastn->get_gff3_file;
 				my $rc = $self->load_analysis_results($status->{gff_file}, 'blastn_user');
-				$self->set_status('blastn_user', 'Done', $blastn->{elapsed});
+				$self->set_status('blastn_user', 'done', $blastn->{elapsed});
 				#$self->set_cache('blastn', $self->crc($blastn->get_options));
 			}
 			else {
 				print STDERR "BLASTN_USER:: fail\n";
-				$self->set_status('blastn_user', 'Error');
+				$self->set_status('blastn_user', 'error');
 			}
 			print STDERR 'BLASTN_USER: duration: ', $blastn->{elapsed}, $/;
 		}
@@ -582,7 +596,7 @@ use Carp;
 		if ($blastx) {
 			my $input_file = $pm->fasta_masked_xsmall;
 			if ($input_file) {
-				$self->set_status('blastx_user', 'Processing');
+				$self->set_status('blastx_user', 'processing');
 				$blastx->run( input => $input_file, debug => 1 );
 			}
 			if (defined $blastx->{exit_status} && $blastx->{exit_status} == 0) {
@@ -591,12 +605,12 @@ use Carp;
 				$status->{elapsed} = $blastx->{elapsed};
 				$status->{gff_file}= $blastx->get_gff3_file;
 				my $rc = $self->load_analysis_results($status->{gff_file}, 'blastx_user');
-				$self->set_status('blastx_user', 'Done', $blastx->{elapsed});
+				$self->set_status('blastx_user', 'done', $blastx->{elapsed});
 				#$self->set_cache('blastx_user', $self->crc($blastx->get_options));
 			}
 			else {
 				print STDERR "BLASTX_USER:: fail\n";
-				$self->set_status('blastx_user', 'Error');
+				$self->set_status('blastx_user', 'error');
 			}
 			print STDERR 'BLASTX_USER: duration: ', $blastx->{elapsed}, $/;
 		}
@@ -625,7 +639,7 @@ use Carp;
 			$status->{success} = 1;
 			$status->{elapsed} = 1.59;
 			$status->{gff_file}= $pm->get_gff3_file($routine);
-			$self->set_status($routine, 'Done', $status->{elapsed});
+			$self->set_status($routine, 'done', $status->{elapsed});
 			#copy  masked fasta files
 			if ($routine eq 'repeat_masker') {
 				for my $mask (qw/repeat_masker repeat_masker2/) {
@@ -697,7 +711,7 @@ use Carp;
 
 =item * $self->upload_sequence
 
-Initializes the project if needed, sets the default status for the project(Not processed)
+Initializes the project if needed, sets the default status for the project(not-processed)
 We actually won't have nothing stored in the DB in this case.
 
 =item * $self->select_sequence

@@ -1,0 +1,104 @@
+<div style="width: 80%; background: xmagenta;">
+
+% if (@err) {
+<div class="error" style="color: red; ">
+%	for (@err) {
+		<div><% $_ %></div>
+%	}
+</div>
+%}
+
+<form method="post">
+	<table>
+%	for (@$fields) {
+		<tr>
+			<td><% $_->{label} %>:</td>
+			<td><input type="text" name="<% $_->{id} %>" value="<% $s->{$_->{id}} |html%>" maxlength="<% $_->{maxlength} %>"/></td>
+		</tr>
+%	}
+
+		<tr>
+			<td>&nbsp;</td>
+			<td><input type="submit" name="submit" value="Register" /></td>
+		</tr>
+	</table>
+</form>
+</div>
+
+%#-------------------------------------------------------------------
+<%once>
+	use DNALC::Pipeline::Utils qw/random_string/;
+	use DNALC::Pipeline::User ();
+	use DNALC::Pipeline::Group ();
+	use Email::Valid ();
+	use MIME::Lite ();
+	use DNALC::Pipeline::Utils qw(random_string);
+
+	my $fields = [
+			{ id => "name_first", label => "First name", re => qr/.+/, maxlength => 64},
+			{ id => "name_last", label => "Last name", re => qr/.+/, maxlength => 64},
+			{ id => "username", label => "Username", re => qr/^[a-z0-9_-]+$/i, maxlength => 16},
+			{ id => "email", label => "Email", re => qr/\@/, maxlength => 120},
+		];
+</%once>
+%#-------------------------------------------------------------------
+<%init>
+$m->session->{pipeline_reg} ||= {};
+my $s = $m->session->{pipeline_reg};
+
+my @err = ();
+
+if ($r->method eq "POST") {
+	for (@$fields) {
+		my $f = $_->{id};
+		$s->{$f} = substr $ARGS{$f}, 0, $_->{maxlength} if defined $ARGS{$f};
+		unless (defined $s->{$f} && $s->{$f} =~ $_->{re}) {
+			push @err, "$_->{label} is missing or invalid!";
+		}
+	}
+	
+	unless (@err) {
+		unless (Email::Valid->address($s->{email})) {
+			push @err, "Email address is invalid!";
+		}
+		my $user = DNALC::Pipeline::User->search( username => $s->{username});
+		if ($user || $s->{username} =~ /^(?:chado|guest|default|postgre|template)/i) {
+			push @err, "Username not available!";
+		}
+	}
+	
+	unless (@err ) {
+		# create passwd
+		my $pwd = random_string(4, 15);
+
+		# create account		
+		my $u = eval {
+				DNALC::Pipeline::User->create({
+					username => $s->{username},
+					password => $pwd,
+					email => $s->{email},
+					name_first => $s->{name_first},
+					name_last => $s->{name_last}
+				});
+			};
+
+		if ($@) {
+			print STDERR "USER: ------------------------------------\n";
+			print STDERR $@, "\n";
+			print STDERR "USER: ------------------------------------\n";
+			push @err, "Error creating user!";
+		}
+		else {
+			# send email with link to click / or just with the password
+			# launch "create-chado-db" in the background
+			my ($users_group) = DNALC::Pipeline::Group->search(group_name => "user");
+			$u->add_to_group($users_group) if $users_group;
+			
+			$m->comp("/_message_add", "User almost created. In the future, we'll send an email..");
+			$m->redirect("/");
+		}
+
+	}
+}
+
+</%init>

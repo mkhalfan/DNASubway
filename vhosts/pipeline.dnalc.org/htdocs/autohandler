@@ -1,80 +1,165 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-<meta name="author" content="Dolan DNA Learning Center" />
-<meta http-equiv="Content-Language" content="en" />
-<title><& SELF:title &> Pipeline</title>
-<script type="text/javascript" src="/js/prototype-1.6.0.3.js"></script>
-%#<script type="text/javascript" src="/js/prototype.js"></script>
-% if ($m->request_comp->attr_if_exists('js') && @{$m->request_comp->attr('js')}) { 
-%	foreach my $js (@{$m->request_comp->attr('js')}) {
-%		next unless $js;
-<script type="text/javascript" src="/js/<% $ js %>"></script>
-%	}
-% }
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<title>DNA Subway - Fast Track to Gene Annotation and Genome Analysis</title>
 
-<!--[if IE]>
-<script type="text/javascript" src="/js/firebug-lite-compressed.js"></script>
-<![endif]-->
-<link type="text/css" rel="stylesheet" href="/css/general.css" />
-<link type="text/css" rel="stylesheet" href="/css/content.css" />
-% if (0 && $m->request_comp->attr_if_exists('css') && @{$m->request_comp->attr('css')}) { 
-%	foreach my $css (@{$m->request_comp->attr('css')}) {
-%		next unless $css;
-<link type='text/css' rel='stylesheet' href='/css/<% $css %>' />
-%	}
-% }
-
-% if ($m->request_comp->attr('load_window_ui')) {
-%#<script src="/files/window/lib/prototype.js" type="text/javascript"></script>
-<script src="/files/window/lib/effects.js" type="text/javascript"></script>  
-<script src="/files/window/dist/window.js" type="text/javascript"></script>
-
-<link href="/files/window/themes/window/window.css" rel="stylesheet" type="text/css" />
-<link href="/files/window/themes/window/alphacube.css" rel="stylesheet" type="text/css" />
-% }
-
+<link type="text/css" rel="stylesheet" href="/css/sgeneral.css" />
+<link type="text/css" rel="stylesheet" href="/css/scontent.css" />
 </head>
+
+
 <body>
 <div id="mainContainer">
-  <div id="headerContainer"><!--START of ID headerContainer-->  		
-	<div id="header_leftButton"><!--START of ID header_leftButton-->
-		<div class="header_left"><a href="#" title="">About</a></div>
-		<div class="header_left"><a href="#" title="">Learn</a></div>
-		<div class="header_log"><a href="#" title="">Log Out</a></div>
-	</div> <!--END of ID header_leftButton-->
-	<div id="header_rightButton"><!--START of ID header_rightButton-->
-		<!--<div class="header_back"><a href="#" title="">go BACK</a></div>-->
-		<!--<div class="header_right"><a href="#" title="" class="current"><span class="textSpace1">CONSOLE</span></a></div>-->
-		<div class="header_right"><a href="/project/browse" title="" >PROJECTS</a></div> 
-	</div>
-  </div>
 
-  <div id="conBody">
+<div id="home_header">
+	<div id="home_header_topline">FAST TRACK TO GENE ANNOTATION AND GENOME ANALYSIS</div>
+    
+	<div id="home_header_left">
+	<div id="memberForm">
+% if (! $s->{logged_in}) {
+		<form method="post" action="/">
+ 			<span class="memberRow1">
+				<label class="memberLabel" for="name">ID:</label> 
+				<input type="text" maxlength="20" id="name" name="name" class="memberInput" value="<% $s->{username} %>"/>
+			</span>
+			<span class="memberRow1">
+				<label class="memberLabel" for="passw">Password:</label>
+				<input type="password" maxlength="12" id="passw" name="passw" class="memberInput" />
+			</span>
+			<div class="memberRow2" style="">
+%#				<div class="registerBT"><a href="#" title="">Register</a></div>
+%#				<div class="registerBT"><a href="/project/" title="">Get started</a></div>
+%#				<input type="submit" name="login" value="Log In" class="memberEnter" />
+				<input type="submit" name="guest" value="As Guest" class="memberEnter" />
+			</div>
+			<div class="forgotPassword"><a href="#" title="">Forgot Password?</a>&nbsp;
+			&nbsp;<a href="#" title=""><strong>Register</strong></a>
+			</div>
+		</form>
+% } else {
+	<!-- <a href="/project/">View map</a> -->
+	<div id="" style="margin-left: -20px;">
+		logged in as <strong><% $s->{full_name} %></strong>
+		<div id="container_H_insidebottom" style="margin-left: -10px;">
+			<span class="bt_LogOut"><a href="/logout"></a></span>
+			<span class="bt_Map"><a href="/project/"></a></span>
+		</div>
+	</div> <!--END of ID container_InsideH_bgr-->
+% }
+	</div> <!--END of ID member form-->
+	</div>	<!--END of ID home_header_left-->
 
-% $m->call_next;
+	<div id="home_header_right"> </div>
+	<div id="home_header_middle"> </div>
+	<div id="home_header_bottomline"></div>	
 
-	<div style="clear: both;">&nbsp;</div> 
-  </div> <!-- end conBody -->  
-  <div id="bottomContainer"></div>
-</div> <!-- #mainContainer  -->
-<div id="footerContainer">
-	<div id="footerContainer_middle">
-		<div id="footer_copyright">All content is © 2009 by the iPlant Collaborative</div>
-	</div>
-</div><!--END of ID footerContainerr-->
+</div> <!--END of IDhome_headerr-->
+
+<!--END of ID HEADER--------------------------------------------------------------->
+
+<!--BODY--------------------------------------------------------------->
+<div id="containerBody">
+	
+<& "/_messages" &>
+
+% $m->call_next;                        
+
+</div><!--END of ID containerBody-->
+ 
+<!--Footer START-->    
+			<div id="footerContainer">
+				<span class="footerLink"><a href="#" title="" class="current">About</a></span>
+				<span class="footerLink"><a href="#" title="" class="current">Funded by</a></span>
+				<span class="footerLink"><a href="#http://www.iplantcollaborative.org/" title="" class="current" target="_blank">iPlant Collaborative</a></span>
+
+				<span id="footerCopy">All content is © 2009 by the iPlant Collaborative</span>
+			</div>
+			<!--END of ID footerContainer-->
+
+
+
+</div><!--END of ID mainContainer-->
 </body>
 </html>
-%#---------------------------------
-<%method title>\
-</%method>\
-%#---------------------------------
-<%attr>
-	js => []
-	css => []
-	load_window_ui => 0
-</%attr>
-%#---------------------------------
 
-%# vim: ft=mason
+%#-------------------------------------------------------------------
+<%args>
+	$name => ''
+	$passw => ''
+	$guest => ''
+	$login => ''
+</%args>
+%#-------------------------------------------------------------------
+<%once>
+	use DNALC::Pipeline::Utils qw/random_string/;
+	use DNALC::Pipeline::User ();
+	use Time::Duration qw/duration/;
+</%once>
+%#-------------------------------------------------------------------
+<%init>
+$m->session->{pipeline} ||= { username => "", logged_in => 0};
+my $s = $m->session->{pipeline};
+
+print STDERR "name = $name//sess =$s->{username} \n";
+
+my @err = ();
+
+my $now = time();
+if ($s->{logged_in} && ($now - $s->{last} > 3600)) {
+	$m->comp("/_message_add", "It's been a while since your last visit: " . duration ($now - $s->{last}));
+	$s->{logged_in} = 0;
+}
+$s->{last} = $now;
+
+
+if ($r->method eq "POST") {
+
+	print STDERR "login = $login\n";
+	print STDERR "guest = $guest\n";
+
+	my $user;
+	
+	if ($guest) {
+		unless ($name) {
+			my $rand = lc random_string(6, 8);
+			$name = "guest_$rand";
+
+			print STDERR "Generated user: ", $name, $/;
+			$user = eval {
+					DNALC::Pipeline::User->create({
+						username => $name,
+						name_first => "Guest",
+						name_last => ucfirst $rand,
+						email => '',
+						password => random_string(8,8)
+					});
+				};
+			if ($@) {
+				push @err, $@;
+			}
+		}
+		else {
+			($user) = DNALC::Pipeline::User->search(username => $name);
+		}
+		if ($user){
+			$s->{username} = $user->username;
+			$s->{full_name} = $user->full_name;
+			$s->{user_id} = $user->id;
+			$s->{logged_in} = 1;
+		}
+	}
+	
+	if ($s->{logged_in}) {
+		$m->redirect("/project/");
+	}
+}
+else {
+	print STDERR "GET username = ", $s->{username}, $/;
+}
+
+</%init>
+%#-------------------------------------------------------------------
+<%flags>
+	inherit => undef
+</%flags>

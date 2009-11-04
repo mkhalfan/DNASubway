@@ -352,15 +352,15 @@ if ($r->method eq 'POST') {
 		
 		unless ($proj) {
 			push @err, "Error creating the project.";
-			#$wfm->set_status('upload_fasta', 'Error');
+			#$wfm->set_status('upload_fasta', 'error');
 		}
 		else {
 			my $wfm = DNALC::Pipeline::App::WorkflowManager->new( $proj );
-			$wfm->set_status('upload_fasta', 'Done');
+			$wfm->set_status('upload_fasta', 'done');
 			print STDERR "project_created: id = ", $proj, ",\tname = ", $proj->name, $/;
 
-			# redirect user to dashboard
-			#$m->comp('/_message_add', "Project created successfully!");
+			# redirect user to console
+			$m->comp('/_message_add', "Project created successfully!");
 			$m->redirect('./console.html?pid=' . $proj->id);
 			
 		} #end else

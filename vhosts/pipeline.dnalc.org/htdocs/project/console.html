@@ -208,7 +208,7 @@
 	my %routines = (
 			'repeat_masker' => 'Repeat Masker',
 			'trna_scan' => 'tRNA Scan',
-			'augustus' => 'Augustus', delay => 15,
+			'augustus' => 'Augustus',
 			'fgenesh' => 'FgenesH',
 			'snap' => 'Snap',
 			'blastn' => 'BlastN',
@@ -254,13 +254,13 @@ if ($r->method eq "POST") {
 				my $st = $pm->add_evidence($r, $_);
 				if ($st->{status} eq "success") {
 					$m->comp("/_message_add", $_ . " evidence added.");
-					$wfm->set_status("upload_$_", 'Done');
+					$wfm->set_status("upload_$_", 'done');
 				}
 				else {
 					$m->comp("/_message_add", 
 						$_ . ": error formatting the evidence database." . $st->{message}, 
 						"error");
-					$wfm->set_status("upload_$_", 'Error');
+					$wfm->set_status("upload_$_", 'error');
 				}
 			}
 		}
@@ -273,18 +273,18 @@ if ($r->method eq "POST") {
 else { # most likely is GET
 	$history = $wfm->get_history;
 
-	for ( keys %routines ) {
-		my $status_name = lc $wfm->get_status($_)->name;
-		$status_name =~ s/\s/-/;
-		$status{$_} = $status_name;
+	for my $rt ( keys %routines ) {
+		my $status_name = $wfm->get_status($rt)->name;
+		$status{$rt} = $status_name;
+		
+		#print STDERR "** $rt => $status_name\n";
 	}
 	$rm_status = $status{repeat_masker};
 	$trimmed_common_name = $pm->cleaned_common_name;
 }
 
-#print STDERR Dumper( \%status ), $/;
-# TODO : set in session when you're starting to run a routine, 
-# and reset this flash after you get info about the execution of the routine
+print STDERR Dumper( \%status ), $/;
+
 </%init>
 %#-------------------------------------------------
 

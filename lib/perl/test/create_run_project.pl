@@ -61,7 +61,7 @@ my $wfm = DNALC::Pipeline::App::WorkflowManager->new( $proj );
 
 my $upload_st = $wfm->get_status('upload_fasta');
 
-if ( $upload_st->name eq 'Not processed') {
+if ( $upload_st->name eq 'not-processed') {
 	my $fasta = $wfm->upload_sequence($input_file);
 
 	$upload_st = $wfm->get_status('upload_fasta');
@@ -69,10 +69,10 @@ if ( $upload_st->name eq 'Not processed') {
 
 print STDERR "U_ST = ", $upload_st->name , $/;
 
-if ( $upload_st->name eq 'Done') {
+if ( $upload_st->name eq 'done') {
 	my $st;
 	my $rm_st = $wfm->get_status('repeat_masker');
-	if ($rm_st->name ne 'Done' && $rm_st->name ne 'Processing') {
+	if ($rm_st->name ne 'done' && $rm_st->name ne 'processing') {
 		print STDERR  '-' x 20 , $/;
 		$st = $wfm->run_repeat_masker;
 		$rm_st = $wfm->get_status('repeat_masker');

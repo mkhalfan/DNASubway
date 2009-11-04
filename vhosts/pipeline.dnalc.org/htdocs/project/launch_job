@@ -8,6 +8,7 @@
 	use DNALC::Pipeline::Config ();
 	use DNALC::Pipeline::App::WorkflowManager ();
 	use DNALC::Pipeline::Utils qw(isin);
+	use DNALC::Pipeline::CacheMemcached ();
 	use Data::Dumper;
 
 	use Gearman::Client ();
@@ -26,6 +27,13 @@
 		return;
 	}
 
+	my $mc_key = "status-$t-$pid";
+	my $memcached = DNALC::Pipeline::CacheMemcached->new;
+	if ($memcached->get($mc_key) eq 'processing') {
+		print "{'status':'error', 'message':'Task is being processed.'}";
+		return;
+	}
+
 	my $proj = DNALC::Pipeline::Project->retrieve($pid);
 	unless ($proj) {
 		print "{'status':'error', 'message':'Project unknown.'}";
@@ -33,13 +41,16 @@
 	}
 
 	if (!$s->{logged_in} || $proj->user_id != $s->{user_id}) {
-		print "{'status':'error', 'message':'You are not logged in or this project belong to another user.'}";
+		print "{'status':'error', 'message':'You are not logged in or this project belongs to another user.'}";
 		return;
 	}
 
 	my $client = Gearman::Client->new;
 	$client->job_servers('127.0.0.1');
 	my $h = $client->dispatch_background( $t => $pid);
+	if ($h) {
+		$memcached->set($mc_key, 'processing');
+	}
 	#print STDERR  "Launched [$t], h = ", $h, $/;
 </%init>
 %#-------------------------------------------------
