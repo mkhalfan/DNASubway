@@ -1,3 +1,4 @@
+<div id="container_rightContent"> 
 <div id="conYellowlineLeft2">
 <input type="hidden" id="tid" value="<% $tid %>" />
 <input type="hidden" id="tstatus" value="<% $tp ? $tp->status : "" %>" />
@@ -115,7 +116,8 @@
 		-->
 	</span> <!--END of span conProjectInfo_column2-->                   							
 
-</div><!--END of ID conProjectInfo-->      
+</div><!--END of ID conProjectInfo-->  
+</div><!--END of ID container_rightContent-->     
 
 <%once>
 	#use DNALC::Pipeline::App::ProjectManager ();

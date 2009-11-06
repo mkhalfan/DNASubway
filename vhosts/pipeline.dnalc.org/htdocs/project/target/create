@@ -1,3 +1,4 @@
+<div id="container_rightContent"> 
 <form method="post" id="forma">
 <div id="conYellowlineLeft1"> 
 	<div id="conProject_newLeft">
@@ -78,6 +79,7 @@
 </div><!--END of ID conRedlineRight1-->
                    
 </form>
+</div><!--END of ID container_rightContent-->
 
 <%args>
 	$g => undef

@@ -30,11 +30,11 @@
 			<div class="memberRow2" style="">
 %#				<div class="registerBT"><a href="#" title="">Register</a></div>
 %#				<div class="registerBT"><a href="/project/" title="">Get started</a></div>
-%#				<input type="submit" name="login" value="Log In" class="memberEnter" />
+				<input type="submit" name="login" value="Log In" class="memberEnter" />
 				<input type="submit" name="guest" value="As Guest" class="memberEnter" />
 			</div>
 			<div class="forgotPassword"><a href="#" title="">Forgot Password?</a>&nbsp;
-			&nbsp;<a href="#" title=""><strong>Register</strong></a>
+			&nbsp;<a href="/register.html" title=""><strong>Register</strong></a>
 			</div>
 		</form>
 % } else {
@@ -69,8 +69,8 @@
  
 <!--Footer START-->    
 			<div id="footerContainer">
-				<span class="footerLink"><a href="#" title="" class="current">About</a></span>
-				<span class="footerLink"><a href="#" title="" class="current">Funded by</a></span>
+				<span class="footerLink"><a href="/footer/about.html">About</a></span>
+				<span class="footerLink"><a href="/footerfundedby.html">Funded by</a></span>
 				<span class="footerLink"><a href="#http://www.iplantcollaborative.org/" title="" class="current" target="_blank">iPlant Collaborative</a></span>
 
 				<span id="footerCopy">All content is © 2009 by the iPlant Collaborative</span>
@@ -101,7 +101,7 @@
 $m->session->{pipeline} ||= { username => "", logged_in => 0};
 my $s = $m->session->{pipeline};
 
-print STDERR "name = $name//sess =$s->{username} \n";
+#print STDERR "name = $name//sess =$s->{username} \n";
 
 my @err = ();
 
@@ -115,44 +115,6 @@ $s->{last} = $now;
 
 if ($r->method eq "POST") {
 
-	print STDERR "login = $login\n";
-	print STDERR "guest = $guest\n";
-
-	my $user;
-	
-	if ($guest) {
-		unless ($name) {
-			my $rand = lc random_string(6, 8);
-			$name = "guest_$rand";
-
-			print STDERR "Generated user: ", $name, $/;
-			$user = eval {
-					DNALC::Pipeline::User->create({
-						username => $name,
-						name_first => "Guest",
-						name_last => ucfirst $rand,
-						email => '',
-						password => random_string(8,8)
-					});
-				};
-			if ($@) {
-				push @err, $@;
-			}
-		}
-		else {
-			($user) = DNALC::Pipeline::User->search(username => $name);
-		}
-		if ($user){
-			$s->{username} = $user->username;
-			$s->{full_name} = $user->full_name;
-			$s->{user_id} = $user->id;
-			$s->{logged_in} = 1;
-		}
-	}
-	
-	if ($s->{logged_in}) {
-		$m->redirect("/project/");
-	}
 }
 else {
 	print STDERR "GET username = ", $s->{username}, $/;

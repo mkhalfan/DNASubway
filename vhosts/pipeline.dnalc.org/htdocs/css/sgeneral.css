@@ -26,6 +26,16 @@ body {
 	
 	}
 */	
+
+h3{
+	text-align: left;
+	font-weight: bold;
+	font-size: 1.2em;
+	color: #6a9f97;
+	padding-bottom: 3px;
+	padding-top: 10px;
+}
+
 h4{
 	text-align: center;
 	font-weight: bold;
@@ -114,6 +124,21 @@ h4{
 	position: relative;
 	background: url("/images/v2/home-headbg.jpg") top no-repeat;
 	}
+#home_header_left_1 {
+	width: 300px;
+	height: 134px;
+	float: left;
+	position: relative;
+	background: url("../images/v2/home-headbg_1.jpg") top no-repeat;
+	}
+.container_log{
+	width: 140px;
+	height: 100px;
+	padding-top: 27px;
+	float: left;
+	position: relative;
+
+}
 #home_header_middle {
 	width: 400px;
 	height: 134px;
@@ -273,11 +298,34 @@ h4{
 	display: block;
 	position: relative;
 	float: left;
-	margin:0px 0px 0px 36px;
+	margin:0px 0px 0px 26px;
 }
 
 .bt_LogOut a:hover {
 	background: url("/images/v2/bt_logout2.png") right no-repeat;
+
+}
+
+.bt_LogIn {
+	width:114px;
+	height: 38px;
+	position: relative;	
+	
+
+}
+
+.bt_LogIn  a {
+	width:114px;
+	height: 38px;
+	background: url("../images/bt_login1.png") right no-repeat;
+	display: block;
+	position: relative;
+	float: left;
+	margin:0px 0px 0px 26px;
+}
+
+.bt_LogIn a:hover {
+	background: url("../images/bt_login2.png") right no-repeat;
 
 }
 
@@ -288,7 +336,7 @@ h4{
 #home_map {
 	width: 1000px;
 	height: 200px;
-	padding-top: 89px;
+	padding-top: 39px;
 	position: relative;
 	margin: 0px  auto;
 	}
@@ -343,7 +391,7 @@ h4{
 }
 
 .bt_redStart a.current {
-	background: url("/images/v2/bt_redStart2.jpg") left no-repeat;
+	background: url("/images/v2/bt_redStart3.jpg") left no-repeat;
 
 }
 
@@ -372,7 +420,7 @@ h4{
 }
 
 .bt_yellowStart a.current{
-	background: url("/images/v2/bt_yellowStart2.jpg") left no-repeat;
+	background: url("/images/v2/bt_yellowStart3.jpg") left no-repeat;
 
 }
 
@@ -400,7 +448,7 @@ h4{
 }
 
 .bt_blueStart a.current {
-	background: url("/images/v2/bt_blueStart2.jpg") left no-repeat;
+	background: url("/images/v2/bt_blueStart3.jpg") left no-repeat;
 
 }
 /*-----Home Map rollover info-----*/

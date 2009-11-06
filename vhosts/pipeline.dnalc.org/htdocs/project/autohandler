@@ -38,27 +38,26 @@
 
 <div id="containerBody">
 <div id="container_leftMenu">
-	<div id="spacer_btGlossary"></div>
+	<span class="spacer_bt1 "></span>
 	<span class="bt_MyProjects"><a href="/project/browse"></a></span>
 	<span class="bt_PublicProjects"><a href="/project/browse"></a></span>
 	<span class="bt_redStart"><a href="/project/create_project.html" class="<% $class_r %>"></a></span>
 	<span class="bt_yellowStart"><a href="/project/target/create" class="<% $class_y %>"></a></span>
 	<span class="bt_blueStart"><a href="#member_blueline1.html" class="<% $class_b %>"></a></span>
+    <span class="spacer_btGlossary"></span> 
 </div><!--END of ID container_leftMenu-->
-    
-<div id="container_rightContent">
 <!-- end header -->
 
 % $m->call_next;
 
 <!-- start footer -->
     
- </div><!--END of ID container_rightContent-->   
+  
  </div><!--END of ID containerBody-->   
 <!--Footer START-->    
 			<div id="footerContainer">
-				<span class="footerLink"><a href="#" title="">About</a></span>
-				<span class="footerLink"><a href="#" title="" class="current">Funded by</a></span>
+				<span class="footerLink"><a href="/footer/about.html">About</a></span>
+				<span class="footerLink"><a href="/footer/fundedby.html">Funded by</a></span>
 				<span class="footerLink"><a href="http://www.iplantcollaborative.org/" title="" class="current" target="_blank">iPlant Collaborative</a></span>
 
 				<span id="footerCopy">All content is © 2009 by the iPlant Collaborative</span>

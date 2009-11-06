@@ -16,6 +16,20 @@
 	font-weight: bold;
 	background: url("/images/v2/bg_pageTitle.jpg") bottom left no-repeat;
 	}
+	
+#container_pageTitle_text{
+	width: 660px;
+	height: 24px;
+	padding: 8px 140px 10px 30px;
+	postion:relative;
+	float: left;
+	color: #46726F;
+	font-size:1.2em; font-family: Times, Serif;
+	text-transform: uppercase;
+	letter-spacing: .4em;
+	font-weight: bold;
+	background: url("../images/v2/bg_pageTitle_textOnly.jpg") bottom left no-repeat;
+	}
 
 #container_leftMenu {
 	width: 150px;
@@ -44,6 +58,16 @@
 	text-align: justify;
 	color: #000;	
 	}
+#conMemberHome_introSpacer{
+	width: 620px;
+	height: 51px;
+	padding: 30px 200px 18px 29px;
+	background: url("../images/v2/bg_introspacer.jpg") left no-repeat;
+	font-size: 1em;
+	font-family: helvetica, sans-serif;
+	text-align: justify;
+	color: #000;	
+	}
 
 /*----LEFT MENU START--------*/
 #spacer_btGlossary {
@@ -54,10 +78,28 @@
 
 }
 
+.spacer_bt {
+	width:140px;
+	height: 135px;
+	display: block;
+	position: relative;
+	float: left;		
+
+}
+.spacer_bt1 {
+	width:140px;
+	height: 10px;
+	display: block;
+	position: relative;
+	float: left;	
+
+}
+
 .bt_Glossary {
 	width:140px;
 	height: 40px;
-	position: relative;	
+	position: relative;
+	float: left;
 
 }
 
@@ -69,7 +111,7 @@
 	display: block;
 	position: relative;
 	float: left;
-	margin: 5px 0px 10px 10px;
+	margin: 5px 0px 10px 0px;
 }
 
 .bt_Glossary a:hover {
@@ -87,6 +129,8 @@
 	width:140px;
 	height: 50px;
 	position: relative;	
+	float: left;
+	margin: 0px 0px 10px 0px;	
 
 }
 
@@ -97,8 +141,8 @@
 	background: url("/images/v2/bt_myProjects1.jpg") left no-repeat;
 	display: block;
 	position: relative;
-	float: right;
-	margin: 0px 0px 15px 10px;
+	float: left;
+	margin: 0px 0px 10px 0px;
 }
 
 .bt_MyProjects a:hover {
@@ -115,6 +159,8 @@
 	width:140px;
 	height: 50px;
 	position: relative;	
+	float: left;
+	margin: 0px 0px 15px 0px;
 
 }
 
@@ -125,8 +171,8 @@
 	background: url("/images/v2/bt_publicProjects1.jpg") left no-repeat;
 	display: block;
 	position: relative;
-	float: right;
-	margin: 0px 0px 15px 10px;
+	float: left;
+	margin: 0px 0px 15px 0px;
 }
 
 .bt_PublicProjects a:hover {
@@ -552,6 +598,32 @@
 	background: url("/images/v2/bt_run2.png") top no-repeat;
 }
 
+.bt_runAdd {
+	width:124px;
+	height: 26px;
+	position: relative;	
+	float: right;
+}
+
+
+.bt_runAdd a {
+	width:100px;
+	height: 26px;
+	display: block;
+	position: relative;
+	float: right;
+	padding-left: 24px;
+	padding-top: 6px;
+	color: #555;
+	font-size: 0.75em;
+	text-align: center; text-decoration: none;
+}
+
+.bt_runAdd a:hover {
+	background: url("../images/v2/bt_runAdd2.png") top no-repeat;
+
+}
+
 #conRunAll{
 	width: 154px;
 	height: 32px;
@@ -560,6 +632,7 @@
 	position: relative;
 	float: left;
 	padding: 25px 150px 0px 150px;
+	z-index: 0;
 }
 
 .bt_RunAll {
@@ -598,6 +671,7 @@
 	background: url("/images/v2/map-redline_R2.jpg") bottom left no-repeat;
 	float: right;
 	position: relative;
+	z-index: 0;
 	
 	}
 #conRedline_ConColumnR1{
@@ -1143,3 +1217,40 @@
 
 
 /*//----------PUBLIC PROJECT  END------------------*/
+
+/* //-------TEXT ONLY PAGE------------------*/
+
+/* //--------Text only page text colume------------------*/
+.container_text1{
+	width: 760px;
+	padding: 20px 30px 35px 20px;
+	float: left;
+	position: relative;
+    color: #333;
+    font-size: .9em;
+    text-align: left; 
+	line-height: 1.2em;
+}
+
+
+.container_text2L{
+	width: 365px;
+	padding: 20px 25px 35px 20px;
+	float: left;
+	position: relative;
+    color: #333;
+    font-size: .9em;
+    text-align: left; 
+	line-height: 1.2em;
+}
+
+.container_text2R{
+	width: 365px;
+	padding: 20px 30px 35px 5px;
+	float: left;
+	position: relative;
+    color: #333;
+    font-size: .9em;
+    text-align: left; 
+	line-height: 1.2em;
+}

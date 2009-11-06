@@ -1,4 +1,5 @@
 
+<div id="container_rightContent">
 <div id="container_pageTitle"> public projects</div>
 <br clear="all"/>
 <div id="container_mytablehome">
@@ -36,6 +37,8 @@
 	suffix => '', prefix => '/project/browse/' &>
 
 </div>
+
+</div><!--END of ID container_rightContent-->  
 
 %#--------------------------------------------------------
 <%args>

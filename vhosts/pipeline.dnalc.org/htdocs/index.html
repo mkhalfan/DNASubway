@@ -82,18 +82,22 @@ analyze genome data.  Roll over any of the “stations” on the subway map to f
 $m->session->{pipeline} ||= { username => "", logged_in => 0};
 my $s = $m->session->{pipeline};
 
-print STDERR "name = $name//sess =$s->{username} \n";
+#print STDERR "name = $name//sess =$s->{username} \n";
 
 my @err = ();
 
 if ($r->method eq "POST") {
 
-	print STDERR "login = $login\n";
-	print STDERR "guest = $guest\n";
-
 	my $user;
 	
-	if ($guest) {
+	if ($login) {
+		($user) = DNALC::Pipeline::User->search(username => $name);
+		$s->{username} = $name;
+		unless ($user->password_valid($passw)) {
+			$user = undef;
+		}
+	}
+	elsif ($guest) {
 		unless ($name) {
 			my $rand = lc random_string(6, 8);
 			$name = "guest_$rand";
@@ -112,23 +116,25 @@ if ($r->method eq "POST") {
 				push @err, $@;
 			}
 		}
-		else {
+		elsif ($name =~ /^guest_/) {
 			($user) = DNALC::Pipeline::User->search(username => $name);
 		}
-		if ($user){
+	}
+	if ($user){
 			$s->{username} = $user->username;
 			$s->{full_name} = $user->full_name;
 			$s->{user_id} = $user->id;
 			$s->{logged_in} = 1;
-		}
+
+			$m->redirect("/project/");
 	}
-	
-	if ($s->{logged_in}) {
-		$m->redirect("/project/");
+	else {
+		$m->comp("/_message_add", "Unable to log you in. Try again.");
+		$m->redirect("/");
 	}
 }
 else {
-	print STDERR "GET username = ", $s->{username}, $/;
+	#print STDERR "GET username = ", $s->{username}, $/;
 }
 
 </%init>
