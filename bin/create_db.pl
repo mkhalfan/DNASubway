@@ -75,6 +75,8 @@ my %args = (
 
 my $utils = DNALC::Pipeline::Chado::Utils->new(%args);
 
+print "exists: ", $utils->check_db_exists($USERNAME), $/;
+
 $utils->create_db($QUIET);
 
 

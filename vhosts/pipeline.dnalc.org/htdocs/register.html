@@ -28,11 +28,12 @@
 %#-------------------------------------------------------------------
 <%once>
 	use DNALC::Pipeline::Utils qw/random_string/;
+	use DNALC::Pipeline::Config ();
+	use DNALC::Pipeline::Chado::Utils ();
 	use DNALC::Pipeline::User ();
 	use DNALC::Pipeline::Group ();
 	use Email::Valid ();
 	use MIME::Lite ();
-	use DNALC::Pipeline::Utils qw(random_string);
 
 	my $fields = [
 			{ id => "name_first", label => "First name", re => qr/.+/, maxlength => 64},
@@ -49,6 +50,9 @@ my $s = $m->session->{pipeline_reg};
 my @err = ();
 
 if ($r->method eq "POST") {
+
+	my $cf = DNALC::Pipeline::Config->new->cf('PIPELINE');
+
 	for (@$fields) {
 		my $f = $_->{id};
 		$s->{$f} = substr $ARGS{$f}, 0, $_->{maxlength} if defined $ARGS{$f};
@@ -64,6 +68,16 @@ if ($r->method eq "POST") {
 		my $user = DNALC::Pipeline::User->search( username => $s->{username});
 		if ($user || $s->{username} =~ /^(?:chado|guest|default|postgre|template)/i) {
 			push @err, "Username not available!";
+		}
+		else {
+			my $cutils = DNALC::Pipeline::Chado::Utils->new(
+							username => $s->{username},
+							profile => $cf->{GMOD_PROFILE},
+						);
+			if ($cutils->check_db_exists($s->{username})) {
+				push @err, "Username not available! Chado DB exists..";
+			}
+			$cutils->dbh->disconnect;
 		}
 	}
 	
@@ -89,12 +103,43 @@ if ($r->method eq "POST") {
 			push @err, "Error creating user!";
 		}
 		else {
-			# send email with link to click / or just with the password
 			# launch "create-chado-db" in the background
+
 			my ($users_group) = DNALC::Pipeline::Group->search(group_name => "user");
 			$u->add_to_group($users_group) if $users_group;
-			
-			$m->comp("/_message_add", "User almost created. In the future, we'll send an email..");
+
+			my $code = $u->create_reset_pwd_code;
+			$u->set_reset_pwd_code($code);
+
+			if ($code) {
+				my $text = "Dear user,\n
+Thank you for creating an account.\n
+Your unsername is: \"$s->{username}\" (without the quotes).\n
+To set your password follow this link:
+$cf->{APOLLO_PROJECT_HOME}/resetpass.html?c=$code\n
+DNALC Team";
+
+				# send mail to the applicant
+				my $msg = MIME::Lite->new (
+							From => '"Admin" <dnalcadmin@cshl.edu>',
+							To	 => $s->{email},
+							Subject => "Set your password",
+							Type	=> 'text/plain',
+							Data => $text
+						);
+				eval {
+					#$msg->send("smtp", "dmzsmtp.cshl.edu", Timeout=>30);
+					$msg->send();
+				};
+				if ($@) {
+					print STDERR "Error: " . $@ . "\n";
+				}
+			}			
+
+			$m->comp("/_message_add", "User almost created. In the future, we'll send an email; code = $code");
+
+			# clear registration session
+			$m->session->{pipeline_reg} = {};
 			$m->redirect("/");
 		}
 

@@ -748,8 +748,29 @@ sub gmod_conf_file {
     return $conffile if (-f $conffile);
 }
 
+sub check_db_exists {
+	my ($self, $db_name) = @_;
+
+	my $dbh = $self->dbh;
+	unless ($dbh) {
+		print STDERR "Unable to connect to DB\n";
+		return;
+	}
+
+	my $query = "SELECT count(*) FROM pg_database WHERE datname = ?";
+	my $sth   = $dbh->prepare($query);
+	$sth->execute($db_name) or die $dbh->errstr;
+	my ($has_db) = $sth->fetchrow_array;
+	$sth->finish;
+	return $has_db;
+}
+
 sub create_db {
     my ($self, $quiet) = @_;
+
+	if ($self->check_db_exists( $self->username )) {
+		return 1;
+	}
 	
 	my $q = $quiet ? '-q' : '';
 

@@ -12,7 +12,7 @@ use DNALC::Pipeline::Utils qw(random_string);
 #use DNALC::Pipeline::UserProfile ();
 
 {
-	my $salt = 'bdb6896bf6e4c2d466a2c9f91d0e99bc'; # do not edit
+	my $salt = 'bdb6896bf6e4c2d466a2c9f91d0e90c5'; # do not edit
 
 	__PACKAGE__->table('users');
 	__PACKAGE__->columns(Primary => 'user_id');
@@ -60,9 +60,19 @@ use DNALC::Pipeline::Utils qw(random_string);
 	sub crypt_password {
 		my ($self) = @_;
 
+		my $hash;
 		my $md5 = Digest::MD5->new;
-		$md5->add($self->{email}, $self->{password}, $salt);
-		$self->{password} = $md5->hexdigest;
+		if ($self->{user_id}) {
+			$md5->add($self->email, $self->password, $salt);
+			$hash = $md5->hexdigest;
+			$self->password($hash);
+		}
+		else {
+			$md5->add($self->{email}, $self->{password}, $salt);
+			$hash = $md5->hexdigest;
+			$self->{password} = $hash;
+		}
+		$hash;
 	}
 
 	sub password_valid {
@@ -88,7 +98,7 @@ use DNALC::Pipeline::Utils qw(random_string);
 
 	#--------------------------------------------------
 	__PACKAGE__->set_sql(user_by_code => <<'');
-	SELECT uid
+	SELECT user_id
 	FROM user_reset_pwd
 	WHERE code = ?
 
@@ -111,23 +121,23 @@ use DNALC::Pipeline::Utils qw(random_string);
 	#--------------------------------------------------
 	__PACKAGE__->set_sql( insert_code => <<'');
 	INSERT INTO user_reset_pwd
-	(uid, code) VALUES (?, ?)
+	(user_id, code) VALUES (?, ?)
 
 	sub set_reset_pwd_code {
 		my ($self, $code) = @_;
 		my $sth = __PACKAGE__->sql_insert_code;
-		$sth->execute($self->uid, $code);
+		$sth->execute($self->id, $code);
 	}
 
 	#--------------------------------------------------
 	__PACKAGE__->set_sql( delete_code => <<'');
 	DELETE FROM user_reset_pwd
-	WHERE uid = ?
+	WHERE user_id = ?
 
 	sub clear_reset_pwd_code {
 		my ($self, $code) = @_;
 		my $sth = __PACKAGE__->sql_delete_code;
-		$sth->execute($self->uid);
+		$sth->execute($self->id);
 	}
 
 	#--------------------------------------------------
