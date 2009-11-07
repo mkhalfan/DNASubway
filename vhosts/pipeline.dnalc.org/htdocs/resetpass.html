@@ -71,12 +71,15 @@
 			unless (defined $p2 && $p2 eq $p) {
 				push @err, "Passwords do not match.";
 			}
-			$u->password($p);
-			$u->crypt_password();
-			$u->update;
-			
-			$u->clear_reset_pwd_code;
-			$m->redirect('/resetpass.html?sc=1');
+			unless (@err) {
+				print STDERR "[$p] =?= [$p2]", $/;
+				$u->password($p);
+				$u->crypt_password();
+				$u->update;
+				
+				$u->clear_reset_pwd_code;
+				$m->redirect('/resetpass.html?sc=1');
+			}
 		}
 	}
 </%init>

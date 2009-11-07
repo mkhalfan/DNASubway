@@ -1,0 +1,109 @@
+<div style="width: 60%; margin-left: 100px;">
+
+<h2>Reset your password</h2>
+<p>&nbsp;</p>
+
+% if (@err) {
+<div class="error" style="color: red; ">
+%	for (@err) {
+		<div><% $_ %></div>
+%	}
+</div>
+%}
+
+% unless ($sc) {
+<p style="font: smaller;">
+	Please enter your username and email. Soon after submiting this info,
+	you will receive an email from us with a code so you can change your password.
+</p>
+<form method="post">
+	<table style="width: 400px;">
+	<tr>
+		<td style="width: 30%">Username:</td>
+		<td><input type="text" name="username" value="<% $username |html%>" /></td>
+	</tr>
+	<tr>
+		<td>Email:</td>
+		<td><input type="text" name="email" value="<% $email |html%>" /></td>
+	</tr>
+	<tr>
+		<td>&nbsp;</td>
+		<td><input type="submit" name="submit" value="Send" /></td>
+	</tr>
+	</table>
+</form>
+% } elsif ($sc) {
+	<p><strong>An email with further instructions was sent to you.</strong></p>
+	<a href="/">DNA Subway</a> Team.
+% }
+</div>
+%#-------------------------------------------------------------------
+<%args>
+	$email => ''
+	$username => ''
+	$sc => 0
+</%args>
+%#-------------------------------------------------------------------
+<%once>
+	use DNALC::Pipeline::User ();
+	use DNALC::Pipeline::Config ();
+	use Email::Valid ();
+	use MIME::Lite ();
+	use Data::Dumper;
+</%once>
+%#-------------------------------------------------------------------
+<%init>
+	my @err = ();
+	my ($u);
+
+	if ($r->method eq "POST") {
+	
+		unless ($username && $email) {
+			push @err, "Username and email must be provided."
+		}
+		else {
+			unless (Email::Valid->address($email)) {
+				push @err, "Email address is invalid!";
+			}
+		}
+
+		unless (@err) {	
+			my $cf = DNALC::Pipeline::Config->new->cf('PIPELINE');
+			my ($u) = DNALC::Pipeline::User->search( username => $username, email => $email );
+			if ($u) {
+				my $code = $u->create_reset_pwd_code;
+				$u->set_reset_pwd_code($code);
+				if ($code) {
+					my $text = "Dear DNA Subway user,\n
+Someone, perhaps you, has requested to change the password for this account.\n
+Your unsername is: \"$username\" (without the quotes).\n
+To set your password follow this link:
+$cf->{PROJECT_HOME}/resetpass.html?c=$code\n
+DNALC Team";
+
+					# send mail to the applicant
+					my $msg = MIME::Lite->new (
+								From => '"Admin" <dnalcadmin@cshl.edu>',
+								To	 => $email,
+								Subject => "[DNA Subway]Reset your password",
+								Type	=> 'text/plain',
+								Data => $text
+							);
+					eval {
+						$msg->send("smtp", $cf->{SMTP_SERVER}, Timeout=>30);
+					};
+					if ($@) {
+						print STDERR "Error: " . $@ . "\n";
+						$msg->send();
+					}
+				}
+			}# end u
+			else {
+				print STDERR "User: $username not found!", $/;
+			}
+
+			$m->redirect('/forgotpass.html?sc=1');
+		}
+	}
+</%init>
+%#-------------------------------------------------------------------

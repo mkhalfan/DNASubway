@@ -33,19 +33,18 @@
 				<input type="submit" name="login" value="Log In" class="memberEnter" />
 				<input type="submit" name="guest" value="As Guest" class="memberEnter" />
 			</div>
-			<div class="forgotPassword"><a href="#" title="">Forgot Password?</a>&nbsp;
+			<div class="forgotPassword"><a href="/forgotpass.html" title="">Forgot Password?</a>&nbsp;
 			&nbsp;<a href="/register.html" title=""><strong>Register</strong></a>
 			</div>
 		</form>
 % } else {
 	<!-- <a href="/project/">View map</a> -->
-	<div id="" style="margin-left: -20px;">
-		logged in as <strong><% $s->{full_name} %></strong>
-		<div id="container_H_insidebottom" style="margin-left: -10px;">
+    <div id="home_header_left_inside">
+		<div class="container_log"> 
 			<span class="bt_LogOut"><a href="/logout"></a></span>
-			<span class="bt_Map"><a href="/project/"></a></span>
+			<span class="bt_projects"><a href="/project/browse"></a></span>
 		</div>
-	</div> <!--END of ID container_InsideH_bgr-->
+	</div>
 % }
 	</div> <!--END of ID member form-->
 	</div>	<!--END of ID home_header_left-->
@@ -111,14 +110,6 @@ if ($s->{logged_in} && ($now - $s->{last} > 3600)) {
 	$s->{logged_in} = 0;
 }
 $s->{last} = $now;
-
-
-if ($r->method eq "POST") {
-
-}
-else {
-	print STDERR "GET username = ", $s->{username}, $/;
-}
 
 </%init>
 %#-------------------------------------------------------------------

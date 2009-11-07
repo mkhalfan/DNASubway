@@ -93,7 +93,7 @@ if ($r->method eq "POST") {
 	if ($login) {
 		($user) = DNALC::Pipeline::User->search(username => $name);
 		$s->{username} = $name;
-		unless ($user->password_valid($passw)) {
+		unless ($user && $user->password_valid($passw)) {
 			$user = undef;
 		}
 	}

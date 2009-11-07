@@ -1,9 +1,11 @@
 <div id="container_rightContent">  
 <input type="hidden" id="pid" value="<% $pid %>"/>
 
-<div class="blurb">	
+%	if (exists $m->session->{messages}) {
+<div style="display:none" id="error_list">	
 	<& "/_messages" &>
 </div>
+% 	}
 
 <!--Left Content Start--------------> 
 <div id="conRedlineLeft2">
@@ -13,6 +15,8 @@
 					<& '.routine', routine => 'repeat_masker', pmanager => $pm,
 						status => $status{repeat_masker}, delay => 15 &>
             </span><!--END of span class conRedline_ConCell-->
+            <span class="conRedline_keys">
+            </span>
      </span><!--END of span class conRedline_ConColumn-->
     
     
@@ -145,8 +149,9 @@
 <div id="conProjectInfo">
 	<div id="conProjectInfo_header">
 		<div id="conProjectInfo_title">Project Information</div>
-		<div class="bt_History"><a href="#"></a></div>
-	</div>
+                                        <div id="conProjectInfo_projecttitle">Title of this project . . . . . . . . . . . . .</div>
+          								<div id="conProjectInfo_projectlog">Project Log</div>
+          							</div>
 	
 
 	<span class="conProjectInfo_column1">
@@ -162,6 +167,11 @@
 		<span class="conProjectInfo_Cell1">Affiliation</span>
 		<span class="conProjectInfo_Cell2">: DNALC</span>
 		</div>
+        <div class="conProjectInfo_Row">
+             							<span class="conProjectInfo_Cell1">Status</span>
+            							<span class="conProjectInfo_Cell3">: &nbsp;<input class="conRadiobox_align" type="radio" name="seq_src" id="seq_src_paste" value="paste"   />&nbsp; Private</span>
+                                        <span class="conProjectInfo_Cell3"><input class="conRadiobox_align" type="radio" name="seq_src" id="seq_src_paste" value="paste"   />&nbsp; Public</span>
+            						</div>
 	</span><!--END of span conProjectInfo_column1-->
 
 	<span class="conProjectInfo_column2">
@@ -180,14 +190,18 @@
 		</div>
 	</span><!--END of span conProjectInfo_column2-->
 
-	<span class="conProjectInfo_column2">
-		<div class="conProjectInfo_Row"></div>
-		<div class="conProjectInfo_Row">
-			<span class="conProjectInfo_Cell1">Status &nbsp; &nbsp; &nbsp; &nbsp;:</span>
-			<span class="conProjectInfo_Cell3"><input class="conRadiobox_align" type="radio" name="seq_src" id="seq_src_paste" value="paste"   />&nbsp; Private</span>
-			<span class="conProjectInfo_Cell3"><input class="conRadiobox_align" type="radio" name="seq_src" id="seq_src_paste" value="paste"   />&nbsp; Public</span>
-		</div>
-	</span> <!--END of span conProjectInfo_column2-->
+	 <span class="conProjectInfo_column3">
+                                     <div class="conHistorylist">
+										<ul >
+											<li ><strong>upload_fasta</strong>, 07/24/2009 09:19:39</li>
+											<li ><strong>repeat_masker</strong>, 41.070 sec., 07/24/2009 09:21:39</li>
+						
+										</ul>
+                                    <span class="bt_more"><a href="#">More . . .</a></span>
+            							
+            						</div>
+                                    </span>
+	</span> <!--END of span conProjectInfo_column3-->
 </div><!--END of ID conProjectInfo-->
 </div><!--END of ID container_rightContent-->  
 
@@ -284,7 +298,7 @@ else { # most likely is GET
 	$trimmed_common_name = $pm->cleaned_common_name;
 }
 
-print STDERR Dumper( \%status ), $/;
+#print STDERR Dumper( \%status ), $/;
 
 </%init>
 %#-------------------------------------------------

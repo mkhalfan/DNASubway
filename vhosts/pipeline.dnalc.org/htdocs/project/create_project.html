@@ -362,7 +362,7 @@ if ($r->method eq 'POST') {
 			print STDERR "project_created: id = ", $proj, ",\tname = ", $proj->name, $/;
 
 			# redirect user to console
-			$m->comp('/_message_add', "Project created successfully!");
+			#$m->comp('/_message_add', "Project created successfully!");
 			$m->redirect('./console.html?pid=' . $proj->id);
 			
 		} #end else

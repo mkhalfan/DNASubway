@@ -42,6 +42,19 @@ __PACKAGE__->add_trigger(after_create => sub {
 	}
 });
 
+__PACKAGE__->add_trigger(before_delete => sub {
+	my ($mp) = DNALC::Pipeline::MasterProject->search({
+				project_id => $_[0]->{project_id},
+				user_id => $_[0]->{user_id},
+			});
+	if ($mp) {
+		$mp->delete;
+	}
+	else {
+		print STDERR  "MasterP for project ", $_[0]->{project_id}, " not found.", $/;
+	}
+});
+
 
 #---------------------------------------------------
 

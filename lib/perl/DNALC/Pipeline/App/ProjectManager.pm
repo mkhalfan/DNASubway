@@ -295,10 +295,10 @@ sub init_chado {
 		print STDERR  "create_db: ", $@, $/;
 	}
 
-	unless ($cutils->check_db_exists( $self->username)) {
-		print STDERR  "Unable to create CHADO DB for ", $self->username, $/;
-		return;
-	}
+	#unless ($cutils->check_db_exists( $self->username)) {
+	#	print STDERR  "Unable to create CHADO DB for ", $self->username, $/;
+	#	return;
+	#}
 	my $conffile_ok = $cutils->gmod_conf_file( $project->id );
 	print STDERR "Created CHADO CONF file = ", $conffile_ok, $/;
 

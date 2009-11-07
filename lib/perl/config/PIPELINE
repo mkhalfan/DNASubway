@@ -20,6 +20,9 @@
 
 	sequence_length => 100_000,
 
+	SMTP_SERVER => "exsmtp.cshl.edu",
+	PROJECT_HOME => 'http://pipeline-dev.dnalc.org',
+
 	APOLLO_USERCONF_DIR => '/var/www/vhosts/pipeline.dnalc.org/var/apollo_userconf',
 	APOLLO_WRITE_DIR => '/var/www/vhosts/pipeline.dnalc.org/htdocs/files/apollo/tmp',
 	APOLLO_WEB_PATH => '/files/apollo/tmp',

@@ -27,8 +27,7 @@ This script accomplishes several tasks:
   Creates a GMOD conf file in $GMOD_ROOT/conf
   Loads the Chado database with the user's analysis results
   Creates a GBrowse conf file
-
-Soon (possibly): creates user specific Apollo conf stuff
+  Creates user specific Apollo conf stuff
 
 =head1 AUTHORS
 
@@ -768,9 +767,9 @@ sub check_db_exists {
 sub create_db {
     my ($self, $quiet) = @_;
 
-	if ($self->check_db_exists( $self->username )) {
-		return 1;
-	}
+	#if ($self->check_db_exists( $self->username )) {
+	#	return 1;
+	#}
 	
 	my $q = $quiet ? '-q' : '';
 

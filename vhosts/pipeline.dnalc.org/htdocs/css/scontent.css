@@ -28,7 +28,7 @@
 	text-transform: uppercase;
 	letter-spacing: .4em;
 	font-weight: bold;
-	background: url("../images/v2/bg_pageTitle_textOnly.jpg") bottom left no-repeat;
+	background: url("/images/v2/bg_pageTitle_textOnly.jpg") bottom left no-repeat;
 	}
 
 #container_leftMenu {
@@ -62,7 +62,7 @@
 	width: 620px;
 	height: 51px;
 	padding: 30px 200px 18px 29px;
-	background: url("../images/v2/bg_introspacer.jpg") left no-repeat;
+	background: url("/images/v2/bg_introspacer.jpg") left no-repeat;
 	font-size: 1em;
 	font-family: helvetica, sans-serif;
 	text-align: justify;
@@ -345,7 +345,7 @@
 
 #conProjectInfo {
 	width: 850px;
-	height: 122px;
+	height: 162px;
 	float: left;
 	position: relative;
 	background: url("/images/v2/projectInfo.jpg") top no-repeat;
@@ -353,15 +353,15 @@
 	
 #conProjectInfo_header {
 	width: 800px;
-	height: 40px;
+	height: 60px;
 	float: left;
 	position: relative;
 	padding: 6px 20px 0px 30px;
 	}
 	
 #conProjectInfo_title {
-	width: 200px;
-	height: 25px;
+	width: 800px;
+	height: 18px;
 	padding-top: 6px;
 	float: left;
 	position: relative;
@@ -369,44 +369,89 @@
 	font-weight: bold;
 	font-family: helvetica, sans-serif;	
 	text-align: left;
-	color: #006699;
+	color: #000;
 
 	}
 	
-.bt_History {
-	width:112px;
-	height: 36px;
+#conProjectInfo_projecttitle {
+	width: 530px;
+	height: 18px;
+	padding-top: 6px;
+	float: left;
+	position: relative;
+	font-size: .95em;
+	font-family: helvetica, sans-serif;	
+	text-align: left;
+	color: #006699;
+	font-weight: bold;
+	font-style: italic;
+	font-family: Times, serif;
+	}
+	
+#conProjectInfo_projectlog {
+	width: 230px;
+	height: 18px;
+	padding-top: 6px;
+	padding-left: 6px;
+	float: left;
+	position: relative;
+	font-size: .9em;
+	font-family: helvetica, sans-serif;	
+	text-align: left;
+	color: #006699;
+	font-weight: bold;
+
+	}
+	
+	
+.bt_more {
+	width:90px;
+	height: 16px;
 	position: relative;	
 	float: right;	
 
 }
 
 
-.bt_History  a {
-	width:112px;
-	height: 36px;
-	background: url("/images/v2/bt_history1.png")  no-repeat;
+.bt_more  a {
+	width:90px;
+	height: 16px;
+	
 	display: block;
 	position: relative;
 	float: right;
+	font-weight: bold;
+	color: #996600;
+	font-size: 1em;
+	text-decoration: none;
 }
 
-.bt_History a:hover {
-	background: url("/images/v2/bt_history2.png") no-repeat;
+.bt_more a:hover {
+	color: #FF6600;
 
 }
+	
+.conHistorylist {
+	width:276px;
+	font-size: 0.8em;
+	clear: both;
+	color: #996600;
+	float: left;
+	margin-left:-10px;
+	list-style-position: outside;
+	}
 
 .conProjectInfo_column1{
-	width: 256px;
-	height: 66px;
+	width: 246px;
+	height: 86px;
 	float: left;
 	position: relative;
 	padding-left: 30px;
 	margin-right: 2px;
 	}
 .conProjectInfo_column2{
-	width: 256px;
-	height: 66px;
+	width: 236px;
+	height: 86px;
 	float: left;
 	position: relative;
 	padding: 0px 10px 0px 10px;
@@ -415,8 +460,21 @@
 	border-color: #CCCCCC;	
 	
 	}
+
+.conProjectInfo_column3{
+	width: 286px;
+	height: 86px;
+	float: left;
+	position: relative;
+	margin-left: 6px;
+	border-top: 0px; border-right: 0px; border-bottom: 0px; border-left: .1em;
+	border-style: solid;
+	border-color: #CCCCCC;	
+	
+	}
+
 .conProjectInfo_Row{
-	width: 256px;
+	width: 246px;
 	height: 20px;
 	margin: 0px auto; 
 	padding-top: 2px;
@@ -432,7 +490,7 @@
 	float: left;
 	}
 .conProjectInfo_Cell2{
-	width: 166px;
+	width: 156px;
 	height: 20px;
 	margin: 0px auto; 
 	color: #996600;
@@ -502,6 +560,14 @@
   width: 124px;
   height: 26px;
   margin: 0px 0px 19px 0px;
+  position: relative;
+  float: left;
+}
+.conRedline_keys{
+  width: 124px;
+  height: 120px;
+  padding-top: 34px ;
+  background: url("/images/v2/keys.jpg") bottom left no-repeat;
   position: relative;
   float: left;
 }
@@ -620,7 +686,7 @@
 }
 
 .bt_runAdd a:hover {
-	background: url("../images/v2/bt_runAdd2.png") top no-repeat;
+	background: url("/images/v2/bt_runAdd2.png") top no-repeat;
 
 }
 
