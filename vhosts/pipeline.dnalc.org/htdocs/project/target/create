@@ -115,12 +115,25 @@ if ($path_info =~ /_(\d+)\/(\d+)\/(\d+)/) {
 	$start = $2;
 	$stop  = $3;
 }
+
 my $pm = DNALC::Pipeline::App::ProjectManager->new($pid);
 if ($pm->project) {
-	#my $seqio = Bio::SeqIO->new( "-format" => "fasta" , -file => $pm->fasta_file);
-	#my $seq_obj = $seqio->next_seq();
 
 	if ($r->method eq "GET") {
+	
+		if (defined $start && $start < 1) {
+			$start = 1;
+		}
+
+		my $seq_len = $pm->project->sequence_length;
+		if (defined $stop && $stop > $seq_len) {
+			if ($seq_len > 10_000) {
+				$stop = 10_000;
+			}
+			else {
+				$stop = $seq_len;
+			}
+		}
 	
 		my $seqio = Bio::SeqIO->new( "-format" => "fasta" , -file => $pm->fasta_file);
 		my $seq_obj = $seqio->next_seq();

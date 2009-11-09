@@ -35,7 +35,7 @@
 		
 		#print STDERR "s1 = ", $g1_str, $/;
 		#print STDERR "s1 = ", $g2_str, $/;
-		if ($g1_str eq $g2_str) {
+		if ($tp->status ne 'failed' && $g1_str eq $g2_str) {
 			$ok = 0;
 			$message = 'Choose a different set of genomes.';
 		}

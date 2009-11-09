@@ -22,7 +22,7 @@ sub run_target {
 	my $cf = DNALC::Pipeline::Config->new->cf('TARGET');
 	my $ua = LWP::UserAgent->new;
 	$ua->agent("pipeline.dnalc.org");
-	$ua->timeout(300); # 5 minutes
+	$ua->timeout(600); # 10 minutes
 
 	my $res;
 	my $server = $cf->{TARGET_SERVER};

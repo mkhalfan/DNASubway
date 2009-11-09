@@ -210,4 +210,21 @@ sub format_datetime {
 	return $t->strftime($out_format_str);
 }
 
+sub remove_dir {
+	my ($class, $dir) = @_;
+
+	if (-d $dir) {
+		my @dir_content = <$dir/*>;
+		foreach my $of (@dir_content) {
+			if ( -d $of) {
+				$class->remove_dir($of);
+			}
+			else {
+				unlink $of;
+			} 
+		}
+		rmdir $dir;
+	}
+}
+
 1;

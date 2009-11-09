@@ -871,7 +871,6 @@ sub create_gbrowse_conf {
 	}
 
     my $username = $self->username; 
-    my $organism = $self->common_name;
     my $confdir  = $self->gbrowse_confdir;
 
 	if (defined $base_db_dir) {
@@ -897,12 +896,7 @@ sub create_gbrowse_conf {
 
 	return $conffile if -f $conffile;
 
-	print STDERR  "Config dir = ", $confdir, $/;
-	print STDERR  "Config file = ", $conffile, $/;
-	if (-f $conffile) {
-        warn "Gbrowse configuration file for this user [$username].[pid=$project_id] already exists.";
-		return $conffile;
-	}
+    my $organism = $self->common_name;
 	my $in  = IO::File->new( $confdir . '/' . $self->gbrowse_template );
 	my $out = IO::File->new( "> $conffile" );
 	if (defined $in && $out) {

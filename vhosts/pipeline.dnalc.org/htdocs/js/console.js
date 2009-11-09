@@ -273,8 +273,13 @@ function launch(what, where) {
 			exporter: '/project/prepare_exporter.html?pid='
 		};
 
-	$('add_evidence').hide();
-	$('add_evidence_link').show();
+	try {
+		$('add_evidence').hide();
+		$('add_evidence_link').show();
+	}
+	catch (e) {
+		//
+	}
 
 	if (what && !urls[what]) {
 		alert('Nothing to load!!');
@@ -296,7 +301,7 @@ function createTargetPoject(sel) {
 	//close_windows();
 	var m = sel.match(/(\w+_\d+):(\d+)\.\.(\d+)/);
 	if (!m || m.length != 4) {
-		alert('hmm');
+		alert('Invalid selection.');
 		return;
 	}
 
@@ -307,8 +312,12 @@ function createTargetPoject(sel) {
 		return;
 	}
 
-	if (stop <= start || stop - start > 10000 ) {
-		alert("Selection too large/small!");
+	if (!m || m.length != 4) {
+		alert('stop <= start');
+		return;
+	}
+	if ( stop - start > 10000 ) {
+		alert("Selection too large! Select maximum 10000 bp.");
 		return;
 	}
 
