@@ -89,15 +89,8 @@ my @err = ();
 if ($r->method eq "POST") {
 
 	my $user;
-	
-	if ($login) {
-		($user) = DNALC::Pipeline::User->search(username => $name);
-		$s->{username} = $name;
-		unless ($user && $user->password_valid($passw)) {
-			$user = undef;
-		}
-	}
-	elsif ($guest) {
+
+	if ($guest) {
 		unless ($name) {
 			my $rand = lc random_string(6, 8);
 			$name = "guest_$rand";
@@ -120,6 +113,13 @@ if ($r->method eq "POST") {
 			($user) = DNALC::Pipeline::User->search(username => $name);
 		}
 	}
+	else {
+		($user) = DNALC::Pipeline::User->search(username => $name);
+		$s->{username} = $name;
+		unless ($user && $user->password_valid($passw)) {
+			$user = undef;
+		}
+	}
 	if ($user){
 			$s->{username} = $user->username;
 			$s->{full_name} = $user->full_name;
@@ -129,6 +129,9 @@ if ($r->method eq "POST") {
 			$m->redirect("/project/");
 	}
 	else {
+		if ($name =~ /^guest_/) {
+			$s->{username} = '';
+		}
 		$m->comp("/_message_add", "Unable to log you in. Try again.");
 		$m->redirect("/");
 	}

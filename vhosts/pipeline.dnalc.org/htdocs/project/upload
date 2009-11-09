@@ -8,10 +8,11 @@
    use Gearman::Client ();
 </%once>
 <%init>
+   print STDERR Dumper(\%ARGS), $/;
    my $msg;
    my $pid = $r->param("projectname");
    my $config = DNALC::Pipeline::Config->new->cf('PIPELINE');
-   my $apollo      = $config->{APOLLO_HEADLESS};
+   my $apollo = $config->{APOLLO_HEADLESS};
    my $pmanager = DNALC::Pipeline::App::ProjectManager->new($pid);
    unless ($pmanager->project) {
          $msg = "Project not found!";
@@ -24,6 +25,7 @@
 	   open(OUTPUT, "> ". $path);	   
 	   while (my $line = <$fh>) { print OUTPUT $line; }
 	   close(OUTPUT);
+	   print STDERR "Uploaded file: ", $path, $/;
        my $cutil = DNALC::Pipeline::Chado::Utils->new();			  
        $cutil->profile( $pmanager->chado_user_profile );
 	   my $conf_file = $cutil->create_chado_adapter($config->{APOLLO_USERCONF_DIR});
@@ -33,7 +35,6 @@
 	   my $sx = $client->job_servers('127.0.0.1');
        my $h = $client->dispatch_background( apollo_insert => $command );
 
-	   # system($command); 
 	   $msg = 'ok';	   
    }
 </%init>
