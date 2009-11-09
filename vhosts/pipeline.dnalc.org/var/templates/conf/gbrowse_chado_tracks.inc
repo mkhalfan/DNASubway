@@ -14,11 +14,6 @@ html  = <div style="width:100%">
              <span style="color:blue;cursor:pointer" onclick="SelectArea.prototype.clearAndRecenter()">Recenter on this region</span>
            </li>
            <li onmouseup="SelectArea.prototype.cancelRubber()">
-             <a href="/cgi-bin/apollo_request_region.pl?selection=SELECTION">
-              Open this section in Apollo
-             </a>
-           </li>
-           <li onmouseup="SelectArea.prototype.cancelRubber()">
              <span style="color:blue;cursor:pointer" onclick="parent.createTargetPoject('SELECTION');//parent.close_windows()">
 				Submit to TARGeT
 			</span>
