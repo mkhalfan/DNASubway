@@ -19,10 +19,8 @@
 #===============================================================================
 
 use lib '/var/www/lib/perl';
-use strict;
-use warnings;
 
-#use diagnostics;
+use common::sense;
 
 use Date::Calc qw/Today Delta_Days/;
 use DNALC::Pipeline::User ();
@@ -31,10 +29,9 @@ use DNALC::Pipeline::Project ();
 use DNALC::Pipeline::App::ProjectManager ();
 use DNALC::Pipeline::App::Utils ();
 use DNALC::Pipeline::TargetProject ();
-use Data::Dumper;
 
 
-my $GBROWSE_TMP_ROOT = '/var/www/vhosts/pipeline.dnalc.org/htdocs/gbrowse/tmp';
+my $GBROWSE_TMP_ROOT = '/var/www/html/gbrowse/tmp';
 
 $ENV{GMOD_ROOT} = '/usr/local/gmod';
 my $cf = DNALC::Pipeline::Config->new->cf('PIPELINE');
@@ -131,7 +128,6 @@ sub remove_apollo_files {
 	my $username = $u->username;
 	my $apollo_dir = $cf->{APOLLO_USERCONF_DIR};
 	my @files = grep {/$apollo_dir\/$username/} <$apollo_dir/*>;
-	#print STDERR "Apollo files: ", Dumper( \@files ), $/;
 	unlink @files if @files;
 }
 
@@ -162,7 +158,6 @@ sub remove_gbrowse_tmp_files {
 	my ($username) = @_;
 
 	my @tmp_dirs = grep {/\/${username}_db_\d+$/o} <$GBROWSE_TMP_ROOT/*>;
-	#print STDERR Dumper( \@tmp_dirs), $/;
 	for (@tmp_dirs) {	
 		DNALC::Pipeline::App::Utils->remove_dir($_);
 	}

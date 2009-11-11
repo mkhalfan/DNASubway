@@ -5,7 +5,19 @@ var intervalID = {};
 var routines = ['augustus', 'fgenesh', 'snap', 'blastn', 'blastx', 
 				'blastn_user', 'blastx_user', 
 				'gbrowse', 'apollo', 'exporter'];
-var windows = [];
+var rnames = {
+			'repeat_masker' : 'Repeat Masker',
+			'trna_scan' : 'tRNA Scan',
+			'augustus' : 'Augustus',
+			'fgenesh' : 'FgenesH',
+			'snap' : 'Snap',
+			'blastn' : 'BlastN',
+			'blastx' : 'BlastX',
+			'blastn_user' : 'User BlastN',
+			'blastx_user' :'User BlastX',
+			'gbrowse' : 'GBrowse',
+			'exporter' : 'Phytosome Browser'
+		};
 
 function check_status (pid, op, h) {
 	var b = $(op + '_btn');
@@ -38,7 +50,7 @@ function check_status (pid, op, h) {
 					clearInterval(intervalID[op]);
 					b.removeClassName('processing');
 					b.addClassName('done');
-					b.onclick = function () { launch(null, file)};
+					b.onclick = function () { launch(null, file, rnames[op])};
 					b.title = 'Click to view results';
 					//b.update('View');
 
@@ -74,18 +86,19 @@ function check_status (pid, op, h) {
 											};
 								}
 								else {
+									//console.log('enabling btn.. ' + rt.id);
 									rt.onclick = function () {
-												//console.log('enable btn.. ' + this.id);
+												//console.log('clicked: ' + routine + ' ' + rnames[routine]);
 												var routine = this.id.replace('_btn','');
-												launch(routine);
+												launch(routine, null, rnames[routine]);
 											};
 								}
 							}
 						}
 						$('apollo_btn').onclick = function () { launch('apollo'); };
-						$('gbrowse_btn').onclick = function () { launch('gbrowse'); };
+						$('gbrowse_btn').onclick = function () { launch('gbrowse', null, rnames['gbrowse']); };
 						if ($('exporter_btn')) {
-							$('exporter_btn').onclick = function () { launch('exporter'); };
+							$('exporter_btn').onclick = function () { launch('exporter', null, rnames['exporter']); };
 						}
 					}
 				} else {}
@@ -217,33 +230,13 @@ function close_windows() {
 		windows[i].close();
 	}
 	windows = [];
-	toggle_console_link();
 }
 
-function toggle_console_link() {
-
-	return;
-
-	var d = $('backtoconsole_head');
-	d.update();
-	if (windows.length) {
-		var a = new Element('a', {href:'javascript:;'}).update('CONSOLE');
-		a.style.color = 'black';
-		Event.observe(a, 'click', function(){close_windows()});
-		//Event.observe(a, 'mouseover', function(){this.style.color});
-		d.appendChild(a);
-	}
-	else {
-		d.update('CONSOLE');
-	}
-}
-
-
-function openWindow(url) {
+function openWindow(url, title) {
 	UI.defaultWM.options.blurredWindowsDontReceiveEvents = true;
 
 	var options = {
-		width: 1024, 
+		width: 900, 
 		height: 496,
 		shadow: true,
 		draggable: false,
@@ -256,21 +249,23 @@ function openWindow(url) {
 	}
 
 	var w = new UI.URLWindow( options ).center();
+	if (title) {
+		w.setHeader(title);
+	}
 
 	var p = w.getPosition();
 	w.setPosition(110, p.left);
 	w.show();
 	w.focus();
-	windows.push(w);
-	toggle_console_link();
+	//windows.push(w);
 }
 
-function launch(what, where) {
+function launch(what, where, title) {
 	
 	var urls = {
-			gbrowse: '/project/prepare_chadogbrowse?pid=',
-			apollo: '/project/prepare_editor.html?pid=',
-			exporter: '/project/prepare_exporter.html?pid='
+			gbrowse: ['/project/prepare_chadogbrowse?pid=', 'GBrowse'],
+			apollo: ['/project/prepare_editor.html?pid=', 'Apollo'],
+			exporter: ['/project/prepare_exporter.html?pid=', 'Phytosome Browser']
 		};
 
 	try {
@@ -291,10 +286,10 @@ function launch(what, where) {
 	}
 	var host = window.location.host;
 	var uri = what 
-					? 'http://' + host + urls[what] + $('pid').value
+					? 'http://' + host + urls[what][0] + $('pid').value
 					: where;
-	//alert(uri);
-	openWindow( uri );
+	var window_title = title ? title : urls[what] ? urls[what][1] : null;
+	openWindow( uri, title);
 }
 
 function createTargetPoject(sel) {
@@ -308,7 +303,7 @@ function createTargetPoject(sel) {
 	var start = parseInt(m[2], 10);
 	var stop = parseInt(m[3], 10);
 	if (isNaN(start) || isNaN(stop) ) {
-		alert("Error!");
+		alert("Invalid selection!");
 		return;
 	}
 
@@ -350,6 +345,7 @@ function show_errors(html) {
 	}
 	var w = new UI.Window(options).center();
 	html = "<div class=\"conNewPro_title\" style=\"vertical-align: middle; padding: 20px\">" + html + "</div>";
+	w.setHeader("Error");
 	w.setContent(html);
 	w.show(true);
 

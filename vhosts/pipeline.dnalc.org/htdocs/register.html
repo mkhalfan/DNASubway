@@ -61,6 +61,10 @@ if ($r->method eq "POST") {
 		}
 	}
 	
+	if ($s->{username} && length($s->{username}) < 4) {
+		push @err, "Username is too short. Use at least 4 chars.";
+	}
+	
 	unless (@err) {
 		unless (Email::Valid->address($s->{email})) {
 			push @err, "Email address is invalid!";
@@ -75,7 +79,7 @@ if ($r->method eq "POST") {
 							profile => $cf->{GMOD_PROFILE},
 						);
 			if ($cutils->check_db_exists($s->{username})) {
-				push @err, "Username not available! Chado DB exists..";
+				push @err, "Username not available!";
 			}
 			$cutils->dbh->disconnect;
 		}

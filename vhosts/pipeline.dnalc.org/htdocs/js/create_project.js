@@ -3,7 +3,7 @@ var dbg;
 function step_one() {
 	if (! $('seq_src_upload').checked && !$('seq_src_sample').checked && !$('seq_src_paste').checked) {
 		//alert("Source not selected!");
-		show_errors("Sequence source not selected!");
+		show_message("Sequence source not selected!", 1);
 		return;
 	}
 
@@ -17,8 +17,9 @@ function step_one() {
 			has_actg = true;
 		}
 		else {
-			show_errors('We only acctept DNA sequences in ' +
-					'<a href="http://en.wikipedia.org/wiki/FASTA_format#Format">FASTA format</a>!'
+			show_message('We only acctept DNA sequences in '
+						+ '<a href="http://en.wikipedia.org/wiki/FASTA_format#Format">FASTA format</a>!',
+						1
 				);
 			return;
 		}
@@ -33,7 +34,7 @@ function step_one() {
 		//return;
 	}
 	//$('continue').disabled = true;
-	show_errors("Creating project. Stand by..");
+	show_message("Creating project. Stand by..");
 	f.submit();
 }
 
@@ -86,6 +87,7 @@ function populate_fields(src) {
 }
 
 
+/*
 function show_errors(html) {
 
 	if (!html || !UI) {
@@ -105,10 +107,39 @@ function show_errors(html) {
 	}
 	var w = new UI.Window(options).center();
 	html = "<div class=\"conNewPro_title\" style=\"vertical-align: middle; padding: 20px\">" + html + "</div>";
+	w.setHeader("Error");
 	w.setContent(html);
 	w.show(true);
 
+}*/
+
+
+function show_message(html, isError) {
+
+	if (!html || !UI) {
+		return;
+	}
+	var resizable = true;
+	var options = {	
+			resizable: false,
+        	width: 400,
+	        height: 200,
+	        shadow: true,
+	        draggable: false
+		};
+	if (navigator.userAgent.indexOf('MSIE') != -1) {
+		// IE doen't like this option!!!
+		delete options['resizable'];
+	}
+	var w = new UI.Window(options).center();
+	html = "<div class=\"conNewPro_title\" style=\"vertical-align: middle; padding: 20px\">" + html + "</div>";
+	w.setContent(html);
+	if (isError) {
+		w.setHeader("Error");
+	}
+	w.show(true);
 }
+
 
 function pasted_data_ok() {
 	var t = $('notebox').value;
@@ -135,5 +166,5 @@ Event.observe(window, 'load', function() {
 	var html = err.innerHTML;
 	if (!html)
 		return;
-	show_errors(html);
+	show_message(html, 1);
 });
