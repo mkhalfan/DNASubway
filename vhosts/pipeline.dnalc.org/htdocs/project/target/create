@@ -14,21 +14,21 @@
 % if (0) {
 		<div class="conNewPro_label1">
 			<input class="conRadiobox_align" type="radio" name="seq_src" id="seq_src_upload" value="upload" onclick="select_source(this)"  />&nbsp; Upload a Sequence File: (max 100kb) 
-			<input class="conStylized_box1" type="file" id="seq_file" name="seq_file"  onchange="set_source('upload')" onclick="set_source('upload')"  />
+			<input class="conStylized_box1" type="file" id="seq_file" name="seq_file"  onchange="//set_source('upload')" onclick="//set_source('upload')"  />
 		</div>
 % }
 		<div style="clear: both;">&nbsp;</div>
 		<div class="conNewPro_label1">
 %#			<input class="conRadiobox_align" type="radio" name="seq_src" id="seq_src_paste" value="paste" <% $seq ne "" ? "checked=\"checked\"" : "" %> />&nbsp; 
 			Enter a Sequence in FASTA Format: 
-			<textarea class="conStylized_box2" name="seq" id="seq" rows="5" cols="30" onfocus="set_source('paste');"><% $seq |html%></textarea>
+			<textarea class="conStylized_box2" name="seq" id="seq" rows="5" cols="30" onfocus="//set_source('paste');"><% $seq |html%></textarea>
 		</div>
 		<div style="clear: both;">&nbsp;</div>
 % if (0 && !$seq) {
 		<div style="clear: both;">&nbsp;</div>
 		<div class="conNewPro_label1">
 			<input class="conRadiobox_align" type="radio" name="seq_src" id="seq_src_paste" value="paste"   />&nbsp; Select a Sample Sequence:  
-			<select class="conStylized_box3" id="specie" name="species" size="6" onchange="set_source('sample');">
+			<select class="conStylized_box3" id="specie" name="species" size="6" onchange="//set_source('sample');">
 			</select>
 		</div>
 % }

@@ -128,10 +128,10 @@
 	</span>
 
 	<span id="conRedline_ConColumnR2">
-		<span class="bt_browserBlue"><a id="gbrowse_btn" href="javascript:;" onclick="<% $rm_status eq "done" ? "launch('gbrowse')" : "" %>">Local<br/>Browser</a></span>
+		<span class="bt_browserBlue"><a id="gbrowse_btn" href="javascript:;" onclick="<% $rm_status eq "done" ? "launch('gbrowse', null, 'GBrowse')" : "" %>">Local<br/>Browser</a></span>
 % 	if ( $proj->sample) {
 		<span class="bt_browserBlueAdd">
-			<a id="exporter_btn" href="javascript:;" onclick="<% $rm_status eq "done" ? "launch('exporter')" : "" %>">Phytozome<br/>Browser</a>
+			<a id="exporter_btn" href="javascript:;" onclick="<% $rm_status eq "done" ? "launch('exporter',null,'Phytozome Browser')" : "" %>">Phytozome<br/>Browser</a>
 		</span>
 % 	} else {
 		<span class="bt_browserBlueSpacer"></span>
@@ -149,7 +149,7 @@
 <div id="conProjectInfo">
 	<div id="conProjectInfo_header">
 		<div id="conProjectInfo_title">Project Information</div>
-                                        <div id="conProjectInfo_projecttitle">Title of this project . . . . . . . . . . . . .</div>
+                                        <div id="conProjectInfo_projecttitle"><% $proj->name |html%></div>
           								<div id="conProjectInfo_projectlog">Project Log</div>
           							</div>
 	
@@ -186,7 +186,7 @@
 		<div class="conProjectInfo_Row">
 			<span class="conProjectInfo_Cell1">Sequence</span>
 			<span class="conProjectInfo_Cell3">: <% nicebasepairs($proj->sequence_length) %></span>
-			<span class="conProjectInfo_CellBT"><a href="javascript:;" onclick="javascript:launch(null, '<& './.comp/filepath_to_web', file => $pm->fasta_file &>')">View</a></span>
+			<span class="conProjectInfo_CellBT"><a href="javascript:;" onclick="javascript:launch(null, '<& './.comp/filepath_to_web', file => $pm->fasta_file &>', 'DNA Sequence')">View</a></span>
 		</div>
 	</span><!--END of span conProjectInfo_column2-->
 
@@ -326,7 +326,7 @@ if ($status eq 'processing') {
 }
 elsif ($status eq 'done') {
 	my $url = $m->comp('./.comp/filepath_to_web', file => $pmanager->get_gff3_file($routine) || '#', just_return => 1); 
-	$action = qq{onclick="launch(null, '$url')"};
+	$action = qq{onclick="launch(null, '$url', '$routines{$routine}')"};
 	$target = '';
 	$title  = 'Click to view results';
 	$label  = 'View';
