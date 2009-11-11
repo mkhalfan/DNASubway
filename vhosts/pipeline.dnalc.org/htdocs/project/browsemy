@@ -1,0 +1,125 @@
+
+<div id="container_rightContent">
+	<div id="container_pageTitle"> my projects</div>
+	<br clear="all"/>
+	<div id="container_mytablehome">
+% if (@projects) {
+  <table class="conProject_table" summary="My projects">
+  <tr>
+    <th width="49" scope="col">#</th>
+    <th width="94" scope="col">Date</th>
+    <th width="279" scope="col">Project Title</th>
+    <th width="264" scope="col">Organism</th>
+    <th width="120" scope="col">Classification</th>
+    <th width="62" scope="col">Status</th>
+  </tr>
+% for (@projects) {
+%	my $created = DNALC::Pipeline::App::Utils->format_datetime($_->created, undef, "%m/%d/%Y");
+%	my $color = "#c1272d";
+%	my $uri = "/project/console.html?pid=" . $_->id;
+%	if ($_->{project_type} eq "target") {
+%		$uri = "/project/target/view/" . $_->id;
+%		$color = "#fdba3e"; #blue = "#3953A4"
+% 	}
+<tr>
+	<td style="background-color: <% $color %>;"><% $_->id %></td>
+	<td><% $created %></td>
+	<td><a href="<% $uri %>"><%$_->name |html%></a></td>
+	<td><% $_->organism %>, <% $_->common_name %></td>
+	<td><% $_->can("clade") ? $clades{$_->clade} : $_->type eq "d" ? "DNA" : "Protein" %></td>
+	<td> public </td>
+</tr>
+% }
+
+</table>
+
+<& '/_pager', cur=>$page, pages => $pages, 
+	suffix => '', prefix => '/project/browsemy/' &>
+% } else {
+	<p>&nbsp;</p>
+	<p>You haven't created a project. Use the links from the left hand side of this page to create a project.</p>
+% }
+	</div>
+</div><!--END of ID container_rightContent-->  
+
+%#--------------------------------------------------------
+<%args>
+	$page => 1
+	$sort => 'created desc'
+</%args>
+<%once>
+	use DNALC::Pipeline::MasterProject ();
+	use DNALC::Pipeline::Project ();
+	use DNALC::Pipeline::TargetProject ();
+	use DNALC::Pipeline::User ();
+	use DNALC::Pipeline::Config ();
+	use DNALC::Pipeline::Utils qw(random_string);
+	use DNALC::Pipeline::App::Utils ();
+
+	use Data::Dumper;
+
+	my %clades = (
+			d => 'Eudicotyledons',
+			m => 'Monocotyledons',
+			u => 'Undefined',
+			o => 'Other'
+		);
+
+	my $epp = 10;
+</%once>
+
+<%init>
+#my $pcf = DNALC::Pipeline::Config->new->cf('PIPELINE');
+$r->content_type('text/html');
+
+$m->session->{pipeline} ||= {};
+my $s = $m->session->{pipeline};
+
+if ($r->uri =~ /\/(\d+)$/) {
+	$page = $1;
+}
+
+unless ($page =~ /^\d+$/) {
+	$page = 1;
+}
+
+#my $pager = DNALC::Pipeline::Project->pager;
+#$pager->per_page( $epp );
+#$pager->page( $page );
+#$pager->order_by( $sort );
+#my @projects = $pager->search_where;
+
+my $pager = DNALC::Pipeline::MasterProject->pager;
+$pager->where({user_id => $s->{user_id}});
+$pager->per_page( $epp );
+$pager->page( $page );
+$pager->order_by( 'mp_id desc' );
+
+
+# this should be replaced by a join in DNALC::Pipeline::MasterProject???
+#if (0) {
+my @projects = grep { defined $_ } map {
+				my $pid = $_->project_id;
+				my $pclass = 'DNALC::Pipeline::Project';
+				if ($_->project_type eq "target") {
+					$pclass = 'DNALC::Pipeline::TargetProject';
+				}
+				my $p = $pclass->retrieve($pid);
+				$p->{project_type} = $_->project_type if $p;
+				$p;
+			} $pager->search_where;
+#}
+#my @projects = $pager->retrieve_all;
+#print STDERR Dumper(\@projects);
+
+my $pages = int($pager->total_entries/$epp) + ($pager->total_entries % $epp > 0 ? 1 : 0);
+
+</%init>
+
+%#---------------------------------
+<%attr>
+	js => []
+</%attr>
+%#---------------------------------
+
+%# vim: ft=mason
