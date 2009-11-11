@@ -757,10 +757,12 @@ sub check_db_exists {
 	}
 
 	my $query = "SELECT count(*) FROM pg_database WHERE datname = ?";
+
 	my $sth   = $dbh->prepare($query);
 	$sth->execute($db_name) or die $dbh->errstr;
 	my ($has_db) = $sth->fetchrow_array;
 	$sth->finish;
+
 	return $has_db;
 }
 
@@ -778,7 +780,10 @@ sub create_db {
 			. " -h " . $self->host
 			. " -p " . $self->port
 	       . " ". $self->username
-		) == 0 or (die "Database called ".$self->username." already exists\n");
+		) == 0 or do {
+				print STDERR "create_db: Error: Perhaps we already have a db called [", $self->username, "]\n";
+				return;
+			};
 
     system("psql $q -U ".$self->dbuser
              . " -h ".$self->host
@@ -787,8 +792,7 @@ sub create_db {
 			 . " < " . $self->dumppath
 			 . ( $quiet ? ' > /dev/null 2>&1' : '')
 		 ) == 0 or do {
-				 warn "Unable to load data into new Chado DB [" 
-					. $self->dbuser . "].\n";
+				 print STDERR "Unable to load data into new Chado DB [", $self->dbuser, "].\n";
 				return;
 			};
 
@@ -796,6 +800,8 @@ sub create_db {
 }
 
 
+# tries to add the organism in the chado db.
+# returns 1 on success
 sub insert_organism {
     my $self = shift;
 
@@ -813,11 +819,14 @@ sub insert_organism {
         if ($$hash_ref{abbreviation} ne $self->abbreviation or
             $$hash_ref{genus}         ne $self->genus or
             $$hash_ref{species}       ne $self->species) {
-            die $self->common_name." is already in the database but not with the given genus and species"; 
+			#die $self->common_name." is already in the database but not with the given genus and species"; 
+			print STDERR  "Organism ", $self->common_name, " is already in the BD but not with the given ",
+						"genus and species.", $/;
+			return;
         }
         else {
-            warn "nothing to do--this organism is already in the database\n";
-            return;
+			#warn "nothing to do--this organism is already in the database\n";
+            return 1;
         } 
     }
 
@@ -826,11 +835,14 @@ sub insert_organism {
     #no really need for the overhead of DBI here for on query.
     my $insert_query= "INSERT INTO organism (abbreviation,genus,species,common_name) VALUES (?,?,?,?)";
     $sth  = $dbh->prepare($insert_query);
-    $sth->execute($self->abbreviation,$self->genus,$self->species,$self->common_name) or die $dbh->errstr; 
+    $sth->execute($self->abbreviation,$self->genus,$self->species,$self->common_name) or do {
+			print STDERR "Error inserting organism: ", $dbh->errstr, "\n";
+			return;
+		};
 
 	$dbh->disconnect;
 
-    return;
+    return 1;
 }
 
 sub load_analysis_results {

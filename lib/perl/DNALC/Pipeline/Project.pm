@@ -58,4 +58,26 @@ __PACKAGE__->add_trigger(before_delete => sub {
 
 #---------------------------------------------------
 
+__PACKAGE__->set_sql( check_organism => q{
+		SELECT DISTINCT organism, common_name 
+		FROM __TABLE__
+		WHERE user_id = ?
+			AND (common_name = ? OR organism = ?)
+	});
+
+sub check_organism {
+	my ($class, $params) = @_;
+	unless ($params->{organism} && $params->{common_name} && $params->{user_id}) {
+		print STDERR  "Project::check_organism: Invalid arguments..", $/;
+		return;
+	}
+	my @data = ();
+	my $sth = $class->sql_check_organism;
+	$sth->execute($params->{user_id}, $params->{common_name}, $params->{organism});
+	while (my $res = $sth->fetchrow_hashref) {
+		push @data, $res;
+	}
+	return \@data;
+}
+
 1;

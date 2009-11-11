@@ -304,7 +304,10 @@ sub init_chado {
 
 	# read data from new file
 	$cutils->profile($self->chado_user_profile);
-	$cutils->insert_organism;
+	unless ($cutils->insert_organism) {
+		# failed...
+		return;
+	}
 	
 	return $cutils->load_fasta($self->fasta_file);
 }
@@ -362,4 +365,10 @@ sub get_available_gff3_files {
 	}
 	return \@files;
 }
+#-----------------------------------------------------------------------------
+sub check_organism {
+	my ($self, $params) = @_;
+	return DNALC::Pipeline::Project->check_organism($params);
+}
+#-----------------------------------------------------------------------------
 1;

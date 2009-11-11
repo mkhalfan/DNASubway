@@ -319,6 +319,17 @@ if ($r->method eq 'POST') {
 	if ($proj) {
 		push @err, "You already have a project named [$name]";
 	}
+	else {
+		my $organisms = $pm->check_organism({
+					organism => $organism, 
+					common_name => $common_name, user_id => $s->{user_id}
+				});
+		for (@$organisms) {
+			if ($_->{organism} ne $organism || $_->{common_name} ne $common_name) {
+				push @err, "You may use <em>$_->{organism}, $_->{common_name}</em> as organism.";
+			}
+		}
+	}
 	# create the project 
 	unless (@err) {
 		my $rc = DNALC::Pipeline::App::Utils->process_input_file( $file2process );
