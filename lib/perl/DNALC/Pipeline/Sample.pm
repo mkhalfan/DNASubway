@@ -218,6 +218,25 @@ sub copy_fasta {
 }
 
 
+__PACKAGE__->set_sql('get_organisms', q{
+		SELECT DISTINCT organism, common_name
+		FROM __TABLE__
+	});
+
+sub get_organisms {
+
+	my $sth = __PACKAGE__->sql_get_organisms;
+	$sth->execute or do {
+		print STDERR  "Error: ", $sth->errstr, $/;	
+		return;
+	};
+	my @data = ();
+	while (my $res = $sth->fetchrow_hashref) {
+		push @data, $res;
+	}
+	return @data;
+}
+
 1;
 
 

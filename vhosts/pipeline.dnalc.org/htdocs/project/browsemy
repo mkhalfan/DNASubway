@@ -61,7 +61,7 @@
 	my %clades = (
 			d => 'Eudicotyledons',
 			m => 'Monocotyledons',
-			u => 'Undefined',
+			u => 'Unknown',
 			o => 'Other'
 		);
 

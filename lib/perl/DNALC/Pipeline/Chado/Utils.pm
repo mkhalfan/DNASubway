@@ -952,9 +952,6 @@ sub gbrowse_chado_conf {
 
     return $conffile if -f $conffile;
 
-    print STDERR  "Config file = ", $conffile, $/;
-    print STDERR $self->chado_gbrowse, $/;
-
     my $in  = IO::File->new( $confdir . '/' . $self->chado_gbrowse );
     my $out = IO::File->new( "> $conffile" );
     if (defined $in && $out) {

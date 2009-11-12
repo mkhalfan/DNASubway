@@ -65,7 +65,7 @@ __PACKAGE__->set_sql( check_organism => q{
 			AND (common_name = ? OR organism = ?)
 	});
 
-sub check_organism {
+sub get_used_organisms {
 	my ($class, $params) = @_;
 	unless ($params->{organism} && $params->{common_name} && $params->{user_id}) {
 		print STDERR  "Project::check_organism: Invalid arguments..", $/;
@@ -77,7 +77,7 @@ sub check_organism {
 	while (my $res = $sth->fetchrow_hashref) {
 		push @data, $res;
 	}
-	return \@data;
+	return @data;
 }
 
 1;

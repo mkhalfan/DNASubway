@@ -236,7 +236,7 @@ my $pcf = $cf->cf('PIPELINE');
 
 # todo: order these by something..
 #my @samples = DNALC::Pipeline::Sample->retrieve_all;
-my @samples = DNALC::Pipeline::Sample->search( active => 1, {order_by => "organism"});
+my @samples = DNALC::Pipeline::Sample->search( active => 1, {order_by => "organism, segment, start"});
 
 my @err = ();
 
@@ -314,19 +314,23 @@ if ($r->method eq 'POST') {
 		#push @err, "Clade is missing!" unless $group;
 	}
 
-	my $pm = DNALC::Pipeline::App::ProjectManager->new;
-	my $proj = $pm->search(user_id => $s->{user_id}, name => $name);
-	if ($proj) {
-		push @err, "You already have a project named [$name]";
-	}
-	else {
-		my $organisms = $pm->check_organism({
+	my ($pm, $proj);
+	unless (@err) {
+		$pm = DNALC::Pipeline::App::ProjectManager->new;
+		my $proj = $pm->search(user_id => $s->{user_id}, name => $name);
+		if ($proj) {
+			push @err, "You already have a project named [$name]";
+		}
+		else {
+			my $conflicts = $pm->get_organism_conflicts({
 					organism => $organism, 
-					common_name => $common_name, user_id => $s->{user_id}
+					common_name => $common_name, 
+					user_id => $s->{user_id}
 				});
-		for (@$organisms) {
-			if ($_->{organism} ne $organism || $_->{common_name} ne $common_name) {
-				push @err, "You may use <em>$_->{organism}, $_->{common_name}</em> as organism.";
+			#print STDERR ">>> conflicts: ", Dumper( $conflicts ), $/;
+			for (@$conflicts) {
+				push @err, "You may use <a href=\"#\" onclick=\"javascript:use_organism(this);\">" 
+						. "<em>$_->{organism}, $_->{common_name}</em></a> as organism.";
 			}
 		}
 	}

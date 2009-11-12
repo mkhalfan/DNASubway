@@ -1,4 +1,4 @@
-var dbg;
+var dbg, w;
 
 function step_one() {
 	if (! $('seq_src_upload').checked && !$('seq_src_sample').checked && !$('seq_src_paste').checked) {
@@ -131,13 +131,30 @@ function show_message(html, isError) {
 		// IE doen't like this option!!!
 		delete options['resizable'];
 	}
-	var w = new UI.Window(options).center();
+	
+	// defined earlier as a global variable
+	_w = new UI.Window(options).center();
 	html = "<div class=\"conNewPro_title\" style=\"vertical-align: middle; padding: 20px\">" + html + "</div>";
-	w.setContent(html);
+	_w.setContent(html);
 	if (isError) {
-		w.setHeader("Error");
+		_w.setHeader("Error");
 	}
-	w.show(true);
+	_w.show(true);
+	_w.activate();
+}
+
+function use_organism(obj) {
+	
+	try {
+		var org = obj.firstChild.innerHTML;
+		var ary = org.split(/,\s+/);
+		if (ary && ary.length == 2) {
+			$('organism').value = ary[0];
+			$('common_name').value = ary[1];
+			_w.close();
+		}
+	}
+	catch (e) {}
 }
 
 

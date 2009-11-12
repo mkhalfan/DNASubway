@@ -1,6 +1,6 @@
 package DNALC::Pipeline::App::ProjectManager;
 
-use strict;
+use common::sense;
 
 use File::Path;
 use File::Copy qw/move/;
@@ -9,12 +9,9 @@ use Carp;
 use DNALC::Pipeline::User ();
 use DNALC::Pipeline::Config ();
 use DNALC::Pipeline::Project ();
-#use DNALC::Pipeline::App::WorkflowManager();
 use DNALC::Pipeline::Chado::Utils ();
 use Bio::SeqIO ();
 use Data::Dumper; 
-
-use warnings;
 
 #-----------------------------------------------------------------------------
 sub new {
@@ -366,9 +363,25 @@ sub get_available_gff3_files {
 	return \@files;
 }
 #-----------------------------------------------------------------------------
-sub check_organism {
+sub get_organism_conflicts {
 	my ($self, $params) = @_;
-	return DNALC::Pipeline::Project->check_organism($params);
+	my @orgs = DNALC::Pipeline::Project->get_used_organisms($params);
+	my @sample_orgs = DNALC::Pipeline::Sample->get_organisms;
+	my @conflicts = ();
+	my %uniq_orgs = ();
+	%uniq_orgs = map { 
+						$_->{organism} => $_->{common_name} unless exists $uniq_orgs{organism}
+					} (@orgs, @sample_orgs);
+	for my $organism (keys %uniq_orgs) {
+		my $common_name = $uniq_orgs{$organism};
+		if (($organism ne $params->{organism} && $common_name eq $params->{common_name})
+				|| 
+			($organism eq $params->{organism} && $common_name ne $params->{common_name}))
+		{
+				push @conflicts, {organism => $organism , common_name => $common_name};
+		}
+	}
+	\@conflicts;
 }
 #-----------------------------------------------------------------------------
 1;
