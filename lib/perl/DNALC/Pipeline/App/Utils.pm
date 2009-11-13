@@ -44,14 +44,13 @@ sub save_upload {
 		my $seq_data = '';
 		my $fh = $u->fh;
 		while (my $line = <$fh>) {
-			#print $out $line;
 			$seq_data .= $line;
 		}
-		$seq_data =~ s/^\s+//;
-		$seq_data =~ s/\s+$//;
+		$seq_data =~ s/^(?:>|;).*//mg;
+		$seq_data =~ s/(?:\d|\s)+//g;
 
-		unless ( $seq_data =~ /^>/) {
-			$msg = "Uploaded file is not in FASTA format.";
+		if ($seq_data =~ /([^actugn]+)/i) {
+			$msg = "The sequence in the uploaded file contains invalid chars: [" . uc ($1) . "].";
 		}
 		else {
 			my $out = IO::File->new;
@@ -150,7 +149,7 @@ sub process_input_file {
 
 	my ($in, $status, $msg) = (undef, 'fail', '');
 	if ($file) {
-		$in = Bio::SeqIO->new(-file => $file, -format => "fasta");
+		$in = Bio::SeqIO->new(-file => $file, -format => "raw");
 	}
 	unless ($in) {
 		return {status => 'fail', msg => 'Unable to process sequence file.'};

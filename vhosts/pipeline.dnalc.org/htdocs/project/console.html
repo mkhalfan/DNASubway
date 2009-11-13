@@ -167,11 +167,13 @@
 		<span class="conProjectInfo_Cell1">Affiliation</span>
 		<span class="conProjectInfo_Cell2">: DNALC</span>
 		</div>
+% if (0) {
         <div class="conProjectInfo_Row">
              							<span class="conProjectInfo_Cell1">Status</span>
             							<span class="conProjectInfo_Cell3">: &nbsp;<input class="conRadiobox_align" type="radio" name="seq_src" id="seq_src_paste" value="paste"   />&nbsp; Private</span>
                                         <span class="conProjectInfo_Cell3"><input class="conRadiobox_align" type="radio" name="seq_src" id="seq_src_paste" value="paste"   />&nbsp; Public</span>
             						</div>
+% }
 	</span><!--END of span conProjectInfo_column1-->
 
 	<span class="conProjectInfo_column2">
@@ -268,7 +270,7 @@ if ($r->method eq "POST") {
 			if ($ARGS{$_}) {
 				my $st = $pm->add_evidence($r, $_);
 				if ($st->{status} eq "success") {
-					$m->comp("/_message_add", $_ . " evidence added.");
+					#$m->comp("/_message_add", $_ . " evidence added.");
 					$wfm->set_status("upload_$_", 'done');
 				}
 				else {

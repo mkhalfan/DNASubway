@@ -17,8 +17,7 @@ function step_one() {
 			has_actg = true;
 		}
 		else {
-			show_message('We only acctept DNA sequences in '
-						+ '<a href="http://en.wikipedia.org/wiki/FASTA_format#Format">FASTA format</a>!',
+			show_message('The sequence is invalid.',
 						1
 				);
 			return;
@@ -160,18 +159,11 @@ function use_organism(obj) {
 
 function pasted_data_ok() {
 	var t = $('notebox').value;
-	t.replace(/^\s+/,'');
-	t.replace(/\s+$/,'');
-
-	// it should start with ">"
-	if (!/^>/.test(t)) {
-		return false;
-	}
-	t = t.replace(/>.*/, '');
+	t = t.replace(/(?:>|;).*/g, '');
 	if (t.length == 0) {
 		return false;
 	}
-	var re = /[^actgn\s]/i;
+	var re = /[^actugn\s\d]/i;
 	return re.test(t) == false;
 }
 

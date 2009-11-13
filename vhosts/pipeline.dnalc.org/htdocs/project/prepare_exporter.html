@@ -30,6 +30,15 @@ if ($proj) {
 		$eurl = $r->get_server_name eq 'pipeline-dev.dnalc.org'
 					? "http://green.cshl.edu/project/prepare_exporter_file%3Fpid%3D$pid"
 					: "http://" . $r->get_server_name . "/project/prepare_exporter_file%3Fpid%3D$pid";
+
+		my ($redirect_to) = '';
+		for ($sample->links) {
+			if ( $_->link_name =~ /Phytozome/) {
+				$redirect_to = $_->link_url;
+				last;
+			}
+		}
+		$m->redirect($redirect_to . ';eurl=' . $eurl) if $redirect_to;
 	}
 }
 
@@ -53,7 +62,7 @@ if ($proj) {
 % for ($sample->links) {
 	<div><a href="<% $_->link_url . ";eurl=" . $eurl %>"><% $_->link_name %></a></div>
 % }
-	<p>To view the annotation results within any of the above browsers use the “Add your own tracks” 
+	<p>To view the annotation results within any of the above browsers use the "Add your own tracks" 
 	facility at the bottom of that page.</p>
 </div>
 % } else {

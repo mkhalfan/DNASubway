@@ -262,7 +262,7 @@ if ($r->method eq 'POST') {
 	}
 
 	if ($seq_src eq "sample" && !defined $sequence) {
-			push @err, "Sequence is missing", $/;
+		push @err, "Sequence is missing", $/;
 	}
 
 	unless (@err) {
@@ -279,17 +279,21 @@ if ($r->method eq 'POST') {
 		}
 		elsif ($seq_src eq "paste") {
 		
-			$sequence =~ s/^\s+//;
-			$sequence =~ s/\s+$//;
-			unless ($sequence =~ /^>/) {
-				push @err, "The sequence is not in FASTA format.";
-			}
+			my $seq = $sequence;
+			$seq =~ s/^(?:>|;).*//mg;
+			$seq =~ s/(?:\d|\s)+//g;
 
-			$file2process = $pcf->{upload_dir} . '/' . random_string(7,7);
-			my $in = IO::File->new;
-			if ($in->open($file2process, "w")) {
-				print $in $sequence;
-				undef $in;
+			if ($seq =~ /([^actugn]+)/i) {
+				push @err, "Sequence contains invalid chars: [". uc ($1) . "]";
+			}
+			else {
+
+				$file2process = $pcf->{upload_dir} . '/' . random_string(7,7);
+				my $out = IO::File->new;
+				if ($out->open($file2process, "w")) {
+					print $out $seq;
+					undef $out;
+				}
 			}
 		}
 		elsif ($seq_src eq "upload") {
