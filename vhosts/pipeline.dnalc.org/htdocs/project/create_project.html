@@ -23,7 +23,7 @@
 		<div class="conNewPro_label1">
 			<input class="conRadiobox_align" type="radio" name="seq_src" id="seq_src_paste" value="paste" <% $seq_src eq "paste" ? "checked=\"checked\"" : ""%> />&nbsp; 
 			Enter a Sequence:
-			<textarea class="conStylized_box2" name="sequence" id="notebox" rows="5" cols="30" onfocus="set_source('paste');"></textarea>
+			<textarea class="conStylized_box2" name="sequence" id="notebox" rows="5" cols="30" onfocus="set_source('paste');"><% $sequence |html %></textarea>
 		</div>
 
 		<div style="clear: both;">&nbsp;</div> 
@@ -100,110 +100,6 @@
 
 </div><!--END of ID conRedlineRight1-->                    
 </form>
-%#----------------------------------------------------------------------------
-
-% if (0) {
-<div></div>
-<hr clear="both" />
-
-% if (0) {
-<div id="conTop_button"> 
-	<div id="conTop_title"><h2>PROJECTS</h2></div>
-		<div id="conTop_menu">
-			<ul id="conTop_menu">
-			<!--<li><a href="#" title="" class="current">New Project</a></li>-->
-			<!--<li><a href="#" title="">My Projects</a></li>-->
-			<li><a href="./browse" title="">Public Projects</a></li>
-			</ul>
-		</div>
-	<div id="conMember_name">USER: Cornel Ghiban</div>
-</div><!--END of ID conTop_button-->
-% }
-
-<form id="forma1" enctype="multipart/form-data" method="post">
-<!-- Left Content Start -->
-<div id="conProject_newLeft">
-	<div class="conNewPro_title">Select Sequence Source</div> 
-  
-	<div class="conNewPro_label1">	
-		<input class="conRadiobox_align" type="radio" name="seq_src" id="seq_src_upload" value="upload" onclick="select_source(this)" <% $seq_src eq "upload" ? "checked=\"checked\"" : ""%> />
-		Upload a Sequence File in <a href="http://en.wikipedia.org/wiki/FASTA_format#Format">FASTA format</a>: (max 100kb) <br/>
-		<input class="conStylized_box1" type="file" id="seq_file" name="seq_file" \
-		onchange="set_source('upload');" onclick="set_source('upload')"  />
-	</div>
-
-	<div style="clear: both;">&nbsp;</div>
-	<div class="conNewPro_label1">
-		<input class="conRadiobox_align" type="radio" name="seq_src" id="seq_src_paste" value="paste" <% $seq_src eq "paste" ? "checked=\"checked\"" : ""%> /> 
-		Enter a Sequence in <a href="http://en.wikipedia.org/wiki/FASTA_format#Format">FASTA format</a>:
-		<textarea name="sequence" class="conStylized_box2" id="notebox" rows="4" cols="30" onfocus="set_source('paste');"><% $sequence |html %></textarea>
-
-	</div>
-	<div style="clear: both;">&nbsp;</div>
-
-	<div class="conNewPro_label1">
-	  <input class="conRadiobox_align" type="radio" name="seq_src" id="seq_src_sample" value="sample" onclick="select_source(this)" <% $seq_src eq "sample" ? "checked=\"checked\"" : ""%> />
-		Select a Sample Sequence:
-		<select class="conStylized_box3" id="specie" name="species" size="6" style="width: 420px;"
-				onchange="set_source('sample');">
-% for my $ss (@samples) {
-%	my $sel = $seq_src eq "sample" && $ss->id == $species ? "selected=\"selected\"" : "";
-			<option id="o<%$ss->id%>" value="<% $ss->id %>" \
-			extra="" clade="<% $ss->{clade} ? $ss->{clade} : "o" %>"\
-			<% $sel %>><% $ss->organism %> (<% $ss->common_name %>) <% $ss->segment %>, <% nicebasepairs($ss->sequence_length) %></option>
-% }
-		</select>
-	</div>
-</div><!-- #conProject_newLeft -->
-
-<div id="conProject_newRight">
-    <div class="conNewPro_title">Name Your Project</div>   
-	<div class="conNewPro_label1">
-		<label>Project Title:</label>
-		<input class="conStylized_box4" type="text" name="name" id="name" value="<% $name|html%>" maxlength="128" />
-	</div>
-
-	<div style="clear: both;">&nbsp;</div>
-	<div class="conNewPro_title">Organism</div>   
-	<div class="conNewPro_label1">
-		<label>Scientific name (Genus Species):</label>
-		<input class="conStylized_box4" type="text" name="organism" id="organism" value="<% $organism |html%>" maxlength="128"  />
-	</div>
-
-	<div class="conNewPro_label1">
-	<label>Common name:</label>
-		<input class="conStylized_box4" type="text"name="common_name" id="common_name" value="<% $common_name |html%>" maxlength="128"   />
-	</div>
-	
-	<div class="conNewPro_label1">
-		<label>Class:</label>
-		<div class="conNewPro_label1">
-			<span class="conNewPro_smallContainer">
-				<input class="conRadiobox_align" type="radio" name="group" id="gm" value="m" <% $group eq "m" ? "checked=\"checked\"" : ""%>/>
-				Monocotyledons
-			</span>
-			<span class="conNewPro_smallContainer">
-				<input class="conRadiobox_align" type="radio" name="group" id="gd" value="d" <% $group eq "d" ? "checked=\"checked\"" : ""%>/>
-				Dicotyledons
-			</span>
-		</div>
-		<div class="conNewPro_label1">
-			<span class="conNewPro_smallContainer">
-				<input class="conRadiobox_align" type="radio" name="group" id="go" value="o" <% $group eq "o" ? "checked=\"checked\"" : ""%>/>
-				Other
-			</span>
-			<span class="conNewPro_smallContainer">
-				<input class="conRadiobox_align" type="radio" name="group" id="gu" value="u" <% $group eq "u" ? "checked=\"checked\"" : ""%>/>
-			I don't know
-			</span>
-		</div>
-	</div>
-	<div style="clear: both;">&nbsp;</div>
-	<div class="conBT_continue"><a href="#" title="Create project" onclick="javascript:step_one()">CONTINUE</a></div>
-</div><!-- #conProject_newRight -->
-<div style="clear: both;">&nbsp;</div>
-</form>
-% }
 </div><!--END of ID container_rightContent-->  
 %#-----------------------------------------------------------------
 <%args>
@@ -234,8 +130,6 @@ my $s = $m->session->{pipeline};
 my $cf = DNALC::Pipeline::Config->new;
 my $pcf = $cf->cf('PIPELINE');
 
-# todo: order these by something..
-#my @samples = DNALC::Pipeline::Sample->retrieve_all;
 my @samples = DNALC::Pipeline::Sample->search( active => 1, {order_by => "organism, segment, start"});
 
 my @err = ();
@@ -243,12 +137,15 @@ my @err = ();
 if ($r->method eq 'POST') {
 
 	my $file2process;
+	my $converted_to_dna = 0;
 
 	for ($name, $organism, $common_name) {
 		$_ =~ s/\s+/ /g;
 		$_ =~ s/^\s+//;
 		$_ =~ s/\s+$//;
 	}
+
+	$organism = ucfirst lc $organism;
 
 	unless ($name) {
 		push @err, "Project name is missing";
@@ -287,6 +184,14 @@ if ($r->method eq 'POST') {
 				push @err, "Sequence contains invalid chars: [". uc ($1) . "]";
 			}
 			else {
+			
+				#make it DNA
+				if ($seq =~ tr/uU/tT/) {
+					$converted_to_dna = 1;
+				}
+
+				# make it FASTA
+				$seq = "> fasta\n" . $seq;
 
 				$file2process = $pcf->{upload_dir} . '/' . random_string(7,7);
 				my $out = IO::File->new;
@@ -308,6 +213,7 @@ if ($r->method eq 'POST') {
 			}
 			else {
 				$file2process = $st->{path};
+				$converted_to_dna = $st->{converted_to_dna};
 			}
 		}
 
@@ -341,6 +247,7 @@ if ($r->method eq 'POST') {
 	# create the project 
 	unless (@err) {
 		my $rc = DNALC::Pipeline::App::Utils->process_input_file( $file2process );
+		#print STDERR Dumper( $rc ), $/;
 		if ($rc->{status} eq "success") {
 			
 	 		my $st = $pm->create_project ({                                       
@@ -352,7 +259,6 @@ if ($r->method eq 'POST') {
                 sample => $species,
                 clade => $group,
             });
-	    	#print STDERR Dumper( $st ), $/;
 			if ($st->{status} eq 'success') {
 				print STDERR  "New PID = ", $pm->project, $/;
 				$proj = $pm->project;
@@ -380,8 +286,11 @@ if ($r->method eq 'POST') {
 			$wfm->set_status('upload_fasta', 'done');
 			print STDERR "project_created: id = ", $proj, ",\tname = ", $proj->name, $/;
 
+			if ($converted_to_dna) {
+				$s->{converted_to_dna} = $proj->id;
+			}
+
 			# redirect user to console
-			#$m->comp('/_message_add', "Project created successfully!");
 			$m->redirect('./console.html?pid=' . $proj->id);
 			
 		} #end else
