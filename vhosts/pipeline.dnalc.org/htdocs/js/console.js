@@ -326,7 +326,8 @@ function debug(msg) {
 }
 
 
-function show_errors(html) {
+
+function show_messages(html, isError) {
 
 	if (!html || !UI) {
 		return;
@@ -345,10 +346,19 @@ function show_errors(html) {
 	}
 	var w = new UI.Window(options).center();
 	html = "<div class=\"conNewPro_title\" style=\"vertical-align: middle; padding: 20px\">" + html + "</div>";
-	w.setHeader("Error");
+	if (isError) {
+		w.setHeader("Error");
+	}	
 	w.setContent(html);
 	w.show(true);
+}
 
+function show_errors(html) {
+
+	if (!html || !UI) {
+		return;
+	}
+	show_messages(html, 1);
 }
 
 //-------------
@@ -360,6 +370,15 @@ Event.observe(window, 'load', function() {
 		var html = err.innerHTML;
 		if (html) {
 			show_errors(html);
+		}
+	}
+	
+	// check messages
+	var mess = $("message_list");
+	if (mess) {
+		var html = mess.innerHTML;
+		if (html) {
+			show_messages(html);
 		}
 	}
 	

@@ -7,6 +7,13 @@
 </div>
 % 	}
 
+%	if (exists $s->{converted_to_dna} && $s->{converted_to_dna} == $pid) {
+%		delete $s->{converted_to_dna};
+<div style="display:none" id="message_list">	
+	We've converted U's to T's in your sequence.
+</div>
+% 	}
+
 <!--Left Content Start--------------> 
 <div id="conRedlineLeft2">
           <span class="conRedline_ConColumn">
@@ -23,25 +30,21 @@
     <span class="conRedline_ConColumn">
 		<span class="conRedline_ConCell">
 		<span class="conIndicator_box"><div id="augustus_st" class="conIndicator_<% $status{repeat_masker} eq "done" ? $status{augustus} : "disabled" %>"></div> </span>
-%#		<span class="bt_run"><a href="#">Augustus</a></span>
 			<& '.routine', routine => 'augustus', pmanager => $pm,
 				status => $status{augustus}, delay => 20, rm_status => $rm_status &>
 		</span><!--END of span class conRedline_ConCell-->
 		<span class="conRedline_ConCell">
 			<span class="conIndicator_box"><div id="fgenesh_st" class="conIndicator_<% $status{repeat_masker} eq "done" ? $status{fgenesh} : "disabled" %>"></div> </span>
-%#			<span class="bt_run"><a href="#">FGenesH</a></span>
 			<& '.routine', routine => 'fgenesh', pmanager => $pm,
 						status => $status{fgenesh}, rm_status => $rm_status &>
 		</span><!--END of span class conRedline_ConCell-->
 		<span class="conRedline_ConCell">
 			<span class="conIndicator_box"><div id="snap_st" class="conIndicator_<% $status{repeat_masker} eq "done" ? $status{snap} : "disabled" %>"></div> </span>
-%#			<span class="bt_run"><a href="#">SNAP</a></span>
 			<& '.routine', routine => 'snap', pmanager => $pm,
 						status => $status{snap}, rm_status => $rm_status &>
 		</span><!--END of span class conRedline_ConCell-->
 		<span class="conRedline_ConCell">
 			<span class="conIndicator_box"><div id="trna_scan_st" class="conIndicator_<% $status{trna_scan} %>"></div> </span>
-%#			<span class="bt_run"><a href="#">tRNA</a></span>
 			<& '.routine', routine => 'trna_scan', pmanager => $pm,
 						status => $status{trna_scan}, rm_status => $rm_status &>
 		</span><!--END of span class conRedline_ConCell-->

@@ -17,9 +17,7 @@ function step_one() {
 			has_actg = true;
 		}
 		else {
-			show_message('The sequence is invalid.',
-						1
-				);
+			show_message('The sequence is invalid.', 1);
 			return;
 		}
 	}
@@ -28,12 +26,8 @@ function step_one() {
 		alert("You must select a file to upload or a sample organism!");
 		return;
 	}
-	if (has_sample) {
-		//alert("Method not yet supported!");
-		//return;
-	}
-	//$('continue').disabled = true;
-	show_message("Creating project. Stand by..");
+
+	show_message("Creating project. Do not close this message. <p>Stand by..</p>");
 	f.submit();
 }
 
@@ -84,34 +78,6 @@ function populate_fields(src) {
 		}
 	}
 }
-
-
-/*
-function show_errors(html) {
-
-	if (!html || !UI) {
-		return;
-	}
-	var resizable = true;
-	var options = {	
-			resizable: false,
-        	width: 400,
-	        height: 200,
-	        shadow: true,
-	        draggable: false
-		};
-	if (navigator.userAgent.indexOf('MSIE') != -1) {
-		// IE doen't like this option!!!
-		delete options['resizable'];
-	}
-	var w = new UI.Window(options).center();
-	html = "<div class=\"conNewPro_title\" style=\"vertical-align: middle; padding: 20px\">" + html + "</div>";
-	w.setHeader("Error");
-	w.setContent(html);
-	w.show(true);
-
-}*/
-
 
 function show_message(html, isError) {
 

@@ -14,7 +14,6 @@ use Time::Piece ();
 use Data::Dumper;
 
 sub save_upload {
-	#print STDERR "save_upload: ", Dumper( \@_), $/;
 	my ($class, $args) = @_;
 	my ($status, $msg, $path);
 	$status = 'fail';
@@ -25,6 +24,7 @@ sub save_upload {
 		return { status => 'fail', message => 'Invalid parameters passed!'};
 	}
 
+	my $converted_to_dna = 0;
 	my $config = DNALC::Pipeline::Config->new;
 
 	my $u = $r->upload($param_name);
@@ -53,6 +53,14 @@ sub save_upload {
 			$msg = "The sequence in the uploaded file contains invalid chars: [" . uc ($1) . "].";
 		}
 		else {
+			#make it DNA
+			if ($seq_data =~ tr/uU/tT/) {
+				$converted_to_dna = 1;
+			}
+
+			# make it FASTA
+			$seq_data = "> fasta\n" . $seq_data;
+
 			my $out = IO::File->new;
 			if ($out->open($path, 'w')) {
 				$status = 'success';
@@ -64,17 +72,7 @@ sub save_upload {
 			}
 		}
 	}
-
-	## check/fix content 
-	#unless ($msg) {
-	#	($status, $msg, $crc, $seq_length) = $class->process_fasta_file({
-	#				fh => $u->fh,
-	#				common_name => $args->{common_name},
-	#				output_file => $path,
-	#			});
-	#}
-
-	return { status => $status, message => $msg, path => $path };
+	return { status => $status, message => $msg, path => $path, converted_to_dna => $converted_to_dna };
 }
 
 sub process_fasta_file {
@@ -149,7 +147,7 @@ sub process_input_file {
 
 	my ($in, $status, $msg) = (undef, 'fail', '');
 	if ($file) {
-		$in = Bio::SeqIO->new(-file => $file, -format => "raw");
+		$in = Bio::SeqIO->new(-file => $file, -format => "fasta");
 	}
 	unless ($in) {
 		return {status => 'fail', msg => 'Unable to process sequence file.'};
@@ -159,6 +157,7 @@ sub process_input_file {
 	my $fasta_seq;
 
 	my $seq = $in->next_seq;
+	print STDERR "ALPHABET = ", $seq->alphabet , $/;
 	if ($seq && $seq->alphabet eq 'dna') {
 		# make sure the sequence is not longer then maximum allowed
 		my $max_seq_length = $config->cf('PIPELINE')->{sequence_length} || 50_000;
