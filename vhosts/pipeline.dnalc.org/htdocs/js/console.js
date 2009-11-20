@@ -4,7 +4,7 @@ var dbg, sent;
 var intervalID = {};
 var routines = ['augustus', 'fgenesh', 'snap', 'blastn', 'blastx', 
 				'blastn_user', 'blastx_user', 
-				'gbrowse', 'apollo', 'exporter'];
+				'gbrowse', 'apollo', 'exporter', 'target'];
 var rnames = {
 			'repeat_masker' : 'Repeat Masker',
 			'trna_scan' : 'tRNA Scan',
@@ -16,7 +16,8 @@ var rnames = {
 			'blastn_user' : 'User BlastN',
 			'blastx_user' :'User BlastX',
 			'gbrowse' : 'GBrowse',
-			'exporter' : 'Phytosome Browser'
+			'exporter' : 'Phytosome Browser',
+			'target' : 'Phylogenetic Tree'
 		};
 
 function check_status (pid, op, h) {
@@ -100,6 +101,7 @@ function check_status (pid, op, h) {
 						if ($('exporter_btn')) {
 							$('exporter_btn').onclick = function () { launch('exporter', null, rnames['exporter']); };
 						}
+						$('target_btn').onclick = function () { launch('target', null, rnames['target']); };
 					}
 				} else {}
 			}
@@ -265,7 +267,8 @@ function launch(what, where, title) {
 	var urls = {
 			gbrowse: ['/project/prepare_chadogbrowse?pid=', 'GBrowse'],
 			apollo: ['/project/prepare_editor.html?pid=', 'Apollo'],
-			exporter: ['/project/prepare_exporter.html?pid=', 'Phytosome Browser']
+			exporter: ['/project/prepare_exporter.html?pid=', 'Phytosome Browser'],
+			target: ['/project/prepare_chadogbrowse?warn=1;pid=', 'Phylogenetic Tree']
 		};
 
 	try {
@@ -318,7 +321,6 @@ function createTargetPoject(sel) {
 
 	top.document.location.href = '/project/target/create/' + m[1] + '/' + m[2] + '/' +  m[3];
 }
-
 
 function debug(msg) {
 	var d = $('debug');

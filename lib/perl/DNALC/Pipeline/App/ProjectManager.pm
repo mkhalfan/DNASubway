@@ -9,6 +9,7 @@ use Carp;
 use DNALC::Pipeline::User ();
 use DNALC::Pipeline::Config ();
 use DNALC::Pipeline::Project ();
+use DNALC::Pipeline::ProjectLogger ();
 use DNALC::Pipeline::Chado::Utils ();
 use Bio::SeqIO ();
 use Data::Dumper; 
@@ -18,7 +19,8 @@ sub new {
 	my ($class, $project) = @_;
 
 	my $self = bless {
-					config => DNALC::Pipeline::Config->new->cf('PIPELINE')
+					config => DNALC::Pipeline::Config->new->cf('PIPELINE'),
+					logger => DNALC::Pipeline::ProjectLogger->new,
 				}, __PACKAGE__;
 	if ($project) {
 		if (ref $project eq '' && $project =~ /^\d+$/) {
@@ -382,6 +384,28 @@ sub get_organism_conflicts {
 		}
 	}
 	\@conflicts;
+}
+#-----------------------------------------------------------------------------
+sub log {
+	my ($self, $message, %args) = @_;
+	my $type = defined $args{type} && $args{type} ? $args{type} : 'INFO';
+
+	my $logger = $self->{logger};
+	my $proj = $self->project;
+	my $user_id = defined $args{user_id} && $args{user_id} 
+					? $args{user_id} 
+					: $proj->user_id;
+	
+	eval { $logger -> log(
+				user_id => $user_id,
+				project_id => $proj->id,
+				type => $type,
+				message => $message
+			);
+		};
+	if ($@) {
+		print STDERR  "Logger: ", $@, $/;
+	}
 }
 #-----------------------------------------------------------------------------
 1;

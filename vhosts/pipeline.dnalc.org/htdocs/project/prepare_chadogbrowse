@@ -1,39 +1,75 @@
+% if ($warn) {
+<html>
+<body>
+	<div>
+	<form id="form2">
+		<input type="hidden" name="pid" value="<% $pid %>" />
+		<p>In order to identify related sequences click a gene or transposons (up to 
+		<% nicenumbers($tcf->{MAX_SEQ_LEN}) %> basepairs) in the Local Browser 
+		and submit it to TARGeT, a tool to conduct Tree Analysis of Related Genes and Transposons.
+		</p>
+		<input type="submit" name="continue" value="Continue" /><br/>
+		<small><input type="checkbox" name="stopwarning" value="1" />Don’t show me this message again.</small>
+	</form>
+	</div>
+</body>
+</html>
+% }
+
 <%args>
 	$pid => 0
+	$warn => 0
+	$stopwarning => 0
+	$continue => ""
 </%args>
 <%once>
 	use DNALC::Pipeline::App::ProjectManager ();
 	use DNALC::Pipeline::Config ();
 	use DNALC::Pipeline::Chado::Utils ();
+	use DNALC::Pipeline::Utils qw(nicenumbers);
+
 	my $pcf = DNALC::Pipeline::Config->new->cf('PIPELINE');
+	my $tcf = DNALC::Pipeline::Config->new->cf('TARGET');
 	use Data::Dumper;
 </%once>
 <%init>
 	$m->session->{pipeline} ||= {};
 	my $s = $m->session->{pipeline};
 
-	my $pm = DNALC::Pipeline::App::ProjectManager->new($pid);
-	#my $proj = DNALC::Pipeline::Project->retrieve($pid);
-	my $proj = $pm->project;
-	unless ($proj) {
-		$m->comp('/_message_add', 'Project not found!', 'error');
-		$m->redirect('/project/');
+	$r->content_type("text/html");
+	if ($warn && $s->{stopwarning}) {
+		$warn = 0;
+	}
+	
+	if ($stopwarning) {
+		$s->{stopwarning} = 1;
 	}
 
-	# TODO : check project ownership.. ;)
+	if (!$warn) {
+		my $pm = DNALC::Pipeline::App::ProjectManager->new($pid);
+		#my $proj = DNALC::Pipeline::Project->retrieve($pid);
+		my $proj = $pm->project;
+		unless ($proj) {
+			$m->comp('/_message_add', 'Project not found!', 'error');
+			$m->redirect('/project/');
+		}
 
-	my $organism = join('_', split /\s+/, $proj->organism). '_' . $proj->common_name;
-	my $cutils = DNALC::Pipeline::Chado::Utils->new(
-		username => $pm->username,
-		organism_string => $organism,
-		chado_gbrowse => 'gbrowse_chado.template',
-		gbrowse_confdir  => $pcf->{GBROWSE_CONF_DIR},
-	);
+		# TODO : check project ownership.. ;)
 
-	# 1st create GBrowse conf file & DB dir for this project
-	$cutils->gbrowse_chado_conf($proj->id);
+		my $organism = join('_', split /\s+/, $proj->organism). '_' . $proj->common_name;
+		my $cutils = DNALC::Pipeline::Chado::Utils->new(
+			username => $pm->username,
+			organism_string => $organism,
+			chado_gbrowse => 'gbrowse_chado.template',
+			gbrowse_confdir  => $pcf->{GBROWSE_CONF_DIR},
+		);
 
-	$m->redirect($pcf->{GBROWSE_URL} . '/' . $pm->username . '_db_' . $proj->id);
+		# 1st create GBrowse conf file & DB dir for this project
+		$cutils->gbrowse_chado_conf($proj->id);
+
+		$m->redirect($pcf->{GBROWSE_URL} . '/' . $pm->username . '_db_' . $proj->id);
+	}
+	
 </%init>
 <%flags>
 	inherit => undef

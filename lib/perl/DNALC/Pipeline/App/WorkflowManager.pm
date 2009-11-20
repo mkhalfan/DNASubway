@@ -91,7 +91,6 @@ use Carp;
 
 		my $mc_key = "status-$task_name-" . $self->project->id;
 		$self->{_mc}->set($mc_key, lc( $status_name ));
-		print STDERR  "set_status: $mc_key  ===>>> $status_name", $/;
 
 		my $wf = DNALC::Pipeline::Workflow->retrieve(
 					project_id => $self->project->id,
@@ -128,7 +127,13 @@ use Carp;
 				die $commit_error;
 			}
 		}
-		$wf->dbi_commit;
+		#$wf->dbi_commit;
+		if ($status_name ne "processing") {
+			$self->log("Setting status for routine [$task_name] to [$status_name] " 
+					. ($duration ? "($duration sec)." : '')
+				);
+		}
+
 		$wf->status;
 	}
 
@@ -701,6 +706,11 @@ use Carp;
 		print STDERR  "\n\nLOADING DATA:\n", $cmd, " ", "@args", $/;
 		system($cmd, @args);
 		return 1;
+	}
+	#-------------------------------------------------------------------------
+	sub log {
+		my ($self, $message, %args) = @_;
+		$self->{pmanager}->log($message, %args);
 	}
 	#-------------------------------------------------------------------------
 }

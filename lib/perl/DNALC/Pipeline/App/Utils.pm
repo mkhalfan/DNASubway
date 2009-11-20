@@ -15,7 +15,7 @@ use Data::Dumper;
 
 sub save_upload {
 	my ($class, $args) = @_;
-	my ($status, $msg, $path);
+	my ($status, $msg, $path, $sequence_id);
 	$status = 'fail';
 
 	my $r = $args->{r};
@@ -46,21 +46,28 @@ sub save_upload {
 		while (my $line = <$fh>) {
 			$seq_data .= $line;
 		}
-		$seq_data =~ s/^(?:>|;).*//mg;
-		$seq_data =~ s/(?:\d|\s)+//g;
-
-		if ($seq_data =~ /([^actugn]+)/i) {
-			$msg = "The sequence in the uploaded file contains invalid chars: [" . uc ($1) . "].";
-		}
-		else {
-			#make it DNA
-			if ($seq_data =~ tr/uU/tT/) {
-				$converted_to_dna = 1;
+		if ($args->{clean_sequence}) {
+			if (my @ids = ($seq_data =~ m/^((?:>|;).*)/mg)) {
+				$sequence_id = join "\n", @ids;
 			}
+			$seq_data =~ s/^(?:>|;).*//mg;
+			$seq_data =~ s/(?:\d|\s)+//g;
 
-			# make it FASTA
-			$seq_data = "> fasta\n" . $seq_data;
+			if ($seq_data =~ /([^actugn]+)/i) {
+				$msg = "The sequence in the uploaded file contains invalid chars: [" . uc ($1) . "].";
+			}
+			else {
+				#make it DNA
+				if ($seq_data =~ tr/uU/tT/) {
+					$converted_to_dna = 1;
+				}
 
+				# make it FASTA
+				$seq_data = "> fasta\n" . $seq_data;
+			}
+		}
+
+		unless ($msg) {
 			my $out = IO::File->new;
 			if ($out->open($path, 'w')) {
 				$status = 'success';
@@ -72,7 +79,12 @@ sub save_upload {
 			}
 		}
 	}
-	return { status => $status, message => $msg, path => $path, converted_to_dna => $converted_to_dna };
+	return { status => $status, 
+			message => $msg, 
+			path => $path, 
+			converted_to_dna => $converted_to_dna,
+			sequence_id => $sequence_id
+		};
 }
 
 sub process_fasta_file {

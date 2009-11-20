@@ -16,18 +16,17 @@
 
 <!--Left Content Start--------------> 
 <div id="conRedlineLeft2">
-          <span class="conRedline_ConColumn">
-     		<span class="conRedline_ConCell">
-            		<div class="conIndicator_box"><div id="repeat_masker_st" class="conIndicator_<% $status{repeat_masker} %>"></div> </div>
-					<& '.routine', routine => 'repeat_masker', pmanager => $pm,
-						status => $status{repeat_masker}, delay => 15 &>
-            </span><!--END of span class conRedline_ConCell-->
-            <span class="conRedline_keys">
-            </span>
-     </span><!--END of span class conRedline_ConColumn-->
-    
-    
-    <span class="conRedline_ConColumn">
+	<span class="conRedline_ConColumn">
+		<span class="conRedline_ConCell">
+				<div class="conIndicator_box"><div id="repeat_masker_st" class="conIndicator_<% $status{repeat_masker} %>"></div> </div>
+				<& '.routine', routine => 'repeat_masker', pmanager => $pm,
+					status => $status{repeat_masker}, delay => 15 &>
+		</span><!--END of span class conRedline_ConCell-->
+		<span class="conRedline_keys">
+		</span>
+	</span><!--END of span class conRedline_ConColumn-->
+
+	<span class="conRedline_ConColumn">
 		<span class="conRedline_ConCell">
 		<span class="conIndicator_box"><div id="augustus_st" class="conIndicator_<% $status{repeat_masker} eq "done" ? $status{augustus} : "disabled" %>"></div> </span>
 			<& '.routine', routine => 'augustus', pmanager => $pm,
@@ -96,6 +95,7 @@
 			<span style="position:relative;">
 				<div id="add_evidence" class="popup">
 				<form enctype="multipart/form-data" method="post">
+				<input type="hidden" name="notused" value="1" />
 % if ( $nt_evid ne "done") {
 					<div class="panel_container">Add Nucleotide based evidence:                     
 						<input class="conStylized_box1" type="file" id="evid_nt" name="evid_nt"/>
@@ -139,7 +139,9 @@
 % 	} else {
 		<span class="bt_browserBlueSpacer"></span>
 %	}
-		<span class="bt_browserYellow"><a href="javascript:;">Phylogenetic<br/>Tree</a></span>
+		<span class="bt_browserYellow">
+			<a id="target_btn" href="javascript:;" onclick="<% $rm_status eq "done" ? "launch('target', null, 'Phylogenetic Tree')" : "" %>" >Phylogenetic<br/>Tree</a>
+		</span>
 	</span>
 </div><!--END of ID conRedlineRight2-->
 
@@ -202,7 +204,7 @@
 											<li ><strong>repeat_masker</strong>, 41.070 sec., 07/24/2009 09:21:39</li>
 						
 										</ul>
-                                    <span class="bt_more"><a href="#">More . . .</a></span>
+                                    <span class="bt_more"><a href="#">more »</a></span>
             							
             						</div>
                                     </span>
