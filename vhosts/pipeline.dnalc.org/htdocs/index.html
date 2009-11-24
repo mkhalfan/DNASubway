@@ -1,10 +1,10 @@
     	<div id="home_map">
 		  <div id="map_left">
 			<span id="map_spacer"></span>
-     				    <span class="bt_redStart"><a href="#" class="Start"><span class="Starttip"><span class="top"></span><span class="middle">Identify the meaningful segments in a DNA sequence and associate this information with the sequence (up to 100,000 nucleotides).</span><span class="bottom"></span></span></a></span>
-			<span class="bt_yellowStart"><a href="#" class="Start"><span class="Starttip"><span class="top"></span><span class="middle">Identify sequences that are related to a gene, transposons, or other DNA sequence (up to 10,000 nucleotides).</span><span class="bottom"></span></span></a></span>
-		    <span class="bt_blueStart"><a href="#" class="Start"><span class="Starttip"><span class="top"></span><span class="middle">Determine the potential nature of genes in a set of expressed sequence tags (EST; up to 100 megabytes of assembled data).</span><span class="bottom"></span></span></a></span> 
-		  </div><!--END of ID map_left-->
+     		<span class="bt_redStart"><a href="<% $s->{logged_in} ? "/project/create_project.html" : "#" %>"></a></span>
+			<span class="bt_yellowStart"><a href="<% $s->{logged_in} ? "/project/target/create" : "#" %>"></a></span>
+		    <span class="bt_blueStart"><a href="#"></a></span> 
+		  </div>
                 
 		  		<div id="map_right">
                  <div class="containerHoz">
@@ -137,13 +137,18 @@ if ($r->method eq "POST") {
 			$user = undef;
 		}
 	}
-	if ($user){
-			$s->{username} = $user->username;
-			$s->{full_name} = $user->full_name;
-			$s->{user_id} = $user->id;
-			$s->{logged_in} = 1;
+	if ($user) {
+		$s->{username} = $user->username;
+		$s->{full_name} = $user->full_name;
+		$s->{user_id} = $user->id;
+		$s->{logged_in} = 1;
 
-			$m->redirect("/project/");
+		if ($user->has_projects) {
+			$m->redirect("/project/browsemy");
+		}
+		else {
+			$m->redirect("/");
+		}
 	}
 	else {
 		if ($name =~ /^guest_/) {
