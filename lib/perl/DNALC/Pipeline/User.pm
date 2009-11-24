@@ -7,9 +7,8 @@ use base qw(DNALC::Pipeline::DBI);
 
 use POSIX ();
 use Digest::MD5 ();
+use DNALC::Pipeline::MasterProject ();
 use DNALC::Pipeline::Utils qw(random_string);
-
-#use DNALC::Pipeline::UserProfile ();
 
 {
 	my $salt = 'bdb6896bf6e4c2d466a2c9f91d0e90c5'; # do not edit
@@ -140,6 +139,12 @@ use DNALC::Pipeline::Utils qw(random_string);
 		$sth->execute($self->id);
 	}
 
+	#--------------------------------------------------
+	sub has_projects {
+		my $self = shift;
+
+		return DNALC::Pipeline::MasterProject->sql_count_per_user->select_val($self->id) > 0;
+	}
 	#--------------------------------------------------
 }
 

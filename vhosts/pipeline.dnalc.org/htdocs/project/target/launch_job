@@ -61,7 +61,7 @@
 		my $workdir = $tp->work_dir;
 		for (<$workdir/*>) {
 			#my $file = $m->comp('../.comp/filepath_to_web', file => $_, just_return => 1);
-			print STDERR  "file to rm: ", $_, $/;
+			#print STDERR  "file to rm: ", $_, $/;
 			unlink $_ if -f;
 		}
 		

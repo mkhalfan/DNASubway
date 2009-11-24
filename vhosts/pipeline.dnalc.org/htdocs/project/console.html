@@ -144,20 +144,19 @@
 		</span>
 	</span>
 </div><!--END of ID conRedlineRight2-->
+<div id="conMessage_FgenesH">FgenesH gene predictor provided by <a target="_blank" href="http://linux1.softberry.com/berry.phtml">Softberry, Inc.</a></div>
 
 <!--
 <div id="conRunAll">
 	<div class="bt_RunAll"><a href="#">RUN<br/> all analysis programs</a></div>
 </div>
 -->
-
 <div id="conProjectInfo">
 	<div id="conProjectInfo_header">
 		<div id="conProjectInfo_title">Project Information</div>
-                                        <div id="conProjectInfo_projecttitle"><% $proj->name |html%></div>
-          								<div id="conProjectInfo_projectlog">Project Log</div>
-          							</div>
-	
+		<div id="conProjectInfo_projecttitle"><% $proj->name |html%></div>
+		<div id="conProjectInfo_projectlog">Project Log</div>
+	</div>
 
 	<span class="conProjectInfo_column1">
 		<div class="conProjectInfo_Row">
@@ -198,16 +197,17 @@
 	</span><!--END of span conProjectInfo_column2-->
 
 	 <span class="conProjectInfo_column3">
-                                     <div class="conHistorylist">
-										<ul >
-											<li ><strong>upload_fasta</strong>, 07/24/2009 09:19:39</li>
-											<li ><strong>repeat_masker</strong>, 41.070 sec., 07/24/2009 09:21:39</li>
-						
-										</ul>
-                                    <span class="bt_more"><a href="#">more »</a></span>
-            							
-            						</div>
-                                    </span>
+% if (1) {
+		 <div class="conHistorylist">
+			<ul >
+%			for ($pm->latest_log_entries) {
+				<li ><strong><% $_->message %></strong></li>
+%			}
+			</ul>
+			<span class="bt_more"><a href="#">more »</a></span>
+		</div>
+% }
+ 	</span>
 	</span> <!--END of span conProjectInfo_column3-->
 </div><!--END of ID conProjectInfo-->
 </div><!--END of ID container_rightContent-->  
@@ -298,8 +298,6 @@ else { # most likely is GET
 	for my $rt ( keys %routines ) {
 		my $status_name = $wfm->get_status($rt)->name;
 		$status{$rt} = $status_name;
-		
-		#print STDERR "** $rt => $status_name\n";
 	}
 	$rm_status = $status{repeat_masker};
 	$trimmed_common_name = $pm->cleaned_common_name;
@@ -309,8 +307,6 @@ else { # most likely is GET
 
 </%init>
 %#-------------------------------------------------
-
-%#----------------------------------------------------------------------------
 <%def .routine>
 <%args>
 	$routine => ""
@@ -361,7 +357,7 @@ else {
 status="<% $status %>" <% $action %> delay="<% $delay %>" title="<% $title %>" ><% $routines{$routine} %></a>
 </span>
 </%def>
-%#----------------------------------------------------------------------------
+%#-------------------------------------------------
 <%attr>
 	js => ['console.js']
 	css => []

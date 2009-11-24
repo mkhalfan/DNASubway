@@ -167,6 +167,15 @@ if ($pm->project) {
 
 		unless (@err) {
 
+			my $sequence_id = '';
+			if (my @ids = ($seq =~ m/^((?:>|;).*)/mg)) {
+				$sequence_id = join " ", @ids;
+			}
+			#clean the sequnece..
+			$seq =~ s/^(?:>|;).*//mg;
+			$seq =~ s/(?:\d|\s)+//g;
+			my $seq_obj = Bio::Seq->new(-display_id => $sequence_id, -seq => $seq);
+
 			my $tp = eval {
 					DNALC::Pipeline::TargetProject->create({
 						name => $name,
@@ -174,18 +183,22 @@ if ($pm->project) {
 						project_id => $pm->project ? $pm->project->id : undef,
 						organism => $organism,
 						segment => $common_name,
-						seq => $seq,
+						seq => $sequence_id . "\n" . $seq_obj->seq,
 						type => $type,
 						status => 'not processed',
+						sequence_length => $seq_obj->length,
 					});
 				};
 			if ($@) {
 				print STDERR $@, $/;
 				push @err, $@;
+				$seq = $sequence_id . "\n" . $seq;
 			}
-			#print STDERR Dumper($s->{target_new_project}), $/;
-			# redirect..
-			$m->redirect('/project/target/view/' . $tp->id) unless @err;
+			else {
+				#print STDERR Dumper($s->{target_new_project}), $/;
+				# redirect..
+				$m->redirect('/project/target/view/' . $tp->id) unless @err;
+			}
 		}
 
 #-------------------------------------

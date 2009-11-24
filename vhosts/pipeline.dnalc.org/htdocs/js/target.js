@@ -21,9 +21,9 @@ function launch_target () {
 	}
 	
 	$('launch_btn').hide();
-	$('alignment_span').update('<a href="#">Multiple<br/>Alignment</a>');
+	/*$('alignment_span').update('<a href="#">Multiple<br/>Alignment</a>');
 	$('tree_btn').onclick = null;
-	$('tree_btn').stopObserving ('click');
+	$('tree_btn').stopObserving ('click');*/
 
 	var tid = $('tid') ? $('tid').value : 0;
 	var params = { 'tid' : tid, 'g' : genomes};
@@ -40,6 +40,9 @@ function launch_target () {
 				var h = r.h || '';
 				intervalID = setInterval(function (){ check_status(tid, h)}, 10000);
 				$('message').update("processing");
+				$('alignment_span').update('<a href="#">Multiple<br/>Alignment</a>');
+				$('tree_btn').onclick = null;
+				$('tree_btn').stopObserving ('click');
 			}
 			else  if (r.status == 'error') {
 				alert(r.message);
@@ -75,7 +78,7 @@ function check_status (tid, h) {
 				clearInterval(intervalID);
 				//console.info("clearing id = " + intervalID);
 				if (r.status == 'done') {
-					$('message').update("Done");
+					$('message').update("Done. Check results.");
 					if (r.files && r.files['fasta']) {
 						var abtn = $('alignment_span');
 						abtn.update('<applet archive="/files/jalview/jalviewApplet.jar" name="Jalview_muscle_1" code="jalview.bin.JalviewLite" height="35" width="110">'

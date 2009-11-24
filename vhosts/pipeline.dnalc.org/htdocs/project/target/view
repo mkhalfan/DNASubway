@@ -34,7 +34,11 @@
 <div id="conYellowlineRight2">
 	<span class="bt_browserYellow" id="alignment_span">
 %	if (defined $files{fasta}) {
-		<applet archive="/files/jalview/jalviewApplet.jar" name="Jalview_muscle_1" code="jalview.bin.JalviewLite" height="35" width="110">
+		<applet archive="/files/jalview/jalviewApplet.jar" name="Jalview" 
+			codebase="/files/jalview/" 
+			code="jalview.bin.JalviewLite"
+			height="35" width="110">
+%#			<param name="code" value="jalview.bin.JalviewLite">
 			<param name="file" value="<% $files{fasta} %>">
 			<param name="showAnnotation" value="true">
 			<param name="windowHeight" value="500">
@@ -42,6 +46,7 @@
 			<param name="showFullId" value="false">
 			<param name="label" value="View Alignment">
 			<param name="defaultColour" value="Clustal">
+			<p id="java_install">To play, <a href="http://java.sun.com/webapps/getjava/BrowserRedirect?host=java.com">install Java now</a>.</p>
 		</applet>
 %	} else {
 	<a href="#">Multiple<br/>Alignment</a>
@@ -70,7 +75,8 @@
 <div id="conProjectInfo">
 	<div id="conProjectInfo_header">
 		<div id="conProjectInfo_title">Project Information</div>
-		<!--<div class="bt_History"><a href="#"></a></div>-->
+		<div id="conProjectInfo_projecttitle"><% $tp ? $tp->name : "" |html%></div>
+		<div id="conProjectInfo_projectlog">Project Log</div>
 	</div>
 
 	<span class="conProjectInfo_column1">
@@ -119,8 +125,10 @@
 </div><!--END of ID conProjectInfo-->  
 </div><!--END of ID container_rightContent-->     
 
+<%args>
+	$tid => 0
+</%args>
 <%once>
-	#use DNALC::Pipeline::App::ProjectManager ();
 	use DNALC::Pipeline::TargetGenome ();
 	use DNALC::Pipeline::TargetProject ();
 	use Data::Dumper;
@@ -132,7 +140,6 @@
 	my $s = $m->session->{pipeline};
 	
 	my $path_info = $r->path_info;
-	my $tid = 0;
 	my $tree_url = '';
 	my @tp_genomes = ();
 	my %files;

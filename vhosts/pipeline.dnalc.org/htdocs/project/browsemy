@@ -18,7 +18,7 @@
 %	my $color = "#c1272d";
 %	my $uri = "/project/console.html?pid=" . $_->id;
 %	if ($_->{project_type} eq "target") {
-%		$uri = "/project/target/view/" . $_->id;
+%		$uri = "/project/target/view?tid=" . $_->id;
 %		$color = "#fdba3e"; #blue = "#3953A4"
 % 	}
 <tr>

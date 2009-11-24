@@ -35,6 +35,21 @@ sub log {
 		});
 }
 
+__PACKAGE__->set_sql(latest => q{
+		SELECT *
+		FROM __TABLE__
+		WHERE project_id = ?
+		ORDER BY created DESC
+		LIMIT 2
+	});
+__PACKAGE__->set_sql(all => q{
+		SELECT *
+		FROM __TABLE__
+		WHERE project_id = ?
+		ORDER BY created DESC
+	});
+
+
 1;
 
 __END__

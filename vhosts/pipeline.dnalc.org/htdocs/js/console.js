@@ -166,6 +166,13 @@ function run (op) {
 			if (r.status == 'success') {
 				var h = r.h || '';
 				intervalID[op] = setInterval(function (){ check_status(p, op, h)}, delay);
+				if (op == 'fgenesh') {
+					$('conMessage_FgenesH').style.display = 'block';
+						new PeriodicalExecuter(function(p){
+							$('conMessage_FgenesH').style.display = 'none';
+							p.stop();
+						}, 5);
+				}
 			}
 			else  if (r.status == 'error') {
 				b.removeClassName(b.className);

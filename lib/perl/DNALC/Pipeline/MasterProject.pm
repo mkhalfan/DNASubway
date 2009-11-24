@@ -33,5 +33,8 @@ sub get_all {
 }
 
 #-----------------------------------------------------------------------------
+__PACKAGE__->set_sql(count_per_user => q{
+		SELECT count(*) FROM __TABLE__ WHERE user_id = ?
+	});
 
 1;

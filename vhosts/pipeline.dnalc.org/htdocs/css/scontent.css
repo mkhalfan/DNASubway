@@ -432,13 +432,13 @@
 }
 	
 .conHistorylist {
-	width:276px;
-	font-size: 0.8em;
+	/*width:276px;*/
+	font-size: 0.7em;
 	clear: both;
 	color: #996600;
-	float: left;
+	/*float: left;
 	margin-left:-10px;
-	list-style-position: outside;
+	/*list-style-position: outside;*/
 	}
 
 .conProjectInfo_column1{
@@ -726,6 +726,22 @@
 .bt_RunAll a:hover {
 	background: url("/images/v2/bt_runAll2.png") top no-repeat;
 
+}
+
+#conMessage_FgenesH{
+	width: 410px;
+	height: auto;
+	margin: 0px 340px 10px 40px;
+	display:none;
+	position: relative;
+	float: left;
+	padding: 10px;
+	font-size:.95em;
+	border: .1em;
+	border-style: solid;
+	border-color: #669900;
+	background-color: #ECF8E0;
+	color: #000;
 }
 /*-END--REDLINE Console left--RUN------*/
 
