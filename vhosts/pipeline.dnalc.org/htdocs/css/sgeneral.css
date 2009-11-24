@@ -425,6 +425,62 @@ h4{
 
 }
 
+a.Start {
+	/*width: 120px;
+	height: 50px;*/
+	display: block;
+	font-size: .85em;
+	color:#FFFFFF;
+	text-decoration:none;
+	text-align: center;
+	position:relative;
+}
+
+
+a.Start span{ 
+	display: none;
+}
+
+a.Start:hover{ 
+	z-index:30; 
+}
+
+
+a.Start:hover span.Starttip {
+	width: 254px;
+	height: 100%;
+	display:block;
+	position:absolute;
+	top:40px;
+	left:10px;
+	color: #000;
+	text-align: left;
+	font-size: .85em;
+}
+
+a.Start:hover span.top{
+	width:254px;
+	height: 18px;
+	display: block;
+   	background: url("/images/v2/bubble_top.png") top no-repeat;
+
+	
+}
+a.Start:hover span.middle{
+	padding: 0px 20px 0px 20px;
+	display: block;
+	background: url("/images/v2/bubble_middle.png") repeat-y;
+}
+a.Start:hover span.bottom{
+	width: 254px;
+	height: 18px;
+	display: block;
+	background: url("/images/v2/bubble_bottom.png") bottom no-repeat;
+
+	
+}
+
+
 .bt_yellowStart {
 	width:150px;
 	height: 40px;
@@ -557,7 +613,7 @@ a.info {
 	font-size: .85em;
 	color:#FFFFFF;
 	text-decoration:none;
-	text-align: center;
+	text-align: left;
 	position:relative;
 }
 
@@ -570,20 +626,20 @@ a.info:hover{
 }
 
 a.info:hover span.infotip {
-	width:182px;
+	width:254px;
 	height: 100%;
 	display:block;
 	position:absolute;
-	top:-60px;
-	left:-10px;
+	top:40px;
+	left:-24px;
 	color: #000;
-	text-align: center;
+	text-align: left;
 	font-size: .85em;
 }
 
 a.info:hover span.top{
-	width:182px;
-	height: 17px;
+	width:254px;
+	height: 18px;
 	display: block;
    	background: url("/images/v2/bubble_top.png") top no-repeat;
 }
@@ -593,8 +649,8 @@ a.info:hover span.middle{
 	background: url("/images/v2/bubble_middle.png") repeat-y;
 }
 a.info:hover span.bottom{
-	width:182px;
-	height: 34px;
+	width:254px;
+	height: 18px;
 	display: block;
 	background: url("/images/v2/bubble_bottom.png") bottom no-repeat;
 }
