@@ -132,15 +132,16 @@ DNALC Team";
 							Data => $text
 						);
 				eval {
-					#$msg->send("smtp", "dmzsmtp.cshl.edu", Timeout=>30);
-					$msg->send();
+					$msg->send("smtp", $cf->{SMTP_SERVER}, Timeout=>30);
+					
 				};
 				if ($@) {
 					print STDERR "Error: " . $@ . "\n";
+					$msg->send();
 				}
 			}			
 
-			$m->comp("/_message_add", "User almost created. In the future, we'll send an email; code = $code");
+			$m->comp("/_message_add", "Account created. You will receive an email with further instructions.");
 
 			# clear registration session
 			$m->session->{pipeline_reg} = {};
