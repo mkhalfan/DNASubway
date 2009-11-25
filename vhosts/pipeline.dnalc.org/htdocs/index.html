@@ -1,9 +1,9 @@
     	<div id="home_map">
 		  <div id="map_left">
-			<span id="map_spacer"></span>
-     		<span class="bt_redStart"><a href="<% $s->{logged_in} ? "/project/create_project.html" : "#" %>" class="Start"><span class="Starttip"><span class="top"></span><span class="middle">Identify the meaningful segments in a DNA sequence and associate this information with the sequence (up to 100,000 nucleotides).</span><span class="bottom"></span></span></a></span>
-			<span class="bt_yellowStart"><a href="<% $s->{logged_in} ? "/project/target/create" : "#" %>" class="Start"><span class="Starttip"><span class="top"></span><span class="middle">Identify sequences that are related to a gene, transposons, or other DNA sequence (up to 10,000 nucleotides).</span><span class="bottom"></span></span></a></span>
-		    <span class="bt_blueStart"><a href="#" class="Start"><span class="Starttip"><span class="top"></span><span class="middle">Determine the potential nature of genes in a set of expressed sequence tags (EST; up to 100 megabytes of assembled data).</span><span class="bottom"></span></span></a></span> 
+			<span id="map_spacer"><div id="startHere"></div></span>
+     		<span class="bt_redStart"><a href="<% $s->{logged_in} ? "/project/create_project.html" : "#" %>" class="Start"><span class="Starttip"><span class="top"></span><span class="middle">Input a DNA sequence of up to 100,000 nucleotides to identify the genes and transposons in it, and annotate (associate) the sequence with this information.</span><span class="bottom"></span></span></a></span>
+			<span class="bt_yellowStart"><a href="<% $s->{logged_in} ? "/project/target/create" : "#" %>" class="Start"><span class="Starttip"><span class="top"></span><span class="middle">Input a gene or protein of up to 10,000 nucleotides or amino acids to identify related genes, determine gene functions, and build phylogenetic trees.</span><span class="bottom"></span></span></a></span>
+		    <span class="bt_blueStart"><a href="#" class="Start"><span class="Starttip"><span class="top"></span><span class="middle">Input a set of Expressed Sequence Tags (ESTs) of up to 100 megabytes of assembled data to determine the potential natures of the genes captured.</span><span class="bottom"></span></span></a></span> 
 		  </div>
                 
 		  		<div id="map_right">
@@ -12,20 +12,19 @@
     
     <li><span class="spacer1"></span></li>
     <li><span class="conConsole_info"><a href="#" class="info"><span class="infotip"><span class="top"></span><span class="middle">
-	The RepeatMasker algorithm indentifies and masks repeats and transposons that otherwise obstruct the analysis of DNA.
+	Identify and mask repeats and transposons that can obstruct sequence analysis.
 	</span><span class="bottom"></span></span></a></span></li>
     <li><span class="spacer3"></span></li>
     <li><span class="conConsole_info"><a href="#" class="info"><span class="infotip"><span class="top"></span><span class="middle">
-	Gene prediction algorithms highlight regions in DNA that show patterns associated with genes.
+	Identify DNA patterns typical for genes using gene prediction algorithms Augustus, FGenesH, SNAP, and tRNA Scan.
 	</span><span class="bottom"></span></span></a></span></li>
     <li><span class="spacer3"></span></li>
     <li><span class="conConsole_info"><a href="#" class="info"><span class="infotip"><span class="top"></span><span class="middle">
-	Search algorithms, such as BLASTN or BLASTP, search databases of previously discovered genes and proteins for matches to DNA.
+	Search the sequence for matches to known genes and proteins using search algorithms BLASTN and BLASTP.
 	</span><span class="bottom"></span></span></a></span></li>
     <li><span class="spacer3"></span></li>
     <li><span class="conConsole_info"><a href="#" class="info"><span class="infotip"><span class="top"></span><span class="middle">
-	Gene prediction and search results may be contradictory and/or incomplete. The annotation editor Apollo helps 
-	synthesizing the results of these analyses into gene models.
+	Synthesize gene predictions and search results into gene models using the annotation editor Apollo.
 	</span><span class="bottom"></span></span></a></span></li>
     </ul>
  	</div><!--END of CLASS containerHoz-->
@@ -37,17 +36,17 @@
     <li><span class="spacer1"></span></li>
     <li><span class="spacer2"></span></li>
     <li><span class="conConsole_info"><a href="#" class="info"><span class="infotip"><span class="top"></span><span class="middle">
-	Search algorithms, such as BLASTN or TBLASTN, search the genome of the same and/or other species for matches to a DNA or protein sequence.
+	Search genomes for matches to a gene using search algorithms BLASTN or TBLASTN.
 	</span><span class="bottom"></span></span></a></span></li>
     <li><span class="spacer2"></span></li>
     <li><span class="spacer2"></span></li>
     <li><span class="conConsole_info"><a href="#" class="info"><span class="infotip"><span class="top"></span><span class="middle">
-	Display the matches identified in the BLAST search in multiple alignment format and as tree view.
+	View BLAST search results in multiple alignment format and as tree view.
 	</span><span class="bottom"></span></span></a></span></li>
     <li><span class="spacer1"></span></li>
     <li><span class="spacer2"></span></li>
     <li><span class="conConsole_info"><a href="#" class="info"><span class="infotip"><span class="top"></span><span class="middle">
-	Genome browsers display analysis results and annotations in a graphical format. Individual genes can also be transferred to the Gene Family track (Yellow Line) to identify related genes, gene function, and to build phylogenetic trees.
+	View analysis results and annotations in a genome browser. Transfer a gene to the Gene Family track (Yellow Line) to identify related genes, determine gene functions, and build phylogenetic trees.
 	</span><span class="bottom"></span></span></a></span></li>
  
     </ul>
@@ -67,7 +66,7 @@
     <span class="spacer2"></span>
     <span class="spacer2"></span>
     <span class="conConsole_info"><a href="#" class="info"><span class="infotip"><span class="top"></span><span class="middle">
-	The search algorithm BLAT is used to search the genome of the same or other species for matches to EST data.
+	Search genome sequences for matches to EST data using DNA search algorithm BLAT.
 	</span><span class="bottom"></span></span></a></span>
  
  	</div><!--END of CLASS containerHoz-->

@@ -394,6 +394,14 @@ h4{
 	position: relative;
 }
 
+#startHere {
+	width: 150px;
+	height: 28px;
+	background: url("/images/v2/startHere.jpg") top left no-repeat;
+	float:left;
+	position: relative;
+}
+
 
 /*//-------HOME Map Start BUTTONs------------------*/
 .bt_redStart {
