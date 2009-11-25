@@ -301,9 +301,12 @@ if ($r->method eq 'POST') {
 				$pm->log("RNA converted to DNA.");
 			}
 
+			# no longer a new user (it has projects now...)
+			delete $s->{new_user} if exists $s->{new_user};
+
 			# redirect user to console
 			$m->redirect('./console.html?pid=' . $proj->id);
-			
+
 		} #end else
 	} #end unless
 } #end if POST

@@ -1,6 +1,10 @@
     	<div id="home_map">
 		  <div id="map_left">
-			<span id="map_spacer"><div id="startHere"></div></span>
+			<span id="map_spacer">
+% if ($s->{logged_in} && $s->{new_user}) {
+			<div id="startHere"></div>
+% }
+			</span>
      		<span class="bt_redStart"><a href="<% $s->{logged_in} ? "/project/create_project.html" : "#" %>" class="Start"><span class="Starttip"><span class="top"></span><span class="middle">Input a DNA sequence of up to 100,000 nucleotides to identify the genes and transposons in it, and annotate (associate) the sequence with this information.</span><span class="bottom"></span></span></a></span>
 			<span class="bt_yellowStart"><a href="<% $s->{logged_in} ? "/project/target/create" : "#" %>" class="Start"><span class="Starttip"><span class="top"></span><span class="middle">Input a gene or protein of up to 10,000 nucleotides or amino acids to identify related genes, determine gene functions, and build phylogenetic trees.</span><span class="bottom"></span></span></a></span>
 		    <span class="bt_blueStart"><a href="#" class="Start"><span class="Starttip"><span class="top"></span><span class="middle">Input a set of Expressed Sequence Tags (ESTs) of up to 100 megabytes of assembled data to determine the potential natures of the genes captured.</span><span class="bottom"></span></span></a></span> 
@@ -146,6 +150,7 @@ if ($r->method eq "POST") {
 			$m->redirect("/project/browsemy");
 		}
 		else {
+			$s->{new_user} = 1;
 			$m->redirect("/");
 		}
 	}

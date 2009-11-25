@@ -1,8 +1,4 @@
-% if ($tp) {
-<%$tp->seq %>
-% } else {
-Error: Can't find sequence for this project.
-% }
+<%$seq %>
 %#-------------------------------------------------
 <%once>
 	use DNALC::Pipeline::TargetProject ();
@@ -11,7 +7,7 @@ Error: Can't find sequence for this project.
 <%init>
 	$r->content_type('text/plain');
 	my $path_info = $r->path_info;
-	my ($tid);
+	my ($tid, $seq);
 
 	my @err = ();
 
@@ -19,6 +15,13 @@ Error: Can't find sequence for this project.
 		$tid = $1;
 	}
 	my $tp = DNALC::Pipeline::TargetProject->retrieve($tid);
+	if ($tp) {
+		$seq = $tp->seq;
+		$seq =~ s/(.{80})/$1\n/g;
+	}
+	else {
+		$seq = "Error: Can't find sequence for this project.";
+	}
 </%init>
 %#-------------------------------------------------
 <%flags>

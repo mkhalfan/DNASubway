@@ -21,6 +21,7 @@ function launch_target () {
 	}
 	
 	$('launch_btn').hide();
+	$('message').update("Processing.");
 	/*$('alignment_span').update('<a href="#">Multiple<br/>Alignment</a>');
 	$('tree_btn').onclick = null;
 	$('tree_btn').stopObserving ('click');*/
@@ -39,7 +40,6 @@ function launch_target () {
 			if (r.status == 'success') {
 				var h = r.h || '';
 				intervalID = setInterval(function (){ check_status(tid, h)}, 10000);
-				$('message').update("processing");
 				$('alignment_span').update('<a href="#">Multiple<br/>Alignment</a>');
 				$('tree_btn').onclick = null;
 				$('tree_btn').stopObserving ('click');

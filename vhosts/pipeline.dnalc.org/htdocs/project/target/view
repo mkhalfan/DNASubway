@@ -105,7 +105,7 @@
 		</div>-->
 		<div class="conProjectInfo_Row">
 			<span class="conProjectInfo_Cell1">Sequence</span>
-			<span class="conProjectInfo_Cell3">: 100kb</span>
+			<span class="conProjectInfo_Cell3">: </span>
 			<span class="conProjectInfo_CellBT"><a href="javascript:;" onclick="javascript:launch_viewseq('<% $tid %>')">View</a></span>
 		</div>
 	</span><!--END of span conProjectInfo_column2-->

@@ -31,7 +31,7 @@
 		</div>
 		<div id="container_H_insidebottom">
 			<span class="bt_LogOut"><a href="/logout"></a></span>
-			<span class="bt_Map"><a href="/project/"></a></span>
+			<span class="bt_Map"><a href="/"></a></span>
 		</div>
 	</div> <!--END of ID container_InsideH_bgr-->
 </div> <!--END of ID container_InsideHeader-->
