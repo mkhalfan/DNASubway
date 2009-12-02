@@ -11,13 +11,12 @@ use DNALC::Pipeline::Config();
 
 use Gearman::Client ();
 
-my $tpid = 24;
+my $tpid = 54;
 my $client = Gearman::Client->new;
 my $sx = $client->job_servers('127.0.0.1');
 
-my $h = $client->dispatch_background( target => $tpid );
-
-__END__;
+#my $h = $client->dispatch_background( target => $tpid );
+#__END__;
 
 my $tp = DNALC::Pipeline::TargetProject->retrieve($tpid);
 
@@ -31,6 +30,7 @@ my $post_url = $server . $cf->{DNA_URL};
 
 my $seq = $tp->seq;
 my @genomes = map {$_->genome_id->id} $tp->genomes;
+my %genomes = map {my $o = $_->genome_id->organism; $o =~ s/\s+/_/g;$_->genome_id->id => $o} $tp->genomes;
 
 my $query = {
 	'orgn[]' => \@genomes,
@@ -40,7 +40,7 @@ my $query = {
 
 #print STDERR Dumper( $query ), $/;
 
-my $xml_url = $server . '/Visitors/143_48_90_149/temp_0826130445.xml';
+my $xml_url = $server . '/Visitors/143_48_90_149/temp_121130310.xml';
 
 unless ($xml_url) {
 	$res = $ua->post($post_url, $query);
@@ -91,9 +91,19 @@ if ($xml_url) {
 						my $file = $work_dir . '/file.' . $ext;
 						my $fh = IO::File->new;
 						if ($fh->open( $file , 'w')) {
+							if ($ext eq 'nw') {
+								$content =~ s/([a-z0-9]+)_AS_/$genomes{$1} . '_AS_'/gei;
+								#print STDERR  $content, $/;
+							}
+							elsif ($ext eq 'fasta') {
+								$content =~ s/^>([a-z0-9]+)_AS_/'>' . $genomes{$1} . '_AS_'/mgei;
+							}
 							$fh->binmode if $ext eq 'jpg';
 							print $fh $content;
 							$fh->close;
+						}
+						else {
+							print STDERR  "Unable to write in ", $file, $/;
 						}
 						#print STDERR  $file, $/;
 					}

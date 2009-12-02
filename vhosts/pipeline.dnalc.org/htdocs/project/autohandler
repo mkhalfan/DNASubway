@@ -67,6 +67,11 @@
 
 
 </div><!--END of ID mainContainer-->
+<script type="text/javascript" src="http://include.reinvigorate.net/re_.js"></script>
+<script type="text/javascript">
+var re_name_tag = "<% $s->{username} %>";
+re_("ktaz7-6gmi62748k");
+</script>
 </body>
 </html>
 %#---------------------------------

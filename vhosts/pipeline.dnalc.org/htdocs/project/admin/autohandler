@@ -28,15 +28,16 @@
 <body>
 <div>
 	<a href="/project/admin/samples/">samples</a>
-	<a href="#">users</a>
-	<a href="#">projects</a>
+	<a href="/project/admin/target_samples/">target samples</a>
+%#	<a href="#">users</a>
+%#	<a href="#">projects</a>
 </div>
 <div id="main">
 
 % $m->call_next;
 
 </div> <!-- #container_main  -->
-<div id="footer">Copyright 2009, Cold Spring Harbor Laboratory. All rights reserved.</div>
+<div id="footer">© Cold Spring Harbor Laboratory. All rights reserved.</div>
 </body>
 </html>
 %#---------------------------------

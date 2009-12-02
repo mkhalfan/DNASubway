@@ -185,6 +185,85 @@ function show_errors(html) {
 
 }
 
+function select_source(el) {
+	alert('select_source() ????');
+	if (el && el.value == 'upload') {
+		$('sample').selectedIndex = -1;
+		//$('sample_info').update('');
+	}
+	else if (el && el.value == 'sample') {
+		//$('organism_info').hide();
+	}
+	populate_fields(el.value);
+}
+
+
+function set_source(s) {
+	var el = $('seq_src_' + s);
+	if (el) {
+		el.click();
+		//if (s == 'sample') {
+		populate_fields(s);
+		//}
+	}
+}
+
+function populate_fields(src) {
+	
+	var sel = $('sample');
+	var organism = $('organism');
+	var common_name = $('common_name');
+	if (src == 'paste' || !sel || sel.selectedIndex == -1) {
+		//organism.value = '';
+		//common_name.value = '';
+		organism.readOnly = false;
+		common_name.readOnly = false;
+		$('function').readOnly = false;
+		$('class').readOnly = false;
+		$('gp_name').readOnly = false;
+		//$('type').readOnly = false;
+	}
+	else {
+		var extra = {};
+		var o = sel.options[sel.selectedIndex];
+		var extra_str = o.hasAttribute('extra') ? o.getAttribute('extra') : null;
+		if (extra_str) {
+			var data = extra_str.match(/(.*?):(.*?);/g);
+			data.each(function(item) {
+				var tmp = item.replace(/;/,'').split(/:/);
+				if (tmp.size() == 2) {
+					extra[tmp[0]] = tmp[1];
+				}
+			});
+		}
+		dbg = extra;
+		if (extra.name)
+			$('gp_name').value = extra.name;
+		if (extra.class_name)
+			$('class').value = extra.class_name;
+		if (extra.function_name)
+			$('function').value = extra.function_name;
+
+		var type_o = $('type_' + extra.type);
+		var full_name = o.text;
+		//organism.value = full_name.replace(/\s*\(.*/,'');
+		var m = full_name.match(/\((.*)\)/);
+		if (m && m.length == 2) {
+			var tmp = m[1].split("/");
+			organism.value = tmp[0];
+			common_name.value = tmp[1];
+		}
+		organism.readOnly = true;
+		common_name.readOnly = true;
+		$('function').readOnly = true;
+		$('class').readOnly = true;
+		$('gp_name').readOnly = true;
+		if (type_o) {
+			type_o.checked = true;
+		}
+	}
+}
+
 //-------------
 // keep this at the end
 Event.observe(window, 'load', function() {

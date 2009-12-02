@@ -2,7 +2,6 @@
 <form method="post" id="forma">
 <div id="conYellowlineLeft1"> 
 	<div id="conProject_newLeft">
-	
 % if (@err) {
 <div style="display:none" id="error_list">
 %	foreach (@err) {
@@ -11,27 +10,25 @@
 </div>
 % }
 	<div class="conNewPro_title">Select Sequence Source</div>
-% if (0) {
 		<div class="conNewPro_label1">
-			<input class="conRadiobox_align" type="radio" name="seq_src" id="seq_src_upload" value="upload" onclick="select_source(this)"  />&nbsp; Upload a Sequence File: (max 100kb) 
-			<input class="conStylized_box1" type="file" id="seq_file" name="seq_file"  onchange="//set_source('upload')" onclick="//set_source('upload')"  />
-		</div>
-% }
-		<div style="clear: both;">&nbsp;</div>
-		<div class="conNewPro_label1">
-%#			<input class="conRadiobox_align" type="radio" name="seq_src" id="seq_src_paste" value="paste" <% $seq ne "" ? "checked=\"checked\"" : "" %> />&nbsp; 
+			<input class="conRadiobox_align" type="radio" name="seq_src" id="seq_src_paste" value="paste" <% $seq ne "" ? "checked=\"checked\"" : "" %> />&nbsp; 
 			Enter a Sequence in FASTA Format: 
-			<textarea class="conStylized_box2" name="seq" id="seq" rows="5" cols="30" onfocus="//set_source('paste');"><% $seq |html%></textarea>
+			<textarea class="conStylized_box2" name="seq" id="seq" rows="5" cols="30" onfocus="set_source('paste');"><% $seq_src eq "sample" ? "" : $seq |html%></textarea>
 		</div>
-		<div style="clear: both;">&nbsp;</div>
-% if (0 && !$seq) {
+% unless ($pm->project) {
 		<div style="clear: both;">&nbsp;</div>
 		<div class="conNewPro_label1">
-			<input class="conRadiobox_align" type="radio" name="seq_src" id="seq_src_paste" value="paste"   />&nbsp; Select a Sample Sequence:  
-			<select class="conStylized_box3" id="specie" name="species" size="6" onchange="//set_source('sample');">
+			<input class="conRadiobox_align" type="radio" name="seq_src" id="seq_src_sample" value="sample" <% $seq_src eq "sample" ? "checked=\"checked\"" : "" %>  />&nbsp; Select a Sample Sequence:  
+			<select class="conStylized_box3" id="sample" name="sample" size="5" style="width: 380px;" onchange="set_source('sample');">
+% for my $ss (@samples) {
+%	my $sel = $seq_src eq "sample" && $ss->id == $sample ? "selected=\"selected\"" : "";
+			<option id="o<%$ss->id%>" value="<% $ss->id %>" extra="type:<% $ss->type %>;function_name:<% $ss->function_name%>;class_name:<% $ss->class_name%>;name:<%$ss->name%>;"\
+			<% $sel %>><% $ss->name %> (<% $ss->organism %>/<% $ss->common_name %>)</option>
+% }
 			</select>
 		</div>
 % }
+		<div style="clear: both;">&nbsp;</div>
 		<div class="conNewPro_label1">
 			<label>Sequence type:</label>
 			<div style="padding-left: 100px;">
@@ -63,15 +60,15 @@
 		<div class="conNewPro_title">Gene/Protein</div>   
 		<div class="conNewPro_label1">
 			<label>Name:</label>
-			<input class="conStylized_box4" type="text" name="organismx" id="organismx" value="???" maxlength="128"  />
-		</div>  
+			<input class="conStylized_box4" type="text" name="gp_name" id="gp_name" value="<% $gp_name |html %>" maxlength="128" />
+		</div>
 		<div class="conNewPro_label1">
 			<label>Class:</label>
-			<input class="conStylized_box4" type="text"name="common_name1" id="common_name1" value="???" maxlength="128"   />
+			<input class="conStylized_box4" type="text" name="class" id="class" value="<% $class |html %>" maxlength="128" />
 		</div> 
 		<div class="conNewPro_label1">
 			<label>Function:</label>
-			<input class="conStylized_box4" type="text"name="common_name2" id="common_name2" value="???" maxlength="128"   />
+			<input class="conStylized_box4" type="text" name="function" id="function" value="<% $function |html %>" maxlength="128" />
 		</div> 
 		<div style="clear: both;">&nbsp;</div>
 		<div class="conBT_continue"><a href="javascript:;" onclick="document.forms['forma'].submit()"></a></div>
@@ -88,12 +85,18 @@
 	$name => ""
 	$type => ""
 	$seq => ""
+	$seq_src => ""
+	$sample => ""
+	$gp_name => ""
+	$class => ""
+	$function => ""
 </%args>
 <%once>
 	use DNALC::Pipeline::Config ();
 	use DNALC::Pipeline::App::ProjectManager ();
 	use DNALC::Pipeline::TargetGenome ();
 	use DNALC::Pipeline::TargetProject ();
+	use DNALC::Pipeline::TargetSample ();
 	use Bio::SeqIO ();
 	use Gearman::Client();
 	use DNALC::Pipeline::CacheMemcached ();
@@ -117,6 +120,7 @@ if ($path_info =~ /_(\d+)\/(\d+)\/(\d+)/) {
 	$stop  = $3;
 }
 
+my @samples;
 my $tcf = DNALC::Pipeline::Config->new->cf('TARGET');
 
 my $pm = DNALC::Pipeline::App::ProjectManager->new($pid);
@@ -147,14 +151,34 @@ if ($pm->project) {
 		$common_name ||= $pm->project->common_name;
 		$name ||= $pm->cleaned_common_name . ":$start..$stop";
 	}
-	$type = 'd';
+	$type = "d";
 	$disable_type = 1;
+}
+else {
+	@samples = DNALC::Pipeline::TargetSample->retrieve_all;
 }
 
 	if ($r->method eq "POST") {
-		unless ($seq) {
-			push @err, "Sequence is missing.";
+	
+		if ($seq_src eq "sample") {
+			my $sample = DNALC::Pipeline::TargetSample->retrieve($sample);
+			if ($sample) {
+				$seq = $sample->sequence_data;
+				$type = $sample->type;
+			}
+			else {
+				push @err, "Unable to retrieve the selected sample.";
+			}
 		}
+		else {
+			unless ($seq) {
+				push @err, "Sequence is missing.";
+			}
+			if ($tcf->{MAX_SEQ_LEN} < length $seq) {
+				push @err, "Sequence length should be  " . $tcf->{MAX_SEQ_LEN} . " or shorter.";
+			}
+		}
+
 		unless ($name) {
 			push @err, "Project title is missing.";
 		}
@@ -166,9 +190,6 @@ if ($pm->project) {
 		}
 		unless ($type) {
 			push @err, "Sequence type is missing.";
-		}
-		if ($tcf->{MAX_SEQ_LEN} < length $seq) {
-			push @err, "Sequence length should be  " . $tcf->{MAX_SEQ_LEN} . " or shorter.";
 		}
 
 		unless (@err) {
@@ -182,6 +203,9 @@ if ($pm->project) {
 						segment => $common_name,
 						seq => $seq,
 						type => $type,
+						gp_name => $gp_name || '',
+						class_name => $class || '',
+						function_name => $function || '',
 						status => 'not processed',
 					});
 				};

@@ -168,7 +168,7 @@ function run (op) {
 				intervalID[op] = setInterval(function (){ check_status(p, op, h)}, delay);
 				if (op == 'fgenesh') {
 					$('conMessage_FgenesH').style.display = 'block';
-						new PeriodicalExecuter(function(p){
+					new PeriodicalExecuter(function(p){
 							$('conMessage_FgenesH').style.display = 'none';
 							p.stop();
 						}, 5);
@@ -221,6 +221,11 @@ function launch_apollo() {
 				//a.fire('click');
 				var upl = new Element('iframe', {src: r.file, width: '0px', height:'0px', style: 'display: none'});
 				status_div.appendChild(upl);
+				new PeriodicalExecuter(function(p){
+							$('apollo_status').hide();
+							$('apollo_btn').parentNode.show();
+							p.stop();
+						}, 60);
 			}
 			else  if (r.status == 'error') {
 				alert("There seem to be an error: " + r.message);

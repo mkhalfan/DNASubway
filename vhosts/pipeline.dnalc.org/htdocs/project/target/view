@@ -54,7 +54,7 @@
 	</span>
 	<span class="bt_browserYellow"><a href="javascript:;" id="tree_btn" \
 % 	if ( $tree_url) {
-		onclick="window.open('/files/phylowidget/bare.html?tree=<% $tree_url %>', 'target_tree', 'status=0,height=500,width=600')"
+		onclick="window.open('/files/phylowidget/bare.html?tree=<% $tree_url %>', 'target_tree', 'status=0,height=550,width=650')"
 % 	}
 	>Phylogenetic<br/>Tree</a></span>
 % if ($tree_url && 0) {
@@ -92,6 +92,11 @@
 			<span class="conProjectInfo_Cell1">Affiliation</span>
 			<span class="conProjectInfo_Cell2">: DNALC</span>
 		</div>
+		<div class="conProjectInfo_Row">
+			<span class="conProjectInfo_Cell1">Sequence</span>
+			<span class="conProjectInfo_Cell3">: </span>
+			<span class="conProjectInfo_CellBT"><a href="javascript:;" onclick="javascript:launch_viewseq('<% $tid %>')">View</a></span>
+		</div>
 	</span><!--END of span conProjectInfo_column1-->
 
 	<span class="conProjectInfo_column2">
@@ -99,14 +104,17 @@
 			<span class="conProjectInfo_Cell1">Organism</span>
 			<span class="conProjectInfo_Cell2">: <% $tp ? $tp->organism : "" %></span>
 		</div>
-		<!--<div class="conProjectInfo_Row">
-			<span class="conProjectInfo_Cell1">Classification</span>
-			<span class="conProjectInfo_Cell2">: Monocotyledons</span>
-		</div>-->
 		<div class="conProjectInfo_Row">
-			<span class="conProjectInfo_Cell1">Sequence</span>
-			<span class="conProjectInfo_Cell3">: </span>
-			<span class="conProjectInfo_CellBT"><a href="javascript:;" onclick="javascript:launch_viewseq('<% $tid %>')">View</a></span>
+			<span class="conProjectInfo_Cell1"><% $tp && $tp->type eq "p" ? "Protein" : "Gene"%> name</span>
+			<span class="conProjectInfo_Cell2">: <% $tp ? $tp->gp_name : "" %></span>
+		</div>
+		<div class="conProjectInfo_Row">
+			<span class="conProjectInfo_Cell1">Class</span>
+			<span class="conProjectInfo_Cell2">: <% $tp ? $tp->class_name : "" %></span>
+		</div>
+		<div class="conProjectInfo_Row">
+			<span class="conProjectInfo_Cell1">Function</span>
+			<span class="conProjectInfo_Cell2">: <% $tp ? $tp->function_name : "" %></span>
 		</div>
 	</span><!--END of span conProjectInfo_column2-->
 	<span class="conProjectInfo_column2">

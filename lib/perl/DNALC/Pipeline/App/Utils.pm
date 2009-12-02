@@ -152,7 +152,7 @@ sub process_input_file {
 	my ($class, $file) = @_;
 
 	unless ($file) {
-		return {status => 'error', msg => 'Inpus file is missing!'};
+		return {status => 'error', msg => 'Input file is missing!'};
 	}
 
 	print STDERR  "IN = file: ", $file, $/ if $file;

@@ -30,6 +30,7 @@ sub run_target {
 
 	my $seq = $tp->seq;
 	my @genomes = map {$_->genome_id->id} $tp->genomes;
+	my %genomes = map {my $o = $_->genome_id->organism; $o =~ s/\s+/_/g;$_->genome_id->id => $o} $tp->genomes;
 
 	my $query = {
 		'orgn[]' => \@genomes,
@@ -72,7 +73,7 @@ sub run_target {
 			my $work_dir = $tp->work_dir;
 
 			my $xml_str = $res->content;
-			my $ref =  XMLin($xml_str);
+			my $ref = XMLin($xml_str);
 			my $steps = $ref->{run}->{steps}->{step};
 			if ($steps) {
 				$tp->create_work_dir;
@@ -107,11 +108,22 @@ sub run_target {
 						my $file = $work_dir . '/file.' . $ext;
 						my $fh = IO::File->new;
 						if ($fh->open( $file , 'w')) {
-							$fh->binmode if $ext eq 'jpg';
+							if ($ext eq 'nw') {
+								$content =~ s/([a-z0-9]+)_AS_/$genomes{$1} . '_AS_'/gei;
+							}
+							elsif ($ext eq 'fasta') {
+								$content =~ s/^>([a-z0-9]+)_AS_/'>' . $genomes{$1} . '_AS_'/mgei;
+								#print STDERR $content, $/;
+							}
+							else {
+								$fh->binmode if $ext eq 'jpg';
+							}
 							print $fh $content;
 							$fh->close;
 						}
-						#print STDERR  $file, $/;
+						else {
+							print STDERR  "Unable to write file: ", $file, $/;
+						}
 					}
 				}
 				$tp->status('done');

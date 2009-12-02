@@ -5,6 +5,7 @@
 	use DNALC::Pipeline::App::ProjectManager ();
 	use DNALC::Pipeline::Config ();
 	use DNALC::Pipeline::Sample ();
+	use DNALC::Pipeline::Utils qw/random_string/;
 </%once>
 <%init>
 
@@ -28,8 +29,11 @@ if ($proj) {
 		$stop = $sample->stop;
 		
 		$eurl = $r->get_server_name eq 'pipeline-dev.dnalc.org'
-					? "http://green.cshl.edu/project/prepare_exporter_file%3Fpid%3D$pid"
-					: "http://" . $r->get_server_name . "/project/prepare_exporter_file%3Fpid%3D$pid";
+					? "http%3A//green.cshl.edu/project/prepare_exporter_file%3Fpid%3D$pid"
+					: "http%3A//" . $r->get_server_name . "/project/prepare_exporter_file%3Fpid%3D$pid";
+
+
+		$eurl .= '%26rand%3D' . random_string();
 
 		my ($redirect_to) = '';
 		for ($sample->links) {
