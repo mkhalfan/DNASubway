@@ -80,7 +80,7 @@ re_("ktaz7-6gmi62748k");
 </%once>
 %#---------------------------------
 <%init>
-	$m->session->{pipeline} ||= {};
+	#$m->session->{pipeline} ||= {};
 	my $s = $m->session->{pipeline};
 
 	my $now = time();

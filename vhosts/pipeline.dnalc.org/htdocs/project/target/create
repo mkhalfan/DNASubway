@@ -155,7 +155,7 @@ if ($pm->project) {
 	$disable_type = 1;
 }
 else {
-	@samples = DNALC::Pipeline::TargetSample->retrieve_all;
+	@samples = DNALC::Pipeline::TargetSample->search(active => 1, {order_by => "name"});
 }
 
 	if ($r->method eq "POST") {
