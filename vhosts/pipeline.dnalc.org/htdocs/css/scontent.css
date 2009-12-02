@@ -842,7 +842,7 @@
 	position: relative;	
 	margin-bottom: 20px;
 	/*padding-left: 22px;*/
-	float: right;
+	float: left;
 }
 
 
@@ -852,7 +852,7 @@
 	background: url("/images/v2/bt_browserAdd1.png") top no-repeat;
 	display: block;
 	position: relative;
-	float: right;
+	float: left;
 	padding-top: 8px;
 	padding-left: 22px;
 	color: #555;
