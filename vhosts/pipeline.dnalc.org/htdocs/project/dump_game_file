@@ -19,10 +19,7 @@
 	my $apollo      = $config->{APOLLO_HEADLESS};
 	my $write_dir   = $config->{APOLLO_WRITE_DIR};
 	my $web_path    = $config->{APOLLO_WEB_PATH};
-	#my $vendor      = $config->{APOLLO_VENDOR};
-	#my $apollo_desc = $config->{APOLLO_DESC};
 
-	#$pid = 473;
 	my $pmanager = DNALC::Pipeline::App::ProjectManager->new($pid);
 	unless ($pmanager->project) {
 		$err = "Project not found!";
@@ -46,7 +43,7 @@
 		$cutil->write_jnlp({
 				jnlp 		=> $config->{APOLLO_WRITE_DIR} . "/$req_region.jnlp",
 				web_jnlp	=> $jnlp,
-				hostname	=> 'http://' . $r->get_server_name,
+				hostname	=> $config->{PROJECT_HOME},
 				game_file 	=> $web_game_file,
 				vendor		=> $config->{APOLLO_VENDOR},
 				apollo_desc => $config->{APOLLO_DESC},
