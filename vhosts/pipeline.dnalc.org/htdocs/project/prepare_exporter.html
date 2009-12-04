@@ -28,9 +28,13 @@ if ($proj) {
 		$start = $sample->start;
 		$stop = $sample->stop;
 		
-		$eurl = $r->get_server_name eq 'pipeline-dev.dnalc.org'
+		my $pcf = DNALC::Pipeline::Config->new->cf("PIPELINE");
+		my $host = $pcf->{PROJECT_HOME};
+		$host =~ s/:/\%3A/;
+		
+		$eurl = $host =~ /pipeline-dev.dnalc.org/
 					? "http%3A//green.cshl.edu/project/prepare_exporter_file%3Fpid%3D$pid"
-					: "http%3A//" . $r->get_server_name . "/project/prepare_exporter_file%3Fpid%3D$pid";
+					: $host . "/project/prepare_exporter_file%3Fpid%3D$pid";
 
 
 		$eurl .= '%26rand%3D' . random_string();

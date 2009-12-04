@@ -218,7 +218,7 @@ else {
 			delete $s->{new_user} if exists $s->{new_user};
 
 			# redirect..
-			$m->redirect('/project/target/view/' . $tp->id) unless @err;
+			$m->redirect('/project/target/view?tid=' . $tp->id) unless @err;
 		}
 	}
 

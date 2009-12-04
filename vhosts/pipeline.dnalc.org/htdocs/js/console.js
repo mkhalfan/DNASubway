@@ -16,7 +16,7 @@ var rnames = {
 			'blastn_user' : 'User BlastN',
 			'blastx_user' :'User BlastX',
 			'gbrowse' : 'GBrowse',
-			'exporter' : 'Phytosome Browser',
+			'exporter' : 'Phytozome Browser',
 			'target' : 'Phylogenetic Tree'
 		};
 
@@ -279,7 +279,7 @@ function launch(what, where, title) {
 	var urls = {
 			gbrowse: ['/project/prepare_chadogbrowse?pid=', 'GBrowse'],
 			apollo: ['/project/prepare_editor.html?pid=', 'Apollo'],
-			exporter: ['/project/prepare_exporter.html?pid=', 'Phytosome Browser'],
+			exporter: ['/project/prepare_exporter.html?pid=', 'Phytozome Browser'],
 			target: ['/project/prepare_chadogbrowse?warn=1;pid=', 'Phylogenetic Tree']
 		};
 

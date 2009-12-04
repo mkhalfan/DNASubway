@@ -86,7 +86,7 @@
 		</div>
 		<div class="conProjectInfo_Row">
 			<span class="conProjectInfo_Cell1">User</span>
-			<span class="conProjectInfo_Cell2">: Anonymous Guest</span>
+			<span class="conProjectInfo_Cell2">: <% $user_fullname %></span>
 		</div>
 		<div class="conProjectInfo_Row">
 			<span class="conProjectInfo_Cell1">Affiliation</span>
@@ -106,15 +106,15 @@
 		</div>
 		<div class="conProjectInfo_Row">
 			<span class="conProjectInfo_Cell1"><% $tp && $tp->type eq "p" ? "Protein" : "Gene"%> name</span>
-			<span class="conProjectInfo_Cell2">: <% $tp ? $tp->gp_name : "" %></span>
+			<span class="conProjectInfo_Cell2">: <% $tp ? $tp->gp_name : "-" %></span>
 		</div>
 		<div class="conProjectInfo_Row">
 			<span class="conProjectInfo_Cell1">Class</span>
-			<span class="conProjectInfo_Cell2">: <% $tp ? $tp->class_name : "" %></span>
+			<span class="conProjectInfo_Cell2">: <% $tp ? $tp->class_name : "-" %></span>
 		</div>
 		<div class="conProjectInfo_Row">
 			<span class="conProjectInfo_Cell1">Function</span>
-			<span class="conProjectInfo_Cell2">: <% $tp ? $tp->function_name : "" %></span>
+			<span class="conProjectInfo_Cell2">: <% $tp ? $tp->function_name : "-" %></span>
 		</div>
 	</span><!--END of span conProjectInfo_column2-->
 	<span class="conProjectInfo_column2">
@@ -157,7 +157,7 @@
 	if ($path_info =~ /\/(\d+)$/) {
 		$tid = $1;
 	}
-	
+	my $user_fullname = '';
 	my @genomes = DNALC::Pipeline::TargetGenome->retrieve_all;
 	my $tp = DNALC::Pipeline::TargetProject->retrieve($tid);
 	unless ($tp) {
@@ -188,6 +188,13 @@
 		}
 		elsif ($tp->status eq 'failed') {
 			$message = 'Failed to get the results from Target.';
+		}
+		if ($tp->user_id != $s->{user_id}) {
+			my $user = DNALC::Pipeline::User->retrieve($tp->user_id);
+			$user_fullname = $user->full_name;
+		}
+		else {
+			$user_fullname = $s->{full_name};
 		}
 	}
 

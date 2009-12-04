@@ -50,6 +50,31 @@
 	load_window_ui => 0
 </%attr>
 %#---------------------------------
+<%init>
+	my $s = $m->session->{pipeline};
+
+	my $now = time();
+	if ($s->{logged_in} && ($now - $s->{last} > 3600)) {
+		$m->comp("/_message_add", "It's been a while since your last visit: " . duration ($now - $s->{last}));
+		$s->{logged_in} = 0;
+		delete $s->{logged_in};
+		delete $s->{user_id};
+	}
+	$s->{last} = $now;
+	unless ($s->{logged_in}) {
+		$m->redirect("/");
+	}
+	
+	my $pcf = DNALC::Pipeline::Config->new->cf("PIPELINE");
+	my $user = $s->{username};
+	my $is_admin = grep {/$user/} @{$pcf->{ADMINS}};
+	unless ($is_admin) {
+		$m->comp("/_message_add", "Resource unavailable.", "error");
+		$m->redirect("/");
+	}
+	
+</%init>
+%#---------------------------------
 <%flags>
 	inherit => undef
 </%flags>
