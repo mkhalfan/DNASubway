@@ -139,6 +139,7 @@
 <%once>
 	use DNALC::Pipeline::TargetGenome ();
 	use DNALC::Pipeline::TargetProject ();
+	use DNALC::Pipeline::User ();
 	use Data::Dumper;
 </%once>
 <%init>

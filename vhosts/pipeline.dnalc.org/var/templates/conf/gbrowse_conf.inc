@@ -65,7 +65,12 @@ head =
 header =
 
 # a footer
-footer =
+footer = <script type="text/javascript">
+	var mf = document.getElementsByName("mainform");
+	if (mf) {
+		mf[0].action = mf[0].action.replace(/(\d+)\/.*$/, "$1/");
+	}
+	</script>
 
 # Various places where you can insert your own HTML -- see configuration docs
 html1 = 
