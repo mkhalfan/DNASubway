@@ -2,6 +2,11 @@
 <div id="container_rightContent">
 	<div id="container_pageTitle"> my projects</div>
 	<br clear="all"/>
+%	if (exists $m->session->{messages}) {
+<div style="font-size: smaller; text-align: center;">	
+<& /_messages &>
+</div>
+%	}
 	<div id="container_mytablehome">
 % if (@projects) {
   <table class="conProject_table" summary="My projects">
@@ -11,7 +16,8 @@
     <th width="279" scope="col">Project Title</th>
     <th width="264" scope="col">Organism</th>
     <th width="120" scope="col">Classification</th>
-    <th width="62" scope="col">Status</th>
+    <th scope="col">Status</th>
+	<th scope="col">&nbsp;</th>
   </tr>
 % for (@projects) {
 %	my $created = DNALC::Pipeline::App::Utils->format_datetime($_->created, undef, "%m/%d/%Y");
@@ -28,9 +34,9 @@
 	<td><% $_->organism %>, <% $_->common_name %></td>
 	<td><% $_->can("clade") ? $clades{$_->clade} : $_->type eq "d" ? "DNA" : "Protein" %></td>
 	<td> public </td>
+	<td><a href="/project/remove?id=<% $_->{master_project_id} %>" onclick="return confirm('Remove this project?')">remove</a></td>
 </tr>
 % }
-
 </table>
 
 <& '/_pager', cur=>$page, pages => $pages, 
@@ -39,6 +45,7 @@
 	<p>&nbsp;</p>
 	<p>You haven't created a project. Use the links from the left hand side of this page to create a project.</p>
 % }
+<p>&nbsp;</p>
 	</div>
 </div><!--END of ID container_rightContent-->  
 
@@ -105,7 +112,10 @@ my @projects = grep { defined $_ } map {
 					$pclass = 'DNALC::Pipeline::TargetProject';
 				}
 				my $p = $pclass->retrieve($pid);
-				$p->{project_type} = $_->project_type if $p;
+				if ($p) {
+					$p->{master_project_id} = $_->id;
+					$p->{project_type} = $_->project_type;
+				}
 				$p;
 			} $pager->search_where;
 #}
