@@ -35,7 +35,7 @@
 
 <& '/_pager', cur=>$page, pages => $pages, 
 	suffix => '', prefix => '/project/browse/' &>
-
+<p>&nbsp;</p>
 </div>
 
 </div><!--END of ID container_rightContent-->  

@@ -1,0 +1,64 @@
+%#--------------------------------------------------------
+<%args>
+	$id => 1
+</%args>
+%#--------------------------------------------------------
+<%once>
+	use DNALC::Pipeline::MasterProject ();
+	use DNALC::Pipeline::App::ProjectManager ();
+	use DNALC::Pipeline::TargetProject ();
+	use DNALC::Pipeline::Config ();
+	use DNALC::Pipeline::Utils qw(random_string);
+	use DNALC::Pipeline::App::Utils ();
+
+	use Data::Dumper;
+
+</%once>
+%#--------------------------------------------------------
+<%init>
+#my $pcf = DNALC::Pipeline::Config->new->cf('PIPELINE');
+$r->content_type('text/html');
+
+my $s = $m->session->{pipeline};
+
+unless ($s->{logged_in}) {
+	$m->comp('/_message_add', 'Your session expired. Please login again.', 'error');
+	$m->redirect('/');
+}
+
+my ($mp) = DNALC::Pipeline::MasterProject->search(user_id => $s->{user_id}, mp_id => $id);
+unless ($mp) {
+	$m->comp('/_message_add', 'Project not found!', 'error');
+	$m->redirect('/project/browsemy');
+}
+
+my $dir;
+if ($mp->project_type eq "target") {
+	my ($p) = DNALC::Pipeline::TargetProject->search(tpid => $mp->project_id, user_id => $s->{user_id});
+	$dir = $p->work_dir;
+	#$mp->delete;
+	$p->delete;
+	DNALC::Pipeline::App::Utils->remove_dir($dir);
+
+	$m->comp('/_message_add', 'Project removed!', 'error');
+}
+elsif ($mp->project_type eq "annotation") {
+	my $pm = DNALC::Pipeline::App::ProjectManager->new($mp->project_id);
+	if ($pm->project) {
+		$pm->remove_project;
+		$m->comp('/_message_add', 'Project removed!', 'error');
+	}
+	else {
+		print STDERR "Nothing to remove...", $/;
+	}
+}
+
+$m->redirect('/project/browsemy');
+
+</%init>
+%#--------------------------------------------------------
+<%flags>
+	inherit => undef
+</%flags>
+%#--------------------------------------------------------
+<% $mp? $mp->project_type : '??' %>

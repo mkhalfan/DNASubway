@@ -419,4 +419,38 @@ sub all_log_entries {
 }
 
 #-----------------------------------------------------------------------------
+sub remove_project {
+	my ($self) = @_;
+	my $p = $self->project;
+	my $organism_str = join('_', split /\s+/, $p->organism) . '_' . $p->common_name;
+
+	my $cutils = eval {
+				DNALC::Pipeline::Chado::Utils->new(
+					username => $self->username,
+					organism_string => $organism_str,
+					profile => $self->chado_user_profile,
+					gbrowse_template => $self->config->{GBROWSE_TEMPLATE},
+					gbrowse_confdir  => $self->config->{GBROWSE_CONF_DIR},
+				);
+			};
+	if ($@) {
+		print STDERR  "Unable to process project $p: ", $@, $/;
+	}
+	else {
+		my $gmod_conf_file = $cutils->gmod_conf_file($p->id);
+		#print STDERR  "p.$p ->", $gmod_conf_file, $/;
+
+		my $gbrowse_file = $cutils->gbrowse_chado_conf($p->id);
+		#print STDERR  "p.$p =>", $gbrowse_file , $/;
+
+		unlink $gmod_conf_file, $gbrowse_file;
+	}
+
+	# project dir
+	my $dir = $self->work_dir;
+	#print STDERR  "p.$p DIR => ", $dir, $/;
+	DNALC::Pipeline::App::Utils->remove_dir($dir);
+	$p->delete;
+}
+#-----------------------------------------------------------------------------
 1;

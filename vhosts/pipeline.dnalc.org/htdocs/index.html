@@ -111,7 +111,13 @@ if ($r->method eq "POST") {
 	my $user;
 
 	if ($guest) {
-		unless ($name) {
+		if ($name && $name =~ /^guest_/) {
+			($user) = DNALC::Pipeline::User->search(username => $name);
+			$name = undef unless $user;
+		}
+
+		# if (!$name || $name !~ /guest/)
+		unless ($name && $name =~ /^guest_/) {
 			my $rand = lc random_string(6, 8);
 			$name = "guest_$rand";
 
@@ -128,9 +134,6 @@ if ($r->method eq "POST") {
 			if ($@) {
 				push @err, $@;
 			}
-		}
-		elsif ($name =~ /^guest_/) {
-			($user) = DNALC::Pipeline::User->search(username => $name);
 		}
 	}
 	else {

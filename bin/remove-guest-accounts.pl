@@ -105,6 +105,8 @@ sub remove_projects {
 		my $dir = $pm->work_dir;
 		print STDERR  "p.$p DIR => ", $dir, $/;
 		DNALC::Pipeline::App::Utils->remove_dir($dir);
+		print STDERR  "Project = $p", $/;
+		$p->delete;
 
 		print STDERR  "----", $/;
 	}
