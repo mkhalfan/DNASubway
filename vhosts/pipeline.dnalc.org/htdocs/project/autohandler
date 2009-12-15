@@ -21,7 +21,7 @@
 <link href="/files/window/themes/window/alphacube.css" rel="stylesheet" type="text/css" />
 % }
 </head>
-<body>
+<body id="body">
 <div id="mainContainer">
 <div id="container_InsideHeader">
 <div id="home_header_topline">FAST TRACK TO GENE ANNOTATION AND GENOME ANALYSIS</div>

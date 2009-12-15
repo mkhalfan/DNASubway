@@ -190,7 +190,6 @@ function run (op) {
 			}
 		},
 		onFailure: function(){
-				//s.update("Something went wrong.");
 				alert('Something went wrong!\nAborting...');
 			}
 	});
@@ -198,11 +197,21 @@ function run (op) {
 
 
 function launch_apollo() {
-	var abtn = $('apollo_btn');
-	abtn.parentNode.hide();
-	//alert(abtn.getAttribute('commonname'));
-	var status_div = $('apollo_status');
-	status_div.show();
+	var abtn = $('apollo_btn');	
+	if (abtn.getAttribute("working") == 1 ) {
+		return;
+	}
+	abtn.setAttribute("working", 1);
+	var i = 0;
+	var pe = new PeriodicalExecuter(function(p){
+		i++;
+		var suffix = '';
+		for (var x = 0; x < i%4; x++)
+			suffix +=".";
+			abtn.update("Apollo<strong>" + suffix + "</strong>");
+		},
+		.4
+	);
 
 	var params = { 'pid' : $('pid').value };
 	sent = params;
@@ -213,28 +222,24 @@ function launch_apollo() {
 			var response = transport.responseText || "{'status':'error', 'message':'No response'}";
 			debug(response);
 			var r = response.evalJSON();
-			dbg = r;
-			//alert(r);
 			if (r.status == 'success') {
-				var a = new Element('a', {'href' : r.file, id: 'launch_a'}).update('Launch Apollo');
-				status_div.update( a );
-				//a.fire('click');
-				var upl = new Element('iframe', {src: r.file, width: '0px', height:'0px', style: 'display: none'});
-				status_div.appendChild(upl);
-				new PeriodicalExecuter(function(p){
-							$('apollo_status').hide();
-							$('apollo_btn').parentNode.show();
-							p.stop();
-						}, 60);
+				var upl = new Element('iframe', {src: r.file, width: '0px', height:'0px'});
+				$('body').insert(upl);
 			}
 			else  if (r.status == 'error') {
 				alert("There seem to be an error: " + r.message);
 			}
 			else {
 			}
+			pe.stop();
+			abtn.update("Apollo");
+			abtn.setAttribute("working", 0);
 		},
 		onFailure: function(){
+				pe.stop();
+				abtn.update("Apollo");
 				alert("Something went wrong.");
+				abtn.setAttribute("working", 0);
 			}
 	});
 }
