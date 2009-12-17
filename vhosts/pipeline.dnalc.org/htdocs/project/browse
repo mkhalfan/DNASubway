@@ -2,7 +2,7 @@
 <div id="container_rightContent">
 <div id="container_pageTitle"> public projects</div>
 <br clear="all"/>
-<div id="container_mytablehome">
+<div id="conProject_tableHolder">
   <table class="conProject_table" summary="">
   <tr>
     <th width="49" scope="col">#</th>
@@ -35,9 +35,9 @@
 
 <& '/_pager', cur=>$page, pages => $pages, 
 	suffix => '', prefix => '/project/browse/' &>
-<p>&nbsp;</p>
-</div>
 
+</div>
+<div class="clear"> </div>
 </div><!--END of ID container_rightContent-->  
 
 %#--------------------------------------------------------

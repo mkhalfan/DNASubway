@@ -7,7 +7,7 @@
 <& /_messages &>
 </div>
 %	}
-	<div id="container_mytablehome">
+	<div id="conProject_tableHolder">
 % if (@projects) {
   <table class="conProject_table" summary="My projects">
   <tr>
@@ -47,6 +47,7 @@
 % }
 <p>&nbsp;</p>
 	</div>
+<div class="clear"> </div>
 </div><!--END of ID container_rightContent-->  
 
 %#--------------------------------------------------------

@@ -27,14 +27,19 @@ function step_one() {
 		return;
 	}
 
-	show_message("Creating project. Do not close this message. <p>Stand by..</p>");
+	var w = show_message("Creating project. Do not close this message. <p>Stand by..</p>");
+	document.observe('window:destroyed', function(event) {
+		if (w.id == event.memo.window.id) {
+			$('step_one_btn').onclick = null;
+			w = show_message("Creating project. Do not close this message. <p>Stand by..</p>");
+		}
+	});
 	f.submit();
 }
 
 function select_source(el) {
 	if (el && el.value == 'upload') {
 		$('specie').selectedIndex = -1;
-		//$('sample_info').update('');
 	}
 	else if (el && el.value == 'sample') {
 		//$('organism_info').hide();
@@ -106,6 +111,7 @@ function show_message(html, isError) {
 	}
 	_w.show(true);
 	_w.activate();
+	return _w;
 }
 
 function use_organism(obj) {

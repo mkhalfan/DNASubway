@@ -33,16 +33,14 @@
 
 #container_leftMenu {
 	width: 150px;
-	height: auto;
-	min-height: 400px;
-	margin: 0px auto;
+	height: 508px;
+	display: block;
 	float: left;
 	position: relative;
 	}
 #container_rightContent {
 	width: 850px;
 	height: auto;
-	min-height: 400px;
 	padding-top: 8px;
 	background: url("/images/v2/header_lower.jpg") top right no-repeat;
 	float: right;
@@ -70,11 +68,12 @@
 	}
 
 /*----LEFT MENU START--------*/
-#spacer_btGlossary {
+.spacer_btGlossary {
 	width:140px;
 	height: 55px;
 	display: block;
-	position: relative;		
+	position: relative;	
+	float: left;	
 
 }
 
@@ -191,8 +190,7 @@
 /*----redLIne project----*/
 #conRedlineLeft1 {
 	width: 470px;
-	height: auto;
-	min-height: 320px;
+	height: 560px;
 	background: url("/images/v2/map-redline_L1.jpg") top left no-repeat;
 	float: left;
 	position: relative;
@@ -203,7 +201,6 @@
 	width: 380px;
 	height:auto;
 	min-height: 320px;
-	overflow: auto;
 	background: url("/images/v2/map-redline_R1.jpg") top left no-repeat;
 	float: right;
 	position: relative;
@@ -690,6 +687,17 @@
 
 }
 
+#conRunAll_empty{
+	width: 154px;
+	height: 32px;
+	margin: 0px 300px 10px 30px;
+	display: block;
+	position: relative;
+	float: left;
+	padding: 25px 150px 0px 150px;
+	z-index: 0;
+}
+
 #conRunAll{
 	width: 154px;
 	height: 32px;
@@ -922,7 +930,7 @@
 
 #conYellowlineLeft2 {
 	width: 519px;
-	height: 216px;
+	height: 250px;
 	background: url("/images/v2/map-yellowline_L2.jpg") top left no-repeat;
 	float: left;
 	position: relative;
@@ -1036,7 +1044,7 @@
 
 #conBluelineLeft2 {
 	width: 519px;
-	height: 216px;
+	height: 250px;
 	background: url("/images/v2/map-blueline_L2.jpg") top left no-repeat;
 	float: left;
 	position: relative;
@@ -1092,8 +1100,10 @@
 /*//----------PUBLIC PROJECT START here PUBLIC PROJECT  START  --- PUBLIC PROJECT  START ---- PUBLIC PROJECT  START----  PUBLIC PROJECT  START------------------*/
 
 #conProject_tableHolder{
-	margin:0px auto;
+	display: block;
 	width: 850px;
+	height: auto;
+	min-height: 500px;
 	float: left;
 	position: relative;
 }
@@ -1300,6 +1310,304 @@
 
 /*//----------PUBLIC PROJECT  END------------------*/
 
+/* //--------GLossary Panel------------------*/
+
+/* //--------GLossary Panel--START----------------*/
+
+#glossarypanel{
+height: 540px; 
+width: 170px; 
+left: 4px; 
+top: -410px;  
+display: none; 
+position: absolute; 
+background: url("/images/v2/glossary_panel.png") no-repeat; 
+z-index: 100;
+}
+
+#panel_glossaryClose {
+	width:22px;
+	height: 26px;
+	position:relative;
+	padding: 16px 20px 10px 118px;
+	float: left;
+}
+#panel_glossaryTopmenu{
+	width: 150px;
+	height: 20px;
+	float: left;
+	position: relative;
+	margin-top: 6px;
+	
+	
+}
+.panel_glossaryText{
+	width:150px;
+	height: 394px;
+	text-align: left;
+	position:relative;
+	padding: 16px 10px 10px 10px;
+  	font-family: Arial;  	
+	float: left;
+}
+
+.con_btGlossaryTitle{
+	width: 136px;
+	height: 22px;
+	padding:2px 6px 0px 8px;
+	position: relative;
+	float: left;
+
+}
+
+.bt_GlossaryTitle{
+	width:136px;
+	height: 22px;
+	display: block;
+	position: relative;	
+	font-size: .85em;
+	text-decoration: none;
+	font-weight: bold;
+	color: #663399;
+	
+}
+
+.bt_GlossaryTitle a {
+	width:136px;
+	height: 22px;
+	display: block;
+	position: relative;	
+	font-size: .85em;
+	text-decoration: none;
+	text-align: left;
+	font-weight: bold;
+	color: #663399;
+	background: none;
+	
+}
+
+.bt_GlossaryTitle a:hover{
+	font-weight: bold;
+	color: #9966CC;
+	background: none;
+}
+
+.con_GlossaryTextbox{
+
+    width: 136px;
+	height: auto;
+	padding:4px 6px 0px 2px;
+	position: relative;
+	float: left;
+	font-size: .8em;
+	text-align: left;
+	color: #333333;
+	display: none;
+}
+
+
+
+.bt_panelClose {
+	width:22px;
+	height: 22px;
+	position: relative;	
+	float: right;
+}
+
+
+.bt_panelClose a {
+	width:22px;
+	height: 22px;
+	background: url("/images/v2/bt_close1.png") top no-repeat;
+	display:block;
+	position: relative;
+	float: right;
+}
+
+.bt_panelClose a:hover {
+	background: url("/images/v2/bt_close2.png") top no-repeat;
+
+}
+
+#con_btCloseT{
+width: 140px;
+height: 30px;
+padding:3px 22px 0px 6px;
+position: relative;
+float: left;
+}
+
+.bt_CloseT {
+	width:140px;
+	height: 26px;
+	display: block;
+	position: relative;	
+	font-size: .95em;
+	text-decoration: none;
+	text-align: center;
+	color: black;
+	font-weight: bold;
+
+	
+}
+
+.bt_CloseT a {
+	position: relative;	
+	font-size: .95em;
+	text-decoration: none;
+	text-align: center;
+	color: black;
+	font-weight: bold;
+	background-image: none;
+	
+}
+
+.bt_CloseT a:hover{
+	background-image: none;
+	color: #FF6600;
+	font-weight: bold;
+}
+
+
+
+.bt_glossaryR {
+	width: 34px;
+	height: 16px;
+	display: block;
+	color: #666;
+	text-decoration: none;
+	display: block;
+	position: relative;
+	float: left;
+	padding-left: 6px;
+	
+	font-size: .8em;
+	text-decoration: none;
+	text-align: left;
+}
+
+
+.bt_glossaryR a {
+	width: 34px;
+	height: 16px;
+	display: block;
+	background: url("/images/v2/btbg_red1.png") left no-repeat;
+	color: #666;
+	text-decoration: none;
+	display: block;
+	position: relative;
+	float: left;
+	padding-left: 6px;
+	
+	font-size: .8em;
+	text-decoration: none;
+	text-align: left;
+}
+
+.bt_glossaryR a:hover {
+	color: #c1272d;
+	background: url("/images/v2/btbg_red2.png") left no-repeat;
+
+}
+
+.bt_glossaryR a.current {
+	color: #c1272d;
+	font-weight: bold;
+	background: url("/images/v2/btbg_red2.png") left no-repeat;	
+}
+
+.bt_glossaryY {
+	width: 60px;
+	height: 16px;
+	display: block;
+	color: #666;
+	text-decoration: none;
+	display: block;
+	position: relative;
+	float: left;
+	padding-left: 6px;
+	font-size: .8em;
+	text-decoration: none;
+	text-align: left;
+}
+
+
+.bt_glossaryY a {
+	width: 60px;
+	height: 16px;
+	display: block;
+	background: url("/images/v2/btbg_yellow1.png") left no-repeat;
+	color: #666;
+	text-decoration: none;
+	display: block;
+	position: relative;
+	float: left;
+	padding-left: 6px;
+	font-size: .8em;
+	text-decoration: none;
+	text-align: left;
+}
+
+.bt_glossaryY a:hover {
+	color: #fdba3f;
+	background: url("/images/v2/btbg_yellow2.png") left no-repeat;
+
+}
+
+.bt_glossaryY a.current {
+	color: #fdba3f;
+	font-weight: bold;
+	background: url("/images/v2/btbg_yellow2.png") left no-repeat;
+}
+
+.bt_glossaryB {
+	width: 38px;
+	height: 16px;
+	display: block;
+	color: #666;
+	text-decoration: none;
+	display: block;
+	position: relative;
+	float: left;
+	padding-left: 4px;
+	font-size: .8em;
+	text-decoration: none;
+	text-align: left;
+}
+
+
+.bt_glossaryB a {
+	width: 38px;
+	height: 16px;
+	display: block;
+	background: url("/images/v2/btbg_blue1.png") left no-repeat;
+	color: #666;
+	text-decoration: none;
+	display: block;
+	position: relative;
+	float: left;
+	padding-left: 4px;
+	font-size: .8em;
+	text-decoration: none;
+	text-align: left;
+}
+
+.bt_glossaryB a:hover {
+	color: #3953a4;
+	background: url("/images/v2/btbg_blue2.png") left no-repeat;
+
+}
+
+.bt_glossaryB a.current {
+	color: #3953a4;
+	font-weight: bold;
+	background: url("/images/v2/btbg_blue2.png") left no-repeat;
+}
+
+/* //--------GLossary Panel End------------------*/
+
+
+
 /* //-------TEXT ONLY PAGE------------------*/
 
 /* //--------Text only page text colume------------------*/
@@ -1336,3 +1644,4 @@
     text-align: left; 
 	line-height: 1.2em;
 }
+
