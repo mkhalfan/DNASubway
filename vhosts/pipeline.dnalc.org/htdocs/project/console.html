@@ -18,46 +18,45 @@
 <div id="conRedlineLeft2">
 	<span class="conRedline_ConColumn">
 		<span class="conRedline_ConCell">
-				<div class="conIndicator_box"><div id="repeat_masker_st" class="conIndicator_<% $status{repeat_masker} %>"></div> </div>
-				<& '.routine', routine => 'repeat_masker', pmanager => $pm,
+				<div class="conIndicator_box"><div id="repeat_masker_st" class="conIndicator_<% $is_owner ? $rm_status : $rm_status eq "done" ? "done" : "disabled" %>"></div> </div>
+				<& '.routine', routine => 'repeat_masker', pmanager => $pm, is_owner => $is_owner,
 					status => $status{repeat_masker}, delay => 15 &>
 		</span><!--END of span class conRedline_ConCell-->
 		<span class="conRedline_keys">
 		</span>
 	</span><!--END of span class conRedline_ConColumn-->
-
 	<span class="conRedline_ConColumn">
 		<span class="conRedline_ConCell">
-		<span class="conIndicator_box"><div id="augustus_st" class="conIndicator_<% $status{repeat_masker} eq "done" ? $status{augustus} : "disabled" %>"></div> </span>
-			<& '.routine', routine => 'augustus', pmanager => $pm,
+		<span class="conIndicator_box"><div id="augustus_st" class="conIndicator_<% $status{augustus} eq "done" ? "done" : $is_owner &&  $rm_status eq "done" ? $status{augustus} : "disabled" %>"></div> </span>
+			<& '.routine', routine => 'augustus', pmanager => $pm, is_owner => $is_owner,
 				status => $status{augustus}, delay => 20, rm_status => $rm_status &>
 		</span><!--END of span class conRedline_ConCell-->
 		<span class="conRedline_ConCell">
-			<span class="conIndicator_box"><div id="fgenesh_st" class="conIndicator_<% $status{repeat_masker} eq "done" ? $status{fgenesh} : "disabled" %>"></div> </span>
-			<& '.routine', routine => 'fgenesh', pmanager => $pm,
+			<span class="conIndicator_box"><div id="fgenesh_st" class="conIndicator_<% $status{fgenesh} eq "done" ? "done" : $is_owner && $rm_status eq "done" ? $status{fgenesh} : "disabled" %>"></div> </span>
+			<& '.routine', routine => 'fgenesh', pmanager => $pm, is_owner => $is_owner,
 						status => $status{fgenesh}, rm_status => $rm_status &>
 		</span><!--END of span class conRedline_ConCell-->
-		<span class="conRedline_ConCell">
-			<span class="conIndicator_box"><div id="snap_st" class="conIndicator_<% $status{repeat_masker} eq "done" ? $status{snap} : "disabled" %>"></div> </span>
-			<& '.routine', routine => 'snap', pmanager => $pm,
+		<span class="conRedline_ConCell"><!-- rm_status = <% $rm_status %> -->
+			<span class="conIndicator_box"><div id="snap_st" class="conIndicator_<% $status{snap} eq "done" ? "done" : $is_owner && $rm_status eq "done" ? $status{snap} : "disabled" %>"></div> </span>
+			<& '.routine', routine => 'snap', pmanager => $pm, is_owner => $is_owner,
 						status => $status{snap}, rm_status => $rm_status &>
 		</span><!--END of span class conRedline_ConCell-->
 		<span class="conRedline_ConCell">
-			<span class="conIndicator_box"><div id="trna_scan_st" class="conIndicator_<% $status{trna_scan} %>"></div> </span>
-			<& '.routine', routine => 'trna_scan', pmanager => $pm,
+			<span class="conIndicator_box"><div id="trna_scan_st" class="conIndicator_<% $status{trna_scan} eq "done" ? "done" : $is_owner && $rm_status eq "done" ? $status{trna_scan} : "disabled" %>"></div> </span>
+			<& '.routine', routine => 'trna_scan', pmanager => $pm, is_owner => $is_owner,
 						status => $status{trna_scan}, rm_status => $rm_status &>
 		</span><!--END of span class conRedline_ConCell-->
      </span><!--END of class conRedline_ConColumn-->
 
 	<span class="conRedline_ConColumn">     
 		<span class="conRedline_ConCell">
-			<span class="conIndicator_box"><div id="blastn_st" class="conIndicator_<% $status{repeat_masker} eq "done" ? $status{blastn} : "disabled" %>"></div> </span>
-			<& '.routine', routine => 'blastn', pmanager => $pm, delay => 15,
+			<span class="conIndicator_box"><div id="blastn_st" class="conIndicator_<% $status{blastn} eq "done" ? "done" : $is_owner && $rm_status eq "done" ? $status{blastn} : "disabled" %>"></div> </span>
+			<& '.routine', routine => 'blastn', pmanager => $pm, delay => 15, is_owner => $is_owner,
 						status => $status{blastn}, rm_status => $rm_status &>
 		</span><!--END of span class conRedline_ConCell-->
 
 		<span class="conRedline_ConCell">
-			<span class="conIndicator_box"><div id="blastx_st" class="conIndicator_<% $status{repeat_masker} eq "done" ? $status{blastx} : "disabled" %>"></div></span>
+			<span class="conIndicator_box"><div id="blastx_st" class="conIndicator_<% $status{blastx} eq "done" ? "done" : $is_owner && $rm_status eq "done" ? $status{blastx} : "disabled" %>"></div></span>
 			<& '.routine', routine => 'blastx', pmanager => $pm, delay => 15,
 						status => $status{blastx}, rm_status => $rm_status &>
 		</span><!--END of span class conRedline_ConCell-->
@@ -113,7 +112,10 @@
 				</form>
 				</div>
 				<a id="add_evidence_link" href="javascript:void(0);" \
-				onclick="javascript:$('add_evidence').style.visibility='visible';$('add_evidence').style.display='block';$('add_evidence_link').hide();">Upload Data</a>
+% if ($is_owner && $rm_status eq "done" ) {
+				onclick="javascript:$('add_evidence').style.visibility='visible';$('add_evidence').style.display='block';$('add_evidence_link').hide();"
+% }				
+				>Upload Data</a>
 			</span>
 
 		</span><!--END of span class conRedline_ConCell-->
@@ -125,7 +127,7 @@
 <!--right Content Start--------------> 
 <div id="conRedlineRight2">
 	<span id="conRedline_ConColumnR1"><span class="bt_browserRedLine"><a id="apollo_btn" href="javascript:;" \
-		onclick="<% $rm_status eq "done" ? "launch('apollo')" : "" %>" \
+		onclick="<% $rm_status eq "done" && $is_owner ? "launch('apollo');" : "show_errors('Apollo only available to project owner.');" %>" \
 		commonname="<% $trimmed_common_name %>" seq_length="<% $proj->sequence_length %>">Apollo</a></span>
 		<div style="display: none;" id="apollo_status">loading apollo...</div>
 	</span>
@@ -140,7 +142,7 @@
 		<span class="bt_browserBlueSpacer"></span>
 %	}
 		<span class="bt_browserYellow">
-			<a id="target_btn" href="javascript:;" onclick="<% $rm_status eq "done" ? "launch('target', null, 'Phylogenetic Tree')" : "" %>" >Phylogenetic<br/>Tree</a>
+			<a id="target_btn" href="javascript:;" onclick="<% $rm_status eq "done" ? "launch('target', null, 'Phylogenetic Tree')" : "" %>">Phylogenetic<br/>Tree</a>
 		</span>
 	</span>
 </div><!--END of ID conRedlineRight2-->
@@ -176,10 +178,10 @@
 		</div>
 % if (0) {
         <div class="conProjectInfo_Row">
-             							<span class="conProjectInfo_Cell1">Status</span>
-            							<span class="conProjectInfo_Cell3">: &nbsp;<input class="conRadiobox_align" type="radio" name="seq_src" id="seq_src_paste" value="paste"   />&nbsp; Private</span>
-                                        <span class="conProjectInfo_Cell3"><input class="conRadiobox_align" type="radio" name="seq_src" id="seq_src_paste" value="paste"   />&nbsp; Public</span>
-            						</div>
+			<div class="conProjectInfo_Cell1">Status</div>
+			<div class="conProjectInfo_Cell3">: &nbsp;<span><input class="" type="radio" name="public" id="public_no" checked="<% $is_public ? "" : "checked" %>"/>&nbsp; Private</span></div>
+			<div class="conProjectInfo_Cell3"><span><input class="" type="radio" name="public" id="seq_src_paste" checked="<% $is_public ? "checked" : "" %>"/>&nbsp; Public</span></div>
+		</div>
 % }
 	</span><!--END of span conProjectInfo_column1-->
 
@@ -227,6 +229,7 @@
 	use DNALC::Pipeline::App::ProjectManager ();
 	use DNALC::Pipeline::App::WorkflowManager ();
 	use DNALC::Pipeline::App::Utils ();
+	use DNALC::Pipeline::MasterProject ();
 	use DNALC::Pipeline::User ();
 	use DNALC::Pipeline::Utils qw/nicebasepairs/;
 
@@ -261,15 +264,20 @@ unless ($proj) {
 	$m->redirect('/project/');
 }
 
+# project's owner
 my $user = DNALC::Pipeline::User->retrieve($proj->user_id);
 
 my %status = ();
 my ($history, $rm_status, $trimmed_common_name);
 my $wfm = DNALC::Pipeline::App::WorkflowManager->new( $proj );
 
+my $is_owner = $s->{user_id} == $user->user_id;
+my $is_public = 1;
+my $mp = undef;
+
 if ($r->method eq "POST") {
 	
-	if (!$s->{logged_in} || $s->{user_id} != $proj->user_id) {
+	if (!$s->{logged_in} || $is_owner) {
 		$m->comp('/_message_add', 'Only the owner of the project is allowed to do this!', 'error');
 	}
 	elsif ($ARGS{evid_nt} || $ARGS{evid_prot}) {
@@ -304,6 +312,13 @@ else { # most likely is GET
 	}
 	$rm_status = $status{repeat_masker};
 	$trimmed_common_name = $pm->cleaned_common_name;
+
+	#($mp) = DNALC::Pipeline::MasterProject->search(user_id => $user->id, project_id => $proj->id);
+	#print STDERR $mp->public, $/;
+	#print STDERR Dumper($mp), $/;
+	#if ($mp->can("public")) {
+	#	$is_public = $mp->public;
+	#}
 }
 
 #print STDERR Dumper( \%status ), $/;
@@ -316,6 +331,7 @@ else { # most likely is GET
 	$rm_status => 'not-processed'
 	$status => 'disabled'
 	$pmanager => undef
+	$is_owner => 0
 	$delay => 5
 </%args>
 <%init>
@@ -338,11 +354,19 @@ elsif ($status eq 'done') {
 	$label  = 'View';
 } 
 else {
-	if ($rm_status ne 'done' && $routine !~ /trna_scan|repeat_masker/) {
-		$status = 'disabled';
-		$action = "";
-		$title = 'Identify repeats first';
-		$label = 'Disabled';
+	if ($rm_status ne 'done') {
+		if ( !$is_owner ) {
+			$status = 'disabled';
+			$action = "";
+			$title = 'You are not the owner of this project.';
+			$label = 'Disabled';
+		}
+		elsif ($routine !~ /repeat_masker/) {
+			$status = 'disabled';
+			$action = "";
+			$title = 'Identify repeats first';
+			$label = 'Disabled';
+		}
 	}
 	else {
 		if ($status eq 'error') {
@@ -355,10 +379,10 @@ else {
 	}
 	$target = "";
 }
+
 </%init>
 <span class="bt_run"><a id="<% $routine %>_btn" href="<% $link %>" class="<% $status %>" <% $target %> \
-status="<% $status %>" <% $action %> delay="<% $delay %>" title="<% $title %>" ><% $routines{$routine} %></a>
-</span>
+status="<% $status %>" <% $action %> delay="<% $delay %>"><% $routines{$routine} %></a></span>
 </%def>
 %#-------------------------------------------------
 <%attr>

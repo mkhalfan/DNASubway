@@ -69,7 +69,7 @@ h4{
 #containerBody  {
 	width: 1000px;
 	height: auto;
-	overflow:auto;
+	overflow:hidden;
 	min-height: 440px;
 	
 	/*background-image: url("/images/v2/bg_middle.png");
@@ -436,60 +436,6 @@ h4{
 
 }
 
-a.Start {
-	/*width: 120px;
-	height: 50px;*/
-	display: block;
-	font-size: .85em;
-	color:#FFFFFF;
-	text-decoration:none;
-	text-align: center;
-	position:relative;
-}
-
-
-a.Start span{ 
-	display: none;
-}
-
-a.Start:hover{ 
-	z-index:30; 
-}
-
-
-a.Start:hover span.Starttip {
-	width: 254px;
-	height: 100%;
-	display:block;
-	position:absolute;
-	top:40px;
-	left:10px;
-	color: #000;
-	text-align: left;
-	font-size: .85em;
-}
-
-a.Start:hover span.top{
-	width:254px;
-	height: 18px;
-	display: block;
-   	background: url("/images/v2/bubble_top.png") top no-repeat;
-
-	
-}
-a.Start:hover span.middle{
-	padding: 0px 20px 0px 20px;
-	display: block;
-	background: url("/images/v2/bubble_middle.png") repeat-y;
-}
-a.Start:hover span.bottom{
-	width: 254px;
-	height: 18px;
-	display: block;
-	background: url("/images/v2/bubble_bottom.png") bottom no-repeat;
-
-	
-}
 
 
 .bt_yellowStart {
@@ -616,55 +562,70 @@ a.Start:hover span.bottom{
 	position: relative;
 	float: left;
 	}
+/*//----------home page discription-----------------*/
+
+
+.startInfoText_R{
+	display: none; 
+	position: fixed; 
+	left: 235px; top: 90px;
+	margin-right: 50px;
+	padding: 20px 20px 10px 25px;  
+	color: #000; 
+	text-align: left; 
+	font-size: .8em; 
+	width: 480px; 
+	height: 100px;
+	background: url("/images/v2/bubble_wideR.png") no-repeat;
+
+}
+
+.startInfoText_Y{
+	display: none; 
+	position: fixed; 
+	left: 235px; top: 90px;
+	margin-right: 50px;
+	padding: 20px 20px 10px 25px;  
+	color: #000; 
+	text-align: left; 
+	font-size: .8em; 
+	width: 480px; 
+	height: 100px;
+	background: url("/images/v2/bubble_wideY.png") no-repeat;
+
+}
+
+.startInfoText_B{
+	display: none; 
+	position: fixed; 
+	left: 235px; top: 90px;
+	margin-right: 50px;
+	padding: 20px 20px 10px 25px;  
+	color: #000; 
+	text-align: left; 
+	font-size: .8em; 
+	width: 480px; 
+	height: 100px;
+	background: url("/images/v2/bubble_wideB.png") no-repeat;
+
+}
+
+.startInfoText_BK{
+	display: none; 
+	position: fixed; 
+	left: 235px; top: 90px;
+	margin-right: 50px;
+	padding: 20px 20px 10px 25px;  
+	color: #000; 
+	text-align: left; 
+	font-size: .8em; 
+	width: 480px; 
+	height: 100px;
+	background: url("/images/v2/bubble_wideBK.png") no-repeat;
+
+}
 	
-a.info {
-	width: 120px;
-	height: 50px;
-	display: block;
-	font-size: .85em;
-	color:#FFFFFF;
-	text-decoration:none;
-	text-align: left;
-	position:relative;
-}
 
-a.info span{ 
-	display: none;
-}
-
-a.info:hover{ 
-	z-index:30; 
-}
-
-a.info:hover span.infotip {
-	width:254px;
-	height: 100%;
-	display:block;
-	position:absolute;
-	top:40px;
-	left:-24px;
-	color: #000;
-	text-align: left;
-	font-size: .85em;
-}
-
-a.info:hover span.top{
-	width:254px;
-	height: 18px;
-	display: block;
-   	background: url("/images/v2/bubble_top.png") top no-repeat;
-}
-a.info:hover span.middle{
-	padding: 0px 20px 0px 20px;
-	display: block;
-	background: url("/images/v2/bubble_middle.png") repeat-y;
-}
-a.info:hover span.bottom{
-	width:254px;
-	height: 18px;
-	display: block;
-	background: url("/images/v2/bubble_bottom.png") bottom no-repeat;
-}
 /*--------end of rollover info------*/
 /*//END ----HOME Map START-------END----------------------------END---------*/
 
@@ -819,4 +780,14 @@ a.info:hover span.bottom{
 clear: both;
 height: 30px;
 width: 400px;
+}
+
+
+/*//----------Under Construction SIGN----------------*/
+.underconstruction{
+	width: 100px;
+	height: 50px;
+	display: block;
+	position: relative;
+	background: url("/images/v2/under_construction.png") top right no-repeat;
 }

@@ -41,7 +41,7 @@
 	}
 
 	if (!$s->{logged_in} || $proj->user_id != $s->{user_id}) {
-		print "{'status':'error', 'message':'You are not logged in or this project belongs to another user.'}";
+		print "{'status':'error', 'message':'Analysis only available to project owner.'}";
 		return;
 	}
 

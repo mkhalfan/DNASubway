@@ -2,7 +2,7 @@
 
 var dbg, sent;
 var intervalID = {};
-var routines = ['augustus', 'fgenesh', 'snap', 'blastn', 'blastx', 
+var routines = ['augustus', 'fgenesh', 'snap', 'trna_scan', 'blastn', 'blastx', 
 				'blastn_user', 'blastx_user', 
 				'gbrowse', 'apollo', 'exporter', 'target'];
 var rnames = {
@@ -52,12 +52,12 @@ function check_status (pid, op, h) {
 					b.removeClassName('processing');
 					b.addClassName('done');
 					b.onclick = function () { launch(null, file, rnames[op])};
-					b.title = 'Click to view results';
+					//b.title = 'Click to view results';
 					//b.update('View');
 
 					ind.removeClassName(ind.className);
 					ind.addClassName('conIndicator_done');
-					ind.title = 'Done';
+					//ind.title = 'Done';
 
 					if (op == 'repeat_masker') {
 						for (var i = 0; i < routines.length; i++) {
@@ -69,7 +69,7 @@ function check_status (pid, op, h) {
 								rt_ind.removeClassName('conIndicator_disabled');
 								rt_ind.addClassName('conIndicator_not-processed');
 								if (i < 7 ) {
-									rt_ind.title = 'Not processed';
+									//rt_ind.title = 'Not processed';
 								}
 								//console.log('IND enabled ' + routines[i]);
 							}
@@ -78,8 +78,7 @@ function check_status (pid, op, h) {
 								rt.removeClassName('disabled');
 								rt.addClassName('not-processed');
 								if (i < 7 ) {
-									rt.title = 'Click to process';
-									//rt.update('Run');
+									//rt.title = 'Click to process';
 									//console.log('RT enabled btn.. ' + this.id);
 									rt.onclick = function () {
 												var routine = this.id.replace('_btn','');
@@ -109,14 +108,13 @@ function check_status (pid, op, h) {
 				clearInterval(intervalID[op]);
 				b.removeClassName('processing');
 				b.addClassName('error');
-				b.title = 'Click to try again';
-				//b.update('Failed/Run');
+				//b.title = 'Click to try again';
 				b.onclick = function () {
 								run(op);
 							};
 				ind.removeClassName(ind.className);
 				ind.addClassName('conIndicator_error');
-				ind.title = 'Error';
+				//ind.title = 'Error';
 			}
 			else {
 				//s.update('Unknown status!');
@@ -142,13 +140,12 @@ function run (op) {
 		b.onclick = null;
 		b.removeClassName(b.className);
 		b.addClassName('processing');
-		b.title = 'Processing';
-		//b.update('Processing');
+		//b.title = 'Processing';
 	}
 	if (ind) {
 		ind.removeClassName(ind.className);
 		ind.addClassName('conIndicator_processing');
-		ind.title = 'Processing';
+		//ind.title = 'Processing';
 	}
 	var delay = b ? parseFloat(b.getAttribute('delay')) : 10;
 	delay = !isNaN(delay) ? (delay * 1000) : 10000;
@@ -180,7 +177,7 @@ function run (op) {
 				
 				ind.removeClassName(ind.className);
 				ind.addClassName('conIndicator_error');
-				ind.title = 'Error';
+				//ind.title = 'Error';
 				
 				show_errors(r.message);
 			}
