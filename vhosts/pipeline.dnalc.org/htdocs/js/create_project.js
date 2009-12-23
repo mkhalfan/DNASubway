@@ -3,7 +3,7 @@ var dbg, w;
 function step_one() {
 	if (! $('seq_src_upload').checked && !$('seq_src_sample').checked && !$('seq_src_paste').checked) {
 		//alert("Source not selected!");
-		show_message("Sequence source not selected!", 1);
+		show_messages("Sequence source not selected!", 1);
 		return;
 	}
 
@@ -17,7 +17,7 @@ function step_one() {
 			has_actg = true;
 		}
 		else {
-			show_message('The sequence is invalid.', 1);
+			show_messages('The sequence is invalid.', 1);
 			return;
 		}
 	}
@@ -27,11 +27,11 @@ function step_one() {
 		return;
 	}
 
-	var w = show_message("Creating project. Do not close this message. <p>Stand by..</p>");
+	var w = show_messages("Creating project. Do not close this message. <p>Stand by..</p>");
 	document.observe('window:destroyed', function(event) {
 		if (w.id == event.memo.window.id) {
 			$('step_one_btn').onclick = null;
-			w = show_message("Creating project. Do not close this message. <p>Stand by..</p>");
+			w = show_messages("Creating project. Do not close this message. <p>Stand by..</p>");
 		}
 	});
 	f.submit();
@@ -84,6 +84,7 @@ function populate_fields(src) {
 	}
 }
 
+/*
 function show_message(html, isError) {
 
 	if (!html || !UI) {
@@ -113,6 +114,7 @@ function show_message(html, isError) {
 	_w.activate();
 	return _w;
 }
+*/
 
 function use_organism(obj) {
 	
@@ -147,5 +149,5 @@ Event.observe(window, 'load', function() {
 	var html = err.innerHTML;
 	if (!html)
 		return;
-	show_message(html, 1);
+	show_messages(html, 1);
 });

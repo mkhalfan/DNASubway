@@ -88,6 +88,7 @@ sub create_project {
 						clade => $clade,
 						sequence_length => $seq_length,
 						crc => $crc,
+						description => $params->{description},
 				});
 	};
 	if ($@) {

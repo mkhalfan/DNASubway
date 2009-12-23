@@ -160,7 +160,7 @@ function launch_viewseq(tid) {
 	openWindow("/project/target/view_seq/" +  tid);
 }
 
-
+/*
 function show_errors(html) {
 
 	if (!html || !UI) {
@@ -184,6 +184,7 @@ function show_errors(html) {
 	w.show(true);
 
 }
+*/
 
 function select_source(el) {
 	alert('select_source() ????');
@@ -265,6 +266,54 @@ function populate_fields(src) {
 }
 
 //-------------
+
+function set_public(np) {
+	if ($('public_yes').disabled)
+		return;
+
+	if (np) {
+		$('public_yes').checked = true;
+		$('public_no').checked = false;
+	}
+	else {
+		$('public_yes').checked = false;
+		$('public_no').checked = true;
+	}
+	
+	$('public_yes').disabled = true;
+	$('public_no').disabled = true;
+	
+	// stop hammering the db
+	new PeriodicalExecuter(function(p){
+				$('public_yes').disabled = false;
+				$('public_no').disabled = false;
+				p.stop();
+		}, 5);
+	
+	var params = { 'pid' : $('tid').value, 'public' : np, 'type' : 'target' };
+	sent = params;
+	new Ajax.Request('/project/update',{
+		method:'get',
+		parameters: params, 
+		onSuccess: function(transport){
+			var response = transport.responseText || "{'status':'error', 'message':'No response'}";
+			var r = response.evalJSON();
+			if (r.status == 'success') {
+				show_messages("Project updated successfully.");
+			}
+			else  if (r.status == 'error') {
+				show_errors("There seem to be an error: " + r.message);
+			}
+			else {
+			}
+		},
+		onFailure: function(){
+				alert("Something went wrong.");
+			}
+	});
+}
+
+//-------------
 // keep this at the end
 Event.observe(window, 'load', function() {
 	// check for errors
@@ -287,5 +336,3 @@ Event.observe(window, 'load', function() {
 		}
 	}
 });
-
-

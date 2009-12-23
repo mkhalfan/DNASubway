@@ -13,24 +13,22 @@
 	<div id="conProject_newLeft"> 
 		<div class="conNewPro_title">Select Sequence Source</div> 
 
-		<div class="conNewPro_label1">
+		<div class="conNewPro_label">
 			<input class="conRadiobox_align" type="radio" name="seq_src" id="seq_src_upload" value="upload" onclick="select_source(this)" <% $seq_src eq "upload" ? "checked=\"checked\"" : ""%>/>&nbsp; 
-			Upload a Sequence File in <a href="http://en.wikipedia.org/wiki/FASTA_format#Format">FASTA format</a> <small>(max 100kb)</small>:
+			Upload a sequence file in <a href="http://en.wikipedia.org/wiki/FASTA_format#Format">FASTA format</a> <small>(max 100kb)</small>:
 			<input class="conStylized_box1" type="file" id="seq_file" name="seq_file"  onchange="set_source('upload')" onclick="set_source('upload')"  />
 		</div>
 
-		<div style="clear: both;">&nbsp;</div> 
-		<div class="conNewPro_label1">
+		<div class="conNewPro_label">
 			<input class="conRadiobox_align" type="radio" name="seq_src" id="seq_src_paste" value="paste" <% $seq_src eq "paste" ? "checked=\"checked\"" : ""%> />&nbsp; 
-			Enter a Sequence:
+			Enter a sequence:
 			<textarea class="conStylized_box2" name="sequence" id="notebox" rows="5" cols="30" onfocus="set_source('paste');"><% $sequence |html %></textarea>
 		</div>
 
-		<div style="clear: both;">&nbsp;</div> 
-		<div class="conNewPro_label1">
+		<div class="conNewPro_label">
 			<input class="conRadiobox_align" type="radio" name="seq_src" id="seq_src_sample" value="sample" onclick="select_source(this)" <% $seq_src eq "sample" ? "checked=\"checked\"" : ""%>/>&nbsp; 
-		Select a Sample Sequence:  
-			<select class="conStylized_box3" id="specie" name="species" size="6" style="width: 380px;" onchange="set_source('sample');">
+		Select a sample sequence:  
+			<select class="conStylized_box3" id="specie" name="species" size="6" style="width: 370px;" onchange="set_source('sample');">
 % for my $ss (@samples) {
 %	my $sel = $seq_src eq "sample" && $ss->id == $species ? "selected=\"selected\"" : "";
 			<option id="o<%$ss->id%>" value="<% $ss->id %>" extra="" clade="<% $ss->{clade} ? $ss->{clade} : "o" %>"\
@@ -38,23 +36,30 @@
 % }
 			</select>
 		</div>
+		<div style="clear: both;">&nbsp;</div>
+        <div class="conNewPro_title">Short description</div>
+        <div class="conNewPro_label">&nbsp;&nbsp;&nbsp;&nbsp; Total characters (max.140): &nbsp;<span id="desc_len"><% length $description %></span></div>
+		<div>
+			<textarea id="description" name="description" cols="40" class="conStylized_box5" onkeyup="check_description_length(event);"><% $description |html %></textarea>
+		</div>
+        <div style="clear: both;">&nbsp;</div>
+        
 	</div>
 	  <!--END of ID conProject_newLeft-->
-
-</div><!--END of ID conRedlineLeft1-->
+      </div><!--END of ID conRedlineLeft1-->
 
 <div id="conRedlineRight1">
 
  <div id="conProject_newRight"> 
             	<div class="conNewPro_title">Name Your Project</div>   
-            		 <div class="conNewPro_label1">
-						<label>Project Title:</label>
-								<input class="conStylized_box4" type="text" name="name" id="name" value="<% $name|html%>" maxlength="128" />
+				<div class="conNewPro_label1">
+					<label>Project title:</label>
+					<input class="conStylized_box4" type="text" name="name" id="name" value="<% $name|html%>" maxlength="40" />
  				</div>
-       		<div style="clear: both;">&nbsp;</div>
+				<div style="clear: both;">&nbsp;</div>
                  <div class="conNewPro_title">Organism</div>   
             		 <div class="conNewPro_label1">
-						<label>Scientific name (Genus Species):</label>
+						<label>Scientific name (genus species):</label>
 								<input class="conStylized_box4" type="text" name="organism" id="organism" value="<% $organism |html%>" maxlength="128"  />
  				 </div>  
                  
@@ -79,22 +84,7 @@
 						<input class="conRadiobox_align" type="radio" name="group" id="gu" value="u" <% $group eq "u" ? "checked=\"checked\"" : ""%>/>&nbsp; I don't know</span>
 					</div>
  				 </div>
-
-                    <div style="clear: both;">&nbsp;
-					<!--
-                      <div class="conNewPro_label1">
-                        <label>Status:</label>
-                        <div style="clear: both;">&nbsp;</div>
-                        <div class="conNewPro_label1"> <span class="conNewPro_smallContainer">
-                          <input class="conRadiobox_align" type="radio" name="group" id="gm2" value="m"   />
-                          &nbsp; Private</span> <span class="conNewPro_smallContainer">
-                      <input class="conRadiobox_align" type="radio" name="group" id="gm2" value="m"   />
-                            &nbsp; Public</span> </div>
-                        <div class="conNewPro_label1"></div>
-                      </div>
-					  -->
-                    </div>
-                    <div style="clear: both;">&nbsp;</div> <div style="clear: both;">&nbsp;</div> 
+				<div style="clear: both;">&nbsp;</div> <div style="clear: both;">&nbsp;</div> 
               <div class="conBT_continue"><a id="step_one_btn" href="javascript:void(0);" onclick="javascript:step_one();"></a></div>
                         
             </div><!--END of ID conProject_newRight-->
@@ -111,6 +101,7 @@
 	$common_name => ''
 	$group => ''
 	$sequence => ''
+	$description => ''
 </%args>
 <%once>
 	use DNALC::Pipeline::Utils qw/nicebasepairs random_string/;
@@ -228,7 +219,10 @@ if ($r->method eq 'POST') {
 		unless (2 == @subnames) {
 			push @err, "Organism name should contain only two words: genus and species";
 		}
-		#push @err, "Clade is missing!" unless $group;
+
+		if (length($description) > 140) {
+			push @err, "Description should be shorter or equal to 140 characters"
+		}
 	}
 
 	my ($pm, $proj);
@@ -265,6 +259,7 @@ if ($r->method eq 'POST') {
 						common_name => $common_name,
 						sample => $species,
 						clade => $group,
+						description => $description,
 					});
 			if ($st->{status} eq 'success') {
 				print STDERR  "New PID = ", $pm->project, $/;

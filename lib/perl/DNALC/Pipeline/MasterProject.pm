@@ -11,7 +11,7 @@ use Class::DBI::Plugin::Pager;
 
 __PACKAGE__->table('master_project');
 __PACKAGE__->columns(Primary => qw/mp_id/);
-__PACKAGE__->columns(Essential => qw/user_id project_id project_type/);
+__PACKAGE__->columns(Essential => qw/user_id project_id project_type public/);
 
 __PACKAGE__->sequence('master_project_mp_id_seq');
 

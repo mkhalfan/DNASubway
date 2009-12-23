@@ -33,8 +33,8 @@
 	<td><a href="<% $uri %>"><%$_->name |html%></a></td>
 	<td><% $_->organism %>, <% $_->common_name %></td>
 	<td><% $_->can("clade") ? $clades{$_->clade} : $_->type eq "d" ? "DNA" : "Protein" %></td>
-	<td> public </td>
-	<td><a href="/project/remove?id=<% $_->{master_project_id} %>" onclick="return confirm('Remove this project?')">remove</a></td>
+	<td><% $_->{public} ? "public" : "private" %></td>
+	<td><a href="/project/remove?id=<% $_->{master_project_id} %>" onclick="return confirm('Remove this project?')"><img src="/images/v2/Trash_Can.png" style="border: none;" alt="[remove project]"/></a></td>
 </tr>
 % }
 </table>
@@ -116,6 +116,7 @@ my @projects = grep { defined $_ } map {
 				if ($p) {
 					$p->{master_project_id} = $_->id;
 					$p->{project_type} = $_->project_type;
+					$p->{public} = $_->public;
 				}
 				$p;
 			} $pager->search_where;

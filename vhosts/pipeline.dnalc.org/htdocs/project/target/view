@@ -29,6 +29,9 @@
 	<span class="conYellowline_ConCell1"><input class="conRadiobox_align" type="checkbox" name="g" id="g_<% $_->id %>" value="<% $_->id %>" <% (grep {$_ eq $gid } @tp_genomes)  ? "checked=\"checked\"" : "" %> />&nbsp; <% $_->organism %></span>
 %	}
  </span><!--END of CLASS conYellowline_ConColumn2-->
+%#<div>Blast all: <input type="checkbox" name="g" id="g_unigene" value="unigene" /> Unigene</div>
+%#<div>Blast all: <input type="checkbox" name="g" id="g_uniprot" value="uniprot" /> UniProt</div>
+
 </div><!--END of ID conYellowlineLeft2-->
 
 <div id="conYellowlineRight2">
@@ -38,7 +41,6 @@
 			codebase="/files/jalview/" 
 			code="jalview.bin.JalviewLite"
 			height="35" width="110">
-%#			<param name="code" value="jalview.bin.JalviewLite">
 			<param name="file" value="<% $files{fasta} %>">
 			<param name="showAnnotation" value="true">
 			<param name="windowHeight" value="500">
@@ -76,14 +78,16 @@
 	<div id="conProjectInfo_header">
 		<div id="conProjectInfo_title">Project Information</div>
 		<div id="conProjectInfo_projecttitle"><% $tp ? $tp->name : "" |html%></div>
-		<div id="conProjectInfo_projectlog">Project Log</div>
+		<div id="conProjectInfo_projectlog">Description</div>
 	</div>
 
 	<span class="conProjectInfo_column1">
+	<!--
 		<div class="conProjectInfo_Row">
 			<span class="conProjectInfo_Cell1">Project ID</span>
 			<span class="conProjectInfo_Cell2">: <% $tp ? $tp->id : "" %></span>
 		</div>
+	-->
 		<div class="conProjectInfo_Row">
 			<span class="conProjectInfo_Cell1">User</span>
 			<span class="conProjectInfo_Cell2">: <% $user_fullname %></span>
@@ -97,6 +101,13 @@
 			<span class="conProjectInfo_Cell3">: </span>
 			<span class="conProjectInfo_CellBT"><a href="javascript:;" onclick="javascript:launch_viewseq('<% $tid %>')">View</a></span>
 		</div>
+% if ($is_owner) {
+        <div class="conProjectInfo_Row">
+			<div class="conProjectInfo_Cell1">Status:</div>
+			<div class="conProjectInfo_Cell3"><span onclick="set_public(0);" style="cursor: pointer;"><input type="radio" name="public" id="public_no" <% $is_public ? "" : "checked=\"checked\"" %> onclick="set_public(0);" />&nbsp; Private</span></div>
+			<div class="conProjectInfo_Cell3"><span onclick="set_public(1);" style="cursor: pointer;"><input type="radio" name="public" id="public_yes" <% $is_public ? "checked=\"checked\"" : "" %> onclick="set_public(1);" />&nbsp; Public</span></div>
+		</div>
+% }
 	</span><!--END of span conProjectInfo_column1-->
 
 	<span class="conProjectInfo_column2">
@@ -117,17 +128,10 @@
 			<span class="conProjectInfo_Cell2">: <% $tp ? $tp->function_name : "-" %></span>
 		</div>
 	</span><!--END of span conProjectInfo_column2-->
-	<span class="conProjectInfo_column2">
-		<div class="conProjectInfo_Row"></div>
-		<!--
+	<span class="conProjectInfo_column2">		
 		<div class="conProjectInfo_Row">
-			<span class="conProjectInfo_Cell1">Status:</span>
-			<span class="conProjectInfo_Cell1x">
-				<input class="conRadiobox_align" type="radio" name="xx" id="" value="" />&nbsp; Private
-				<input class="conRadiobox_align" type="radio" name="xx" id="" value="" />&nbsp; Public
-			</span>
+			<% $tp ? $tp->description : "" |html %>
 		</div>
-		-->
 	</span> <!--END of span conProjectInfo_column2-->                   							
 
 </div><!--END of ID conProjectInfo-->  
@@ -152,6 +156,10 @@
 	my $tree_url = '';
 	my @tp_genomes = ();
 	my %files;
+	
+	my $is_owner = 0;
+	my $is_public = undef;
+	my $mp = undef;
 	
 	my $message = '';
 
@@ -196,7 +204,11 @@
 		}
 		else {
 			$user_fullname = $s->{full_name};
+			$is_owner = 1;
 		}
+
+		($mp) = DNALC::Pipeline::MasterProject->search(user_id => $tp->user_id, project_id => $tp->id);
+		$is_public = $mp->public;
 	}
 
 </%init>

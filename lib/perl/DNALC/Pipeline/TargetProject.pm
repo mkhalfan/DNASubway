@@ -10,7 +10,7 @@ use DNALC::Pipeline::MasterProject ();
 __PACKAGE__->table('target_project');
 __PACKAGE__->columns(Primary => qw/tpid/);
 __PACKAGE__->columns(Essential => qw/user_id name project_id type organism segment 
-									gp_name class_name function_name status/);
+									gp_name class_name function_name status description/);
 __PACKAGE__->columns(Others => qw/seq created updated/);
 
 __PACKAGE__->sequence('target_project_tpid_seq');

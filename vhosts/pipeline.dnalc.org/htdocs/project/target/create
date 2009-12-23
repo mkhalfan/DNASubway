@@ -36,6 +36,12 @@
 			<input class="conRadiobox_align" type="radio" name="type" id="type_p" value="p" <% "p" eq $type ? "checked=\"checked\"": ""%> <% $disable_type ? "disabled=\"disabled\"" : ""%>/> Protein
 			</div>
 		</div>
+		<div style="clear: both;">&nbsp;</div>
+		<div class="conNewPro_title">Description</div>
+		<div class="conNewPro_label1">
+			<textarea id="description" name="description" cols="40" class="conStylized_box" onkeyup="check_description_length(event);"><% $description |html %></textarea>
+			<span id="desc_len"><% length $description %></span>
+		</div>
 	</div><!--END of ID conProject_newLeft-->
 </div><!--END of ID conRedlineLeft1-->
 
@@ -90,6 +96,7 @@
 	$gp_name => ""
 	$class => ""
 	$function => ""
+	$description => ""
 </%args>
 <%once>
 	use DNALC::Pipeline::Config ();
@@ -207,6 +214,7 @@ else {
 						class_name => $class || '',
 						function_name => $function || '',
 						status => 'not processed',
+						description => $description || ''
 					});
 				};
 			if ($@) {

@@ -19,7 +19,7 @@ use Data::Dumper;
 
 __PACKAGE__->table('project');
 __PACKAGE__->columns(Primary => qw/project_id/);
-__PACKAGE__->columns(Essential => qw/user_id name organism common_name 
+__PACKAGE__->columns(Essential => qw/user_id name organism common_name description
 								clade sample crc sequence_length created/);
 __PACKAGE__->sequence('project_project_id_seq');
 

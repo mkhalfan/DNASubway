@@ -95,12 +95,34 @@ function check_status (pid, op, h) {
 								}
 							}
 						}
-						$('apollo_btn').onclick = function () { launch('apollo'); };
+						if ($('isowner').value == "1") {
+							$('apollo_btn').onclick = function () { launch('apollo'); };
+							$('apollo_btn').removeClassName('disabled');
+							$('apollo_ind').removeClassName("conIndicator_disabled");
+							$('apollo_ind').addClassName("conIndicator_not-processed");
+							$('evidence_ind').removeClassName('conIndicator_disabled');
+							$('evidence_ind').addClassName('conIndicator_not-processed');
+							$('add_evidence_link').removeClassName('disabled');
+							$('add_evidence_link').onclick = function () {
+									$('add_evidence').style.visibility='visible';
+									$('add_evidence').style.display='block';
+									$('add_evidence_link').hide();
+								};
+						}
 						$('gbrowse_btn').onclick = function () { launch('gbrowse', null, rnames['gbrowse']); };
+						$('gbrowse_btn').removeClassName('disabled');
+						$('gbrowse_ind').removeClassName("conIndicator_disabled");
+						$('gbrowse_ind').addClassName("conIndicator_Rb");
 						if ($('exporter_btn')) {
 							$('exporter_btn').onclick = function () { launch('exporter', null, rnames['exporter']); };
+							$('exporter_btn').removeClassName('disabled');
+							$('exporter_ind').removeClassName("conIndicator_disabled");
+							$('exporter_ind').addClassName("conIndicator_Rb");
 						}
 						$('target_btn').onclick = function () { launch('target', null, rnames['target']); };
+						$('target_btn').removeClassName('disabled');
+						$('target_ind').removeClassName("conIndicator_disabled");
+						$('target_ind').addClassName("conIndicator_Rb");
 					}
 				} else {}
 			}
@@ -341,8 +363,7 @@ function debug(msg) {
 	if (d) d.update(msg);
 }
 
-
-
+/*
 function show_messages(html, isError) {
 
 	if (!html || !UI) {
@@ -376,6 +397,55 @@ function show_errors(html) {
 	}
 	show_messages(html, 1);
 }
+*/
+//-------------
+
+function set_public(np) {
+	if ($('public_yes').disabled)
+		return;
+
+	if (np) {
+		$('public_yes').checked = true;
+		$('public_no').checked = false;
+	}
+	else {
+		$('public_yes').checked = false;
+		$('public_no').checked = true;
+	}
+	
+	$('public_yes').disabled = true;
+	$('public_no').disabled = true;
+	
+	// stop hammering the db
+	new PeriodicalExecuter(function(p){
+				$('public_yes').disabled = false;
+				$('public_no').disabled = false;
+				p.stop();
+		}, 5);
+	
+	var params = { 'pid' : $('pid').value, 'public' : np, type: 'annotation' };
+	sent = params;
+	new Ajax.Request('/project/update',{
+		method:'get',
+		parameters: params, 
+		onSuccess: function(transport){
+			var response = transport.responseText || "{'status':'error', 'message':'No response'}";
+			debug(response);
+			var r = response.evalJSON();
+			if (r.status == 'success') {
+				show_messages("Project updated successfully.");
+			}
+			else  if (r.status == 'error') {
+				show_errors("There seem to be an error: " + r.message);
+			}
+			else {
+			}
+		},
+		onFailure: function(){
+				alert("Something went wrong.");
+			}
+	});
+}
 
 //-------------
 // keep this at the end
@@ -399,6 +469,9 @@ Event.observe(window, 'load', function() {
 	}
 	
 	// re-check processing routines' status
+	if ($('isowner').value != "1") 
+		return;
+	
 	var as = $$('a');
 	var x = 0;
 	for (var i = 0; i < as.length; i++ ) {

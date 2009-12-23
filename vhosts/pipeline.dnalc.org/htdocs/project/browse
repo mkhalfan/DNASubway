@@ -5,12 +5,12 @@
 <div id="conProject_tableHolder">
   <table class="conProject_table" summary="">
   <tr>
-    <th width="49" scope="col">#</th>
-    <th width="94" scope="col">Date</th>
-    <th width="279" scope="col">Project Title</th>
-    <th width="264" scope="col">Organism</th>
-    <th width="120" scope="col">Classification</th>
-    <th width="62" scope="col">Status</th>
+    <th width="32" scope="col">#</th>
+    <th width="76" scope="col">Date</th>
+    <th width="200" scope="col">Project Title</th>
+	<th width="240" scope="col">Description</th>
+    <th width="200" scope="col">Organism</th>
+    <th width="120" scope="col">Author</th>
   </tr>
 % for (@projects) {
 %	my $created = DNALC::Pipeline::App::Utils->format_datetime($_->created, undef, "%m/%d/%Y");
@@ -24,10 +24,10 @@
 	<td style="background-color: <% $color %>;"><% $_->id %></td>
 	<td><% $created %></td>
 	<td><a href="<% $uri %>"><%$_->name |html%></a></td>
+	<td><% $_->description |html %></td>
 	<td><% $_->organism %>, <% $_->common_name %></td>
-	<td><% $_->can("clade") ? $clades{$_->clade} : $_->type eq "d" ? "DNA" : "Protein" %></td>
+	<td><% $_->{full_name} %></td>
 	<!--<td><% $_->user_id %></td>-->
-	<td> public </td>
 </tr>
 % }
 
@@ -83,17 +83,11 @@ unless ($page =~ /^\d+$/) {
 	$page = 1;
 }
 
-#my $pager = DNALC::Pipeline::Project->pager;
-#$pager->per_page( $epp );
-#$pager->page( $page );
-#$pager->order_by( $sort );
-#my @projects = $pager->search_where;
-
 my $pager = DNALC::Pipeline::MasterProject->pager;
 $pager->per_page( $epp );
 $pager->page( $page );
 $pager->order_by( 'mp_id desc' );
-
+$pager->where({ public => 1});
 
 # this should be replaced by a join in DNALC::Pipeline::MasterProject???
 #if (0) {
@@ -103,8 +97,12 @@ my @projects = grep { defined $_ } map {
 				if ($_->project_type eq "target") {
 					$pclass = 'DNALC::Pipeline::TargetProject';
 				}
+				my $u = DNALC::Pipeline::User->retrieve($_->user_id);
 				my $p = $pclass->retrieve($pid);
-				$p->{project_type} = $_->project_type if $p;
+				if ($p) {
+					$p->{project_type} = $_->project_type;
+					$p->{full_name} = $u->full_name if $u;
+				}
 				$p;
 			} $pager->search_where;
 #}

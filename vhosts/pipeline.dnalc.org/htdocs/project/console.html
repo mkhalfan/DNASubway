@@ -1,5 +1,6 @@
-<div id="container_rightContent">  
+<div id="container_rightContent">
 <input type="hidden" id="pid" value="<% $pid %>"/>
+<input type="hidden" id="isowner" value="<% $is_owner %>"/>
 
 %	if (exists $m->session->{messages}) {
 <div style="display:none" id="error_list">	
@@ -25,6 +26,7 @@
 		<span class="conRedline_keys">
 		</span>
 	</span><!--END of span class conRedline_ConColumn-->
+
 	<span class="conRedline_ConColumn">
 		<span class="conRedline_ConCell">
 		<span class="conIndicator_box"><div id="augustus_st" class="conIndicator_<% $status{augustus} eq "done" ? "done" : $is_owner &&  $rm_status eq "done" ? $status{augustus} : "disabled" %>"></div> </span>
@@ -36,7 +38,7 @@
 			<& '.routine', routine => 'fgenesh', pmanager => $pm, is_owner => $is_owner,
 						status => $status{fgenesh}, rm_status => $rm_status &>
 		</span><!--END of span class conRedline_ConCell-->
-		<span class="conRedline_ConCell"><!-- rm_status = <% $rm_status %> -->
+		<span class="conRedline_ConCell">
 			<span class="conIndicator_box"><div id="snap_st" class="conIndicator_<% $status{snap} eq "done" ? "done" : $is_owner && $rm_status eq "done" ? $status{snap} : "disabled" %>"></div> </span>
 			<& '.routine', routine => 'snap', pmanager => $pm, is_owner => $is_owner,
 						status => $status{snap}, rm_status => $rm_status &>
@@ -66,7 +68,7 @@
 % my $prot_evid = lc $wfm->get_status("upload_evid_prot")->name;
 % if ( $nt_evid eq "done") {
 		<span class="conRedline_ConCellAdd">
-			<span class="conIndicator_box"><div id="blastn_user_st" class="conIndicator_<% $status{blastn_user} %>"></div></span>
+			<span class="conIndicator_box"><div id="blastn_user_st" class="conIndicator_<% $status{blastn_user} eq "done" ? "done" : $is_owner ? $status{blastn_user} : 'disabled' %>"></div></span>
 			<& '.routine', routine => 'blastn_user', pmanager => $pm, delay => 15,
 					status => $status{blastn_user}, rm_status => $rm_status &>
 		</span><!--END of span class conRedline_ConCell-->
@@ -77,7 +79,7 @@
 		
 % if ($prot_evid eq "done") {
 		<span class="conRedline_ConCellAdd"> <!-- conRedline_ConCell -->
-			<span class="conIndicator_box"><div id="blastx_user_st" class="conIndicator_<% $status{blastx_user} %>"></div></span>
+			<span class="conIndicator_box"><div id="blastx_user_st" class="conIndicator_<% $status{blastx_user} eq "done" ? "done" : $is_owner ? $status{blastx_user} : 'disabled' %>"></div></span>
 			<& '.routine', routine => 'blastx_user', pmanager => $pm, delay => 15,
 					status => $status{blastx_user}, rm_status => $rm_status &>
 		</span><!--END of span class conRedline_ConCell-->
@@ -86,22 +88,24 @@
 % }
 		
 
-% if ( $nt_evid ne "done" || $prot_evid ne "done") {
+%# if ( $nt_evid ne "done" || $prot_evid ne "done") 
+% if ( 1 ) {
 		<span class="conRedline_ConCell2">
-			<span class="conIndicator_box"></span>
+			<span class="conIndicator_box"><div id="evidence_ind" class="conIndicator_<% $rm_status eq 'done' && $is_owner ? 'not-processed' : 'disabled' %>"></div></span>
 			<span class="bt_run">
 			
 			<span style="position:relative;">
 				<div id="add_evidence" class="popup">
+% if ( $nt_evid ne "done" || $prot_evid ne "done") {
 				<form enctype="multipart/form-data" method="post">
 				<input type="hidden" name="notused" value="1" />
 % if ( $nt_evid ne "done") {
-					<div class="panel_container">Add Nucleotide based evidence:                     
+					<div class="panel_container">Add nucleotide-based evidence:                     
 						<input class="conStylized_box1" type="file" id="evid_nt" name="evid_nt"/>
 					</div>
 % }
 % if ( $prot_evid ne "done") {
-					<div class="panel_container">Add Proteine based evidence:                      
+					<div class="panel_container">Add protein-based evidence:                      
 						<input class="conStylized_box1" type="file" id="evid_prot" name="evid_prot"/>
 					</div>
 % }
@@ -110,11 +114,22 @@
 						<input type="submit" value="  Upload  " class="input" />
 					</div>
 				</form>
+% } else {
+				<p>&nbsp;</p>
+				<p>&nbsp;</p>
+				All possible evience uploaded.
+				<p>&nbsp;</p>
+				<div class="panel_container1">
+					<input type="button" value="  OK  " class="input" onclick="javascript:$('add_evidence').hide();$('add_evidence_link').show();" /> &nbsp; &nbsp; &nbsp; &nbsp;
+				</div>
+% }
 				</div>
 				<a id="add_evidence_link" href="javascript:void(0);" \
 % if ($is_owner && $rm_status eq "done" ) {
-				onclick="javascript:$('add_evidence').style.visibility='visible';$('add_evidence').style.display='block';$('add_evidence_link').hide();"
-% }				
+				onclick="javascript:$('add_evidence').style.visibility='visible';$('add_evidence').style.display='block';$('add_evidence_link').hide();" \
+% } else {
+				class="disabled"
+% }
 				>Upload Data</a>
 			</span>
 
@@ -126,25 +141,52 @@
 
 <!--right Content Start--------------> 
 <div id="conRedlineRight2">
-	<span id="conRedline_ConColumnR1"><span class="bt_browserRedLine"><a id="apollo_btn" href="javascript:;" \
-		onclick="<% $rm_status eq "done" && $is_owner ? "launch('apollo');" : "show_errors('Apollo only available to project owner.');" %>" \
-		commonname="<% $trimmed_common_name %>" seq_length="<% $proj->sequence_length %>">Apollo</a></span>
-		<div style="display: none;" id="apollo_status">loading apollo...</div>
-	</span>
+	<span id="conRedline_ConColumnR1">
+	<span class="con_browserBT ">
+		<span class="conIndicator_boxBrowse">
+			<div id="apollo_ind" class="conIndicator_<% $rm_status eq "done" && $is_owner ? 'not-processed' : 'disabled' %>"></div>
+		</span>
+		<span class="bt_browserRedLine"><a id="apollo_btn" href="javascript:;" \
+			onclick="<% $rm_status eq "done" && $is_owner ? "launch('apollo');" : "" %>" \
+			class="<% $rm_status eq "done" && $is_owner ? '' : 'disabled'%>" \
+			commonname="<% $trimmed_common_name %>" seq_length="<% $proj->sequence_length %>">Apollo</a></span>
+		</span>
+	</span><!--END of CLASS  con_browserBT-->
+	</span><!--END of I DconRedline_ConColumnR1-->
 
 	<span id="conRedline_ConColumnR2">
-		<span class="bt_browserBlue"><a id="gbrowse_btn" href="javascript:;" onclick="<% $rm_status eq "done" ? "launch('gbrowse', null, 'GBrowse')" : "" %>">Local<br/>Browser</a></span>
+	<span class="con_browserBT">
+		<span class="conIndicator_boxBrowse"><div id="gbrowse_ind" class="conIndicator_<%$rm_status eq "done" ? 'Rb' : 'disabled' %>"></div></span>
+		<span class="bt_browserBlue"><a id="gbrowse_btn" href="javascript:;" \
+			class="<% $rm_status eq "done" ? '' : 'disabled'%>" \
+			onclick="<% $rm_status eq "done" ? "launch('gbrowse', null, 'GBrowse')" : "" %>">Local<br/>Browser</a></span>
+    </span>
+
 % 	if ( $proj->sample) {
-		<span class="bt_browserBlueAdd">
-			<a id="exporter_btn" href="javascript:;" onclick="<% $rm_status eq "done" ? "launch('exporter',null,'Phytozome Browser')" : "" %>">Phytozome<br/>Browser</a>
-		</span>
+	<div class="bt_browserBlueSpacer">
+		<div id="con_browserBlueAdd">
+			<span class="conIndicator_boxBrowse"><div id="exporter_ind" class="conIndicator_<%$rm_status eq "done" ? 'Rb' : 'disabled' %>"></div></span>
+			<span class="bt_browserBlueAdd">
+				<a id="exporter_btn" href="javascript:;" \
+					class="<% $rm_status eq "done" ? '' : 'disabled'%>" \
+					onclick="<% $rm_status eq "done" ? "launch('exporter',null,'Phytozome Browser')" : "" %>">Phytozome<br/>Browser</a>
+			</span>
+		</div>
+	</div>
 % 	} else {
 		<span class="bt_browserBlueSpacer"></span>
 %	}
+		<span class="con_browserBT ">
+			<span class="conIndicator_boxBrowse"><div id="target_ind" class="conIndicator_<%$rm_status eq "done" ? 'Rb' : 'disabled' %>"></div></span>
 		<span class="bt_browserYellow">
-			<a id="target_btn" href="javascript:;" onclick="<% $rm_status eq "done" ? "launch('target', null, 'Phylogenetic Tree')" : "" %>">Phylogenetic<br/>Tree</a>
+			<a id="target_btn" href="javascript:;" \
+				class="<% $rm_status eq "done" ? '' : 'disabled'%>" \
+				onclick="<% $rm_status eq "done" ? "launch('target', null, 'Phylogenetic Tree')" : "" %>">Phylogenetic<br/>Tree</a>
 		</span>
 	</span>
+</span>
+
+
 </div><!--END of ID conRedlineRight2-->
 <div id="conMessage_FgenesH">FgenesH gene predictor provided by <a target="_blank" href="http://linux1.softberry.com/berry.phtml">Softberry, Inc.</a></div>
 
@@ -159,28 +201,28 @@
 <div id="conProjectInfo">
 	<div id="conProjectInfo_header">
 		<div id="conProjectInfo_title">Project Information</div>
-		<div id="conProjectInfo_projecttitle"><% $proj->name |html%></div>
-		<div id="conProjectInfo_projectlog">Project Log</div>
+		<div id="conProjectInfo_projecttitle"><small><% $proj->id %></small>.<% $proj->name |html%></div>
+		<div id="conProjectInfo_projectlog">Description</div>
 	</div>
 
 	<span class="conProjectInfo_column1">
+%#		<div class="conProjectInfo_Row">
+%#			<span class="conProjectInfo_Cell1">Project ID</span>
+%#			<span class="conProjectInfo_Cell2">: <% $proj->id %></span>
+%#		</div>
 		<div class="conProjectInfo_Row">
-		<span class="conProjectInfo_Cell1">Project ID</span>
-		<span class="conProjectInfo_Cell2">: <% $proj->id %></span>
+			<span class="conProjectInfo_Cell1">User</span>
+			<span class="conProjectInfo_Cell2">: <% $user ? $user->full_name : "" |html%></span>
 		</div>
 		<div class="conProjectInfo_Row">
-		<span class="conProjectInfo_Cell1">User</span>
-		<span class="conProjectInfo_Cell2">: <% $user ? $user->full_name : "" |html%></span>
+			<span class="conProjectInfo_Cell1">Affiliation</span>
+			<span class="conProjectInfo_Cell2">: DNALC</span>
 		</div>
-		<div class="conProjectInfo_Row">
-		<span class="conProjectInfo_Cell1">Affiliation</span>
-		<span class="conProjectInfo_Cell2">: DNALC</span>
-		</div>
-% if (0) {
+% if ($is_owner) {
         <div class="conProjectInfo_Row">
 			<div class="conProjectInfo_Cell1">Status</div>
-			<div class="conProjectInfo_Cell3">: &nbsp;<span><input class="" type="radio" name="public" id="public_no" checked="<% $is_public ? "" : "checked" %>"/>&nbsp; Private</span></div>
-			<div class="conProjectInfo_Cell3"><span><input class="" type="radio" name="public" id="seq_src_paste" checked="<% $is_public ? "checked" : "" %>"/>&nbsp; Public</span></div>
+			<div class="conProjectInfo_Cell3">: &nbsp;<span onclick="set_public(0);" style="cursor: pointer;"><input type="radio" name="public" id="public_no" <% $is_public ? "" : "checked=\"checked\"" %> onclick="set_public(0);" />&nbsp; Private</span></div>
+			<div class="conProjectInfo_Cell3"><span onclick="set_public(1);" style="cursor: pointer;"><input type="radio" name="public" id="public_yes" <% $is_public ? "checked=\"checked\"" : "" %> onclick="set_public(1);" />&nbsp; Public</span></div>
 		</div>
 % }
 	</span><!--END of span conProjectInfo_column1-->
@@ -195,14 +237,13 @@
 			<span class="conProjectInfo_Cell2">: <% $clades{$proj->clade} %></span>
 		</div>
 		<div class="conProjectInfo_Row">
-			<span class="conProjectInfo_Cell1">Sequence</span>
-			<span class="conProjectInfo_Cell3">: <% nicebasepairs($proj->sequence_length) %></span>
-			<span class="conProjectInfo_CellBT"><a href="javascript:;" onclick="javascript:launch(null, '<& './.comp/filepath_to_web', file => $pm->fasta_file &>', 'DNA Sequence')">View</a></span>
+			<span class="conProjectInfo_Cell1"><a href="javascript:;" onclick="javascript:launch(null, '<& './.comp/filepath_to_web', file => $pm->fasta_file &>', 'DNA Sequence')">Sequence</a></span>
+			<span class="conProjectInfo_Cell2">: <% nicebasepairs($proj->sequence_length) %></span>
 		</div>
 	</span><!--END of span conProjectInfo_column2-->
 
 	 <span class="conProjectInfo_column3">
-% if (1) {
+% if (0) {
 		 <div class="conHistorylist">
 			<ul >
 %			for ($pm->latest_log_entries) {
@@ -212,6 +253,7 @@
 			<span class="bt_more"><a href="#">more »</a></span>
 		</div>
 % }
+		<div class=""><small><% $proj->description |html %></small></div>
  	</span>
 	</span> <!--END of span conProjectInfo_column3-->
 </div><!--END of ID conProjectInfo-->
@@ -272,12 +314,12 @@ my ($history, $rm_status, $trimmed_common_name);
 my $wfm = DNALC::Pipeline::App::WorkflowManager->new( $proj );
 
 my $is_owner = $s->{user_id} == $user->user_id;
-my $is_public = 1;
+my $is_public = undef;
 my $mp = undef;
 
 if ($r->method eq "POST") {
 	
-	if (!$s->{logged_in} || $is_owner) {
+	if (!$is_owner) {
 		$m->comp('/_message_add', 'Only the owner of the project is allowed to do this!', 'error');
 	}
 	elsif ($ARGS{evid_nt} || $ARGS{evid_prot}) {
@@ -313,15 +355,9 @@ else { # most likely is GET
 	$rm_status = $status{repeat_masker};
 	$trimmed_common_name = $pm->cleaned_common_name;
 
-	#($mp) = DNALC::Pipeline::MasterProject->search(user_id => $user->id, project_id => $proj->id);
-	#print STDERR $mp->public, $/;
-	#print STDERR Dumper($mp), $/;
-	#if ($mp->can("public")) {
-	#	$is_public = $mp->public;
-	#}
+	($mp) = DNALC::Pipeline::MasterProject->search(user_id => $user->id, project_id => $proj->id);
+	$is_public = $mp->public;
 }
-
-#print STDERR Dumper( \%status ), $/;
 
 </%init>
 %#-------------------------------------------------
@@ -337,7 +373,7 @@ else { # most likely is GET
 <%init>
 my $link   = 'javascript:;';
 my $target = 'target="_blank"';
-my $action = qq{onclick="run('$routine')"};
+my $action = $is_owner ? qq{onclick="run('$routine')"} : '';
 my $title  = '';
 my $label  = '';
 
@@ -382,7 +418,10 @@ else {
 
 </%init>
 <span class="bt_run"><a id="<% $routine %>_btn" href="<% $link %>" class="<% $status %>" <% $target %> \
-status="<% $status %>" <% $action %> delay="<% $delay %>"><% $routines{$routine} %></a></span>
+% if ($is_owner) {
+status="<% $status %>" \
+% }
+<% $action %> delay="<% $delay %>"><% $routines{$routine} %></a></span>
 </%def>
 %#-------------------------------------------------
 <%attr>

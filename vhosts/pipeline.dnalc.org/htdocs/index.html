@@ -5,91 +5,78 @@
 			<div id="startHere"></div>
 % }
 			</span>
-     		<span class="bt_redStart"><a href="<% $s->{logged_in} ? "/project/create_project.html" : "#" %>" onmouseover="document.getElementById('red').style.display = 'block' "  onmouseout="document.getElementById('red').style.display = 'none' " style="cursor: default;" ></a></span>
-          <div id='red' style class='startInfoText_R'>
+     		<span class="bt_redStart"><a href="<% $s->{logged_in} ? "/project/create_project.html" : "#" %>" onmouseover="document.getElementById('red').style.display='block'" 
+				onmouseout="document.getElementById('red').style.display='none'" style="cursor: <% $s->{logged_in} ? "pointer" : "default"%>;" ></a></span>
+          <div id='red' class='startInfoText_R'>
 	<b>Annotate a Genomic Sequence:&nbsp;</b>Input a DNA sequence of up to 100,000 nucleotides to identify the genes and transposons in it, and annotate (associate) the sequence with this information.</div>
     
 			
-            <span class="bt_yellowStart"><a href="<% $s->{logged_in} ? "/project/target/create" : "#" %>" onmouseover="document.getElementById('yellow').style.display = 'block' "  onmouseout="document.getElementById('yellow').style.display = 'none' " style="cursor: default;"></a></span>
-          <div id='yellow' style class='startInfoText_Y'>
-	<b>Build Gene Family Tree with TARGeT:&nbsp;</b>Input a gene or protein of up to 10,000 nucleotides or amino acids to identify related genes, determine gene functions, and build phylogenetic trees.</div>
+		<span class="bt_yellowStart"><a href="<% $s->{logged_in} ? "/project/target/create" : "#" %>" onmouseover="document.getElementById('yellow').style.display='block'" 
+			onmouseout="document.getElementById('yellow').style.display='none'" style="cursor: <% $s->{logged_in} ? "pointer" : "default"%>;"></a></span>
+
+		<div id='yellow' class='startInfoText_Y'>
+			<span class="comingsoon">Coming Soon...</span>&nbsp;
+			<b>Build Gene Family Tree with TARGeT:&nbsp;</b>Input a gene or protein of up to 10,000 nucleotides or amino acids to identify related genes, determine gene functions, and build phylogenetic trees.
+		</div>
             
-		    <span class="bt_blueStart"><a href="#" onmouseover="document.getElementById('blue').style.display = 'block' "  onmouseout="document.getElementById('blue').style.display = 'none' " style="cursor: default;"></a></span>
-          <div id='blue' style class='startInfoText_B'>
-	<b>Analyze Transcript Data:&nbsp;</b>Input a set of Expressed Sequence Tags (ESTs) of up to 100 megabytes of assembled data to determine the potential natures of the genes captured.</div>
+		<span class="bt_blueStart"><a href="#" onmouseover="document.getElementById('blue').style.display='block'" 
+			onmouseout="document.getElementById('blue').style.display='none'" style="cursor: <% $s->{logged_in} ? "pointer" : "default"%>;"></a></span>
+		<div id='blue' class='startInfoText_B'>
+			<span class="comingsoon">Coming Soon...</span>&nbsp;<b>Analyze Transcript Data:&nbsp;</b>Input a set of Expressed Sequence Tags (ESTs) of up to 100 megabytes of assembled data to determine the potential natures of the genes captured.
+		</div>
     
 		  </div><!--END of ID map_left-->
           
           
                 
-		  		<div id="map_right">
-                 <div class="containerHoz">
-   
-   <span class="spacer1"></span>
-    <span class="conConsole_info"> <a onmouseover="document.getElementById('red1').style.display = 'block' "  onmouseout="document.getElementById('red1').style.display = 'none' "></a></span>
-          <div id='red1' style class='startInfoText_R'>
-	<b>Find Repeats:&nbsp;</b>Identify and mask repeats and transposons that can obstruct sequence analysis.</div>
-    
-    
-    <span class="spacer3"></span>
-    
-    <span class="conConsole_info"> <a onmouseover="document.getElementById('red2').style.display = 'block' "  onmouseout="document.getElementById('red2').style.display = 'none' "></a></span>
-          <div id='red2' style class='startInfoText_R'>
-	<b>Predict Genes:&nbsp;</b>Identify DNA patterns typical for genes using gene prediction algorithms Augustus, FGenesH, SNAP, and tRNA Scan.</div>
-    
-    
-    <span class="spacer3"></span>
-    <span class="conConsole_info"> <a onmouseover="document.getElementById('red3').style.display = 'block' "  onmouseout="document.getElementById('red3').style.display = 'none' "></a></span>
-          <div id='red3' style class='startInfoText_R'>
-	<b>Search Databases:&nbsp;</b>Search the sequence for matches to known genes and proteins using search algorithms BLASTN and BLASTP.</div>
-        
-    <span class="spacer3"></span>
-   <span class="conConsole_info"> <a onmouseover="document.getElementById('red4').style.display = 'block' "  onmouseout="document.getElementById('red4').style.display = 'none' "></a></span>
-          <div id='red4' style class='startInfoText_R'>
-	<b>Build Models:&nbsp;</b>Synthesize gene predictions and search results into gene models using the annotation editor Apollo.</div>
-    
+	<div id="map_right">
+	<div class="containerHoz">
+		<span class="spacer1"></span>
+		<span class="conConsole_info" onmouseover="document.getElementById('red1').style.display='block'" onmouseout="document.getElementById('red1').style.display='none'"></span>
+		<div id='red1' class='startInfoText_R'><b>Find Repeats:&nbsp;</b>Identify and mask repeats and transposons that can obstruct sequence analysis.</div>
+
+		<span class="spacer3"></span>
+		<span class="conConsole_info" onmouseover="document.getElementById('red2').style.display='block'" onmouseout="document.getElementById('red2').style.display='none'"></span>
+		<div id='red2' class='startInfoText_R'><b>Predict Genes:&nbsp;</b>Identify DNA patterns typical for genes using gene prediction algorithms Augustus, FGenesH, SNAP, and tRNA Scan.</div>
+
+		<span class="spacer3"></span>
+		<span class="conConsole_info" onmouseover="document.getElementById('red3').style.display='block'" onmouseout="document.getElementById('red3').style.display='none'"></span>
+		<div id='red3' class='startInfoText_R'><b>Search Databases:&nbsp;</b>Search the sequence for matches to known genes and proteins using search algorithms BLASTN and BLASTP.</div>
+
+		<span class="spacer3"></span>
+		<span class="conConsole_info" onmouseover="document.getElementById('red4').style.display = 'block' " onmouseout="document.getElementById('red4').style.display = 'none' "></span>
+		<div id='red4' class='startInfoText_R'><b>Build Models:&nbsp;</b>Synthesize gene predictions and search results into gene models using the annotation editor Apollo.</div>
+	</div><!--END of CLASS containerHoz-->
+
+	<div class="containerHoz">
+		<span class="spacer1"><div class="underconstruction"></div></span>
+		<span class="spacer2"></span>
+		<span class="conConsole_info" onmouseover="document.getElementById('yellow1').style.display='block'" onmouseout="document.getElementById('yellow1').style.display='none'"></span>
+		<div id='yellow1' class='startInfoText_Y'><span class="comingsoon">Coming Soon...</span>&nbsp;<b>Search Genomes:&nbsp;</b>Search genomes for matches to a gene using search algorithms BLASTN or TBLASTN.</div>
+
+		<span class="spacer2"></span>
+		<span class="spacer2"></span>
+		<span class="conConsole_info" onmouseover="document.getElementById('yellow2').style.display='block'" onmouseout="document.getElementById('yellow2').style.display='none'"></span>
+		<div id='yellow2' class='startInfoText_Y'><span class="comingsoon">Coming Soon...</span>&nbsp;<b>Alignment & Tree Viewer:&nbsp;</b>View BLAST search results in multiple alignment format and as tree view.</div>
+
+		<span class="spacer1"></span>
+		<span class="spacer2"></span>
+		<span class="conConsole_info" onmouseover="document.getElementById('redblue').style.display='block'" onmouseout="document.getElementById('redblue').style.display='none'"></span>
+		<div id='redblue' class='startInfoText_BK'><b>Browsers & Transfer:&nbsp;</b>View analysis results and annotations in a genome browser. Transfer a gene to the Gene Family track (Yellow Line) to identify related genes, determine gene functions, and build phylogenetic trees.</div>
  	</div><!--END of CLASS containerHoz-->
     
-    
-    <div class="containerHoz">
-    
-    
-    <span class="spacer1"><div class="underconstruction"></div></span>
-    <span class="spacer2"></span>
-    <span class="conConsole_info"> <a onmouseover="document.getElementById('yellow1').style.display = 'block' "  onmouseout="document.getElementById('yellow1').style.display = 'none' "></a></span>
-          <div id='yellow1' style class='startInfoText_Y'>
-	<b>Search Genomes:&nbsp;</b>Search genomes for matches to a gene using search algorithms BLASTN or TBLASTN.</div>
-    
-    <span class="spacer2"></span>
-    <span class="spacer2"></span>
-    <span class="conConsole_info"> <a onmouseover="document.getElementById('yellow2').style.display = 'block' "  onmouseout="document.getElementById('yellow2').style.display = 'none' "></a></span>
-          <div id='yellow2' style class='startInfoText_Y'>
-	<b>Alignment & Tree Viewer:&nbsp;</b>View BLAST search results in multiple alignment format and as tree view.</div>
-    
-    <span class="spacer1"></span>
-    <span class="spacer2"></span>
-    <span class="conConsole_info"> <a onmouseover="document.getElementById('redblue').style.display = 'block' "  onmouseout="document.getElementById('redblue').style.display = 'none' "></a></span>
-          <div id='redblue' style class='startInfoText_BK'>
-	<b>Browsers & Transfer:&nbsp;</b>View analysis results and annotations in a genome browser. Transfer a gene to the Gene Family track (Yellow Line) to identify related genes, determine gene functions, and build phylogenetic trees.</div>
     
 
-    
- 	</div><!--END of CLASS containerHoz-->
-    
-    
-    
-      <div class="containerHoz">
-   
-    
-   <span class="spacer1"><div class="underconstruction"></div></span>
-    <span class="spacer2"></span>
-    <span class="spacer2"></span>
- <span class="conConsole_info"> <a onmouseover="document.getElementById('blue1').style.display = 'block' "  onmouseout="document.getElementById('blue1').style.display = 'none' "></a></span>
-          <div id='blue1' style class='startInfoText_B'>
-	<b>Search Genomes:&nbsp;</b>Search genome sequences for matches to EST data using DNA search algorithm BLAT.</div>
-    
-    
- 	</div><!--END of CLASS containerHoz-->
+	<div class="containerHoz">
+		<span class="spacer1"><div class="underconstruction"></div></span>
+		<span class="spacer2"></span>
+		<span class="spacer2"></span>
+		<span class="conConsole_info"> <a onmouseover="document.getElementById('blue1').style.display = 'block' "  onmouseout="document.getElementById('blue1').style.display = 'none' "></a></span>
+		<div id='blue1' class="startInfoText_B">
+			<span class="comingsoon">Coming Soon...</span>&nbsp;
+			<b>Search Genomes:&nbsp;</b>Search genome sequences for matches to EST data using DNA search algorithm BLAT.
+		</div>
+	</div><!--END of CLASS containerHoz-->
                  
  		  </div> <!--END of ID map_right-->
      
