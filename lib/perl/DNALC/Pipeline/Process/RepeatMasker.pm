@@ -74,7 +74,7 @@ use strict;
 		}
 		
 		my $file_to_parse = "$dir/$f[0]";
-		#print "file=", $file_to_parse, $/;
+		#print STDERR "file_to_parse=", $file_to_parse, $/;
 
 		#print "$self->{conf}->{parser_program} $file_to_parse > $gff_file", $/;
 		#system("$self->{conf}->{parser_program} $file_to_parse > $gff_file") 
@@ -110,29 +110,29 @@ use strict;
 			#   Score:     New!
 			#   Strand:    "+" or "-"
 			#   Phase:     0
-			#   Attributes: ID=;Name=;Target=FAM 24 180
+			#   Attributes: ID=;Name=;Description=FAM 24 180
 			print $out "" . $currentQueryName . "\t";
 			print $out "RepeatMasker\t";
 			print $out "repeat_region\t";
 			print $out $result->getQueryStart() . "\t";
 			print $out $result->getQueryEnd() . "\t";
-			print $out $result->getScore() . "\t";
+			#print $out $result->getScore() . "\t";
+			print $out ".\t";
 			if ( $result->getOrientation() eq "C" ) {
-			  print $out "-\t";
+				print $out "-\t";
 			}
 			else {
-			  print $out "+\t";
+				print $out "+\t";
 			}
 			print $out ".\t";
 			my $type = $result->getSubjType;
-			print $out "ID=RepeatMasker$i;Name=RepeatMasker$i-$type;Target="
+			print $out "ID=RepeatMasker$i;Name=RepeatMasker$i-$type;description="
 				. $result->getSubjName . ' '
 				. $result->getSubjStart . ' '
-				. $result->getSubjEnd . "\n";
-
-			}
-
-			undef $out;
+				. $result->getSubjEnd . ' score:'
+				. $result->getScore() . "\n";
+		}
+		undef $out;
 	}
 
 

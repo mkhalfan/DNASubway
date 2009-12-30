@@ -850,7 +850,7 @@ sub load_analysis_results {
 
 	return unless -f $file;
 
-	my $param = $self->additional_load_parameters(uc $alg) || '-a';
+	my $param = $self->additional_load_parameters(uc $alg);
 
 	my $profile = $self->profile;
 	my $command = "/usr/local/bin/gmod_bulk_load_gff3.pl $param --dbprof $profile -g $file";
@@ -1033,10 +1033,10 @@ sub additional_load_parameters {
 
     if (defined $algorithm_params{$alg}) {
         return $algorithm_params{$alg};
-    }     
+    }
 
-    warn "$alg isn't defined; the data load may not go as planned";
-    return;
+    print STDERR "$alg isn't defined; the data load may not go as planned\n";
+    return '';
 }
 
 
