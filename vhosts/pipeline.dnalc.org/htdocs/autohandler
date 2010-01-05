@@ -67,8 +67,8 @@
  
 <!--Footer START-->    
 			<div id="footerContainer">
-				<span class="footerLink"><a href="/footer/about.html">About</a></span>
-				<span class="footerLink"><a href="/footer/fundedby.html">Credits</a></span>
+				<span class="footerLink"><a href="/about/">About</a></span>
+				<span class="footerLink"><a href="/about/credits.html">Credits</a></span>
 				<span class="footerLink"><a href="http://www.iplantcollaborative.org/" title="" target="_blank">iPlant Collaborative</a></span>
 
 				<span id="footerCopy">All content is © 2009 by the iPlant Collaborative</span>

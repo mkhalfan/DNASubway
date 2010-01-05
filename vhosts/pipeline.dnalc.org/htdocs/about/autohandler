@@ -6,7 +6,6 @@
 <link type="text/css" rel="stylesheet" href="/css/sgeneral.css" />
 <link type="text/css" rel="stylesheet" href="/css/scontent.css" />
 <script type="text/javascript" src="/js/prototype-1.6.1.js"></script>
-<script type="text/javascript" src="/js/common.js"></script>
 % if ($m->request_comp->attr_if_exists('js') && @{$m->request_comp->attr('js')}) {
 %	foreach my $js (@{$m->request_comp->attr('js')}) {
 %		next unless $js;
@@ -22,7 +21,7 @@
 <link href="/files/window/themes/window/alphacube.css" rel="stylesheet" type="text/css" />
 % }
 </head>
-<body id="body">
+<body>
 <div id="mainContainer">
 <div id="container_InsideHeader">
 <div id="home_header_topline">FAST TRACK TO GENE ANNOTATION AND GENOME ANALYSIS</div>
@@ -32,7 +31,7 @@
 		</div>
 		<div id="container_H_insidebottom">
 			<span class="bt_LogOut"><a href="/logout"></a></span>
-			<span class="bt_Map"><a href="/"></a></span>
+			<span class="bt_Map"><a href="/project/"></a></span>
 		</div>
 	</div> <!--END of ID container_InsideH_bgr-->
 </div> <!--END of ID container_InsideHeader-->
@@ -40,36 +39,12 @@
 <div id="containerBody">
 <div id="container_leftMenu">
 	<span class="spacer_bt1 "></span>
-	<span class="bt_MyProjects"><a href="/project/browsemy" title="Browse my projects"></a></span>
-	<span class="bt_PublicProjects"><a href="/project/browse" title="Browse public project"></a></span>
+	<span class="bt_MyProjects"><a href="/project/browse"></a></span>
+	<span class="bt_PublicProjects"><a href="/project/browse"></a></span>
 	<span class="bt_redStart"><a href="/project/create_project.html" class="<% $class_r %>"></a></span>
 	<span class="bt_yellowStart"><a href="/project/target/create" class="<% $class_y %>"></a></span>
-	<span class="bt_blueStart"><a href="#" onclick="javascript:void(0);" class="<% $class_b %>"></a></span>
+	<span class="bt_blueStart"><a href="#" class="<% $class_b %>"></a></span>
     <span class="spacer_btGlossary"></span> 
-    <span class="spacer_btGlossary"></span>
-                         
-  <!-- Glossary Panel STart -->                       
-  <span class="bt_Glossary">
-    <a href="javascript:;" onclick="$('glossarypanel').style.display = 'block';"></a>
-
-    <div id="glossarypanel">
-    <div id="panel_glossaryClose"><div class="bt_panelClose"><a href="javascript:;" onclick="$('glossarypanel').style.display = 'none';"></a></div></div>
-    <div id="panel_glossaryTopmenu">               
-		<span class="bt_glossaryR"><a href="#" class="<% $class_r %>">RED</a></span>
-		<span class="bt_glossaryY"><a href="#" class="<% $class_y %>">YELLOW</a></span>
-		<span class="bt_glossaryB"><a href="#" class="<% $class_b %>">BLUE</a></span>
-    </div><!--END of ID panel_glossaryTopmenu-->
-               
-    <div class="panel_glossaryText">
-		<& "./glossary", section => $section &>
-    </div>
- 		
-    <div id="con_btCloseT"><div class="bt_CloseT"><a href="javascript:;" onclick="$('glossarypanel').style.display = 'none';">CLOSE</a></div></div>
-
-	</div> <!--END of ID 'PopUp'-->
-    
-  </span> <!--END of ID bt_Glossary-->
-  
 </div><!--END of ID container_leftMenu-->
 <!-- end header -->
 
@@ -83,7 +58,7 @@
 			<div id="footerContainer">
 				<span class="footerLink"><a href="/about/">About</a></span>
 				<span class="footerLink"><a href="/about/credits.html">Credits</a></span>
-				<span class="footerLink"><a href="http://www.iplantcollaborative.org/" class="current" target="_blank">iPlant Collaborative</a></span>
+				<span class="footerLink"><a href="http://www.iplantcollaborative.org/" title="" class="current" target="_blank">iPlant Collaborative</a></span>
 
 				<span id="footerCopy">All content is © 2009 by the iPlant Collaborative</span>
 			</div>
@@ -92,11 +67,6 @@
 
 
 </div><!--END of ID mainContainer-->
-<script type="text/javascript" src="http://include.reinvigorate.net/re_.js"></script>
-<script type="text/javascript">
-var re_name_tag = "<% $s->{username} %>";
-re_("ktaz7-6gmi62748k");
-</script>
 </body>
 </html>
 %#---------------------------------
@@ -105,20 +75,20 @@ re_("ktaz7-6gmi62748k");
 </%once>
 %#---------------------------------
 <%init>
-	#$m->session->{pipeline} ||= {};
+	$m->session->{pipeline} ||= {};
 	my $s = $m->session->{pipeline};
 
 	my $now = time();
 	if ($s->{logged_in} && ($now - $s->{last} > 3600)) {
 		$m->comp("/_message_add", "It's been a while since your last visit: " . duration ($now - $s->{last}));
-		$s->{logged_in} = 0;
-		delete $s->{logged_in};
-		delete $s->{user_id};
+		#$s->{logged_in} = 0;
+		#delete $s->{logged_in};
+		#delete $s->{user_id};
 	}
 	$s->{last} = $now;
-	unless ($s->{logged_in}) {
-		$m->redirect("/");
-	}
+	#unless ($s->{logged_in}) {
+	#	$m->redirect("/");
+	#}
 	
 	my ($class_r, $class_y, $class_b) = ('', '', '');
 	my $section = $m->request_comp->attr('current_section');
