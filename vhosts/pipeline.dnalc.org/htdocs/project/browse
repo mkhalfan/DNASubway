@@ -10,7 +10,7 @@
     <th width="200" scope="col">Project Title</th>
 	<th width="240" scope="col">Description</th>
     <th width="200" scope="col">Organism</th>
-    <th width="120" scope="col">Author</th>
+    <th width="120" scope="col">Owner</th>
   </tr>
 % for (@projects) {
 %	my $created = DNALC::Pipeline::App::Utils->format_datetime($_->created, undef, "%m/%d/%Y");

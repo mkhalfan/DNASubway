@@ -11,9 +11,10 @@
 <form method="post">
 	<table>
 %	for (@$fields) {
+%		my $type = defined $_->{type} ? $_->{type}  : 'text';
 		<tr>
 			<td><% $_->{label} %>:</td>
-			<td><input type="text" name="<% $_->{id} %>" value="<% $s->{$_->{id}} |html%>" maxlength="<% $_->{maxlength} %>"/></td>
+			<td><input type="<% $type %>" name="<% $_->{id} %>" value="<% $s->{$_->{id}} |html%>" maxlength="<% $_->{maxlength} %>"/></td>
 		</tr>
 %	}
 
@@ -39,7 +40,7 @@
 			{ id => "name_first", label => "First name", re => qr/.+/, maxlength => 64},
 			{ id => "name_last", label => "Last name", re => qr/.+/, maxlength => 64},
 			{ id => "username", label => "Username", re => qr/^[a-z0-9_-]+$/i, maxlength => 16},
-			{ id => "email", label => "Email", re => qr/\@/, maxlength => 120},
+			{ id => "email", type => "email", label => "Email", re => qr/\@/, maxlength => 120},
 		];
 </%once>
 %#-------------------------------------------------------------------

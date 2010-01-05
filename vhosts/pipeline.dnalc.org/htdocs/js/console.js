@@ -221,7 +221,7 @@ function launch_apollo() {
 		return;
 	}
 	abtn.setAttribute("working", 1);
-	var i = 0;
+	/*var i = 0;
 	var pe = new PeriodicalExecuter(function(p){
 		i++;
 		var suffix = '';
@@ -230,7 +230,9 @@ function launch_apollo() {
 			abtn.update("Apollo<strong>" + suffix + "</strong>");
 		},
 		.4
-	);
+	);*/
+	$('apollo_ind').removeClassName("conIndicator_not-processed");
+	$('apollo_ind').addClassName("conIndicator_processing");
 
 	var params = { 'pid' : $('pid').value };
 	sent = params;
@@ -250,13 +252,17 @@ function launch_apollo() {
 			}
 			else {
 			}
-			pe.stop();
-			abtn.update("Apollo");
+			//pe.stop();
+			//abtn.update("Apollo");
 			abtn.setAttribute("working", 0);
+			$('apollo_ind').removeClassName("conIndicator_processing");
+			$('apollo_ind').addClassName("conIndicator_not-processed");
 		},
 		onFailure: function(){
-				pe.stop();
-				abtn.update("Apollo");
+				//pe.stop();
+				//abtn.update("Apollo");
+				$('apollo_ind').removeClassName("conIndicator_processing");
+				$('apollo_ind').addClassName("conIndicator_not-processed");
 				alert("Something went wrong.");
 				abtn.setAttribute("working", 0);
 			}

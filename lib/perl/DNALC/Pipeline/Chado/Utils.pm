@@ -44,7 +44,9 @@ it under the same terms as Perl itself.
 my %algorithm_params = (
     AUGUSTUS            => '-a --noexon',
     BLASTN              => '-a',
-    BLASTX              => '-a',  
+    BLASTN_USER         => '-a',
+    BLASTX              => '-a',
+    BLASTX_USER         => '-a',
     FGENESH             => '-a --noexon',
     REPEAT_MASKER       => '',
     REPEAT_MASKER2      => '',

@@ -29,8 +29,8 @@ glyph        = gene
 base         = 1
 #sub_part     = exon
 #ignore_sub_part = polypeptide 
-fgcolor      = green
-bgcolor      = lightgreen
+fgcolor      = #0f6969
+bgcolor      = #0f6969
 height       = 8
 das category = transcription
 key          = Augustus Predicted Genes
@@ -40,7 +40,8 @@ balloon hover = <b>$name</b> is a predicted gene spanning $ref from $start to $e
 feature      = gene:FGenesH_Monocots gene:FGenesH gene:FGenesH_Dicots
 glyph        = gene
 sub_part     = exon
-bgcolor      = green
+fgcolor      = #589c7f
+bgcolor      = #589c7f
 #ignore_sub_part = polypeptide
 label_transcripts = 1
 thin_utr     = 1
@@ -62,7 +63,8 @@ feature      = gene:SNAP
 sub_part     = exon
 ignore_sub_part = polypeptide
 glyph        = gene
-bgcolor      = green
+fgcolor      = #a5cba9
+bgcolor      = #a5cba9
 label_transcripts = 1
 thin_utr     = 1
 pad_bottom   = 3
@@ -71,7 +73,8 @@ key          = Snap Predicted Genes
 
 [tRNA]
 feature      = gene:tRNAScan-SE
-fgcolor      = black
+fgcolor      = #ac307f
+bgcolor      = #ac307f
 stranded     = 1
 das category = transcription
 key          = Predicted tRNAs
@@ -79,8 +82,8 @@ key          = Predicted tRNAs
 [Repeats]
 feature      = repeat_region
 glyph        = generic
-bgcolor      = black
-fgcolor      = black
+bgcolor      = #663187
+fgcolor      = #663187
 das category = repeat
 key          = Repeats
 
@@ -106,7 +109,8 @@ axis_color   = blue
 [Blastn]
 feature      = match:BLASTN
 glyph        = segments
-fgcolor      = red
+fgcolor      = #b21a1f
+bgcolor      = #b21a1f
 stranded     = 1
 height       = 8
 description = sub {
@@ -120,10 +124,10 @@ key          = Blastn
 [Blastx]
 feature      = match:BLASTX
 glyph        = segments
-fgcolor      = magenta
+fgcolor      = #925732
+bgcolor      = #925732
 das category = transcription
 key          = Blastx
-
 
 
 #[BLAST]
@@ -139,6 +143,6 @@ key          = Blastx
 [usergenes]
 feature     = gene:user
 glyph       = gene
-bgcolor     = red
+bgcolor     = rgb(51,102,255)
 das category = transcription
 key         = User created models

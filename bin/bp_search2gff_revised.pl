@@ -299,7 +299,8 @@ while( my $result = $parser->next_result ) {
 		#$matchf->add_tag_value('Target', $target);
 		#$matchf->add_tag_value('Target', $min{$type});
 		#$matchf->add_tag_value('Target', $max{$type});
-	    $matchf->add_tag_value('Description', $desc);
+	    $matchf->add_tag_value('description', $desc);
+		$matchf->add_tag_value('significance',$hit->significance || '-');
 	    $out->write_feature($matchf);
 	}
 	foreach my $feature (@hsp_feature) {
