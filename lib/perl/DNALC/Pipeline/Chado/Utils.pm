@@ -48,8 +48,8 @@ my %algorithm_params = (
     BLASTX              => '-a',
     BLASTX_USER         => '-a',
     FGENESH             => '-a --noexon',
-    REPEAT_MASKER       => '',
-    REPEAT_MASKER2      => '',
+    REPEAT_MASKER       => '-a',
+    REPEAT_MASKER2      => '-a',
     SNAP                => '-a --noexon',
     TRNA_SCAN           => '-a',
 );
@@ -1135,9 +1135,15 @@ sub create_chado_adapter {
 		</sequenceTypes>
 
 	   <genePredictionPrograms>
-			<program>FgenesH</program>
+			<program>FGenesH</program>
+			<program>AUGUSTUS</program>
+			<program>SNAP</program>
 		</genePredictionPrograms>
-
+			
+		<oneLevelResultPrograms>
+			<program>RepeatMasker</program>
+		</oneLevelResultPrograms>
+		
 		<searchHitPrograms>
 			<program>BLASTN</program>
 			<program>BLASTX</program>
