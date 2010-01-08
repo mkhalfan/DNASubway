@@ -248,7 +248,7 @@ function launch_apollo() {
 				$('body').insert(upl);
 			}
 			else  if (r.status == 'error') {
-				alert("There seem to be an error: " + r.message);
+				alert("There seems to be an error: " + r.message);
 			}
 			else {
 			}
@@ -365,45 +365,83 @@ function createTargetPoject(sel) {
 }
 
 function debug(msg) {
-	var d = $('debug');
-	if (d) d.update(msg);
+	try {
+		var d = $('debug');
+		if (d) d.update(msg);
+		if (console) console.info(msg);
+	}
+	catch (e) {
+		;
+	}
 }
 
-/*
-function show_messages(html, isError) {
 
-	if (!html || !UI) {
+function show_edit() {
+	$('conProjectInfo_edit').update('<div class="bt_projectInfo_done"><a href="javascript:;" onclick="update_info();"></a></div><div class="bt_projectInfo_cancel"><a href="javascript:;" onclick="hide_edit();"></a></div>');
+	var ddiv = $('description_container');
+	ddiv.setAttribute('origdesc', ddiv.innerHTML);
+	var ta = new Element('textarea', {id:'description', style:'width:100%;height: 80px;'});
+	ta.value = ddiv.innerHTML;
+	ddiv.update(ta);
+
+	var tdiv = $('conProjectInfo_projecttitle');
+	tdiv.setAttribute('origtitle', tdiv.innerHTML);
+
+	var ttl = tdiv.innerHTML.replace(/<.+?>.*<\/.+?>/,'');
+	ttl = ttl.replace(/^\s+/,'').replace(/\s+$/,'');
+	tdiv.update(new Element('input', {id:'title', type:'text',style:'width:300px;', value: ttl, maxlength: 40}));
+}
+
+function hide_edit() {
+	$('conProjectInfo_edit').update('<div class="bt_projectInfo_edit"><a href="javascript:;" onclick="show_edit();"></a></div>');
+	var ddiv = $('description_container');
+	ddiv.update( ddiv.readAttribute('origdesc'));
+	var tdiv = $('conProjectInfo_projecttitle');
+	tdiv.update(tdiv.readAttribute('origtitle'));
+}
+
+function update_info() {
+	var ttl = $('title');
+	var desc = $('description');
+	ttl.value = ttl.value.replace(/^\s+/,'').replace(/\s+$/,'');
+	desc.value = desc.value.replace(/^\s+/,'').replace(/\s+$/,'');
+
+	if (ttl.value.length > 40) {
+		show_errors("Title should have 40 characters or less.");
+		//ttl.focus();
 		return;
 	}
-	var resizable = true;
-	var options = {	
-			resizable: false,
-        	width: 400,
-	        height: 200,
-	        shadow: true,
-	        draggable: false
-		};
-	if (navigator.userAgent.indexOf('MSIE') != -1) {
-		// IE doen't like this option!!!
-		delete options['resizable'];
-	}
-	var w = new UI.Window(options).center();
-	html = "<div class=\"conNewPro_title\" style=\"vertical-align: middle; padding: 20px\">" + html + "</div>";
-	if (isError) {
-		w.setHeader("Error");
-	}	
-	w.setContent(html);
-	w.show(true);
-}
-
-function show_errors(html) {
-
-	if (!html || !UI) {
+	if (desc.value.length > 140) {
+		show_errors("Description should have 140 characters or less.");
 		return;
 	}
-	show_messages(html, 1);
+	var params = { pid : $('pid').value, type: 'annotation',
+					title : ttl.value, description: desc.value
+				};
+	//sent = params;
+	new Ajax.Request('/project/update', {
+		method:'get',
+		parameters: params, 
+		onSuccess: function(transport){
+			var response = transport.responseText || "{'status':'error', 'message':'No response'}";
+			var r = response.evalJSON();
+			if (r.status == 'success') {
+				show_messages("Project updated successfully.");
+				$('conProjectInfo_projecttitle').writeAttribute('origtitle', ttl.value);
+				$('description_container').writeAttribute('origdesc', desc.value);
+				hide_edit();
+			}
+			else  if (r.status == 'error') {
+				show_errors("There seems to be an error: " + r.message);
+			}
+			else {
+			}
+		},
+		onFailure: function(){
+				alert("Something went wrong.");
+			}
+	});
 }
-*/
 //-------------
 
 function set_public(np) {
@@ -442,7 +480,7 @@ function set_public(np) {
 				show_messages("Project updated successfully.");
 			}
 			else  if (r.status == 'error') {
-				show_errors("There seem to be an error: " + r.message);
+				show_errors("There seems to be an error: " + r.message);
 			}
 			else {
 			}

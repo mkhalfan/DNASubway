@@ -372,15 +372,15 @@
 	}
 	
 #conProjectInfo_header {
-	width: 800px;
+	width: 820px;
 	height: 60px;
 	float: left;
 	position: relative;
-	padding: 6px 20px 0px 30px;
+	padding: 6px 0px 0px 30px;
 	}
 	
 #conProjectInfo_title {
-	width: 800px;
+	width: 600px;
 	height: 18px;
 	padding-top: 6px;
 	float: left;
@@ -394,7 +394,7 @@
 	}
 	
 #conProjectInfo_projecttitle {
-	width: 530px;
+	width: 520px;
 	height: 18px;
 	padding-top: 6px;
 	float: left;
@@ -409,7 +409,7 @@
 	}
 	
 #conProjectInfo_projectlog {
-	width: 230px;
+	width: 160px;
 	height: 18px;
 	padding-top: 6px;
 	padding-left: 6px;
@@ -422,7 +422,93 @@
 	font-weight: bold;
 
 	}
+#conProjectInfo_edit {
+	width: 170px;
+	height: 30px;
+	margin-top: 5px;
+	margin-right: 20px;
+	float: right;
+	position: relative;
+
+	}
 	
+.bt_projectInfo_edit {
+	width:100px;
+	height: 24px;
+	position: relative;	
+	float: right;	
+	display:block;
+
+}
+
+
+.bt_projectInfo_edit  a {
+	width:100px;
+	height: 24px;
+	display: block;
+	position: relative;
+	
+	float: right;
+	background: url("/images/v2/bt_projectinfo_edit1.png") top no-repeat;
+	text-decoration: none;
+}
+
+.bt_projectInfo_edit a:hover {
+	background: url("/images/v2/bt_projectinfo_edit2.png") top no-repeat;
+
+}
+
+.bt_projectInfo_done {
+	width:80px;
+	height: 24px;
+	position: relative;	
+	float: left;	
+	display:block;
+
+}
+
+
+.bt_projectInfo_done  a {
+	width:80px;
+	height: 24px;
+	display: block;
+	position: relative;
+	float: left;
+	background: url("/images/v2/bt_projectinfo_done1.png") top no-repeat;
+	text-decoration: none;
+}
+
+.bt_projectInfo_done a:hover {
+	background: url("/images/v2//bt_projectinfo_done2.png") top no-repeat;
+
+}
+
+.bt_projectInfo_cancel {
+	width:80px;
+	height: 24px;
+	position: relative;	
+	float: right;	
+	display:block;
+
+}
+
+
+.bt_projectInfo_cancel  a {
+	width:80px;
+	height: 24px;
+	display: block;
+	position: relative;
+	float: right;
+	background: url("/images/v2/bt_projectinfo_cancel1.png") top no-repeat;
+	text-decoration: none;
+}
+
+.bt_projectInfo_cancel a:hover {
+	background: url("/images/v2/bt_projectinfo_cancel2.png") top no-repeat;
+
+}
+	
+		
 	
 .bt_more {
 	width:90px;
@@ -482,15 +568,24 @@
 	}
 
 .conProjectInfo_column3{
-	width: 286px;
+	width: 274px;
 	height: 86px;
 	float: left;
 	position: relative;
 	margin-left: 6px;
 	border-top: 0px; border-right: 0px; border-bottom: 0px; border-left: .1em;
+	padding-left: 14px;
 	border-style: solid;
 	border-color: #CCCCCC;	
 	
+	}
+.conProjectInfo_description{
+	width: 270px;
+	height: 80px;
+	color: #996600;
+	font-size: 0.8em;
+	text-align: left;
+	float: left;
 	}
 
 .conProjectInfo_Row{

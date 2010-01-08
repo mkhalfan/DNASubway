@@ -201,7 +201,19 @@
 <div id="conProjectInfo">
 	<div id="conProjectInfo_header">
 		<div id="conProjectInfo_title">Project Information</div>
-		<div id="conProjectInfo_projecttitle"><small><% $proj->id %></small>.<% $proj->name |html%></div>
+% if ($is_owner) {
+		<div id="conProjectInfo_edit">
+	        <div class="bt_projectInfo_edit"><a href="#" onclick="show_edit();"></a></div>
+			<!--
+			<div class="bt_projectInfo_done"><a href="#"></a></div>
+			<div class="bt_projectInfo_cancel"><a href="#"></a></div>
+			-->
+		</div>
+% }
+		<div id="conProjectInfo_projecttitle" origtitle="">\
+%#	<!--<small><% $proj->id %>.</small>-->
+			<% $proj->name |html%>
+		</div>
 		<div id="conProjectInfo_projectlog">Description</div>
 	</div>
 
@@ -253,7 +265,7 @@
 			<span class="bt_more"><a href="#">more »</a></span>
 		</div>
 % }
-		<div class=""><small><% $proj->description |html %></small></div>
+		<div id="description_container" origdesc="" class="conProjectInfo_description"><% $proj->description |html %></div>
  	</span>
 	</span> <!--END of span conProjectInfo_column3-->
 </div><!--END of ID conProjectInfo-->

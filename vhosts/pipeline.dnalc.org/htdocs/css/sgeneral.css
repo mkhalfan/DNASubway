@@ -178,7 +178,7 @@ h4{
 	position: relative;
 	}
 .memberLabel{
-	width: 64px;
+	width: 174px;
 	height: 14px;
 	display:block;
 	float:left;
@@ -234,7 +234,7 @@ h4{
 	color: #666699;
 	list-style-type: none;
 	position: relative;
-	float: left;	
+	float:left;	
 	
 
 }
@@ -244,7 +244,7 @@ h4{
 	color: #666699;
 	text-decoration: none;
 	text-align: left;
-	float: left;	
+	float:left;	
 	padding-top: 4px;
 	display: block;
 	position: relative;
@@ -407,6 +407,73 @@ h4{
 
 
 /*//-------HOME Map Start BUTTONs------------------*/
+.bt_redStart_home {
+	width:150px;
+	height: 40px;
+	position: relative;	
+	float: left;
+	margin: 0px 0px 25px 0px;	
+
+}
+
+.bt_redStart_home a{
+	width:150px;
+	height: 40px;
+	background: url("/images/v2/bt_redStart1.jpg") left no-repeat;
+	display: block;
+	position: relative;
+	float: left;
+	margin: 0px 0px 25px 0px;
+}
+
+
+.bt_yellowStart_home {
+	width:150px;
+	height: 40px;
+	position: relative;
+	float: left;
+	margin: 0px 0px 25px 0px;		
+
+}
+
+.bt_yellowStart_home a{
+	width:150px;
+	height: 40px;
+	background: url("/images/v2/bt_yellowStart1.jpg") left no-repeat;
+	display: block;
+	position: relative;
+	float: left;
+	margin: 0px 0px 25px 0px;
+}
+
+.bt_yellowStart_home a:hover {
+	background: url("/images/v2/bt_yellowStart1.jpg") left no-repeat;
+
+}
+
+.bt_blueStart_home {
+	width:150px;
+	height: 40px;
+	position: relative;
+	float: left;		
+
+}
+
+.bt_blueStart_home a {
+	width:150px;
+	height: 40px;
+	background: url("/images/v2/bt_blueStart1.jpg") left no-repeat;
+	display: block;
+	position: relative;
+	float: left;
+	margin: 0px 0px 0px 0px;
+}
+
+.bt_blueStart_home a:hover {
+	background: url("/images/v2/bt_blueStart1.jpg") left no-repeat;
+
+}
+
 .bt_redStart {
 	width:150px;
 	height: 40px;
@@ -496,7 +563,23 @@ h4{
 }
 /*-----Home Map rollover info-----*/
 
-.containerHoz{
+.containerHoz1{
+	width: 780px;
+	height: 50px;
+	position: relative;
+	padding-top: 24px;
+	float: left;
+	
+}
+
+.containerHoz2{
+	width: 780px;
+	height: 50px;
+	position: relative;
+	float: left;
+	
+}
+.containerHoz3{
 	width: 780px;
 	height: 50px;
 	position: relative;
@@ -504,6 +587,7 @@ h4{
 	float: left;
 	
 }
+
 .rolloverMap {
 	width: 750px;
 	height: 50px;
@@ -525,7 +609,7 @@ h4{
 
 
 .spacer1{
-	width: 100px;
+	width: 80px;
 	height: 50px;
 	display: block;
 	position: relative;

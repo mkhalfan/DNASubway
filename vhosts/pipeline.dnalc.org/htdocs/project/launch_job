@@ -44,6 +44,14 @@
 		print "{'status':'error', 'message':'Analysis only available to project owner.'}";
 		return;
 	}
+	
+	if ($t ne 'repeat_masker') {
+		my $wfm = DNALC::Pipeline::App::WorkflowManager->new( $proj );
+		if ($wfm->get_status('repeat_masker')->name ne "done" ) {
+			print "{'status':'error', 'message':'Repeat Masker must be run first.'}";
+			return;
+		}
+	}
 
 	my $client = Gearman::Client->new;
 	$client->job_servers('127.0.0.1');

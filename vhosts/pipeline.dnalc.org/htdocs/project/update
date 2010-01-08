@@ -2,11 +2,14 @@
 	$pid => 0
 	$public => undef
 	$type => ''
+	$title => undef
+	$description => undef
 </%args>
 %#--------------------------------------------------------
 <%once>
 	use DNALC::Pipeline::MasterProject ();
-	use DNALC::Pipeline::App::ProjectManager ();
+	use DNALC::Pipeline::Project ();
+	#use DNALC::Pipeline::App::ProjectManager ();
 	use DNALC::Pipeline::TargetProject ();
 	use DNALC::Pipeline::Config ();
 	use DNALC::Pipeline::Utils qw(random_string);
@@ -24,6 +27,7 @@ my $s = $m->session->{pipeline};
 
 my $status  = 'error';
 my $message = '';
+my $error = 0;
 
 unless ($s->{logged_in}) {
 	$message = 'Your session expired. Please login!';
@@ -36,10 +40,41 @@ unless ($s->{logged_in}) {
 	else {
 		if (defined $public && $mp->public != $public) {
 			$mp->public($public);
+			if ($mp->is_changed && $mp->update) {
+				$status = 'success';
+			}
+			else {
+				$message = 'There is nothing to update!';
+			}
 		}
-		
-		if ($mp->is_changed && $mp->update) {
-			$status = 'success';
+
+		if ($type eq 'annotation' && (defined $title || defined $description)) {
+			#my $proj = DNALC::Pipeline::Project->search(user_id => $s->{user_id}, name => $name);
+			my $proj = DNALC::Pipeline::Project->retrieve($pid);
+			#print STDERR "\n----------------\n", $proj->name, " => ", $title, $/;
+			#print STDERR $proj->description, " => ", $description, $/;
+
+			if (defined $title && $proj->name ne $title) {
+				my $otherproj = DNALC::Pipeline::Project->search(user_id => $s->{user_id}, name => $title);
+				if ($otherproj) {
+					$message = 'You already have a project with this name!';
+					$error = 1;
+				}
+				else {
+					$proj->name($title);
+				}
+			}
+			unless ($error) {
+				if (defined $description && $proj->description ne $description) {
+					$proj->description($description);
+				}
+				if ($proj->is_changed && $proj->update) {
+					$status = 'success';
+				}
+				else {
+					$message = 'There is nothing to update!';
+				}
+			}
 		}
 	}	
 }

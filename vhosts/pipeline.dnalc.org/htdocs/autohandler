@@ -6,6 +6,9 @@
 
 <link type="text/css" rel="stylesheet" href="/css/sgeneral.css" />
 <link type="text/css" rel="stylesheet" href="/css/scontent.css" />
+<link rel="stylesheet" type="text/css" href="/css/prototip.css" />
+<script type="text/javascript" src="/js/prototype-1.6.1.js"></script>
+<script type='text/javascript' src='/js/prototip/prototip.js'></script>
 </head>
 
 
