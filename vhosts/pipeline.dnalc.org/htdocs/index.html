@@ -5,99 +5,122 @@
 			<div id="startHere"></div>
 % }
 			</span>
-     		<span class="bt_redStart_home" id="tt_red1"><a href="<% $s->{logged_in} ? "/project/create_project.html" : "#" %>" 
-%#				onmouseover="document.getElementById('red').style.display='block'" onmouseout="document.getElementById('red').style.display='none'"
+     		<span class="bt_redStart_home" id="tt_red1"><a href="<% $s->{logged_in} ? "/project/create_project.html" : "#" %>"
 				style="cursor: <% $s->{logged_in} ? "pointer" : "default"%>;"></a></span>
-          <div id='red' class='startInfoText_R'>
-	<b>Annotate a Genomic Sequence:&nbsp;</b>Input a DNA sequence of up to 100,000 nucleotides to identify the genes and transposons in it, and annotate (associate) the sequence with this information.</div>
 <script type="text/javascript" language="javascript">
 new Tip('tt_red1', "Input a DNA sequence of up to 100,000 nucleotides to identify the genes and transposons in it, and annotate (associate) the sequence with this information.", {
-				title: "Annotate a Genomic Sequence",
-				border: 5,
-				radius: 5,
-				style: 'red'
-			});
+		title: "Annotate a Genomic Sequence",
+		border: 5,
+		radius: 5,
+		style: 'red'
+	});
 </script>
 
-		<span class="bt_yellowStart_home"><a href="<% $s->{logged_in} && 0 ? "/project/target/create" : "#" %>" onmouseover="document.getElementById('yellow').style.display='block'" 
-			onmouseout="document.getElementById('yellow').style.display='none'" style="cursor: <% $s->{logged_in} ? "pointer" : "default"%>;"></a></span>
+		<span class="bt_yellowStart_home" id="tt_yellow1"><a href="<% $s->{logged_in} && 0 ? "/project/target/create" : "#" %>"
+			style="cursor: <% $s->{logged_in} ? "pointer" : "default"%>;"></a></span>
+<script type="text/javascript" language="javascript">
+new Tip('tt_yellow1', "<span class='comingsoon'>Coming Soon...</span> Input a gene or protein of up to 10,000 nucleotides or amino acids to identify related genes, determine gene functions, and build phylogenetic trees.", {
+		title: "Build Gene Family Tree with TARGeT",
+		style: 'yellow'
+	});
+</script>
 
-		<div id='yellow' class='startInfoText_Y'>
-			<span class="comingsoon">Coming Soon...</span>&nbsp;
-			<b>Build Gene Family Tree with TARGeT:&nbsp;</b>Input a gene or protein of up to 10,000 nucleotides or amino acids to identify related genes, determine gene functions, and build phylogenetic trees.
-		</div>
-            
-		<span class="bt_blueStart_home"><a href="#" onmouseover="document.getElementById('blue').style.display='block'" 
-			onmouseout="document.getElementById('blue').style.display='none'" style="cursor: <% $s->{logged_in} ? "pointer" : "default"%>;"></a></span>
-		<div id='blue' class='startInfoText_B'>
-			<span class="comingsoon">Coming Soon...</span>&nbsp;<b>Analyze Transcript Data:&nbsp;</b>Input a set of Expressed Sequence Tags (ESTs) of up to 100 megabytes of assembled data to determine the potential natures of the genes captured.
-		</div>
+		<span class="bt_blueStart_home" id="tt_blue1"><a href="#" style="cursor: <% $s->{logged_in} ? "pointer" : "default"%>;"></a></span>
+<script type="text/javascript" language="javascript">
+new Tip('tt_blue1', "<span class='comingsoon'>Coming Soon...</span> Input a set of Expressed Sequence Tags (ESTs) of up to 100 megabytes of assembled data to determine the potential natures of the genes captured.", {
+		title: "Analyze Transcript Data",
+		style: 'blue'
+	});
+</script>
 	</div><!--END of ID map_left-->
            
 	<div id="map_right">
 	<div class="containerHoz1">
 		<span class="spacer1"></span>
 		<span class="conConsole_info" id="tt_red2"></span>
-%# onmouseover="document.getElementById('red1').style.display='block'" onmouseout="document.getElementById('red1').style.display='none'"
-		<div id='red1' class='startInfoText_R'><b>Find Repeats:&nbsp;</b>Identify and mask repeats and transposons that can obstruct sequence analysis.</div>
 <script type="text/javascript" language="javascript">
 new Tip('tt_red2', "Identify and mask repeats and transposons that can obstruct sequence analysis.", {
-				title: "Find Repeats",
-				border: 5,
-				radius: 5,
-				style: 'red'
-			});
+		title: "Find Repeats",
+		style: 'red'
+	});
 </script>
 
 		<span class="spacer3"></span>
-		<span class="conConsole_info" onmouseover="document.getElementById('red2').style.display='block'" onmouseout="document.getElementById('red2').style.display='none'"></span>
-		<div id='red2' class='startInfoText_R'><b>Predict Genes:&nbsp;</b>Identify DNA patterns typical for genes using gene prediction algorithms Augustus, FGenesH, SNAP, and tRNA Scan.</div>
+		<span class="conConsole_info" id="tt_red3"></span>
+<script type="text/javascript" language="javascript">
+new Tip('tt_red3', "Identify DNA patterns typical for genes using gene prediction algorithms Augustus, FGenesH, SNAP, and tRNA Scan.", {
+		title: "Predict Genes",
+		style: 'red'
+	});
+</script>
 
 		<span class="spacer3"></span>
-		<span class="conConsole_info" onmouseover="document.getElementById('red3').style.display='block'" onmouseout="document.getElementById('red3').style.display='none'"></span>
-		<div id='red3' class='startInfoText_R'><b>Search Databases:&nbsp;</b>Search the sequence for matches to known genes and proteins using search algorithms BLASTN and BLASTP.</div>
+		<span class="conConsole_info" id="tt_red4"></span>
+<script type="text/javascript" language="javascript">
+new Tip('tt_red4', "Search the sequence for matches to known genes and proteins using search algorithms BLASTN and BLASTP.", {
+		title: "Search Databases",
+		style: 'red'
+	});
+</script>
 
 		<span class="spacer3"></span>
-		<span class="conConsole_info" onmouseover="document.getElementById('red4').style.display = 'block' " onmouseout="document.getElementById('red4').style.display = 'none' "></span>
-		<div id='red4' class='startInfoText_R'><b>Build Models:&nbsp;</b>Synthesize gene predictions and search results into gene models using the annotation editor Apollo.</div>
+		<span class="conConsole_info" id="tt_red5"></span>
+<script type="text/javascript" language="javascript">
+new Tip('tt_red5', "Synthesize gene predictions and search results into gene models using the annotation editor Apollo.", {
+		title: "Build Models",
+		style: 'red'
+	});
+</script>
 	</div><!--END of CLASS containerHoz-->
 
 	<div class="containerHoz2">
 		<span class="spacer1"><div class="underconstruction"></div></span>
 		<span class="spacer2"></span>
-		<span class="conConsole_info" onmouseover="document.getElementById('yellow1').style.display='block'" onmouseout="document.getElementById('yellow1').style.display='none'"></span>
-		<div id='yellow1' class='startInfoText_Y'><span class="comingsoon">Coming Soon...</span>&nbsp;<b>Search Genomes:&nbsp;</b>Search genomes for matches to a gene using search algorithms BLASTN or TBLASTN.</div>
+		<span class="conConsole_info" id="tt_yellow2"></span>
+<script type="text/javascript" language="javascript">
+new Tip('tt_yellow2', '<span class="comingsoon">Coming Soon...</span>&nbsp;Search genomes for matches to a gene using search algorithms BLASTN or TBLASTN.', {
+		title: "Search Genomes",
+		style: 'yellow'
+	});
+</script>
 
 		<span class="spacer1"></span>
 		<span class="spacer3"></span>
-		<span class="conConsole_info" onmouseover="document.getElementById('yellow2').style.display='block'" onmouseout="document.getElementById('yellow2').style.display='none'"></span>
-		<div id='yellow2' class='startInfoText_Y'><span class="comingsoon">Coming Soon...</span>&nbsp;<b>Alignment & Tree Viewer:&nbsp;</b>View BLAST search results in multiple alignment format and as tree view.</div>
+		<span class="conConsole_info" id="tt_yellow3"></span>
+<script type="text/javascript" language="javascript">
+new Tip('tt_yellow3', "View BLAST search results in multiple alignment format and as tree view.", {
+		title: "Alignment &amp; Tree Viewer",
+		style: 'yellow'
+	});
+</script>
 
 		<span class="spacer1"></span>
 		<span class="spacer2"></span>
-		<span class="conConsole_info" onmouseover="document.getElementById('redblue').style.display='block'" onmouseout="document.getElementById('redblue').style.display='none'"></span>
-		<div id='redblue' class='startInfoText_BK'><b>Browsers & Transfer:&nbsp;</b>View analysis results and annotations in a genome browser. Transfer a gene to the Gene Family track (Yellow Line) to identify related genes, determine gene functions, and build phylogenetic trees.</div>
+		<span class="conConsole_info" id="tt_black1"></span>
+<script type="text/javascript" language="javascript">
+new Tip('tt_black1', "View analysis results and annotations in a genome browser. Transfer a gene to the Gene Family track (Yellow Line) to identify related genes, determine gene functions, and build phylogenetic trees.", {
+		title: "Browsers &amp; Transfer",
+		style: 'black'
+	});
+</script>
  	</div><!--END of CLASS containerHoz-->
-    
-    
 
 	<div class="containerHoz3">
 		<span class="spacer1"><div class="underconstruction"></div></span>
 		<span class="spacer2"></span>
 		<span class="spacer2"></span>
-		<span class="conConsole_info"> <a onmouseover="document.getElementById('blue1').style.display = 'block' "  onmouseout="document.getElementById('blue1').style.display = 'none' "></a></span>
-		<div id='blue1' class="startInfoText_B">
-			<span class="comingsoon">Coming Soon...</span>&nbsp;
-			<b>Search Genomes:&nbsp;</b>Search genome sequences for matches to EST data using DNA search algorithm BLAT.
-		</div>
+		<span class="conConsole_info" id="tt_blue2"></span>
+<script type="text/javascript" language="javascript">
+new Tip('tt_blue2', '<span class="comingsoon">Coming Soon...</span>&nbsp;Search genome sequences for matches to EST data using DNA search algorithm BLAT.', {
+		title: "Search Genomes",
+		style: 'blue'
+	});
+</script>
 	</div><!--END of CLASS containerHoz-->
-                 
- 		  </div> <!--END of ID map_right-->
-     
-     
-	  </div><!--END of ID home_map-->
-    
-    
+
+	</div><!--END of ID map_right-->
+	</div><!--END of ID home_map-->
+
     <div id="home_intro" class="container_text">This site ties together key bioinformatics tools and databases used to annotate genes and 
 analyze genome data.  Roll over any of the “stations” on the subway map to find out more about the analysis steps. Start a project by selecting one of the three “subway lines” 
 (red, yellow, blue). Register and login if you want to save or share your results.</div>
@@ -152,6 +175,7 @@ if ($r->method eq "POST") {
 			if ($@) {
 				push @err, $@;
 			}
+			#$s->{warn_guest} = 1;
 		}
 	}
 	else {

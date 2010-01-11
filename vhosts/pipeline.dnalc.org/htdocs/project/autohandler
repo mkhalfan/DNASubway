@@ -14,10 +14,8 @@
 %	}
 % }
 % if ($m->request_comp->attr('load_window_ui')) {
-%#<script src="/files/window/lib/prototype.js" type="text/javascript"></script>
 <script src="/files/window/lib/effects.js" type="text/javascript"></script>  
 <script src="/files/window/dist/window.js" type="text/javascript"></script>
-
 <link href="/files/window/themes/window/window.css" rel="stylesheet" type="text/css" />
 <link href="/files/window/themes/window/alphacube.css" rel="stylesheet" type="text/css" />
 % }
@@ -80,24 +78,19 @@
     
   
  </div><!--END of ID containerBody-->   
-<!--Footer START-->    
-			<div id="footerContainer">
-				<span class="footerLink"><a href="/about/">About</a></span>
-				<span class="footerLink"><a href="/about/credits.html">Credits</a></span>
-				<span class="footerLink"><a href="http://www.iplantcollaborative.org/" class="current" target="_blank">iPlant Collaborative</a></span>
 
-				<span id="footerCopy">All content is © 2009 by the iPlant Collaborative</span>
-			</div>
-			<!--END of ID footerContainer-->
-
-
+<& "../_snippets/footer.html" &>
 
 </div><!--END of ID mainContainer-->
+% unless ($ENV{DEVEL_SERVER}) {
 <script type="text/javascript" src="http://include.reinvigorate.net/re_.js"></script>
 <script type="text/javascript">
+% if ($s->{username}) {
 var re_name_tag = "<% $s->{username} %>";
+% }
 re_("ktaz7-6gmi62748k");
 </script>
+% }
 </body>
 </html>
 %#---------------------------------

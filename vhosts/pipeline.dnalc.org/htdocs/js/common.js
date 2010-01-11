@@ -32,14 +32,15 @@ function show_messages(html, isError) {
 		// IE doen't like this option!!!
 		delete options['resizable'];
 	}
-	var w = new UI.Window(options).center();
+	var _w = new UI.Window(options).center();
 	html = "<div class=\"conNewPro_title\" style=\"vertical-align: middle; padding: 20px\">" + html + "</div>";
 	if (isError) {
-		w.setHeader("Error");
+		_w.setHeader("Error");
 	}	
-	w.setContent(html);
-	w.show(true);
-	w.focus();
+	_w.setContent(html);
+	_w.show(true);
+	_w.activate();
+	return _w;
 }
 
 function show_errors(html) {

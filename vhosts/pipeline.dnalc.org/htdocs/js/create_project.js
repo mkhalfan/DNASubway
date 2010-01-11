@@ -27,7 +27,7 @@ function step_one() {
 		return;
 	}
 
-	var w = show_messages("Creating project. Do not close this message. <p>Stand by..</p>");
+	w = show_messages("Creating project. Do not close this message. <p>Stand by..</p>");
 	document.observe('window:destroyed', function(event) {
 		if (w.id == event.memo.window.id) {
 			$('step_one_btn').onclick = null;

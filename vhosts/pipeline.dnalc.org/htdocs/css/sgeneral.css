@@ -117,64 +117,71 @@ h4{
 	background-color: #666666;
 	vertical-align: bottom;
 	}
-#home_header_left {
-	width: 300px;
+#home_header_BG {
+	width: 1000px;
 	height: 134px;
-	float: left;
 	position: relative;
-	background: url("/images/v2/home-headbg.jpg") top no-repeat;
+	background: url("/images/v2/bg_home_head.jpg") top no-repeat;
 	}
-#home_header_left_inside {
-	width: 300px;
+#home_header_BG_member {
+	width: 1000px;
+	height: 134px;
+	position: relative;
+	background: url("/images/v2/bg_home_head_member.jpg") top no-repeat;
+	}
+
+	
+#home_header_left_member {
+	width: 430px;
 	height: 134px;
 	float: left;
 	position: relative;
-	background: url("/images/v2/home-headbg_1.jpg") top no-repeat;
-	margin-left: -38px;
-	margin-top: -4px;
 	}
 .container_log{
 	width: 140px;
 	height: 100px;
-	padding-top: 27px;
+	padding-top: 6px;
 	float: left;
 	position: relative;
 
 }
-#home_header_middle {
-	width: 400px;
-	height: 134px;
-	background: url("/images/v2/home-logo.jpg") top no-repeat;
-	position: relative;
-	margin: 0 auto;
-	}
-#home_header_right {
-	width: 300px;
-	height: 134px;
+.bt_backhome {
+	width: 230px;
+	height: 44px;
+	postion: relative;
 	float: right;
-	background: url("/images/v2/home-decoline.jpg") top no-repeat;
+	display: block;
+	}
+.bt_backhome a {
+	width: 230px;
+	height: 44px;
+	postion: relative;
+	float: right;
+	display: block;
 	}
 /*//END-------HOMEPAGE Header END------------------*/	
 
 /*//----------Member Log in start------------------*/
 #memberForm{
-	width:174px;
+	width:200px;
 	height:128px;
 	margin: 4px 0px 0px 40px;
 	float: left;
 	position: relative;
+	overflow: hidden;
 	}
 .memberRow1{
 	width:174px;
 	height: auto;
-	padding-bottom: 3px;
+	
 	float: left;
 	position: relative;
+	clear: both;
 	}
 .memberRow2{
-	width:174px;
+	width:200px;
 	height:24px;
-	float: left;
+	float:left;
 	position: relative;
 	}
 .memberLabel{
@@ -745,19 +752,18 @@ h4{
 	
 	}
 #conMember_name {
-	width: 440px;
+	width: 400px;
 	height: 20px;
-	padding-bottom: 2px;
+	padding-left: 30px;
+	padding-top: 2px;
 	position: relative;
 	float: left;
-	font-size: 1.1em;
+	font-size: .95em;
 	font-weight: bold;
-	font-family: Time, serif;	
-	text-align: right;
+	font-family: serif;	
+	text-align: left;
 	color: #663300;
 	font-style: italic;
-	letter-spacing: .1em;
-	
 	}
 .bt_Map {
 	width:114px;

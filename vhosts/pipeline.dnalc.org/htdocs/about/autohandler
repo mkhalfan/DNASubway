@@ -13,7 +13,6 @@
 %	}
 % }
 % if ($m->request_comp->attr('load_window_ui')) {
-%#<script src="/files/window/lib/prototype.js" type="text/javascript"></script>
 <script src="/files/window/lib/effects.js" type="text/javascript"></script>  
 <script src="/files/window/dist/window.js" type="text/javascript"></script>
 
@@ -27,11 +26,15 @@
 <div id="home_header_topline">FAST TRACK TO GENE ANNOTATION AND GENOME ANALYSIS</div>
 	<div id="container_InsideH_bg">   
 		<div id="container_H_insideTop">
+% if ($s->{logged_in}) {
 			<div id="conMember_name"><% $s->{full_name} |html %></div>
+% }
 		</div>
 		<div id="container_H_insidebottom">
+% if ($s->{logged_in}) {
 			<span class="bt_LogOut"><a href="/logout"></a></span>
-			<span class="bt_Map"><a href="/project/"></a></span>
+% }
+			<span class="bt_Map"><a href="/"></a></span>
 		</div>
 	</div> <!--END of ID container_InsideH_bgr-->
 </div> <!--END of ID container_InsideHeader-->
@@ -39,12 +42,14 @@
 <div id="containerBody">
 <div id="container_leftMenu">
 	<span class="spacer_bt1 "></span>
+% if ($s->{logged_in}) {
 	<span class="bt_MyProjects"><a href="/project/browse"></a></span>
 	<span class="bt_PublicProjects"><a href="/project/browse"></a></span>
 	<span class="bt_redStart"><a href="/project/create_project.html"></a></span>
 	<span class="bt_yellowStart"><a href="#"></a></span>
 	<span class="bt_blueStart"><a href="#"></a></span>
-    <span class="spacer_btGlossary"></span> 
+    <span class="spacer_btGlossary"></span>
+% }
 </div><!--END of ID container_leftMenu-->
 <!-- end header -->
 
@@ -57,6 +62,15 @@
 <& "../_snippets/footer.html" &>
 
 </div><!--END of ID mainContainer-->
+% unless ($ENV{DEVEL_SERVER}) {
+<script type="text/javascript" src="http://include.reinvigorate.net/re_.js"></script>
+<script type="text/javascript">
+% if ($s->{username}) {
+var re_name_tag = "<% $s->{username} %>";
+% }
+re_("ktaz7-6gmi62748k");
+</script>
+% }
 </body>
 </html>
 %#---------------------------------

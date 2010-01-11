@@ -442,7 +442,7 @@
 }
 
 
-.bt_projectInfo_edit  a {
+.bt_projectInfo_edit a {
 	width:100px;
 	height: 24px;
 	display: block;
@@ -468,7 +468,7 @@
 }
 
 
-.bt_projectInfo_done  a {
+.bt_projectInfo_done a {
 	width:80px;
 	height: 24px;
 	display: block;
@@ -493,7 +493,7 @@
 }
 
 
-.bt_projectInfo_cancel  a {
+.bt_projectInfo_cancel a {
 	width:80px;
 	height: 24px;
 	display: block;
@@ -1078,7 +1078,7 @@
 .bt_browserYellow {
 	width:100px;
 	height: 34px;
-	position: relative;	
+	position: relative;
 	float: right;
 }
 
@@ -1227,9 +1227,8 @@
 	float: left;
 	position: relative;
 	padding: 137px 16px 0px 174px;
-	
 	}
-	
+
 /*---BlueLINE NEW PROJECT------*/
 #conBluelineLeft1 {
 	width: 470px;

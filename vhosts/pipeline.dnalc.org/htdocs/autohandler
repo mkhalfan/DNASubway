@@ -11,16 +11,15 @@
 <script type='text/javascript' src='/js/prototip/prototip.js'></script>
 </head>
 
-
 <body>
 <div id="mainContainer">
 
 <div id="home_header">
 	<div id="home_header_topline">FAST TRACK TO GENE ANNOTATION AND GENOME ANALYSIS</div>
-    
-	<div id="home_header_left">
+% if (! $s->{logged_in}) {   
+	<div id="home_header_BG">
 	<div id="memberForm">
-% if (! $s->{logged_in}) {
+
 		<form method="post" action="/">
  			<span class="memberRow1">
 				<label class="memberLabel" for="name">ID:</label> 
@@ -35,31 +34,30 @@
 				<input type="submit" name="guest" value="Enter As Guest" class="memberEnter" />
 			</div>
 			<div class="forgotPassword">
-            <a href="/forgotpass.html" title="">Forgot Password?</a>
+            <a href="/forgotpass.html" title="">Forgot Password? &nbsp;</a>
             <a href="/register.html" title=""><strong>Register</strong></a>
 			</div>
 		</form>
+        </div> <!--END of ID member form-->
+	</div>	<!--END of ID home_header_BG -->
 % } else {
 	<!-- <a href="/project/">View map</a> -->
-    <div id="home_header_left_inside">
-		<div class="container_log"> 
-			<span class="bt_LogOut"><a href="/logout"></a></span>
-			<span class="bt_projects"><a href="/project/browse"></a></span>
+    <div id="home_header_BG_member">
+
+		<div id="home_header_left_member">
+			<div id="conMember_name"><% $s->{full_name} %></div> 
+			<div class="container_log"> 
+				<span class="bt_LogOut"><a href="/logout"></a></span>
+				<span class="bt_projects"><a href="/project/browse"></a></span>
+			</div>
 		</div>
 	</div>
 % }
-	</div> <!--END of ID member form-->
-	</div>	<!--END of ID home_header_left-->
-
-	<div id="home_header_right"> </div>
-	<div id="home_header_middle"> </div>
 	<div id="home_header_bottomline"></div>	
-
 </div> <!--END of IDhome_headerr-->
 
-<!--END of ID HEADER--------------------------------------------------------------->
-
-<!--BODY--------------------------------------------------------------->
+<!--END of ID HEADER -->
+<!-- BODY -->
 <div id="containerBody">
 	
 <& "/_messages" &>
@@ -68,19 +66,10 @@
 
 </div><!--END of ID containerBody-->
  
-<!--Footer START-->    
-			<div id="footerContainer">
-				<span class="footerLink"><a href="/about/">About</a></span>
-				<span class="footerLink"><a href="/about/credits.html">Credits</a></span>
-				<span class="footerLink"><a href="http://www.iplantcollaborative.org/" title="" target="_blank">iPlant Collaborative</a></span>
-
-				<span id="footerCopy">All content is © 2009 by the iPlant Collaborative</span>
-			</div>
-			<!--END of ID footerContainer-->
-
-
+<& "./_snippets/footer.html" &>
 
 </div><!--END of ID mainContainer-->
+% unless ($ENV{DEVEL_SERVER}) {
 <script type="text/javascript" src="http://include.reinvigorate.net/re_.js"></script>
 <script type="text/javascript">
 % if ($s->{username}) {
@@ -88,6 +77,7 @@ var re_name_tag = "<% $s->{username} %>";
 % }
 re_("ktaz7-6gmi62748k");
 </script>
+% }
 </body>
 </html>
 
