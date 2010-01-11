@@ -41,9 +41,9 @@
 	<span class="spacer_bt1 "></span>
 	<span class="bt_MyProjects"><a href="/project/browse"></a></span>
 	<span class="bt_PublicProjects"><a href="/project/browse"></a></span>
-	<span class="bt_redStart"><a href="/project/create_project.html" class="<% $class_r %>"></a></span>
-	<span class="bt_yellowStart"><a href="/project/target/create" class="<% $class_y %>"></a></span>
-	<span class="bt_blueStart"><a href="#" class="<% $class_b %>"></a></span>
+	<span class="bt_redStart"><a href="/project/create_project.html"></a></span>
+	<span class="bt_yellowStart"><a href="#"></a></span>
+	<span class="bt_blueStart"><a href="#"></a></span>
     <span class="spacer_btGlossary"></span> 
 </div><!--END of ID container_leftMenu-->
 <!-- end header -->
@@ -51,20 +51,10 @@
 % $m->call_next;
 
 <!-- start footer -->
-    
-  
- </div><!--END of ID containerBody-->   
-<!--Footer START-->    
-			<div id="footerContainer">
-				<span class="footerLink"><a href="/about/">About</a></span>
-				<span class="footerLink"><a href="/about/credits.html">Credits</a></span>
-				<span class="footerLink"><a href="http://www.iplantcollaborative.org/" title="" class="current" target="_blank">iPlant Collaborative</a></span>
 
-				<span id="footerCopy">All content is © 2009 by the iPlant Collaborative</span>
-			</div>
-			<!--END of ID footerContainer-->
+</div><!--END of ID containerBody-->   
 
-
+<& "../_snippets/footer.html" &>
 
 </div><!--END of ID mainContainer-->
 </body>
@@ -79,28 +69,21 @@
 	my $s = $m->session->{pipeline};
 
 	my $now = time();
-	if ($s->{logged_in} && ($now - $s->{last} > 3600)) {
-		$m->comp("/_message_add", "It's been a while since your last visit: " . duration ($now - $s->{last}));
-		#$s->{logged_in} = 0;
-		#delete $s->{logged_in};
-		#delete $s->{user_id};
-	}
 	$s->{last} = $now;
-	#unless ($s->{logged_in}) {
-	#	$m->redirect("/");
-	#}
 	
-	my ($class_r, $class_y, $class_b) = ('', '', '');
-	my $section = $m->request_comp->attr('current_section');
+	if (0) {
+		my ($class_r, $class_y, $class_b) = ('', '', '');
+		my $section = $m->request_comp->attr('current_section');
 
-	if ($section eq 'red') {
-		$class_r = 'current';
-	}
-	elsif ($section eq 'yellow') {
-		$class_y = 'current';
-	}
-	elsif ($section eq 'blue') {
-		$class_b = 'current';
+		if ($section eq 'red') {
+			$class_r = 'current';
+		}
+		elsif ($section eq 'yellow') {
+			$class_y = 'current';
+		}
+		elsif ($section eq 'blue') {
+			$class_b = 'current';
+		}
 	}
 	
 </%init>
