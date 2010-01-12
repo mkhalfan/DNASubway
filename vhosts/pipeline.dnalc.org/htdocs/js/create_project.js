@@ -140,14 +140,3 @@ function pasted_data_ok() {
 	var re = /[^actugn\s\d]/i;
 	return re.test(t) == false;
 }
-
-
-Event.observe(window, 'load', function() {
-	var err = $("error_list");
-	if (!err)
-		return;
-	var html = err.innerHTML;
-	if (!html)
-		return;
-	show_messages(html, 1);
-});

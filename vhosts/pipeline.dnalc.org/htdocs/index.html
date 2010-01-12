@@ -6,7 +6,7 @@
 % }
 			</span>
      		<span class="bt_redStart_home" id="tt_red1"><a href="<% $s->{logged_in} ? "/project/create_project.html" : "#" %>"
-				style="cursor: <% $s->{logged_in} ? "pointer" : "default"%>;"></a></span>
+				style="cursor: <% $s->{logged_in} ? "pointer" : "default"%>;"<% $s->{logged_in} ? "" : " class=\"nohover\"" %>></a></span>
 <script type="text/javascript" language="javascript">
 new Tip('tt_red1', "Input a DNA sequence of up to 100,000 nucleotides to identify the genes and transposons in it, and annotate (associate) the sequence with this information.", {
 		title: "Annotate a Genomic Sequence",
@@ -124,6 +124,11 @@ new Tip('tt_blue2', '<span class="comingsoon">Coming Soon...</span>&nbsp;Search 
 analyze genome data.  Roll over any of the “stations” on the subway map to find out more about the analysis steps. Start a project by selecting one of the three “subway lines” 
 (red, yellow, blue). Register and login if you want to save or share your results.</div>
 
+% if ($s->{warn_guest}) {
+<div id="message_list" style="display:none;">Your guest account will be removed after 48 hours.</div>
+% 	delete $s->{warn_guest};
+%}
+
 %#-------------------------------------------------------------------
 <%args>
 	$name => ''
@@ -174,7 +179,7 @@ if ($r->method eq "POST") {
 			if ($@) {
 				push @err, $@;
 			}
-			#$s->{warn_guest} = 1;
+			$s->{warn_guest} = 1;
 		}
 	}
 	else {

@@ -3,12 +3,17 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 <title>DNA Subway - Fast Track to Gene Annotation and Genome Analysis</title>
-
-<link type="text/css" rel="stylesheet" href="/css/sgeneral.css" />
-<link type="text/css" rel="stylesheet" href="/css/scontent.css" />
+<link rel="icon" type="image/png" href="/images/favicon.png" />
+<link rel="stylesheet" type="text/css" href="/css/sgeneral.css" />
+<link rel="stylesheet" type="text/css" href="/css/scontent.css" />
 <link rel="stylesheet" type="text/css" href="/css/prototip.css" />
+<link rel="stylesheet" type="text/css" href="/files/window/themes/window/window.css" />
+<link rel="stylesheet" type="text/css" href="/files/window/themes/window/alphacube.css" />
 <script type="text/javascript" src="/js/prototype-1.6.1.js"></script>
-<script type='text/javascript' src='/js/prototip/prototip.js'></script>
+<script type="text/javascript" src="/js/prototip/prototip.js"></script>
+<script type="text/javascript" src="/js/common.js"></script>
+<script type="text/javascript" src="/files/window/lib/effects.js"></script>  
+<script type="text/javascript" src="/files/window/dist/window.js"></script>
 </head>
 
 <body>

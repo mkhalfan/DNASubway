@@ -3,6 +3,7 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 <title><& SELF:title &> DNA Subway - Fast Track to Gene Annotation and Genome Analysis</title>
+<link rel="icon" type="image/png" href="/images/favicon.png" />
 <link type="text/css" rel="stylesheet" href="/css/sgeneral.css" />
 <link type="text/css" rel="stylesheet" href="/css/scontent.css" />
 <script type="text/javascript" src="/js/prototype-1.6.1.js"></script>

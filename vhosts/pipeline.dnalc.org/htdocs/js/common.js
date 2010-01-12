@@ -64,3 +64,22 @@ function check_description_length(e) {
 	}
 }
 //------------------------
+Event.observe(window, 'load', function() {
+	// check for errors
+	var err = $("error_list");
+	if (err) {
+		var html = err.innerHTML;
+		if (html) {
+			show_errors(html);
+		}
+	}
+	
+	// check messages
+	var mess = $("message_list");
+	if (mess) {
+		var html = mess.innerHTML;
+		if (html) {
+			show_messages(html);
+		}
+	}
+});

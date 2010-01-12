@@ -4,7 +4,8 @@ var dbg, sent;
 var intervalID = {};
 var routines = ['augustus', 'fgenesh', 'snap', 'trna_scan', 'blastn', 'blastx', 
 				'blastn_user', 'blastx_user', 
-				'gbrowse', 'apollo', 'exporter', 'target'];
+				'gbrowse', 'apollo', 'exporter'//, 'target'
+				];
 var rnames = {
 			'repeat_masker' : 'Repeat Masker',
 			'trna_scan' : 'tRNA Scan',
@@ -119,10 +120,10 @@ function check_status (pid, op, h) {
 							$('exporter_ind').removeClassName("conIndicator_disabled");
 							$('exporter_ind').addClassName("conIndicator_Rb");
 						}
-						$('target_btn').onclick = function () { launch('target', null, rnames['target']); };
+						/*$('target_btn').onclick = function () { launch('target', null, rnames['target']); };
 						$('target_btn').removeClassName('disabled');
 						$('target_ind').removeClassName("conIndicator_disabled");
-						$('target_ind').addClassName("conIndicator_Rb");
+						$('target_ind').addClassName("conIndicator_Rb");*/
 					}
 				} else {}
 			}
@@ -309,8 +310,8 @@ function launch(what, where, title) {
 	var urls = {
 			gbrowse: ['/project/prepare_chadogbrowse?pid=', 'GBrowse'],
 			apollo: ['/project/prepare_editor.html?pid=', 'Apollo'],
-			exporter: ['/project/prepare_exporter.html?pid=', 'Phytozome Browser'],
-			target: ['/project/prepare_chadogbrowse?warn=1;pid=', 'Phylogenetic Tree']
+			exporter: ['/project/prepare_exporter.html?pid=', 'Phytozome Browser']
+			//target: ['/project/prepare_chadogbrowse?warn=1;pid=', 'Phylogenetic Tree']
 		};
 
 	try {
@@ -338,6 +339,8 @@ function launch(what, where, title) {
 }
 
 function createTargetPoject(sel) {
+	return;
+
 	//close_windows();
 	var m = sel.match(/(\w+_\d+):(\d+)\.\.(\d+)/);
 	if (!m || m.length != 4) {
@@ -494,30 +497,12 @@ function set_public(np) {
 //-------------
 // keep this at the end
 Event.observe(window, 'load', function() {
-	// check for errors
-	var err = $("error_list");
-	if (err) {
-		var html = err.innerHTML;
-		if (html) {
-			show_errors(html);
-		}
-	}
-	
-	// check messages
-	var mess = $("message_list");
-	if (mess) {
-		var html = mess.innerHTML;
-		if (html) {
-			show_messages(html);
-		}
-	}
 	
 	// re-check processing routines' status
 	if ($('isowner').value != "1") 
 		return;
 	
 	var as = $$('a');
-	var x = 0;
 	for (var i = 0; i < as.length; i++ ) {
 	    var stat = as[i].readAttribute('status');
 		if (!stat)

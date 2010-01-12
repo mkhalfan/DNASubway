@@ -109,8 +109,10 @@ axis_color   = blue
 [Blastn]
 feature      = match:BLASTN
 glyph        = segments
-fgcolor      = #b21a1f
-bgcolor      = #b21a1f
+#fgcolor      = #b21a1f
+#bgcolor      = #b21a1f
+fgcolor      = rgb(196,143,14)
+bgcolor      = rgb(196,143,14)
 stranded     = 1
 height       = 8
 description = sub {

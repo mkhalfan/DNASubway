@@ -10,7 +10,7 @@
 	position:relative;
 	float: left;
 	color: #000000;
-	font-size:1.2em; font-family: Times, Serif;
+	font-size:1.2em; font-family: sans-erif;
 	text-transform: uppercase;
 	letter-spacing: .5em;
 	font-weight: bold;
@@ -24,9 +24,9 @@
 	postion:relative;
 	float: left;
 	color: #46726F;
-	font-size:1.2em; font-family: Times, Serif;
+	font-size:1.2em; font-family: serif;
 	text-transform: uppercase;
-	letter-spacing: .4em;
+	letter-spacing: .3em;
 	font-weight: bold;
 	background: url("/images/v2/bg_pageTitle_textOnly.jpg") bottom left no-repeat;
 	}

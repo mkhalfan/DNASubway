@@ -177,11 +177,11 @@
 		<span class="bt_browserBlueSpacer"></span>
 %	}
 		<span class="con_browserBT ">
-			<span class="conIndicator_boxBrowse"><div id="target_ind" class="conIndicator_<%$rm_status eq "done" ? 'Rb' : 'disabled' %>"></div></span>
+			<span class="conIndicator_boxBrowse"><div id="target_ind" class="conIndicator_<% 0 && $rm_status eq "done" ? 'Rb' : 'disabled' %>"></div></span>
 		<span class="bt_browserYellow">
 			<a id="target_btn" href="javascript:;" \
-				class="<% $rm_status eq "done" ? '' : 'disabled'%>" \
-				onclick="<% $rm_status eq "done" ? "launch('target', null, 'Phylogenetic Tree')" : "" %>">Phylogenetic<br/>Tree</a>
+				class="<% 0 && $rm_status eq "done" ? '' : 'disabled'%>" \
+				onclick="<% 0 && $rm_status eq "done" ? "launch('target', null, 'Phylogenetic Tree')" : "" %>">Phylogenetic<br/>Tree</a>
 		</span>
 	</span>
 </span>

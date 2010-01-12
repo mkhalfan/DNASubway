@@ -42,6 +42,15 @@ h4{
 	font-size: .9em;
 	color: #336699;
 }
+
+h5{
+	padding: 8px 0px 4px 0px;
+	text-align: left;
+	font-weight: normal;
+	font-size: 1.1em;
+	/*color: #663300;*/
+	color: #46726F;
+}
 	
 .p1{
 	color:#336699;
@@ -56,6 +65,93 @@ h4{
 	text-align: left;
 	line-height: 1em;
 }
+
+.p3{
+	padding-left: 45px;
+	text-align: left;
+	font-weight: bold;
+	font-size: .95em;
+	color: #424242;
+}
+
+.p4{
+	
+	text-align: left;
+	font-weight: bold;
+	font-size: .95em;
+	color: #424242;
+}
+
+.textLink1{
+	width: auto;
+	height: 60px;
+	text-align: left;
+	font-size: 1.1em;
+	color: #663300;
+	text-decoration:none;
+	font-weight: bold;
+
+	}
+.textLink1 a{
+	width: auto;
+	height: 60px;
+	padding-left: 44px;
+	padding-top: 12px;
+	padding-bottom: 6px;
+	text-align: left;
+	font-size: 1.1em;
+	color: #663300;
+	text-decoration:none;
+	font-weight: bold;
+	background: url("/images/v2/logo_nsf.jpg") bottom left no-repeat;
+	
+	}
+.textLink1 a:hover{
+	color: #F47721;
+	
+	
+	}
+.textLink2{
+	
+	text-align: left;
+	font-size: 1em;
+	color: #663300;
+	text-decoration:none;
+	
+	}
+.textLink2 a{
+ 	
+	text-align: left;
+	font-size: 1em;
+	color: #663300;
+	text-decoration:none;
+	
+	
+	}
+.textLink2 a:hover{
+	color: #F47721;
+	
+	}
+
+.textLink3{
+	
+	text-align: left;
+	font-size: 1em;
+	color: #663300;
+	text-decoration:none;
+	
+	}
+.textLink3 a{
+	text-align: left;
+	font-size: 1em;
+	color: #663300;
+	text-decoration:none;
+	
+	}
+.textLink3 a:hover{
+	color: #F47721;
+
+	}
 	
 #mainContainer {
 	width: 1000px;
@@ -433,8 +529,14 @@ h4{
 	margin: 0px 0px 25px 0px;
 }
 
+
+
 .bt_redStart_home a:hover {
 	background: url("/images/v2/bt_redStart2.jpg") left no-repeat;
+}
+
+.bt_redStart_home a.nohover {
+	background: url("/images/v2/bt_redStart1.jpg") left no-repeat;
 }
 
 .bt_yellowStart_home {
@@ -743,14 +845,14 @@ h4{
 	width: 1000px;
 	height: 28px;
 	position: relative;
-	
 	}
+
 #container_H_insidebottom {
 	width: 1000px;
 	height: 44px;
 	position: relative;
-	
 	}
+
 #conMember_name {
 	width: 400px;
 	height: 20px;
@@ -764,13 +866,12 @@ h4{
 	text-align: left;
 	color: #663300;
 	font-style: italic;
-	}
+}
+
 .bt_Map {
 	width:114px;
 	height: 38px;
 	position: relative;	
-	
-
 }
 
 .bt_Map  a {
@@ -785,7 +886,6 @@ h4{
 
 .bt_Map a:hover {
 	background: url("/images/v2/bt_map2.png") right no-repeat;
-
 }
 
 #spacer_memberHome {
@@ -793,10 +893,8 @@ h4{
 	height: 120px;
 	position: relative;
 	display: block;
-	
-	}
+}
 
-/*//----------footer------------------footer-------------footer------------------------*/
 /*---footer START------*/
 
 #footerContainer {
