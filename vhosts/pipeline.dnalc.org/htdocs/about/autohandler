@@ -33,9 +33,9 @@
 		</div>
 		<div id="container_H_insidebottom">
 % if ($s->{logged_in}) {
-			<span class="bt_LogOut"><a href="/logout"></a></span>
+			<span class="bt_LogOut"><a href="/logout" title="[Logout]"></a></span>
 % }
-			<span class="bt_Map"><a href="/"></a></span>
+			<span class="bt_home"><a href="/" title="[Home]"></a></span>
 		</div>
 	</div> <!--END of ID container_InsideH_bgr-->
 </div> <!--END of ID container_InsideHeader-->
@@ -44,11 +44,11 @@
 <div id="container_leftMenu">
 	<span class="spacer_bt1 "></span>
 % if ($s->{logged_in}) {
-	<span class="bt_MyProjects"><a href="/project/browse"></a></span>
+	<span class="bt_MyProjects"><a href="/project/browsemy"></a></span>
 	<span class="bt_PublicProjects"><a href="/project/browse"></a></span>
 	<span class="bt_redStart"><a href="/project/create_project.html"></a></span>
-	<span class="bt_yellowStart"><a href="#"></a></span>
-	<span class="bt_blueStart"><a href="#"></a></span>
+	<span class="bt_yellowStart"><a href="#" style="cursor: default;"></a></span>
+	<span class="bt_blueStart"><a href="#" style="cursor: default;"></a></span>
     <span class="spacer_btGlossary"></span>
 % }
 </div><!--END of ID container_leftMenu-->

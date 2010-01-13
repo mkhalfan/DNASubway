@@ -888,6 +888,26 @@ h5{
 	background: url("/images/v2/bt_map2.png") right no-repeat;
 }
 
+.bt_home {
+	width: 114px;
+	height: 38px;
+	position: relative;	
+}
+
+.bt_home  a {
+	width:114px;
+	height: 38px;
+	background: url("/images/v2/bt_home1.png") right no-repeat;
+	display: block;
+	position: relative;
+	float: left;
+	margin:0px 0px 0px 24px;
+}
+
+.bt_home a:hover {
+	background: url("/images/v2/bt_home2.png") right no-repeat;
+}
+
 #spacer_memberHome {
 	width: 850px;
 	height: 120px;
