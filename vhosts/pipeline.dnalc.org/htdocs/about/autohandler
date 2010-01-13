@@ -34,8 +34,10 @@
 		<div id="container_H_insidebottom">
 % if ($s->{logged_in}) {
 			<span class="bt_LogOut"><a href="/logout" title="[Logout]"></a></span>
-% }
+			<span class="bt_Map"><a href="/" title="[Map]"></a></span>
+% } else {
 			<span class="bt_home"><a href="/" title="[Home]"></a></span>
+% }
 		</div>
 	</div> <!--END of ID container_InsideH_bgr-->
 </div> <!--END of ID container_InsideHeader-->
