@@ -14,6 +14,7 @@
 <script type="text/javascript" src="/js/common.js"></script>
 <script type="text/javascript" src="/files/window/lib/effects.js"></script>  
 <script type="text/javascript" src="/files/window/dist/window.js"></script>
+<!--[if lte IE 6]><script src="/files/ie6/warning.js"></script><script>window.onload=function(){e("/files/ie6/")}</script><![endif]-->
 </head>
 
 <body>
@@ -64,8 +65,18 @@
 <!--END of ID HEADER -->
 <!-- BODY -->
 <div id="containerBody">
-	
-<& "/_messages" &>
+
+% if (exists $m->session->{messages}) {
+<div style="display:none" id="error_list">	
+	<& "/_messages" &>
+</div>
+% }
+
+<noscript>
+	<div style="text-align: center;font-weight: bold; color: red;padding-top: 20px;">
+		Please enable JavaScript for this website.
+	</div>
+</noscript>
 
 % $m->call_next;                        
 
