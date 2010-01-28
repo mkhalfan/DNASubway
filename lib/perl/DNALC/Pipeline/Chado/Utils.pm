@@ -1093,7 +1093,7 @@ sub create_chado_adapter {
 
 		<oneLevelAnnotTypes>
 			<type>promoter</type>
-			<type>insertion site</type>
+			<type>insertion_site</type>
 			<type>transposable_element</type>
 			<type>transposable_element_insertion_site</type>
 			<type>remark</type>
@@ -1123,7 +1123,6 @@ sub create_chado_adapter {
 		<relationshipCV>relationship</relationshipCV>
 		<propertyTypeCV>feature_property</propertyTypeCV>
 		<writebackXmlTemplateFile>transactionXMLTemplate_rice.xml</writebackXmlTemplateFile>
-
 		<sequenceTypes>
 			<type>gene</type>
 			<type>
@@ -1139,11 +1138,11 @@ sub create_chado_adapter {
 			<program>AUGUSTUS</program>
 			<program>SNAP</program>
 		</genePredictionPrograms>
-			
+
 		<oneLevelResultPrograms>
 			<program>RepeatMasker</program>
 		</oneLevelResultPrograms>
-		
+
 		<searchHitPrograms>
 			<program>BLASTN</program>
 			<program>BLASTX</program>
@@ -1152,25 +1151,7 @@ sub create_chado_adapter {
 		<searchHitsHaveFeatLocs>true</searchHitsHaveFeatLocs>
 
 		<clsName>apollo.dataadapter.chado.jdbc.RiceChadoInstance</clsName>
-
-		<oneLevelAnnotTypes>
-			<type>promoter</type>
-			<type>transposable_element</type>
-			<type>remark</type>
-			<type>repeat_region</type>
-		</oneLevelAnnotTypes>
-
-		<threeLevelAnnotTypes>
-			<type>gene</type>
-			<type>pseudogene</type>
-			<type>tRNA</type>
-			<type>snRNA</type>
-			<type>snoRNA</type>
-			<type>ncRNA</type>
-			<type>rRNA</type>
-			<type>miRNA</type>
-		</threeLevelAnnotTypes>
-    </chadoInstance>
+	</chadoInstance>
 
     <chadoInstance id="ricePure">
        <inheritsInstance>riceInstance</inheritsInstance>
@@ -1189,7 +1170,7 @@ sub create_chado_adapter {
 		<dbName>$dbname</dbName>
 		<dbUser>$dbuser</dbUser>
 		<dbInstance>ricePure</dbInstance>
-		<style>rice.style</style>
+		<!--<style>dnalc.style</style>-->
 		<default-command-line-db>true</default-command-line-db>
 	</chadodb>
 </chado-adapter>
@@ -1242,7 +1223,7 @@ sub write_jnlp {
     <vendor>$vendor</vendor>
     <description>$apollo_desc</description>
     <homepage href="$hostname/" />
-    <icon href="/images/head-of-apollo.gif" kind="shortcut"/>
+    <icon href="/images/head-of-apollo.jpg" kind="shortcut"/>
     <offline-allowed/>
   </information>
   <security>
@@ -1278,7 +1259,7 @@ sub write_jnlp {
     <argument>-i</argument>
     <argument>game</argument>
     <argument>-f</argument>
-    <argument>$hostname/$game_file</argument>
+    <argument>$hostname$game_file</argument>
 	<argument>-N</argument>
 	<argument>$pid</argument>
   </application-desc>

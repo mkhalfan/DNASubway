@@ -42,7 +42,7 @@ use Carp;
 		my ($self, $project_dir) = @_;
 
 		my $dir = $project_dir . '/' . $self->{type};
-		print STDERR "work dir = ", $dir, $/;
+		#print STDERR "work dir = ", $dir, $/;
 
 		# TODO : move these into a future ProjectManager module
 		if (-e $dir) {

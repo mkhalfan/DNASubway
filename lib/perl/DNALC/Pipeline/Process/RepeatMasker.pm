@@ -137,10 +137,10 @@ use strict;
 
 
 	sub get_gff3_file {
-		my ($self) = @_;
+		my ($self, $dont_parse) = @_;
 
 		my $gff_file = $self->{work_dir} . '/' . $self->{conf}->{gff3_file};
-		return $gff_file if (-e $gff_file);
+		return $gff_file if (-e $gff_file || $dont_parse);
 
 		$self->convert2GFF3;
 

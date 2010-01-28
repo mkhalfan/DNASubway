@@ -2,8 +2,8 @@
 <div id="container_rightContent">
 	<div id="container_pageTitle"> my projects</div>
 	<br clear="all"/>
-%	if (exists $m->session->{messages}) {
-<div style="font-size: smaller; text-align: center;">	
+%	if (0 && exists $m->session->{messages}) {
+<div id="message_list" style="display:none;">	
 <& /_messages &>
 </div>
 %	}

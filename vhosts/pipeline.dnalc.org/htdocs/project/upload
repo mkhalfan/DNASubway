@@ -8,7 +8,7 @@
    use Gearman::Client ();
 </%once>
 <%init>
-   print STDERR Dumper(\%ARGS), $/;
+   #print STDERR Dumper(\%ARGS), $/;
    my $msg;
    my $pid = $r->param("projectname");
    my $config = DNALC::Pipeline::Config->new->cf('PIPELINE');

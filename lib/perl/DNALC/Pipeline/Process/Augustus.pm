@@ -26,9 +26,11 @@ use strict;
 	}
 
 	sub get_gff3_file {
-		my ($self) = @_;
+		my ($self, $dont_parse) = @_;
 
 		my $dir = $self->{work_dir};
+		my $gff_file2 = $dir . '/' . $self->{conf}->{gff3_file};
+		return $gff_file2 if (-e $gff_file2 || $dont_parse);
 
 		#find file to parse
 		opendir(DIR, $dir) or die "Can't opendir $dir: $!";
@@ -40,7 +42,6 @@ use strict;
 		}
 
 		my $gff_file = "$dir/$f[0]";
-		my $gff_file2 = $dir . '/' . $self->{conf}->{gff3_file};
 		#parse file
 
 		my $in  = IO::File->new($gff_file) or die "Can't open gff3 file: $!\n";

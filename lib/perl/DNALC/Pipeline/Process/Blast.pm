@@ -26,18 +26,16 @@ use strict;
 			$ENV{BLASTDB} = $self->{conf}{blastdb};
 		}
 		$ENV{BLASTMAT}=$self->{conf}{blastmat};
-		#$self->{prog} = $prog;
-		print STDERR  '$ENV{BLASTDB} = ', $ENV{BLASTDB}, $/;
 
 		return $self;
 	}
 
 	sub get_gff3_file {
-		my ($self) = @_;
+		my ($self, $dont_parse) = @_;
 
 		my $dir = $self->{work_dir};
 		my $gff_file = $dir . '/' . $self->{conf}->{gff3_file};
-		return $gff_file if (-e $gff_file);
+		return $gff_file if (-e $gff_file || $dont_parse);
 
 
 		#find file to parse

@@ -149,14 +149,14 @@
 		<span class="bt_browserRedLine"><a id="apollo_btn" href="javascript:;" \
 			onclick="<% $rm_status eq "done" && $is_owner ? "launch('apollo');" : "" %>" \
 			class="<% $rm_status eq "done" && $is_owner ? '' : 'disabled'%>" \
-			commonname="<% $trimmed_common_name %>" seq_length="<% $proj->sequence_length %>">Apollo</a></span>
+			commonname="<% $trimmed_common_name %>" seq_length="<% $proj->sequence_length %>">Apollo</a>
 		</span>
 	</span><!--END of CLASS  con_browserBT-->
-	</span><!--END of I DconRedline_ConColumnR1-->
+	</span><!--END of ID conRedline_ConColumnR1-->
 
 	<span id="conRedline_ConColumnR2">
 	<span class="con_browserBT">
-		<span class="conIndicator_boxBrowse"><div id="gbrowse_ind" class="conIndicator_<%$rm_status eq "done" ? 'Rb' : 'disabled' %>"></div></span>
+		<span class="conIndicator_boxBrowse"><div id="gbrowse_ind" class="conIndicator_<%$rm_status eq "done" ? 'Rb' : 'Rb_disabled' %>"></div></span>
 		<span class="bt_browserBlue"><a id="gbrowse_btn" href="javascript:;" \
 			class="<% $rm_status eq "done" ? '' : 'disabled'%>" \
 			onclick="<% $rm_status eq "done" ? "launch('gbrowse', null, 'GBrowse')" : "" %>">Local<br/>Browser</a></span>
@@ -165,7 +165,7 @@
 % 	if ( $proj->sample) {
 	<div class="bt_browserBlueSpacer">
 		<div id="con_browserBlueAdd">
-			<span class="conIndicator_boxBrowse"><div id="exporter_ind" class="conIndicator_<%$rm_status eq "done" ? 'Rb' : 'disabled' %>"></div></span>
+			<span class="conIndicator_boxBrowse"><div id="exporter_ind" class="conIndicator_<%$rm_status eq "done" ? 'Rb' : 'Rb_disabled' %>"></div></span>
 			<span class="bt_browserBlueAdd">
 				<a id="exporter_btn" href="javascript:;" \
 					class="<% $rm_status eq "done" ? '' : 'disabled'%>" \
@@ -177,7 +177,7 @@
 		<span class="bt_browserBlueSpacer"></span>
 %	}
 		<span class="con_browserBT ">
-			<span class="conIndicator_boxBrowse"><div id="target_ind" class="conIndicator_<% 0 && $rm_status eq "done" ? 'Rb' : 'disabled' %>"></div></span>
+			<span class="conIndicator_boxBrowse"><div id="target_ind" class="conIndicator_<% 0 && $rm_status eq "done" ? 'Rb' : 'Rb_disabled' %>"></div></span>
 		<span class="bt_browserYellow">
 			<a id="target_btn" href="javascript:;" \
 				class="<% 0 && $rm_status eq "done" ? '' : 'disabled'%>" \
@@ -266,7 +266,6 @@
 		</div>
 % }
 		<div id="description_container" origdesc="" class="conProjectInfo_description"><% $proj->description |html %></div>
- 	</span>
 	</span> <!--END of span conProjectInfo_column3-->
 </div><!--END of ID conProjectInfo-->
 </div><!--END of ID container_rightContent-->  
@@ -323,11 +322,18 @@ my $user = DNALC::Pipeline::User->retrieve($proj->user_id);
 
 my %status = ();
 my ($history, $rm_status, $trimmed_common_name);
-my $wfm = DNALC::Pipeline::App::WorkflowManager->new( $proj );
 
 my $is_owner = $s->{user_id} == $user->user_id;
-my $is_public = undef;
-my $mp = undef;
+my ($mp) = DNALC::Pipeline::MasterProject->search(user_id => $user->id, project_id => $proj->id);
+my $is_public = $mp->public;
+
+if (!$is_public && !$is_owner) {
+	#$m->comp('/_message_add', 'Project is not accessible!', 'error');
+	#print STDERR "Project not accesible...", $/;
+	$m->redirect('/project/browse');
+}
+
+my $wfm = DNALC::Pipeline::App::WorkflowManager->new( $proj );
 
 if ($r->method eq "POST") {
 	
@@ -335,7 +341,7 @@ if ($r->method eq "POST") {
 		$m->comp('/_message_add', 'Only the owner of the project is allowed to do this!', 'error');
 	}
 	elsif ($ARGS{evid_nt} || $ARGS{evid_prot}) {
-		my $wfm = DNALC::Pipeline::App::WorkflowManager->new( $proj );
+		#my $wfm = DNALC::Pipeline::App::WorkflowManager->new( $proj );
 		for (qw/evid_nt evid_prot/) {
 			if ($ARGS{$_}) {
 				my $st = $pm->add_evidence($r, $_);
@@ -366,9 +372,6 @@ else { # most likely is GET
 	}
 	$rm_status = $status{repeat_masker};
 	$trimmed_common_name = $pm->cleaned_common_name;
-
-	($mp) = DNALC::Pipeline::MasterProject->search(user_id => $user->id, project_id => $proj->id);
-	$is_public = $mp->public;
 }
 
 </%init>
@@ -396,6 +399,7 @@ if ($status eq 'processing') {
 	$title = $label = 'Processing';
 }
 elsif ($status eq 'done') {
+	#my $url = "/project/gff_to_html?f=" . $m->comp('./.comp/filepath_to_web', file => $pmanager->get_gff3_file($routine) || '#', just_return => 1); 
 	my $url = $m->comp('./.comp/filepath_to_web', file => $pmanager->get_gff3_file($routine) || '#', just_return => 1); 
 	$action = qq{onclick="launch(null, '$url', '$routines{$routine}')"};
 	$target = '';

@@ -64,6 +64,41 @@ function check_description_length(e) {
 	}
 }
 //------------------------
+
+function skip_detection () {
+	var ua = navigator.userAgent;
+	var re1 = /msie/i;
+	var re2 = /win/i;
+	var re3 = /opera/i;
+	return re3.test(ua) || re1.test(ua) && re2.test(ua);
+}
+//------------------------
+
+function webstartVersionCheck(versionString) {
+	// skip detection for IE, Opera browsers
+	if (skip_detection())
+		return true;
+
+    // Mozilla may not recognize new plugins without this refresh
+    //navigator.plugins.refresh(true);
+	var hasJnlp = false;
+	var hasApplet = false;
+    // First, determine if Web Start is available
+    if (navigator.mimeTypes['application/x-java-jnlp-file'])
+		hasJnlp = true;
+	// Next, check for appropriate version family
+	for (var i = 0; i < navigator.mimeTypes.length; ++i) {
+		pluginType = navigator.mimeTypes[i].type;
+		//console.info(pluginType);
+		if (pluginType == "application/x-java-applet;version=" + versionString) {
+			hasApplet = true;
+			break;
+		}
+	 }
+	return hasApplet || hasJnlp;
+ }
+//------------------------
+
 Event.observe(window, 'load', function() {
 	// check for errors
 	var err = $("error_list");

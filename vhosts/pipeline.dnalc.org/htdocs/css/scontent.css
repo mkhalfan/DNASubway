@@ -757,13 +757,20 @@
 	background: url("/images/v2/indicatorX.png") bottom left no-repeat;
 }
 
-.conIndicator_Rb{
+.conIndicator_Rb {
 	width: 18px;
 	height: 18px;
 	display: block;
 	position: relative;
 	background: url("/images/v2/indicatorRb.png") bottom left no-repeat;
+}
 
+.conIndicator_Rb_disabled {
+	width: 18px;
+	height: 18px;
+	display: block;
+	position: relative;
+	background: url("/images/v2/indicatorXb.png") bottom left no-repeat;
 }
 
 .conIndicator_runningb{

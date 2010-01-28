@@ -64,13 +64,13 @@
 			}
 
 			my $gff_merger = $pcf->{EXE_PATH} . '/gff3_merger.pl';
-			
 			my @args = ($gff_merger, @params, '-f', $pm->fasta_file, '-o', $gff_file);
+			#print STDERR "@args", $/;
 
 			system (@args) && die "Error: $!\n";
 		}
 		else {
-			print "Error: No gff3 files ware found! Perhaps no routine has been called.";
+			print "Error: No gff3 files were found! Perhaps no routine has been called.";
 		}
 	}
 	else {

@@ -100,5 +100,13 @@ sub get_history {
 	return \@history;
 }
 
+sub get_by_status {
+	my ($class, $project, $status) = @_;
+	my ($st) = DNALC::Pipeline::TaskStatus->search( name => $status);
+	return unless $st;
+	#my @routines = 
+	$class->search(project_id => $project, status_id => $st);
+}
+
 1;
 

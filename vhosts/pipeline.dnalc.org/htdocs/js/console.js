@@ -112,17 +112,17 @@ function check_status (pid, op, h) {
 						}
 						$('gbrowse_btn').onclick = function () { launch('gbrowse', null, rnames['gbrowse']); };
 						$('gbrowse_btn').removeClassName('disabled');
-						$('gbrowse_ind').removeClassName("conIndicator_disabled");
+						$('gbrowse_ind').removeClassName("conIndicator_Rb_disabled");
 						$('gbrowse_ind').addClassName("conIndicator_Rb");
 						if ($('exporter_btn')) {
 							$('exporter_btn').onclick = function () { launch('exporter', null, rnames['exporter']); };
 							$('exporter_btn').removeClassName('disabled');
-							$('exporter_ind').removeClassName("conIndicator_disabled");
+							$('exporter_ind').removeClassName("conIndicator_Rb_disabled");
 							$('exporter_ind').addClassName("conIndicator_Rb");
 						}
 						/*$('target_btn').onclick = function () { launch('target', null, rnames['target']); };
 						$('target_btn').removeClassName('disabled');
-						$('target_ind').removeClassName("conIndicator_disabled");
+						$('target_ind').removeClassName("conIndicator_Rb_disabled");
 						$('target_ind').addClassName("conIndicator_Rb");*/
 					}
 				} else {}
@@ -217,6 +217,16 @@ function run (op) {
 
 
 function launch_apollo() {
+
+	if (!webstartVersionCheck("1.5")) {
+		show_messages(
+			"Your browser is missing or showing an old version of Java plugin. "
+			+ "Please <a href=\""
+			+ "http://jdl.sun.com/webapps/getjava/BrowserRedirect?locale=en&host=java.com\">"
+			+ "install latest Java</a> to launch Apollo.");
+		return;
+	}
+
 	var abtn = $('apollo_btn');	
 	if (abtn.getAttribute("working") == 1 ) {
 		return;

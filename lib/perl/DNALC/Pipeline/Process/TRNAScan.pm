@@ -31,18 +31,20 @@ use Data::Dumper;
 		# it's ok to create an empty file?
 		#return if -z $file_to_parse;
 
-		my $in  = IO::File->new($file_to_parse) or die "Can't open tRNA_SCAN file: $!\n";
 		my $out = IO::File->new("> $gff_file") 
 			or die "Can't write to gff file [$gff_file]: $!\n";
-		print $out "##gff-version 3\n";
-		while (my $line = <$in>) {
-			chomp $line;
-			my @tokens = split /\s+/, $line;
-			next unless _validate(\@tokens);
-			_print_gff3_entry($out, \@tokens);
-		}
+		if (-z $file_to_parse) {
+			my $in  = IO::File->new($file_to_parse) or die "Can't open tRNA_SCAN file: $!\n";
+			print $out "##gff-version 3\n";
+			while (my $line = <$in>) {
+				chomp $line;
+				my @tokens = split /\s+/, $line;
+				next unless _validate(\@tokens);
+				_print_gff3_entry($out, \@tokens);
+			}
 
-		undef $in;
+			undef $in;
+		}
 		undef $out;
 		return $gff_file;
 	}
@@ -90,8 +92,9 @@ use Data::Dumper;
 	}
 
 	sub get_gff3_file {
-		my ($self) = @_;
+		my ($self, $dont_parse) = @_;
 
+		return $self->{work_dir} . '/' . $self->{conf}->{gff3_file} if $dont_parse;
 		my $gff_file = $self->convert2GFF3;
 		return $gff_file if ($gff_file && -e $gff_file && !-z $gff_file);
 	}

@@ -159,6 +159,14 @@ use Carp;
 		$wf->status;
 	}
 	#-------------------------------------------------------------------------
+	# returns a list of the done routines
+	sub get_done {
+		my ($self) = @_;
+		map { 
+			$_->task->name 
+		} DNALC::Pipeline::Workflow->get_by_status($self->project, 'done');
+	}
+	#-------------------------------------------------------------------------
 	sub get_history {
 		my ($self, $all) = @_;
 

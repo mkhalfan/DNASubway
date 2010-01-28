@@ -2,6 +2,11 @@
 <div id="container_rightContent">
 <div id="container_pageTitle"> public projects</div>
 <br clear="all"/>
+%	if (0 && exists $m->session->{messages}) {
+<div id="error_list" style="display:none;">	
+<& /_messages &>
+</div>
+%	}
 <div id="conProject_tableHolder">
   <table class="conProject_table" summary="">
   <tr>
