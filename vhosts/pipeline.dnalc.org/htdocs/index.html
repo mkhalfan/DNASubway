@@ -188,12 +188,19 @@ if ($r->method eq "POST") {
 		unless ($user && $user->password_valid($passw)) {
 			$user = undef;
 		}
+		if ($user && !$user->active) {
+			$user = undef;
+			$m->comp("/_message_add", "Account is blocked. Contact the admin of the site for info.");
+			$m->redirect("/");
+		}
 	}
 	if ($user) {
 		$s->{username} = $user->username;
 		$s->{full_name} = $user->full_name;
 		$s->{user_id} = $user->id;
 		$s->{logged_in} = 1;
+		
+		$user->increment_login_count;
 
 		if ($user->has_projects) {
 			$m->redirect("/project/browsemy");

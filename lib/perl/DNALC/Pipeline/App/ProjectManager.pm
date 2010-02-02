@@ -140,9 +140,10 @@ sub add_evidence {
 	my $evidence_dir;
 
 	my $st = DNALC::Pipeline::App::Utils->save_upload( { r => $r, param_name => $type});
-	print STDERR Dumper( $st), $/;
+	#print STDERR Dumper( $st), $/;
 
 	if ($st->{status} eq 'fail') {
+		print STDERR  'PM: __add_evidence__:', $st->{message}, $/;
 		push @errors, "Unable to upload file: ". $st->{message};
 	}
 	else {

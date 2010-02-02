@@ -40,7 +40,7 @@
 <div id="container_leftMenu">
 	<span class="spacer_bt1 "></span>
 	<span class="bt_MyProjects"><a href="/project/browsemy" title="Browse my projects"></a></span>
-	<span class="bt_PublicProjects"><a href="/project/browse" title="Browse public project"></a></span>
+	<span class="bt_PublicProjects"><a href="/project/browse" title="Browse public projects"></a></span>
 	<span class="bt_redStart"><a href="/project/create_project.html" class="<% $class_r %>"></a></span>
 %#	<span class="bt_yellowStart"><a href="/project/target/create" class="<% $class_y %>"></a></span>
 	<span class="bt_yellowStart"><a href="#" style="cursor: default;"></a></span>

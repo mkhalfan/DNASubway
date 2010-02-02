@@ -716,6 +716,31 @@ use Carp;
 		return 1;
 	}
 	#-------------------------------------------------------------------------
+	sub count_runs {
+		my ($self, %args) = @_;
+
+		my ($user_id, $task_id);
+
+		if (defined $args{user_id} && $args{user_id}) {
+			$user_id = $args{user_id};
+		}
+		if (defined $args{task_id} && $args{task_id}) {
+			$task_id = $args{task_id};
+		}
+		if (defined $args{task} && $args{task}) {
+			$task_id = $self->{task_name_to_id}->{ $args{task} };
+		}
+
+		if (! $user_id && $self->project) {
+			$user_id = $self->project->user_id;
+		}
+		if (! $user_id || !$task_id) {
+			Carp::carp "WFM::count_runs: invalid args: ", Dumper(\%args);
+			return;
+		}
+		DNALC::Pipeline::Workflow->count_by_user_task_interval($user_id, $task_id);
+	}
+	#-------------------------------------------------------------------------
 	sub log {
 		my ($self, $message, %args) = @_;
 		$self->{pmanager}->log($message, %args);

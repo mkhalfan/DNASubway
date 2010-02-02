@@ -54,7 +54,7 @@
 			<div id="conMember_name"><% $s->{full_name} %></div> 
 			<div class="container_log"> 
 				<span class="bt_LogOut"><a href="/logout" title="[Logout]"></a></span>
-				<span class="bt_projects"><a href="/project/browse" title="[Projects]"></a></span>
+				<span class="bt_projects"><a href="/project/browse" title="[Browse Projects]"></a></span>
 			</div>
 		</div>
 	</div>

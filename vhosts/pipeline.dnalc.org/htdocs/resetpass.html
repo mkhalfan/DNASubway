@@ -65,8 +65,8 @@
 	
 	if ($r->method eq "POST") {
 		if ($u) {
-			unless (defined $p && length ($p) >= 5) {
-				push @err, "Password is too short. Use minimum 5 chars.";
+			unless (defined $p && length ($p) >= 6) {
+				push @err, "Password is too short. Use minimum 6 chars.";
 			}
 			unless (defined $p2 && $p2 eq $p) {
 				push @err, "Passwords do not match.";

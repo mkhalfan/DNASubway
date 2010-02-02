@@ -141,7 +141,7 @@ if ($r->method eq 'POST') {
 	$organism = ucfirst lc $organism;
 
 	unless ($name) {
-		push @err, "Project name is missing";
+		push @err, "Project title is missing";
 	}
 
 	unless ($organism && $common_name) {

@@ -15,8 +15,8 @@ use DNALC::Pipeline::Utils qw(random_string);
 
 	__PACKAGE__->table('users');
 	__PACKAGE__->columns(Primary => 'user_id');
-	__PACKAGE__->columns(Essential => qw/username email password name_first name_last/);
-	__PACKAGE__->columns(Others => qw/created login_num/);
+	__PACKAGE__->columns(Essential => qw/username email password/);
+	__PACKAGE__->columns(Others => qw/title name_first name_last login_count login_last active created /);
 	__PACKAGE__->sequence('users_user_id_seq');
 
 	__PACKAGE__->add_trigger(before_create => sub {
@@ -31,6 +31,13 @@ use DNALC::Pipeline::Utils qw(random_string);
 	sub full_name {
 		my ($self) = @_;
 		$self->name_first . ' ' . $self->name_last;
+	}
+
+	sub increment_login_count {
+		my ($self) = @_;
+	    $self->login_last( POSIX::strftime "%Y-%m-%d %H:%M:%S", localtime(+time) );
+		$self->login_count($self->login_count + 1);
+		$self->update;
 	}
 
 	sub groups { 

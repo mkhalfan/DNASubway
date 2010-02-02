@@ -108,5 +108,21 @@ sub get_by_status {
 	$class->search(project_id => $project, status_id => $st);
 }
 
+__PACKAGE__->set_sql( '24h_count_by_user_task_interval' => q{
+		SELECT count(*)
+		FROM workflow w
+		LEFT JOIN project p ON p.project_id = w.project_id
+		WHERE w.user_id = ?
+		AND w.task_id = ?
+		AND w.created > now () - interval '1 day'
+		AND p.sample = ''
+	});
+
+sub count_by_user_task_interval {
+	my ($class, $user_id, $task_id) = @_;
+
+	$class->sql_24h_count_by_user_task_interval->select_val($user_id, $task_id);
+}
+
 1;
 
