@@ -187,11 +187,21 @@ function run (op) {
 				var h = r.h || '';
 				intervalID[op] = setInterval(function (){ check_status(p, op, h)}, delay);
 				if (op == 'fgenesh') {
+					var tout = 5;
+					if (r.warning) {
+						var fwarn = $('fgenesh_warning');
+						if (!fwarn) {
+							fwarn = new Element('div', {id:'fgenesh_warning'});
+							$('conMessage_FgenesH').insert(fwarn);
+						}
+						fwarn.update(r.warning);
+						tout = 15;
+					}
 					$('conMessage_FgenesH').style.display = 'block';
 					new PeriodicalExecuter(function(p){
 							$('conMessage_FgenesH').style.display = 'none';
 							p.stop();
-						}, 5);
+						}, tout);
 				}
 			}
 			else  if (r.status == 'error') {
