@@ -108,6 +108,8 @@ sub get_by_status {
 	$class->search(project_id => $project, status_id => $st);
 }
 
+# this will get the number of runs (succsessful or not) 
+# of the specified task for a certain user in the last 24h
 __PACKAGE__->set_sql( '24h_count_by_user_task_interval' => q{
 		SELECT count(*)
 		FROM workflow w
@@ -117,11 +119,24 @@ __PACKAGE__->set_sql( '24h_count_by_user_task_interval' => q{
 		AND w.created > now () - interval '1 day'
 		AND p.sample = ''
 	});
+# this will get the number of runs (succsessful or not) 
+# of the specified task for a certain user within the current day
+__PACKAGE__->set_sql( 'day_count_by_user_task_interval' => q{
+		SELECT count(*)
+		FROM workflow w
+		LEFT JOIN project p ON p.project_id = w.project_id
+		WHERE w.user_id = ?
+		AND w.task_id = ?
+		AND date_trunc('day', w.created) = date_trunc('day', current_date)
+		AND p.sample = ''
+	});
+
 
 sub count_by_user_task_interval {
 	my ($class, $user_id, $task_id) = @_;
 
-	$class->sql_24h_count_by_user_task_interval->select_val($user_id, $task_id);
+	#$class->sql_24h_count_by_user_task_interval->select_val($user_id, $task_id);
+	$class->sql_day_count_by_user_task_interval->select_val($user_id, $task_id);
 }
 
 1;

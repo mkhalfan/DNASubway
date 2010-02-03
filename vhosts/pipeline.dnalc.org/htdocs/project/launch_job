@@ -22,6 +22,8 @@
 	$m->session->{pipeline} ||= {};
 	my $s = $m->session->{pipeline};
 
+	my $warn_message = '';
+
 	unless ($t) {
 		print "{'status':'error', 'message': 'Task unknown.'}";
 		return;
@@ -44,12 +46,34 @@
 		print "{'status':'error', 'message':'Analysis only available to project owner.'}";
 		return;
 	}
-	
+
+	my $wfm = DNALC::Pipeline::App::WorkflowManager->new( $proj );
 	if ($t ne 'repeat_masker') {
-		my $wfm = DNALC::Pipeline::App::WorkflowManager->new( $proj );
 		if ($wfm->get_status('repeat_masker')->name ne "done" ) {
 			print "{'status':'error', 'message':'Repeat Masker must be run first.'}";
 			return;
+		}
+	}
+
+	if ($t eq 'fgenesh' && $proj->sample eq "" ) {
+		if ($s->{username} =~ /^guest_/i) {
+			print "{'status':'error', 'message':'Guest users may not run FGenesH on uploaded data.'}";
+			return;
+		}
+
+		my $cf = DNALC::Pipeline::Config->new->cf('FGENESH');
+
+		if ($cf->{RUN_LIMIT_PER_DAY} && $s->{username} !~ /^guest_/i ) {
+			#print STDERR "We have limits per day: ", $cf->{RUN_LIMIT_PER_DAY}, $/;
+			my $runs = $wfm->count_runs(task => 'fgenesh');
+			if ($runs >= $cf->{RUN_LIMIT_PER_DAY}) {
+				print "{'status':'error', 'message':'$cf->{RUN_LIMIT_PER_DAY_MSG_EXCEEDED}'}";
+				return;
+			}
+			elsif ($runs >= $cf->{RUN_LIMIT_PER_DAY}/2) {
+				$warn_message = $cf->{RUN_LIMIT_PER_DAY_MSG_WARN};
+				$warn_message =~ s/__\$runs__/$runs+1/e;
+			}
 		}
 	}
 
@@ -67,7 +91,11 @@
 </%flags>
 %#-------------------------------------------------
 % if ($h) {
-{'status':'success', 'h':'<% $h %>'}
+{'status':'success', 'h':'<% $h %>'\
+%	if ($warn_message) {
+, 'warning' : '<% $warn_message %>'\
+%	}
+}
 % } else {
 {'status':'error', 'message':'Unable to submit job request.'}
 % }

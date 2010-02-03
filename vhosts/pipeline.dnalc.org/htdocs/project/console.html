@@ -35,8 +35,9 @@
 		</span><!--END of span class conRedline_ConCell-->
 		<span class="conRedline_ConCell">
 			<span class="conIndicator_box"><div id="fgenesh_st" class="conIndicator_<% $status{fgenesh} eq "done" ? "done" : $is_owner && $rm_status eq "done" ? $status{fgenesh} : "disabled" %>"></div> </span>
-			<& '.routine', routine => 'fgenesh', pmanager => $pm, is_owner => $is_owner,
+			<& '.routine', routine => 'fgenesh', pmanager => $pm, is_owner => $is_owner, 
 						status => $status{fgenesh}, rm_status => $rm_status &>
+%#						#limit_reached => $s->{username} =~ /^guest_/ || ($proj->sample eq "" && $wfm->count_runs(task => 'fgenesh') >= 3),
 		</span><!--END of span class conRedline_ConCell-->
 		<span class="conRedline_ConCell">
 			<span class="conIndicator_box"><div id="snap_st" class="conIndicator_<% $status{snap} eq "done" ? "done" : $is_owner && $rm_status eq "done" ? $status{snap} : "disabled" %>"></div> </span>
@@ -188,7 +189,7 @@
 
 
 </div><!--END of ID conRedlineRight2-->
-<div id="conMessage_FgenesH">FgenesH gene predictor provided by <a target="_blank" href="http://linux1.softberry.com/berry.phtml">Softberry, Inc.</a></div>
+<div id="conMessage_FgenesH">FGenesH gene predictor provided by <a target="_blank" href="http://linux1.softberry.com/berry.phtml">Softberry, Inc.</a></div>
 
 <!--
 <div id="conRunAll">
@@ -287,10 +288,10 @@
 	use DNALC::Pipeline::Utils qw/nicebasepairs/;
 
 	my %routines = (
-			'repeat_masker' => 'Repeat Masker',
+			'repeat_masker' => 'RepeatMasker',
 			'trna_scan' => 'tRNA Scan',
 			'augustus' => 'Augustus',
-			'fgenesh' => 'FgenesH',
+			'fgenesh' => 'FGenesH',
 			'snap' => 'Snap',
 			'blastn' => 'BlastN',
 			'blastx' => 'BlastX',
@@ -384,6 +385,7 @@ else { # most likely is GET
 	$pmanager => undef
 	$is_owner => 0
 	$delay => 5
+	$limit_reached => 0
 </%args>
 <%init>
 my $link   = 'javascript:;';
@@ -426,7 +428,10 @@ else {
 		}
 	}
 	else {
-		if ($status eq 'error') {
+		if ($limit_reached) {
+			$status = 'disabled';
+		}
+		elsif ($status eq 'error') {
 			$label = 'Failed/Run';
 		}
 		else {

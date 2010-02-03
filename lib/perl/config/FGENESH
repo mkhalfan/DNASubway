@@ -13,4 +13,8 @@
 		m => '/usr/local/fgenesh/Monocots',
 		default => '/usr/local/fgenesh/Dicots',
 	},
+	RUN_LIMIT_PER_DAY => 20,
+	RUN_LIMIT_PER_DAY_MSG_WARN => '<p>&nbsp;</p>This is your __$runs__th FGenesH run today on a sequence you uploaded. According to our license agreement with Softberry, Inc., Registered users can only run the FGenesH program on up to 20 user-uploaded sequences per day. All other programs are in DNA Subway are available without limitation, as is FGenesH on all sample data provided in DNA Subway.',
+	RUN_LIMIT_PER_DAY_MSG_EXCEEDED => '<p>Today you ran FGenesH 20 times on uploaded sequence data. According to our license agreement with Softberry, Inc., Registered users can only run the FGenesH program on up to 20 user-uploaded sequences per day. Please retry using FGenesH on your data tomorrow again. All other programs in DNA Subway are available without limitation, as is FGenesH on all sample data provided in DNA Subway.</p>',
+
 }
