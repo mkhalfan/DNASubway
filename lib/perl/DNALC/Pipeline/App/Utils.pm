@@ -6,6 +6,7 @@ use warnings;
 use Apache2::Upload;
 use Bio::SeqIO ();
 use IO::File ();
+use Text::FixEOL ();
 use DNALC::Pipeline::Config ();
 use DNALC::Pipeline::Utils qw(random_string);
 use Digest::MD5 ();
@@ -66,6 +67,9 @@ sub save_upload {
 				$seq_data = "> fasta\n" . $seq_data;
 			}
 		}
+
+		my $fixer = Text::FixEOL->new;
+		$seq_data = $fixer->fix_eol($seq_data);
 
 		unless ($msg) {
 			my $out = IO::File->new;

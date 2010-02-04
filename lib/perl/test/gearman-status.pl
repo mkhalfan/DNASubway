@@ -21,17 +21,23 @@
 use strict;
 use warnings;
 
-use Net::Telnet ();
+use Net::Telnet::Gearman;
+use Data::Dumper;
 
-my $t = new Net::Telnet (Timeout => 5, Host => 'localhost', Port => 7003 );
-my $ok = $t->print('status');
-if ($ok) {
-	while (my $line = $t->getline ) {
-		chop $line;
-		last if $line =~ /^\./;
-		print "got line: [", $line, "]", $/;
-	}
-}
-$t->close;
+my $session = Net::Telnet::Gearman->new(
+	Host => '127.0.0.1',
+	Port => 7003,
+);
 
+my @workers   = $session->workers();
+print STDERR Dumper( \@workers), $/;
+#my @functions = $session->status();
+#print STDERR Dumper( \@functions), $/;
+#my $version   = $session->versioI#n();
+
+my $result    = $session->maxqueue( routines_check_stop_if => 10 );
+print STDERR  "Set maxque for routines_check_stop_if to 10: ", $result, $/;
+
+$result    = $session->maxqueue( routines_worker_exit => 10 );
+print STDERR  "Set maxque for routines_worker_exit to 10: ", $result, $/;
 

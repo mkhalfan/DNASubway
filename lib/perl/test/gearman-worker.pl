@@ -118,6 +118,7 @@ sub run_blastx_user {
 
 my $worker = Gearman::Worker->new;
 $worker->job_servers('localhost');
+
 $worker->register_function("augustus", \&run_augustus);
 $worker->register_function("repeat_masker", \&run_repeatmasker);
 $worker->register_function("trna_scan", \&run_trnascan);
@@ -128,4 +129,35 @@ $worker->register_function("blastx", \&run_blastx);
 $worker->register_function("blastn_user", \&run_blastn_user);
 $worker->register_function("blastx_user", \&run_blastx_user);
 
-$worker->work while 1;
+#-------------------------------------------------
+my $work_exit = 0;
+my ($is_idle, $last_job_time);
+
+my $stop_if = sub { 
+	($is_idle, $last_job_time) = @_; 
+	#print STDERR  "Routines worker is idle = $is_idle", $/;
+
+	if ($work_exit) { 
+		#$work_exit = 0;
+		print STDERR  "*** Routines worker exiting.. \n", $/;
+		return 1; 
+	}
+	return 0; 
+}; 
+
+#-------------------------------------------------
+
+$worker->register_function(routines_check_stop_if =>  sub { 
+	return freeze([$is_idle, $last_job_time]); 
+});
+
+$worker->register_function(routines_worker_exit => sub { 
+	$work_exit = 1; 
+});
+
+#-------------------------------------------------
+#$worker->work while 1;
+$worker->work( stop_if => $stop_if ) while !$work_exit;
+
+exit 0;
+
