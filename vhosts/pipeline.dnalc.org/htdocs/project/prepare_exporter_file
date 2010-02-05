@@ -52,6 +52,7 @@
 			my @cmd = ($pcf->{EXE_PATH} . '/dump_user_annotations.pl', 
 							'--profile', $pm->chado_user_profile,
 							'--seqid', $trimmed_common_name,
+							'--type', 'user',
 							'--file', $user_annot_file
 						);
 			#print STDERR "@cmd", $/;
@@ -86,15 +87,39 @@
 		print q{[gene:AUGUSTUS]
 glyph = gene
 sub_part = CDS
+fgcolor = #0f6969
+bgcolor = #0f6969
 
 [gene:SNAP]
 glyph = gene
+fgcolor = #a5cba9
+bgcolor = #a5cba9
 
 [gene:FGenesH]
 glyph = gene
+#ignore_part = CDS
+#sub_part = exon
+fgcolor = #589c7f
+bgcolor = #589c7f
 
 [gene:user]
 glyph = gene
+bgcolor = rgb(51,102,255)
+
+[repeat_region:RepeatMasker]
+glyph = generic
+bgcolor = #663187
+fgcolor = #663187
+
+[match:BLASTN]
+glyph = segments
+fgcolor = rgb(196,143,14)
+bgcolor = rgb(196,143,14)
+
+[match:BLASTX]
+glyph = segments
+fgcolor = #925732
+bgcolor = #925732
 
 }, "\n";
 		print "##gff-version 3\n";

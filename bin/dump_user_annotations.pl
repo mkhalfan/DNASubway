@@ -47,7 +47,6 @@ die 'Sequence ID is missing' unless $SEQID;
 
 $TYPE ||= 'all';
 my $type = $TYPE eq 'all' ? 'gene' : 'gene:' . $TYPE;
-#print STDERR  $type, $/;
 
 my $fh = IO::File->new;
 unless ($fh->open($FILE, 'w')) {
@@ -75,7 +74,12 @@ my @features = $db->features(
 					-seq_id => $SEQID,
 				 );
 
-print $fh "###GFF3\n";
+#for some reasons, we get all the genes, unless we have user annotations
+if ($TYPE ne 'all') {
+	@features = grep {$_->type->source eq $TYPE} @features;
+}
+
+print $fh "###GFF3\n" if @features;
 
 for my $f (@features) {
 	#print Dumper( $f ), $/;
