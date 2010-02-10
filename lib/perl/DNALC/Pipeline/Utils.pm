@@ -16,6 +16,7 @@ use vars qw(
 @ISA = qw(Exporter);
 @EXPORT_OK = qw(
                     array_diff
+					break_long_text
                     clean_query
                     debug_cdbi
                     escape_js
@@ -177,6 +178,28 @@ sub array_diff {
 sub round {
     local $_ = shift;
     int($_ + .5)
+}
+
+
+sub break_long_text {
+	my ($text, $maxlen) = @_;
+
+	$maxlen ||= 50;
+	$text =~ s/\S{$maxlen}/$& /sg;
+	return $text;
+
+	my @long_words = grep {length $_ > $maxlen} split /\W+/, $text;
+
+	for my $lw (@long_words) {
+		my @parts = split //, $lw;
+		my $new_word = '';
+		while (@parts) {
+			$new_word .= join ('', splice(@parts, 0, $maxlen)) . ' ';
+		}
+		$new_word =~ s/\s+$//;
+		$text =~ s/$lw/$new_word/;
+	}
+	$text;
 }
 
 #=================================

@@ -25,11 +25,12 @@
 %		$uri = "/project/target/view?tid=" . $_->id;
 %		$color = "#fdba3e"; #blue = "#3953A4"
 % 	}
+%	my $description = break_long_text($_->description, 35);
 <tr>
 	<td style="background-color: <% $color %>;"><% $_->id %></td>
 	<td><% $created %></td>
 	<td><a href="<% $uri %>"><%$_->name |html%></a></td>
-	<td><% $_->description |html %></td>
+	<td><% $description |html %></td>
 	<td><% $_->organism %>, <% $_->common_name %></td>
 	<td><% $_->{full_name} %></td>
 	<!--<td><% $_->user_id %></td>-->
@@ -58,6 +59,7 @@
 	use DNALC::Pipeline::Config ();
 	use DNALC::Pipeline::Utils qw(random_string);
 	use DNALC::Pipeline::App::Utils ();
+	use DNALC::Pipeline::Utils qw(break_long_text);
 	
 	#use Switch 'Perl6';
 	
