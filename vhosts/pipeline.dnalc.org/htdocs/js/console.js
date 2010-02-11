@@ -303,8 +303,8 @@ function openWindow(url, title) {
 	var options = {
 		width: 900, 
 		height: 496,
-		shadow: true,
-		draggable: false,
+		shadow: false,
+		draggable: true,
 		resizable: true,
 		url: url
 	};

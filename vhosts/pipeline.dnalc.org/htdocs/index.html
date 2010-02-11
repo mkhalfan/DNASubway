@@ -121,11 +121,18 @@ new Tip('tt_blue2', '<span class="comingsoon">Coming Soon...</span>&nbsp;Search 
 	</div><!--END of ID home_map-->
 
     <div id="home_intro" class="container_text">This site ties together key bioinformatics tools and databases used to annotate genes and 
-analyze genome data.  Roll over any of the “stations” on the subway map to find out more about the analysis steps. Start a project by selecting one of the three “subway lines” 
+analyze genome data.  Roll over any of the "stations" on the subway map to find out more about the analysis steps. Start a project by selecting one of the three “subway lines” 
 (red, yellow, blue). Register and login if you want to save or share your results.</div>
 
 % if ($s->{warn_guest}) {
-<div id="message_list" style="display:none;">Your guest account will be removed after 48 hours.</div>
+<div id="message_list" style="display:none;">Guest users can use the DNA Subway to the same extend 
+as registered users with two important exceptions:
+<p>a) Guest users cannot save their projects.</p>
+<p>b) Guest users can use the FGenesH gene prediction program (on the Red Line) only on samples 
+provided in DNA Subway, not on sequences they upload.</p>
+
+</div>
+
 % 	delete $s->{warn_guest};
 %}
 

@@ -10,22 +10,122 @@
 
 <form method="post">
 	<table>
+	<tr>
+		<td>Title:</td>
+		<td><select name="title" value="title" />
+		<option value="">Title</option>
+%	for ( @titles ) {
+%		my $sel = lc $_ eq $s->{title} ? " selected=\"selected\"" : "";
+	<option value="<% lc $_ %>"<% $sel %>><% $_ %></option>
+%	}
+			</select></td>
+		</tr>
 %	for (@$fields) {
 %		my $type = defined $_->{type} ? $_->{type}  : 'text';
 		<tr>
 			<td><% $_->{label} %>:</td>
-			<td><input type="<% $type %>" name="<% $_->{id} %>" value="<% $s->{$_->{id}} |html%>" maxlength="<% $_->{maxlength} %>"/></td>
+			<td><input class="conStylized_box4" type="<% $type %>" name="<% $_->{id} %>" value="<% $s->{$_->{id}} |html%>" maxlength="<% $_->{maxlength} %>"/></td>
 		</tr>
 %	}
-
 		<tr>
-			<td>&nbsp;</td>
-			<td><input type="submit" name="submit" value="Register" /></td>
+			<td colspan="2">&nbsp;</td>
 		</tr>
+		<tr>
+			<td>Country:</td>
+			<td><& project/.comp/countries, country => $s->{country} &></td>
+		</tr>
+		<tr>
+			<td>Zip code:</td>
+			<td><input class="conStylized_box4" type="text" name="zip" value="<% $s->{zip} |html%>" maxlength="10"/></td>
+		</tr>
+% if (0) {
+		<tr>
+			<td>Highest degree:</td>
+			<td><select name="degree" id="degree" onchange="show_degree_details()">
+			<option value="">Select your highest degree</option>
+%	my $js = "";
+%	my $sel_degree = undef;
+%	for (@degrees) {
+%		$js .= '"' . lc ($_->{name}) . '":"' . $_->{details} . '",' if defined $_->{details};
+%		my $sel = "";
+%#		print STDERR "$s->{degree} eq lc $_->{name} = ", $s->{degree} eq lc $_->{name}, $/;
+%		if ($s->{degree} eq lc $_->{name}) { 
+%			$sel = " selected=\"selected\"";
+%			$sel_degree = $_;
+%		}
+		<option value="<% lc $_->{name} %>"<% $sel %>><% $_->{name} %></option>
+%	}
+%	$js =~ s/,$//;
+			</select></td>
+		</tr>
+		<tr id="degree_details_tr" style="display:<% $sel_degree && defined $sel_degree->{details} ? "block" : "block" %>;">
+			<td style="text-align: right;"><% $sel_degree->{details}%> » </td>
+			<td><input class="conStylized_box4" type="text" name="degree_details" id="degree_details" value="<% $s->{degree_details} |html%>" maxlength="128"/></td>
+		</tr>
+<script type="text/javascript">
+<!--
+function show_degree_details() {
+	var degrees = {<% $js %>};
+	var details = degrees[$('degree').value];
+	if (details != null || details != undefined) {
+		$('degree_details_tr').cells[0].innerHTML = (details || "Specify") + " » ";
+		$('degree_details_tr').show();
+	}
+	else {
+		$('degree_details').value = '';
+		$('degree_details_tr').hide();
+	}
+}
+function show_occupation_details () {
+	//alert("show_occupation_details");
+}
+//-->
+</script>
+		<tr>
+			<td>Occupation/Interest:</td>
+			<td><select name="occupation" id="occupation" onchange="show_occupation_details()">
+			<option value="">Select your occupation/interest</option>
+%	for (@occupations) {
+%		my $sel = $s->{occupation} eq lc $_ ? " selected=\"selected\"" : "";
+		<option value="<% lc $_ %>"<% $sel %>><% $_ %></option>
+%	}
+			</select></td>
+		</tr>
+		<tr>
+			<td>Gender:</td>
+			<td>
+				<div><input class="conRadiobox_align" type="radio" name="gender" id="gender" value="f" <% $s->{gender} eq "f" ? "checked=\"checked\"" : ""%>/>&nbsp; Female</div>
+				<div><input class="conRadiobox_align" type="radio" name="gender" id="gender" value="m" <% $s->{gender} eq "m" ? "checked=\"checked\"" : ""%>/>&nbsp; Male</div>
+			</td>
+		</tr>
+		<tr>
+			<td>Ethnicity:</td>
+			<td><select name="ethnicity" id="ethnicity" onchange="">
+			<option value="">Select your ethnicity</option>
+%	for (@races) {
+%		my $sel = $s->{ethnicity} eq lc $_ ? " selected=\"selected\"" : "";
+		<option value="<% lc $_ %>"<% $sel %>><% $_ %></option>
+%	}
+			</select></td>
+		</tr>
+% } # enf if (0)
+<& "./_user_profile", questions => \%questions, answers => $s &>
 	</table>
+	<div style="text-align: center"><input type="submit" name="submit" value="Register" /></div
 </form>
 </div>
 
+%#-------------------------------------------------------------------
+<%args>
+	$title => ''
+	$gender => ''
+	$country => ''
+	$zip => ''
+	$degree => ''
+	$degree_details => ''
+	$occupation => ''
+	$ethnicity => ''
+</%args>
 %#-------------------------------------------------------------------
 <%once>
 	use DNALC::Pipeline::Utils qw/random_string/;
@@ -33,6 +133,7 @@
 	use DNALC::Pipeline::Chado::Utils ();
 	use DNALC::Pipeline::User ();
 	use DNALC::Pipeline::Group ();
+	use DNALC::Pipeline::UserProfile ();
 	use Email::Valid ();
 	use MIME::Lite ();
 
@@ -42,6 +143,23 @@
 			{ id => "username", label => "Username", re => qr/^[a-z0-9_-]+$/i, maxlength => 16},
 			{ id => "email", type => "email", label => "Email", re => qr/\@/, maxlength => 120},
 		];
+	my @titles = qw/Ms Mr Miss PhD MBA MD Prof/;
+	my @degrees = (
+			{ name => "HS Diploma"},
+			{ name => "Professional Training/Associate's Degree", details => "Area"},
+			{ name => "Bachelor's Degree", details => "Major(s)"},
+			{ name => "Master's Degree", details => "Subject area"},
+			{ name => "Ph. D.", details => "Subject area"},
+			{ name => "Other", details => ""},
+		);
+	my @occupations = ("Student", "Educator", "Scientist/Researcher", "Interested Public/Other");
+	my @races = ("African American or Black, not of Hispanic Origin",
+				"American Indian, Alaskan Native, Hawaiian Native",
+				"Asian or Pacific Islander",
+				"White, Hispanic or Latino",
+				"White, including Arabic. not of Hispanic Origin",
+				"Other",
+		);
 </%once>
 %#-------------------------------------------------------------------
 <%init>
@@ -50,7 +168,45 @@ my $s = $m->session->{pipeline_reg};
 
 my @err = ();
 
+my $tree_root = 2;
+my $tree = undef;#$m->cache->get("question-tree-$tree_root");
+unless (defined $tree) {
+		$tree = DNALC::Pipeline::UserProfile->get_question_tree($tree_root);
+		$m->cache->set("question-tree-$tree_root", $tree, "2m"); # set cache for X minutes
+}
+else {
+	#print STDERR "cache: ", "question-tree-$tree_root", $/;
+}
+
+my %questions = map {
+				$_->{q_id} => {q => $_, a => []}
+			} grep {$_->{q_type} eq "q" } @$tree;
+
+for (grep {$_->{q_type} eq "a" } @$tree) {
+	my $question_id = $_->{q_parent_id};
+	push @{ $questions{$question_id}->{a} }, $_;
+}
+
 if ($r->method eq "POST") {
+
+	if (0) {
+	$s->{title} = $title;
+	$s->{zip} = $zip;
+	$s->{country} = $country;
+	$s->{gender} = $gender;
+	$s->{degree} = $degree;
+	$s->{degree_details} = $degree_details;
+	$s->{occupation} = $occupation;
+	$s->{ethnicity} = $ethnicity;
+	}
+
+	my $user_profile_data = {};
+	#print STDERR "\t", Dumper(\%ARGS), $/;
+	for (keys %ARGS) {
+		$s->{$_} = $ARGS{$_};
+		$user_profile_data->{$_} = $ARGS{$_} if $_ =~ /^q\d+/;
+	}
+	#print STDERR "\t", Dumper($user_profile_data), $/;
 
 	my $cf = DNALC::Pipeline::Config->new->cf('PIPELINE');
 
@@ -62,8 +218,8 @@ if ($r->method eq "POST") {
 		}
 	}
 	
-	if ($s->{username} && length($s->{username}) < 4) {
-		push @err, "Username is too short. Use at least 4 chars.";
+	if ($s->{username} && length($s->{username}) < 6) {
+		push @err, "Username is too short. Use at least 6 chars.";
 	}
 	
 	unless (@err) {
@@ -71,7 +227,7 @@ if ($r->method eq "POST") {
 			push @err, "Email address is invalid!";
 		}
 		my $user = DNALC::Pipeline::User->search( username => $s->{username});
-		if ($user || $s->{username} =~ /^(?:chado|guest|default|postgre|template)/i) {
+		if ($user || $s->{username} =~ /^(?:chado|guest|default|postgre|temp|mysql)/i) {
 			push @err, "Username not available!";
 		}
 		else {
@@ -96,8 +252,9 @@ if ($r->method eq "POST") {
 					username => $s->{username},
 					password => $pwd,
 					email => $s->{email},
+					title => $s->{title},
 					name_first => $s->{name_first},
-					name_last => $s->{name_last}
+					name_last => $s->{name_last},
 				});
 			};
 
@@ -108,6 +265,15 @@ if ($r->method eq "POST") {
 			push @err, "Error creating user!";
 		}
 		else {
+			eval {
+				DNALC::Pipeline::UserProfile->store_user_profile($tree_root, $u->id, $user_profile_data);
+			};
+			if ($@) {
+				print STDERR "USER PROFILE: ------------------------------------\n";
+				print STDERR $@, "\n";
+				print STDERR "USER PROFILE: ------------------------------------\n";
+			}
+			
 			# launch "create-chado-db" in the background
 
 			my ($users_group) = DNALC::Pipeline::Group->search(group_name => "user");
@@ -148,8 +314,11 @@ DNALC Team";
 			$m->session->{pipeline_reg} = {};
 			$m->redirect("/");
 		}
-
 	}
 }
 
 </%init>
+
+<%attr>
+	js => ['user_profile.js']
+</%attr>

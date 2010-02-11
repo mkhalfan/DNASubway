@@ -14,6 +14,12 @@
 <script type="text/javascript" src="/js/common.js"></script>
 <script type="text/javascript" src="/files/window/lib/effects.js"></script>  
 <script type="text/javascript" src="/files/window/dist/window.js"></script>
+% if ($m->request_comp->attr_if_exists('js') && @{$m->request_comp->attr('js')}) {
+%	foreach my $js (@{$m->request_comp->attr('js')}) {
+%		next unless $js;
+<script type="text/javascript" src="/js/<% $ js %>"></script>
+%	}
+% }
 <!--[if lte IE 6]><script src="/files/ie6/warning.js"></script><script>window.onload=function(){e("/files/ie6/")}</script><![endif]-->
 </head>
 
