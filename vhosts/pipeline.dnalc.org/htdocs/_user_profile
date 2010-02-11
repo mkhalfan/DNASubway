@@ -1,0 +1,89 @@
+
+
+% for my $q_id (sort {$questions->{$a}->{q}->{q_order_num} <=> $questions->{$b}->{q}->{q_order_num}} keys %$questions) {
+%	my $q = $questions->{$q_id}->{q};
+%	my $a = $questions->{$q_id}->{a};
+%	my @labels = map {$_->{q_label}} grep {$_->{q_input_type} ne "other"} @$a;
+%	my @values = map {$_->{q_id}} grep {$_->{q_input_type} ne "other"} @$a;
+%	my ($triggerer, $triggered) = map {$_->{q_id}, $_->{q_triggers}} grep {defined $_->{q_triggers} } @$a;
+%	my ($other) = grep {$_->{q_input_type} eq "other"} @$a;
+%	my ($other_answered) = grep { $_->{q_id} == $answers->{"q$q_id"} } @$a;
+<tr>
+	<td><% $q->{q_label} %></td>
+	<td>
+%#		<span style="color: red">q<%$q_id%> ~~ <b><% $answers->{"q$q_id"} %></b> == <% $triggerer %> -» <% $triggered %></span>
+%#		<span style="color: green">other_answered:<% $other_answered->{q_triggers} %> = other:<% $other->{q_id} %></span>
+%	if ($q->{q_input_type} eq 'select') {
+		<& ".select", name=> "q$q_id", selected => $answers->{"q$q_id"},
+			label => "Select " . $q->{q_label},
+			labels => \@labels, values => \@values, 
+			onchange => $triggered == $other->{q_id} ? "javascript:show_other('q$q_id', 'cq$triggered', '$triggerer');" : '',
+		&>
+%	} elsif ($q->{q_input_type} eq 'radio') {
+		<& ".radio", name=> "q$q_id", checked => $answers->{"q$q_id"}, labels => \@labels, values => \@values &>
+%	} else {
+		<input type="text" name="q<% $q_id%>" id="q<% $q_id%>" value="" />
+%	}
+	</td>
+</tr>
+%	if ($other) {
+%	my $show_other = defined $other_answered->{q_triggers} && $other_answered->{q_triggers} == $other->{q_id};
+<tr id="cq<% $other->{q_id} %>" style="display: <% $show_other ? "table-row" : "none" %>;">
+	<td style="text-align: right;"><small><% $other->{q_label} %> » </small></td>
+	<td>
+%#		<input type="text" name="q<% $q_id%>_other" id="q<% $q_id%>_other" value="<% $triggers %>" />
+		<input type="text" name="q<% $other->{q_id} %>" id="q<% $other->{q_id} %>" value="<% $show_other ? $answers->{"q" . $other->{q_id}} : "" %>" />
+	</td>
+</tr>
+%	}
+% }
+
+%#-----------------------------
+<%args>
+	$questions => {}
+	$answers => {}
+</%args>
+%#-----------------------------
+<%once>
+	use Data::Dumper;
+</%once>
+%#-----------------------------
+%#-----------------------------
+<%def .select>
+<%args>
+	$name => 'select'
+	$selected => ''
+	$label => 'Select'
+	$labels => [],
+	$values => [],
+	$onchange => ''
+</%args>
+<%init>
+
+</%init>
+	<select name="<% $name %>" id="<% $name%>" <% $onchange ? "onchange=\"$onchange\"" : "" %>>
+		<option value=""><% $label |html%></option>
+%	for (my $i = 0; $i < scalar @$labels; $i++) {
+%		my $sel = $selected == $values->[$i] ? "selected=\"selected\"" : "";
+		<option value="<% $values->[$i] %>" <% $sel %>><% $labels->[$i] |html%></option>
+%	}
+	</select>
+</%def>
+%#-----------------------------
+<%def .radio>
+<%args>
+	$name => 'radio'
+	$checked => '',
+	$labels => [],
+	$values => [],
+	$onchange => ''
+</%args>
+%	for (my $i = 0; $i < scalar @$labels; $i++) {
+%		my $chk = $checked == $values->[$i] ? "checked=\"checked\"" : "";
+		<div style="cursor:pointer;">
+			<input type="radio" name="<% $name %>" id="<% $name%>-<% $i %>" value="<% $values->[$i] %>" <% $chk %>/>&nbsp;
+			<span onclick="javascript:$('<% $name %>-<% $i %>').click();"><% $labels->[$i] |html%></span>
+		</div>
+%	}
+</%def>
+%#-----------------------------
