@@ -109,7 +109,7 @@ function show_occupation_details () {
 			</select></td>
 		</tr>
 % } # enf if (0)
-<& "./_user_profile", questions => \%questions, answers => $s &>
+<& "./_user_profile", parent => $tree_root, questions => $questions, answers => $s &>
 	</table>
 	<div style="text-align: center"><input type="submit" name="submit" value="Register" /></div
 </form>
@@ -169,22 +169,13 @@ my $s = $m->session->{pipeline_reg};
 my @err = ();
 
 my $tree_root = 2;
-my $tree = undef;#$m->cache->get("question-tree-$tree_root");
-unless (defined $tree) {
-		$tree = DNALC::Pipeline::UserProfile->get_question_tree($tree_root);
-		$m->cache->set("question-tree-$tree_root", $tree, "2m"); # set cache for X minutes
+my $questions = undef;#$m->cache->get("question-tree-$tree_root");
+unless (defined $questions) {
+		$questions = DNALC::Pipeline::UserProfile->get_question_tree($tree_root);
+		$m->cache->set("question-tree-$tree_root", $questions, "2m"); # set cache for X minutes
 }
 else {
 	#print STDERR "cache: ", "question-tree-$tree_root", $/;
-}
-
-my %questions = map {
-				$_->{q_id} => {q => $_, a => []}
-			} grep {$_->{q_type} eq "q" } @$tree;
-
-for (grep {$_->{q_type} eq "a" } @$tree) {
-	my $question_id = $_->{q_parent_id};
-	push @{ $questions{$question_id}->{a} }, $_;
 }
 
 if ($r->method eq "POST") {
@@ -206,7 +197,7 @@ if ($r->method eq "POST") {
 		$s->{$_} = $ARGS{$_};
 		$user_profile_data->{$_} = $ARGS{$_} if $_ =~ /^q\d+/;
 	}
-	#print STDERR "\t", Dumper($user_profile_data), $/;
+	print STDERR "User profile data:\t", Dumper($user_profile_data), $/;
 
 	my $cf = DNALC::Pipeline::Config->new->cf('PIPELINE');
 

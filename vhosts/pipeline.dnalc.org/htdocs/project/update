@@ -30,7 +30,7 @@ my $message = '';
 my $error = 0;
 
 unless ($s->{logged_in}) {
-	$message = 'Your session expired. Please login!';
+	$message = 'Your session has expired. Please login!';
 } else {
 
 	my ($mp) = DNALC::Pipeline::MasterProject->search(user_id => $s->{user_id}, project_id => $pid, project_type => $type);

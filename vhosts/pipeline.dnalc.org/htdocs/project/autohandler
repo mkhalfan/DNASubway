@@ -96,7 +96,6 @@ re_("ktaz7-6gmi62748k");
 </html>
 %#---------------------------------
 <%once>
-	use Time::Duration qw/duration/;
 </%once>
 %#---------------------------------
 <%init>
@@ -105,7 +104,7 @@ re_("ktaz7-6gmi62748k");
 
 	my $now = time();
 	if ($s->{logged_in} && ($now - $s->{last} > 3600)) {
-		$m->comp("/_message_add", "It's been a while since your last visit: " . duration ($now - $s->{last}));
+		$m->comp("/_message_add", "Your session has expired. Please login.");
 		$s->{logged_in} = 0;
 		delete $s->{logged_in};
 		delete $s->{user_id};

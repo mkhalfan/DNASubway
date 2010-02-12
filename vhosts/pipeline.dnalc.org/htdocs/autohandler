@@ -114,7 +114,6 @@ re_("ktaz7-6gmi62748k");
 <%once>
 	use DNALC::Pipeline::Utils qw/random_string/;
 	use DNALC::Pipeline::User ();
-	use Time::Duration qw/duration/;
 </%once>
 %#-------------------------------------------------------------------
 <%init>
@@ -127,7 +126,7 @@ my @err = ();
 
 my $now = time();
 if ($s->{logged_in} && ($now - $s->{last} > 3600)) {
-	$m->comp("/_message_add", "It's been a while since your last visit: " . duration ($now - $s->{last}));
+	$m->comp("/_message_add", "Your session has expired. Please login!");
 	$s->{logged_in} = 0;
 }
 $s->{last} = $now;
