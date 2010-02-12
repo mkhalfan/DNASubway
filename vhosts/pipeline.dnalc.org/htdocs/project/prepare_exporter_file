@@ -104,7 +104,9 @@ bgcolor = #589c7f
 
 [gene:user]
 glyph = gene
-bgcolor = rgb(51,102,255)
+fgcolor = cyan
+bgcolor = #3366ff
+#bgcolor = rgb(51,102,255)
 
 [repeat_region:RepeatMasker]
 glyph = generic
@@ -113,8 +115,9 @@ fgcolor = #663187
 
 [match:BLASTN]
 glyph = segments
-fgcolor = rgb(196,143,14)
-bgcolor = rgb(196,143,14)
+fgcolor = #c48f0e
+bgcolor = #c48f0e
+#bgcolor = rgb(196,143,14)
 
 [match:BLASTX]
 glyph = segments
