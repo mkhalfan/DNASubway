@@ -43,5 +43,6 @@ my @aa = map {$ah->{$_}} sort { $ah->{$a}->{q_order_num} <=> $ah->{$b}->{q_order
 my (@x) = grep {
 			$_->{q_triggers} && !defined $ah->{ $_->{q_triggers} }
 		} @aa;
-print STDERR "anwer thet triggers question = ", Dumper( @x ), $/;
+#print STDERR "anwer thet triggers question = ", Dumper( @x ), $/;
+print join ',', map { $_->{q_triggers} . ':' . $_->{q_id} } @x;
 

@@ -12,17 +12,27 @@ function show_other(parent, triggered, triggerer) {
 	}
 }
 
-function load_profile_questions (parent, triggered, triggerer) {
+function load_profile_questions (parent, atqs) {
 	var p = $(parent);
-	if (p.value == triggerer) {
-		alert("we should load " + triggered);
-	}
-	else {
-		//alert("we should remove them..");
-		$$('tr').each(function(s) {
-			// table.remove...
-			console.info(s.getAttribute('parent'));
-		});
+	var triggered, triggerer;
+	Object.keys( atqs ).each( function(k, i) {
+		//alert('::' + i + ':' + k + '<' + atqs[k]);
+		if (p.value == atqs[k]) {
+			triggerer = atqs[k];
+			triggered = k;
+			return;
+		}
+	});
 
+	$$('tr').each(function(tr) {
+		if ( tr.hasAttribute('parent') && tr.getAttribute('parent') == parent ) {
+			//alert('to remove ' + tr.cells[0].innerHTML + "//" + parent);
+			tr.parentNode.removeChild(tr);
+		}
+	});
+
+	if (triggered && triggerer) {
+		alert("Wwe should load " + triggered);
 	}
+
 }

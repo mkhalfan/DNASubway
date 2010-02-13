@@ -88,7 +88,7 @@ sub validate_user_profile_data {
 	my $questions = DNALC::Pipeline::UserProfile->get_question_tree($root);
 	my %questions = %$questions;
 
-	#check for any answers that trigger other questions
+	#check if the selected answer triggers other question
 	for my $qid ( keys %questions)
 	{
 		my $q = $questions{$qid}->{q};
