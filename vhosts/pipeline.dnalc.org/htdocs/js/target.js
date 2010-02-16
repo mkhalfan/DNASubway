@@ -43,6 +43,13 @@ function launch_target () {
 				$('alignment_span').update('<a href="#">Multiple<br/>Alignment</a>');
 				$('tree_btn').onclick = null;
 				$('tree_btn').stopObserving ('click');
+				
+				var alignment_ind = $('alignment_ind');
+				alignment_ind.removeClassName('conIndicator_Rb');
+				alignment_ind.addClassName('conIndicator_Rb_disabled');
+				var tree_ind = $('tree_ind');
+				tree_ind.removeClassName('conIndicator_Rb');
+				tree_ind.addClassName('conIndicator_Rb_disabled');
 			}
 			else  if (r.status == 'error') {
 				alert(r.message);
@@ -91,6 +98,9 @@ function check_status (tid, h) {
 							+ '<param name="defaultColour" value="Clustal">'
 							+ '</applet>'
 						);
+						var abtn_ind = $('alignment_ind');
+						abtn_ind.removeClassName('conIndicator_Rb_disabled');
+						abtn_ind.addClassName('conIndicator_Rb');
 					}
 					if (r.files && r.files['nw']) {
 						var start = top.document.location.href.indexOf('.org')
@@ -99,6 +109,9 @@ function check_status (tid, h) {
 							
 							window.open('/files/phylowidget/bare.html?tree=' + server + r.files['nw'], 'target_tree', 'status=0,height=500,width=600');
 						});
+						var tree_ind = $('tree_ind');
+						tree_ind.removeClassName('conIndicator_Rb_disabled');
+						tree_ind.addClassName('conIndicator_Rb');
 					}
 				}
 				else if (r.status == "done-empty") {
