@@ -1,3 +1,4 @@
+var dbg;
 function show_other(parent, triggered, triggerer) {
 	//alert(parent + ' ' + id);
 	var p = $(parent);
@@ -32,7 +33,30 @@ function load_profile_questions (parent, atqs) {
 	});
 
 	if (triggered && triggerer) {
-		alert("Wwe should load " + triggered);
+		var form = document.forms['form_reg'];//$('form_reg');
+		$('faction').value = 'reload';
+		form.submit();
+		/*
+		alert("We should load " + triggered);
+		new Ajax.Request('/get_profile_node',{
+			method:'get',
+			parameters: {node: triggered}, 
+			onSuccess: function(transport){
+				var response = transport.responseText || '';
+				//alert(response);
+				//console.info('r = ' + response);
+				//var r = response.evalJSON();
+				//dbg = r;
+				alert(response);
+				var tr = p.parentNode.parentNode;
+				tr.insert({after:response});
+			},
+			onFailure: function(){
+				alert("Something went wrong.");
+				clearInterval(intervalID[op]);
+			}
+		});
+		*/
 	}
 
 }

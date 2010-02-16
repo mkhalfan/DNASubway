@@ -479,7 +479,7 @@
 }
 
 .bt_projectInfo_done a:hover {
-	background: url("/images/v2//bt_projectinfo_done2.png") top no-repeat;
+	background: url("/images/v2/bt_projectinfo_done2.png") top no-repeat;
 
 }
 
@@ -1142,11 +1142,11 @@
 
 #conYellowlineLeft2 {
 	width: 519px;
-	height: 250px;
+	height: 260px;
 	background: url("/images/v2/map-yellowline_L2.jpg") top left no-repeat;
 	float: left;
 	position: relative;
-	padding-top: 114px;
+	padding-top: 104px;
 	padding-left: 38px;
 	
 	}
@@ -1159,7 +1159,7 @@
   }	
 .conYellowline_ConCell1{
   width: 163px;
-  height: 27px;
+  height: 22px;
   position: relative;
   float: left;
   color: #000;
@@ -1181,40 +1181,41 @@
   margin-left:26px;
 }
 
-
 #conRun_yellowline{
-	width: 154px;
-	/*height: 32px;
-	
+	width: 120px;
+	height: 48px;
+	background: url("/images/v2/map-yellowline_L2_line.jpg") top left no-repeat;
 	position: relative;
-	float: left;*/
-	padding: 0px 30px 0px 300px;
+	float: left;
+	padding: 0px 10px 0px 430px;
+	margin-bottom: 10px;
 }
 
 .bt_Runyellowline {
-	width:152px;
-	height:32px;
+	width:120px;
+	height:28px;
+	padding-top: 8px;
 	position: relative;	
-	float: right;
+	float: left;
 }
 
 
 .bt_Runyellowline a {
-	width:152px;
-	height:32px;
-	background: url("/images/v2/bt_runAll1.png") top no-repeat;
+	width:120px;
+	height:20px;
+	padding-top: 8px;
+	background: url("/images/v2/bt_runAll_sm1.png") top no-repeat;
 	display: block;
 	position: relative;
-	float: right;
-	padding-top: 10px;
+	float: left;
 	color: #555;
-	font-size: 1em;
+	font-size: .9em;
 	text-align: center; text-decoration: none;
 	line-height: 0.8em;
 }
 
 .bt_Runyellowline a:hover {
-	background: url("/images/v2/bt_runAll2.png") top no-repeat;
+	background: url("/images/v2/bt_runAll_sm2.png") top no-repeat;
 
 }
 	
@@ -1867,4 +1868,13 @@ float: left;
 .pager {
 	text-align: right;
 	padding-right: 16px;
+}
+
+/* - registration */
+table.register-table {
+	border-spacing: 0px;
+}
+
+table.register-table td.label{
+	font-size: small;
 }

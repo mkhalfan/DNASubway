@@ -109,10 +109,10 @@ sub run_target {
 						my $fh = IO::File->new;
 						if ($fh->open( $file , 'w')) {
 							if ($ext eq 'nw') {
-								$content =~ s/([a-z0-9]+)_AS_/$genomes{$1} . '_AS_'/gei;
+								$content =~ s/([a-z0-9_]+)_AS_/$genomes{$1} . '_AS_'/gei;
 							}
 							elsif ($ext eq 'fasta') {
-								$content =~ s/^>([a-z0-9]+)_AS_/'>' . $genomes{$1} . '_AS_'/mgei;
+								$content =~ s/^>([a-z0-9_]+)_AS_/'>' . $genomes{$1} . '_AS_'/mgei;
 								#print STDERR $content, $/;
 							}
 							else {

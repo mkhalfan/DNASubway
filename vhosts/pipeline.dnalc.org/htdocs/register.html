@@ -1,6 +1,6 @@
 <div style="width: 80%;">
 
-% if (@err) {
+% if ($faction ne 'reload' && @err) {
 <div class="error" style="color: red; ">
 %	for (@err) {
 		<div><% $_ %></div>
@@ -8,11 +8,12 @@
 </div>
 %}
 
-<form method="post">
-	<table>
-	<tr>
-		<td>Title:</td>
-		<td><select name="title" value="title" />
+<form id="form_reg" method="post">
+<input type="hidden" name="faction" id="faction" value="" />
+	<table class="register-table">
+		<tr>
+			<td class="label">Title:</td>
+			<td><select name="title" id="title" class="conStylized_box4"/>
 		<option value="">Title</option>
 %	for ( @titles ) {
 %		my $sel = lc $_ eq $s->{title} ? " selected=\"selected\"" : "";
@@ -23,7 +24,7 @@
 %	for (@$fields) {
 %		my $type = defined $_->{type} ? $_->{type}  : 'text';
 		<tr>
-			<td><% $_->{label} %>:</td>
+			<td class="label"><% $_->{label} %>:</td>
 			<td><input class="conStylized_box4" type="<% $type %>" name="<% $_->{id} %>" value="<% $s->{$_->{id}} |html%>" maxlength="<% $_->{maxlength} %>"/></td>
 		</tr>
 %	}
@@ -31,87 +32,16 @@
 			<td colspan="2">&nbsp;</td>
 		</tr>
 		<tr>
-			<td>Country:</td>
-			<td><& project/.comp/countries, country => $s->{country} &></td>
+			<td class="label">Country:</td>
+			<td><& project/.comp/countries, country => $s->{country}, class => "conStylized_box4" &></td>
 		</tr>
 		<tr>
-			<td>Zip code:</td>
+			<td class="label">Zip code:</td>
 			<td><input class="conStylized_box4" type="text" name="zip" value="<% $s->{zip} |html%>" maxlength="10"/></td>
 		</tr>
-% if (0) {
-		<tr>
-			<td>Highest degree:</td>
-			<td><select name="degree" id="degree" onchange="show_degree_details()">
-			<option value="">Select your highest degree</option>
-%	my $js = "";
-%	my $sel_degree = undef;
-%	for (@degrees) {
-%		$js .= '"' . lc ($_->{name}) . '":"' . $_->{details} . '",' if defined $_->{details};
-%		my $sel = "";
-%#		print STDERR "$s->{degree} eq lc $_->{name} = ", $s->{degree} eq lc $_->{name}, $/;
-%		if ($s->{degree} eq lc $_->{name}) { 
-%			$sel = " selected=\"selected\"";
-%			$sel_degree = $_;
-%		}
-		<option value="<% lc $_->{name} %>"<% $sel %>><% $_->{name} %></option>
-%	}
-%	$js =~ s/,$//;
-			</select></td>
-		</tr>
-		<tr id="degree_details_tr" style="display:<% $sel_degree && defined $sel_degree->{details} ? "block" : "block" %>;">
-			<td style="text-align: right;"><% $sel_degree->{details}%> » </td>
-			<td><input class="conStylized_box4" type="text" name="degree_details" id="degree_details" value="<% $s->{degree_details} |html%>" maxlength="128"/></td>
-		</tr>
-<script type="text/javascript">
-<!--
-function show_degree_details() {
-	var degrees = {<% $js %>};
-	var details = degrees[$('degree').value];
-	if (details != null || details != undefined) {
-		$('degree_details_tr').cells[0].innerHTML = (details || "Specify") + " » ";
-		$('degree_details_tr').show();
-	}
-	else {
-		$('degree_details').value = '';
-		$('degree_details_tr').hide();
-	}
-}
-function show_occupation_details () {
-	//alert("show_occupation_details");
-}
-//-->
-</script>
-		<tr>
-			<td>Occupation/Interest:</td>
-			<td><select name="occupation" id="occupation" onchange="show_occupation_details()">
-			<option value="">Select your occupation/interest</option>
-%	for (@occupations) {
-%		my $sel = $s->{occupation} eq lc $_ ? " selected=\"selected\"" : "";
-		<option value="<% lc $_ %>"<% $sel %>><% $_ %></option>
-%	}
-			</select></td>
-		</tr>
-		<tr>
-			<td>Gender:</td>
-			<td>
-				<div><input class="conRadiobox_align" type="radio" name="gender" id="gender" value="f" <% $s->{gender} eq "f" ? "checked=\"checked\"" : ""%>/>&nbsp; Female</div>
-				<div><input class="conRadiobox_align" type="radio" name="gender" id="gender" value="m" <% $s->{gender} eq "m" ? "checked=\"checked\"" : ""%>/>&nbsp; Male</div>
-			</td>
-		</tr>
-		<tr>
-			<td>Ethnicity:</td>
-			<td><select name="ethnicity" id="ethnicity" onchange="">
-			<option value="">Select your ethnicity</option>
-%	for (@races) {
-%		my $sel = $s->{ethnicity} eq lc $_ ? " selected=\"selected\"" : "";
-		<option value="<% lc $_ %>"<% $sel %>><% $_ %></option>
-%	}
-			</select></td>
-		</tr>
-% } # enf if (0)
 <& "./_user_profile", parent => $tree_root, questions => $questions, answers => $s &>
 	</table>
-	<div style="text-align: center"><input type="submit" name="submit" value="Register" /></div
+	<div style="text-align: center"><input type="submit" name="fsubmit" value="Register" /></div
 </form>
 </div>
 
@@ -125,6 +55,7 @@ function show_occupation_details () {
 	$degree_details => ''
 	$occupation => ''
 	$ethnicity => ''
+	$faction => ''
 </%args>
 %#-------------------------------------------------------------------
 <%once>
@@ -136,6 +67,8 @@ function show_occupation_details () {
 	use DNALC::Pipeline::UserProfile ();
 	use Email::Valid ();
 	use MIME::Lite ();
+	
+	use Data::Dumper;
 
 	my $fields = [
 			{ id => "name_first", label => "First name", re => qr/.+/, maxlength => 64},

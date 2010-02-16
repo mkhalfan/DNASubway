@@ -557,11 +557,9 @@ h5{
 	margin: 0px 0px 25px 0px;
 }
 
-/*
 .bt_yellowStart_home a:hover {
 	background: url("/images/v2/bt_yellowStart1.jpg") left no-repeat;
 }
-*/
 
 .bt_blueStart_home {
 	width:150px;
@@ -632,7 +630,6 @@ h5{
 }
 
 /*- inactive -*/
-/*
 .bt_yellowStart a:hover {
 	background: url("/images/v2/bt_yellowStart2.jpg") left no-repeat;
 }
@@ -640,7 +637,6 @@ h5{
 .bt_yellowStart a.current{
 	background: url("/images/v2/bt_yellowStart3.jpg") left no-repeat;
 }
-*/
 
 .bt_blueStart {
 	width:150px;

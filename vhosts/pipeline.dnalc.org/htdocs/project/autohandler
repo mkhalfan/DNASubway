@@ -42,8 +42,7 @@
 	<span class="bt_MyProjects"><a href="/project/browsemy" title="Browse my projects"></a></span>
 	<span class="bt_PublicProjects"><a href="/project/browse" title="Browse public projects"></a></span>
 	<span class="bt_redStart"><a href="/project/create_project.html" class="<% $class_r %>"></a></span>
-%#	<span class="bt_yellowStart"><a href="/project/target/create" class="<% $class_y %>"></a></span>
-	<span class="bt_yellowStart"><a href="#" style="cursor: default;"></a></span>
+	<span class="bt_yellowStart"><a href="/project/target/create" class="<% $class_y %>"></a></span>
 	<span class="bt_blueStart"><a href="#" style="cursor: default;"></a></span>
     <span class="spacer_btGlossary"></span> 
     <span class="spacer_btGlossary"></span>
@@ -78,7 +77,7 @@
 <!-- start footer -->
     
   
- </div><!--END of ID containerBody-->   
+</div><!--END of ID containerBody-->
 
 <& "../_snippets/footer.html" &>
 

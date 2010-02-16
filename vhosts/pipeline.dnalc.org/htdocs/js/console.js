@@ -4,7 +4,7 @@ var dbg, sent;
 var intervalID = {};
 var routines = ['augustus', 'fgenesh', 'snap', 'trna_scan', 'blastn', 'blastx', 
 				'blastn_user', 'blastx_user', 
-				'gbrowse', 'apollo', 'exporter'//, 'target'
+				'gbrowse', 'apollo', 'exporter', 'target'
 				];
 var rnames = {
 			'repeat_masker' : 'Repeat Masker',
@@ -120,10 +120,10 @@ function check_status (pid, op, h) {
 							$('exporter_ind').removeClassName("conIndicator_Rb_disabled");
 							$('exporter_ind').addClassName("conIndicator_Rb");
 						}
-						/*$('target_btn').onclick = function () { launch('target', null, rnames['target']); };
+						$('target_btn').onclick = function () { launch('target', null, rnames['target']); };
 						$('target_btn').removeClassName('disabled');
 						$('target_ind').removeClassName("conIndicator_Rb_disabled");
-						$('target_ind').addClassName("conIndicator_Rb");*/
+						$('target_ind').addClassName("conIndicator_Rb");
 					}
 				} else {}
 			}
@@ -330,8 +330,8 @@ function launch(what, where, title) {
 	var urls = {
 			gbrowse: ['/project/prepare_chadogbrowse?pid=', 'GBrowse'],
 			apollo: ['/project/prepare_editor.html?pid=', 'Apollo'],
-			exporter: ['/project/prepare_exporter.html?pid=', 'Phytozome Browser']
-			//target: ['/project/prepare_chadogbrowse?warn=1;pid=', 'Phylogenetic Tree']
+			exporter: ['/project/prepare_exporter.html?pid=', 'Phytozome Browser'],
+			target: ['/project/prepare_chadogbrowse?warn=1;pid=', 'Phylogenetic Tree']
 		};
 
 	try {
@@ -359,7 +359,6 @@ function launch(what, where, title) {
 }
 
 function createTargetPoject(sel) {
-	return;
 
 	//close_windows();
 	var m = sel.match(/(\w+_\d+):(\d+)\.\.(\d+)/);
