@@ -43,7 +43,7 @@
 	<span class="bt_PublicProjects"><a href="/project/browse" title="Browse public projects"></a></span>
 	<span class="bt_redStart"><a href="/project/create_project.html" class="<% $class_r %>"></a></span>
 	<span class="bt_yellowStart"><a href="/project/target/create" class="<% $class_y %>"></a></span>
-	<span class="bt_blueStart"><a href="#" style="cursor: default;"></a></span>
+	<span class="bt_blueStart">&nbsp;<!--<a href="#" style="cursor: default;"></a>--></span>
     <span class="spacer_btGlossary"></span> 
     <span class="spacer_btGlossary"></span>
                          
@@ -56,7 +56,7 @@
     <div id="panel_glossaryTopmenu">               
 		<span class="bt_glossaryR"><a href="#" class="<% $class_r %>">RED</a></span>
 		<span class="bt_glossaryY"><a href="#" class="<% $class_y %>">YELLOW</a></span>
-		<span class="bt_glossaryB"><a href="#" class="<% $class_b %>">BLUE</a></span>
+		<!--<span class="bt_glossaryB"><a href="#" class="<% $class_b %>">BLUE</a></span>-->
     </div><!--END of ID panel_glossaryTopmenu-->
                
     <div class="panel_glossaryText">

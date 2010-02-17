@@ -40,7 +40,7 @@ function launch_target () {
 			if (r.status == 'success') {
 				var h = r.h || '';
 				intervalID = setInterval(function (){ check_status(tid, h)}, 10000);
-				$('alignment_span').update('<a href="#">Multiple<br/>Alignment</a>');
+				$('alignment_span').update('<a href="#">Alignment<br/>View</a>');
 				$('tree_btn').onclick = null;
 				$('tree_btn').stopObserving ('click');
 				
@@ -306,7 +306,7 @@ function set_public(np) {
 	var params = { 'pid' : $('tid').value, 'public' : np, 'type' : 'target' };
 	sent = params;
 	new Ajax.Request('/project/update',{
-		method:'get',
+		method:'post',
 		parameters: params, 
 		onSuccess: function(transport){
 			var response = transport.responseText || "{'status':'error', 'message':'No response'}";

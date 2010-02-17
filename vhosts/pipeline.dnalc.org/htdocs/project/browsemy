@@ -12,9 +12,9 @@
   <table class="conProject_table" summary="My projects">
   <tr>
     <th width="32" scope="col">#</th>
-    <th width="76" scope="col">Date</th>
+    <th width="60" scope="col">Date</th>
     <th width="200" scope="col">Project Title</th>
-	<th width="240" scope="col">Description</th>
+	<th width="250" scope="col">Description</th>
     <th width="200" scope="col">Organism</th>
     <th scope="col">Status</th>
 	<th scope="col">&nbsp;</th>

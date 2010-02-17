@@ -16,14 +16,14 @@ new Tip('tt_red1', "Input a DNA sequence of up to 100,000 nucleotides to identif
 	});
 </script>
 
-		<span class="bt_yellowStart_home" id="tt_yellow1"><a href="<% $s->{logged_in} && 0 ? "/project/target/create" : "#" %>" style="cursor: default;"></a></span>
+		<span class="bt_yellowStart_home" id="tt_yellow1"><a href="<% $s->{logged_in} ? "/project/target/create" : "#" %>" style="cursor: default;"></a></span>
 <script type="text/javascript" language="javascript">
 new Tip('tt_yellow1', "Input a gene or protein of up to 10,000 nucleotides/amino acids to identify related sequences within entire genomes.", {
 		title: "Prospect Genomes",
 		style: 'yellow'
 	});
 </script>
-
+<!--
 		<span class="bt_blueStart_home" id="tt_blue1"><a href="#" style="cursor: default;"></a></span>
 <script type="text/javascript" language="javascript">
 new Tip('tt_blue1', "<span class='comingsoon'>Coming Soon...</span> Input a set of Expressed Sequence Tags (ESTs) of up to 100 megabytes of assembled data to determine the potential natures of the genes captured.", {
@@ -31,6 +31,7 @@ new Tip('tt_blue1', "<span class='comingsoon'>Coming Soon...</span> Input a set 
 		style: 'blue'
 	});
 </script>
+-->
 	</div><!--END of ID map_left-->
            
 	<div id="map_right">
@@ -73,7 +74,7 @@ new Tip('tt_red5', "Synthesize gene predictions and search results into gene mod
 	</div><!--END of CLASS containerHoz-->
 
 	<div class="containerHoz2">
-		<span class="spacer1"><div class="underconstruction"></div></span>
+		<!--<span class="spacer1"><div class="underconstruction"></div></span>-->
 		<span class="spacer2"></span>
 		<span class="conConsole_info" id="tt_yellow2"></span>
 <script type="text/javascript" language="javascript">
@@ -103,7 +104,7 @@ new Tip('tt_black1', "View analysis results and annotations in a genome browser.
 	});
 </script>
  	</div><!--END of CLASS containerHoz-->
-
+<!--
 	<div class="containerHoz3">
 		<span class="spacer1"><div class="underconstruction"></div></span>
 		<span class="spacer2"></span>
@@ -115,7 +116,9 @@ new Tip('tt_blue2', '<span class="comingsoon">Coming Soon...</span>&nbsp;Search 
 		style: 'blue'
 	});
 </script>
-	</div><!--END of CLASS containerHoz-->
+	</div>
+	-->
+	
 
 	</div><!--END of ID map_right-->
 	</div><!--END of ID home_map-->

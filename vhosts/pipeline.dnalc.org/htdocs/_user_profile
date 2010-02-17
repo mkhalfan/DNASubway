@@ -40,7 +40,7 @@
 %	if ($other) {
 %	my $show_other = defined $other_answered->{q_triggers} && $other_answered->{q_triggers} == $other->{q_id};
 <!-- OTHER answer for this question = <% $answers->{"q$q_id"} %>-->
-<tr id="cq<% $other->{q_id} %>" style="display: <% $show_other ? "table-row" : "none" %>;" parent="<% $parent %>">
+<tr id="cq<% $other->{q_id} %>" style="display: <% $show_other ? "table-row" : "none" %>; background-color: <% $depth ? $colors[$depth] : "inherit"%>;" parent="<% $parent %>">
 	<td style="text-align: right;"><small><% $other->{q_label} %> » </small></td>
 	<td>
 %#		<input type="text" name="q<% $q_id%>_other" id="q<% $q_id%>_other" value="<% $triggers %>" />

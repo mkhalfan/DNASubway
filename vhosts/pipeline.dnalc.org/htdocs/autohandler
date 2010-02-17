@@ -125,9 +125,12 @@ my $s = $m->session->{pipeline};
 my @err = ();
 
 my $now = time();
-if ($s->{logged_in} && ($now - $s->{last} > 3600)) {
-	$m->comp("/_message_add", "Your session has expired. Please login!");
+my $delta = $now - $s->{last};
+if ($s->{logged_in} && $delta > 3600) {
 	$s->{logged_in} = 0;
+	if ($delta < 5 * 3600) {
+		$m->comp("/_message_add", "Your session has expired. Please login!");
+	}
 }
 $s->{last} = $now;
 

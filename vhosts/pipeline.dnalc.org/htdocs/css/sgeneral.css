@@ -487,7 +487,7 @@ h5{
 #map_right {
 	width:850px;
 	height: 200px;
-	background: url("/images/v2/subway-map-right.jpg") top left no-repeat;
+	background: url("/images/v2/subway-map-right-1.jpg") top left no-repeat;
 	float: right;
 	position: relative;
 
@@ -558,7 +558,7 @@ h5{
 }
 
 .bt_yellowStart_home a:hover {
-	background: url("/images/v2/bt_yellowStart1.jpg") left no-repeat;
+	background: url("/images/v2/bt_yellowStart2.jpg") left no-repeat;
 }
 
 .bt_blueStart_home {

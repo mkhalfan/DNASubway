@@ -2,6 +2,7 @@
 <div id="conYellowlineLeft2">
 <input type="hidden" id="tid" value="<% $tid %>" />
 <input type="hidden" id="tstatus" value="<% $tp ? $tp->status : "" %>" />
+<input type="hidden" id="isowner" value="<% $is_owner %>"/>
  <span class="conYellowline_ConColumn1">
 	<span class="conYellowline_ConCellTitle">Mosses</span>
 %	for (sort {$a->{organism} cmp $b->{organism} } grep {$_->clade =~ /mosses/} @genomes) {
@@ -88,7 +89,12 @@
 <div id="conProjectInfo">
 	<div id="conProjectInfo_header">
 		<div id="conProjectInfo_title">Project Information</div>
-        <div class="bt_projectInfo"><a href="#"></a></div>
+%#        <div class="bt_projectInfo"><a href="#">xxxx</a></div>
+% if ($is_owner) {
+		<div id="conProjectInfo_edit">
+	        <div class="bt_projectInfo_edit"><a href="javascript:;" onclick="show_edit();"></a></div>
+		</div>
+% }
 		<div id="conProjectInfo_projecttitle"><% $tp ? $tp->name : "" |html%></div>
 		<div id="conProjectInfo_projectlog">Description</div>
 	</div>
@@ -140,10 +146,8 @@
 			<span class="conProjectInfo_Cell2">: <% $tp ? $tp->function_name : "-" %></span>
 		</div>
 	</span><!--END of span conProjectInfo_column2-->
-	<span class="conProjectInfo_column2">
-		<div class="conProjectInfo_Row">
-			<% $tp ? $tp->description : "" |html %>
-		</div>
+	<span class="conProjectInfo_column3">
+		<div id="description_container" origdesc="" class="conProjectInfo_description"><% $tp ? $tp->description : "" |html %></div>
 	</span> <!--END of span conProjectInfo_column2-->                   							
 
 </div><!--END of ID conProjectInfo-->  

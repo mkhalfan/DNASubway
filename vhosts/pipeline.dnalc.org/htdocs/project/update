@@ -48,22 +48,36 @@ unless ($s->{logged_in}) {
 			}
 		}
 
-		if ($type eq 'annotation' && (defined $title || defined $description)) {
+		my $proj;
+		if ($type eq 'annotation') {
+			$proj = DNALC::Pipeline::Project->retrieve($pid);
+		}
+		elsif ($type eq 'target') {
+			$proj = DNALC::Pipeline::TargetProject->retrieve($pid);
+		}
+
+		if ($proj && (defined $title || defined $description)) {
 			#my $proj = DNALC::Pipeline::Project->search(user_id => $s->{user_id}, name => $name);
-			my $proj = DNALC::Pipeline::Project->retrieve($pid);
+			#my $proj = DNALC::Pipeline::Project->retrieve($pid);
 			#print STDERR "\n----------------\n", $proj->name, " => ", $title, $/;
 			#print STDERR $proj->description, " => ", $description, $/;
 
-			if (defined $title && $proj->name ne $title) {
-				my $otherproj = DNALC::Pipeline::Project->search(user_id => $s->{user_id}, name => $title);
-				if ($otherproj) {
-					$message = 'You already have a project with this name!';
-					$error = 1;
+			if (defined $title && $title ne '' && $proj->name ne $title) {
+				if ($type eq 'annotation') {
+					my $otherproj = DNALC::Pipeline::Project->search(user_id => $s->{user_id}, name => $title);
+					if ($otherproj) {
+						$message = 'You already have a project with this title!';
+						$error = 1;
+					}
+					else {
+						$proj->name($title);
+					}
 				}
 				else {
 					$proj->name($title);
 				}
 			}
+
 			unless ($error) {
 				if (defined $description && $proj->description ne $description) {
 					$proj->description($description);
