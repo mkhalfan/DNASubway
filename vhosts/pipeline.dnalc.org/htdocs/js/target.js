@@ -347,5 +347,15 @@ Event.observe(window, 'load', function() {
 		if (btn && btn.style.display == 'none') {
 				intervalID = setInterval(check_status, 10000, tid, -1);
 		}
+		
+		// load tooltips
+		$$('span.conYellowline_ConCell1').each(function(el) {
+			if (el.hasAttribute('id') && el.id.indexOf('sg_') == 0) {
+				if (el.hasAttribute('cn')) {
+					//console.info(el.getAttribute('cn'));
+					new Tip(el, el.getAttribute('cn'), {width: 'auto'});
+				}
+			}
+		});
 	}
 });

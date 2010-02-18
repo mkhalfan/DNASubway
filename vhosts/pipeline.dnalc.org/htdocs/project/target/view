@@ -7,27 +7,39 @@
 	<span class="conYellowline_ConCellTitle">Mosses</span>
 %	for (sort {$a->{organism} cmp $b->{organism} } grep {$_->clade =~ /mosses/} @genomes) {
 %		my $gid = $_->id;
-	<span class="conYellowline_ConCell1"><input class="conRadiobox_align" type="checkbox" name="g" id="g_<% $_->id %>" value="<% $_->id %>" <% (grep {$_ eq $gid } @tp_genomes)  ? "checked=\"checked\"" : "" %> />&nbsp; <% $_->organism %></span>
+	<span id="sg_<% $gid %>" class="conYellowline_ConCell1" cnx="<% $_->common_name |html %>"><input class="conRadiobox_align" type="checkbox" name="g" id="g_<% $_->id %>" value="<% $_->id %>" <% (grep {$_ eq $gid } @tp_genomes)  ? "checked=\"checked\"" : "" %> />&nbsp; <% $_->organism %></span>
+<script type="text/javascript" language="javascript">
+new Tip('sg_<% $gid %>', "<% $_->common_name |html%>", {style: 'creamy', width: 'auto', border: 1, radius: 1 });
+</script>
 %	}
 	<span class="conYellowline_ConCell1"> &nbsp; </span>
 	<span class="conYellowline_ConCellTitle">Algae</span>
 %	for (sort {$a->{organism} cmp $b->{organism} } grep {$_->clade =~ /algi/} @genomes) {
 %		my $gid = $_->id;
-	<span class="conYellowline_ConCell1"><input class="conRadiobox_align" type="checkbox" name="g" id="g_<% $_->id %>" value="<% $_->id %>" <% (grep {$_ eq $gid } @tp_genomes)  ? "checked=\"checked\"" : "" %> />&nbsp; <% $_->organism %></span>
+	<span id="sg_<% $gid %>" class="conYellowline_ConCell1" cnx="<% $_->common_name |html %>"><input class="conRadiobox_align" type="checkbox" name="g" id="g_<% $_->id %>" value="<% $_->id %>" <% (grep {$_ eq $gid } @tp_genomes)  ? "checked=\"checked\"" : "" %> />&nbsp; <% $_->organism %></span>
+<script type="text/javascript" language="javascript">
+new Tip('sg_<% $gid %>', "<% $_->common_name |html%>", {style: 'creamy', width: 'auto', border: 1, radius: 1 });
+</script>
 %	}
  </span><!--END of CLASS conYellowline_ConColumn1-->
  <span class="conYellowline_ConColumn1">
 	<span class="conYellowline_ConCellTitle">Dicotyledons</span>
 %	for (sort {$a->{organism} cmp $b->{organism} } grep {$_->clade =~ /dicotyledones/} @genomes) {
 %		my $gid = $_->id;
-	<span class="conYellowline_ConCell1"><input class="conRadiobox_align" type="checkbox" name="g" id="g_<% $_->id %>" value="<% $_->id %>" <% (grep {$_ eq $gid } @tp_genomes)  ? "checked=\"checked\"" : "" %>/>&nbsp; <% $_->organism %></span>
+	<span id="sg_<% $gid %>" class="conYellowline_ConCell1" cn="<% $_->common_name |html %>"><input class="conRadiobox_align" type="checkbox" name="g" id="g_<% $_->id %>" value="<% $_->id %>" <% (grep {$_ eq $gid } @tp_genomes)  ? "checked=\"checked\"" : "" %>/>&nbsp; <% $_->organism %></span>
+%#<script type="text/javascript" language="javascript">
+%#new Tip('sg_<% $gid %>', "<% $_->common_name |html%>", {style: 'creamy', width: 'auto', border: 1, radius: 1 });
+%#</script>
 %	}
 </span><!--END of CLASS conYellowline_ConColumn1-->
 <span class="conYellowline_ConColumn1">
 	<span class="conYellowline_ConCellTitle">Monocotyledons</span>
 %	for (sort {$a->{organism} cmp $b->{organism} } grep {$_->clade =~ /monocotyledones/} @genomes) {
 %		my $gid = $_->id;
-	<span class="conYellowline_ConCell1"><input class="conRadiobox_align" type="checkbox" name="g" id="g_<% $_->id %>" value="<% $_->id %>" <% (grep {$_ eq $gid } @tp_genomes)  ? "checked=\"checked\"" : "" %> />&nbsp; <% $_->organism %></span>
+	<span id="sg_<% $gid %>" class="conYellowline_ConCell1" cn="<% $_->common_name |html %>" ><input class="conRadiobox_align" type="checkbox" name="g" id="g_<% $_->id %>" value="<% $_->id %>" <% (grep {$_ eq $gid } @tp_genomes)  ? "checked=\"checked\"" : "" %> />&nbsp; <% $_->organism %></span>
+%#<script type="text/javascript" language="javascript">
+%#new Tip('sg_<% $gid %>', "<% $_->common_name |html%>", {style: 'creamy', width: 'auto', border: 1, radius: 1 });
+%#</script>
 %	}
  </span><!--END of CLASS conYellowline_ConColumn2-->
 %#<div>Blast all: <input type="checkbox" name="g" id="g_unigene" value="unigene" /> Unigene</div>
@@ -183,7 +195,17 @@
 		$tid = $1;
 	}
 	my $user_fullname = '';
-	my @genomes = grep {$_->active} DNALC::Pipeline::TargetGenome->retrieve_all;
+	my @genomes = ();
+	#--------------------
+	{
+		my $genomes = $m->cache->get("target-genomes");
+		unless (defined $genomes) {
+				$genomes = [ grep {$_->active} DNALC::Pipeline::TargetGenome->retrieve_all ];
+				$m->cache->set("target-genomes", $genomes, "10m"); # set cache for 10 minutes
+		}
+		@genomes = @$genomes;
+	}
+	#--------------------
 	my $tp = DNALC::Pipeline::TargetProject->retrieve($tid);
 	unless ($tp) {
 		$message = "Project not found!";
@@ -232,6 +254,7 @@
 %#-----------------------------------------------------------------
 <%attr>
 	current_section => 'yellow'
-	js => ['target.js']
+	js => ['target.js', 'prototip/prototip.js']
+	css => ['prototip.css']
 	load_window_ui => 1
 </%attr>
