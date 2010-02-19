@@ -257,4 +257,5 @@ new Tip('sg_<% $gid %>', "<% $_->common_name |html%>", {style: 'creamy', width: 
 	js => ['target.js', 'prototip/prototip.js']
 	css => ['prototip.css']
 	load_window_ui => 1
+	show_glossary => 1
 </%attr>

@@ -10,7 +10,7 @@
 <div id="conProject_tableHolder">
   <table class="conProject_table" summary="">
   <tr>
-    <th width="32" scope="col">#</th>
+    <th width="32" scope="col">ID</th>
     <th width="60" scope="col">Date</th>
     <th width="200" scope="col">Project Title</th>
 	<th width="250" scope="col">Description</th>

@@ -11,7 +11,7 @@
 % if (@projects) {
   <table class="conProject_table" summary="My projects">
   <tr>
-    <th width="32" scope="col">#</th>
+    <th width="32" scope="col">ID</th>
     <th width="60" scope="col">Date</th>
     <th width="200" scope="col">Project Title</th>
 	<th width="250" scope="col">Description</th>
@@ -45,7 +45,7 @@
 	suffix => '', prefix => '/project/browsemy/' &>
 % } else {
 	<p>&nbsp;</p>
-	<p>You haven't created a project. Use the links from the left hand side of this page to create a project.</p>
+	<p>You have no projects, yet. To start a project, click one of the squares on the left.</p>
 % }
 <p>&nbsp;</p>
 	</div>

@@ -50,21 +50,22 @@
 	<span class="bt_redStart"><a href="/project/create_project.html" class="<% $class_r %>"></a></span>
 	<span class="bt_yellowStart"><a href="/project/target/create" class="<% $class_y %>"></a></span>
 	<span class="bt_blueStart">&nbsp;<!--<a href="#" style="cursor: default;"></a>--></span>
+     
+% if ($m->request_comp->attr('show_glossary')) {
     <span class="spacer_btGlossary"></span> 
     <span class="spacer_btGlossary"></span>
-                         
   <!-- Glossary Panel STart -->                       
   <span class="bt_Glossary">
     <a href="javascript:;" onclick="$('glossarypanel').style.display = 'block';"></a>
 
     <div id="glossarypanel">
     <div id="panel_glossaryClose"><div class="bt_panelClose"><a href="javascript:;" onclick="$('glossarypanel').style.display = 'none';"></a></div></div>
-    <div id="panel_glossaryTopmenu">               
-		<span class="bt_glossaryR"><a href="#" class="<% $class_r %>">RED</a></span>
-		<span class="bt_glossaryY"><a href="#" class="<% $class_y %>">YELLOW</a></span>
-		<!--<span class="bt_glossaryB"><a href="#" class="<% $class_b %>">BLUE</a></span>-->
+    <div id="panel_glossaryTopmenu">
+%#		<span class="bt_glossaryR"><a href="#" class="<% $class_r %>">RED</a></span>
+%#		<span class="bt_glossaryY"><a href="#" class="<% $class_y %>">YELLOW</a></span>
+%#		<!--<span class="bt_glossaryB"><a href="#" class="<% $class_b %>">BLUE</a></span>-->
     </div><!--END of ID panel_glossaryTopmenu-->
-               
+
     <div class="panel_glossaryText">
 		<& "./glossary", section => $section &>
     </div>
@@ -74,8 +75,9 @@
 	</div> <!--END of ID 'PopUp'-->
     
   </span> <!--END of ID bt_Glossary-->
-  
+% }  
 </div><!--END of ID container_leftMenu-->
+
 <!-- end header -->
 
 % $m->call_next;
@@ -141,6 +143,7 @@ re_("ktaz7-6gmi62748k");
 	js => []
 	css => []
 	load_window_ui => 0
+	show_glossary => 0
 	current_section => ''
 </%attr>
 %#---------------------------------
