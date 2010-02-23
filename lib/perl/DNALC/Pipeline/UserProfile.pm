@@ -6,10 +6,7 @@ use warnings;
 use base qw(DNALC::Pipeline::DBI);
 use Carp;
 
-#use POSIX ();
-#use Digest::MD5 ();
-#use DNALC::Pipeline::Utils qw(random_string);
-use Data::Dumper;
+#use Data::Dumper;
 
 #-----------------------------------------------------------------------------
 sub get_question_tree_flat {
@@ -28,6 +25,23 @@ sub get_question_tree_flat {
 	}
 	$sth->finish;
 	\@tree;
+}
+
+#-----------------------------------------------------------------------------
+sub get_question {
+	my ($class, $node_id) = @_;
+	return unless $node_id;
+
+	my $dbh = $class->getDBH;
+	my $sth = $dbh->prepare('SELECT * FROM user_profile_question WHERE q_id = ?') or do {
+					carp 'ERROR preparing query: ', $dbh->errstr;
+					return; };
+	$sth->execute($node_id) or do {
+					carp 'ERROR preparing query: ', $sth->errstr;
+					return; };
+	my $row = $sth->fetchrow_hashref;
+	$sth->finish;
+	$row;
 }
 
 #-----------------------------------------------------------------------------
@@ -111,7 +125,7 @@ sub validate_user_profile_data {
 		}
 	}
 
-	# questions aswers
+	# questions aswered
 	my %qa = map {$_ => $data->{"q$_"}} keys %questions;
 	#print STDERR Dumper( \%qa ), $/;
 	#return;
@@ -119,22 +133,81 @@ sub validate_user_profile_data {
 	for my $qid (keys %qa) {
 		next unless defined $qa{$qid};
 		my $answer_value = '';
+		my @possible_answers = ();
 		my $possible_answer = $qa{$qid} ? $questions{$qid}->{a}->{$qa{$qid}} : undef;
-		if ($possible_answer) {
-			$answer_value = $possible_answer->{q_label};
-			
-			# [$question_id, $answer_id, $value]
-			push @rows, [ $qid, $qa{$qid}, $possible_answer->{q_label}];
 
-			if ($possible_answer->{q_triggers} && defined $data->{ "q" . $possible_answer->{q_triggers}}) {
-				$answer_value = $data->{ "q" . $possible_answer->{q_triggers}};
+		#unless ($possible_answer) {
+			#print $qid, ' ', $qa{$qid}, $/;
+			#print STDERR Dumper( $questions->{$qid}), $/ if $qid == 37;
+		#}
+
+		if (!$possible_answer) {
+			if (ref $qa{$qid} eq 'ARRAY') {
+			
+				#print STDERR Dumper( $questions{$qid}->{a} ), $/;
+				#print STDERR  $qid, " => ", $qa{$qid}, $/;
+				for (@{$qa{$qid}}) {
+					next unless defined $questions{$qid}->{a}->{$_};
+					push @possible_answers, $questions{$qid}->{a}->{$_};
+				}
+			}
+			elsif ( ! keys %{$questions->{$qid}->{a}} ) { # no answers, it's just a plain question
 				
-				push @rows, [ $qid, $possible_answer->{q_triggers}, $answer_value || ''];
+				#print '##', $qid, ' ', $qa{$qid}, $/;
+				#print STDERR '##', Dumper( $questions->{$qid}), $/ if $qid == 37;
+				push @possible_answers, $questions->{$qid}->{q};
+			}
+		}
+		else {
+			push @possible_answers, $possible_answer;
+		}
+
+		for my $possible_answer (@possible_answers) {
+			if ($possible_answer) {
+				$answer_value = $possible_answer->{q_type} eq 'a' 
+								? $possible_answer->{q_label}
+								: $data->{"q" . $possible_answer->{q_id}};
+				
+				# [$question_id, $answer_id, $value]
+				push @rows, [ $qid, $possible_answer->{q_id}, $answer_value];
+
+				if ($possible_answer->{q_triggers} && defined $data->{ "q" . $possible_answer->{q_triggers}}) {
+					$answer_value = $data->{ "q" . $possible_answer->{q_triggers}};
+					
+					push @rows, [ $qid, $possible_answer->{q_triggers}, $answer_value || ''];
+				}
 			}
 		}
 	}
 
 	return @rows;
+}
+
+#-----------------------------------------------------------------------------
+# stors directly the answers into user's  profile
+# used for simle questions, not found within a tree structure
+sub store_user_profile_directly {
+	my ($class, $user_id, $data) = @_;
+
+	my $query = 'INSERT INTO user_profile_answer (a_user_id, a_question_id, a_answer_id, a_value)
+			VALUES (?, ?, ?, ?)';
+	my $dbh = $class->getDBH;
+	my $sth = $dbh->prepare($query) or do {
+				carp 'ERROR preparing query: ', $dbh->errstr;
+				return; };
+
+	for my $key (keys %$data) {
+		my $qid = $key;
+		if ($qid =~ /^q\d+$/) {
+			$qid =~ s/^q//;
+		}
+		my $q = $class->get_question($qid);
+		next unless $q;
+		#print STDERR  $qid, ' ', $q->{q_label}, ' = ', $data->{$key}, $/;
+		$sth->execute($user_id, $qid, undef, $data->{$key}) or do {
+					carp 'ERROR executing query: ', $sth->errstr;
+					return; };
+	}
 }
 
 1;

@@ -168,9 +168,11 @@ sub add_evidence {
 
 		my $ftype = $type eq 'evid_nt' ? 'F' : 'T';
 		my $cmd = "/usr/bin/formatdb -i $file -p $ftype -o T -l $file" . '_log.txt 2>/dev/null';
-		print STDERR  "CMD: ", $cmd, $/;
+		#print STDERR  "CMD: ", $cmd, $/;
 		if (system($cmd) == 0) {
-			print STDERR  "Format DB = success for ", $type, $/;
+			#print STDERR  "Format DB = success for ", $type, $/;
+			# remove the uploaded file (is this safe?!)
+			#unlink $file;
 			return {status => 'success'};
 		}
 		else {

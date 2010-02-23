@@ -69,6 +69,8 @@
 	use MIME::Lite ();
 	
 	use Data::Dumper;
+	
+	my $VALUE_MAX_LEN = 2000; # max 2000 chars (what about utf8 ?!)
 
 	my $fields = [
 			{ id => "name_first", label => "First name", re => qr/.+/, maxlength => 64},
@@ -77,21 +79,9 @@
 			{ id => "email", type => "email", label => "Email", re => qr/\@/, maxlength => 120},
 		];
 	my @titles = qw/Ms Mr Miss PhD MBA MD Prof/;
-	my @degrees = (
-			{ name => "HS Diploma"},
-			{ name => "Professional Training/Associate's Degree", details => "Area"},
-			{ name => "Bachelor's Degree", details => "Major(s)"},
-			{ name => "Master's Degree", details => "Subject area"},
-			{ name => "Ph. D.", details => "Subject area"},
-			{ name => "Other", details => ""},
-		);
-	my @occupations = ("Student", "Educator", "Scientist/Researcher", "Interested Public/Other");
-	my @races = ("African American or Black, not of Hispanic Origin",
-				"American Indian, Alaskan Native, Hawaiian Native",
-				"Asian or Pacific Islander",
-				"White, Hispanic or Latino",
-				"White, including Arabic. not of Hispanic Origin",
-				"Other",
+	my %question_map = (
+			country => 'q6',
+			zip	=> 'q8',
 		);
 </%once>
 %#-------------------------------------------------------------------
@@ -111,24 +101,16 @@ else {
 	#print STDERR "cache: ", "question-tree-$tree_root", $/;
 }
 
-if ($r->method eq "POST") {
+print STDERR "-" x 20, $/;
+print STDERR "Session:\t", Dumper($s), $/;
 
-	if (0) {
-	$s->{title} = $title;
-	$s->{zip} = $zip;
-	$s->{country} = $country;
-	$s->{gender} = $gender;
-	$s->{degree} = $degree;
-	$s->{degree_details} = $degree_details;
-	$s->{occupation} = $occupation;
-	$s->{ethnicity} = $ethnicity;
-	}
+if ($r->method eq "POST") {
 
 	my $user_profile_data = {};
 	#print STDERR "\t", Dumper(\%ARGS), $/;
 	for (keys %ARGS) {
-		$s->{$_} = $ARGS{$_};
-		$user_profile_data->{$_} = $ARGS{$_} if $_ =~ /^q\d+/;
+		$s->{$_} = substr $ARGS{$_}, 0, $VALUE_MAX_LEN;
+		$user_profile_data->{$_} = $s->{$_} if $_ =~ /^q\d+/;
 	}
 	print STDERR "User profile data:\t", Dumper($user_profile_data), $/;
 
@@ -146,6 +128,13 @@ if ($r->method eq "POST") {
 		push @err, "Username is too short. Use at least 6 chars.";
 	}
 	
+	if (! defined $s->{country}  || $s->{country} eq '') {
+		push @err, "Country is missing.";
+	}
+	if (!defined $s->{zip} || $s->{zip} eq '') {
+		push @err, "Zip/Postal code is missing.";
+	}
+
 	unless (@err) {
 		unless (Email::Valid->address($s->{email})) {
 			push @err, "Email address is invalid!";
@@ -189,6 +178,16 @@ if ($r->method eq "POST") {
 			push @err, "Error creating user!";
 		}
 		else {
+			# store country && zip code
+			for (keys %question_map ) {
+				print STDERR "DD: ", $_, " = ", $question_map{$_}, " = ", $s->{$_}, $/;
+			}
+			my %data_directly = map {$question_map{$_} => $s->{$_}} grep {$s->{$_} ne "" } keys %question_map;
+			eval {
+				DNALC::Pipeline::UserProfile->store_user_profile_directly($u->id, \%data_directly);
+			};
+			
+			# store the rest of the profile questions
 			eval {
 				DNALC::Pipeline::UserProfile->store_user_profile($tree_root, $u->id, $user_profile_data);
 			};

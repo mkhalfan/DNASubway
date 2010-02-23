@@ -10,6 +10,12 @@
 %	my ($triggerer, $triggered) = map {$_->{q_id}, $_->{q_triggers}} grep {defined $_->{q_triggers} && defined $ah->{$_->{q_triggers}}} @aa;
 %	my ($other) = grep {$_->{q_input_type} eq "other"} @aa;
 %	my $other_answered = $ah->{ $answers->{"q$q_id"} };
+%	if (! $other_answered && ref  $answers->{"q$q_id"} eq 'ARRAY') {
+%		($other_answered) = grep {defined $_->{q_triggers} && $other->{q_id} == $_->{q_triggers}} map {$ah->{$_}} @{$answers->{"q$q_id"}};
+%#<tr style="background: pink">
+%#	<td colspan="1">xxx<pre><% Dumper $other_answered %></pre></td>
+%#</tr>
+%	}
 %#	look for any answers that trigger a question (not an answer from the current question)
 %	my (@answers_triggering_question) = grep { defined $_->{q_triggers} && !defined $ah->{$_->{q_triggers}} } @aa;
 <tr style="background-color: <% $depth ? $colors[$depth] : "inherit"%>;" parent="<% $parent %>">
@@ -32,6 +38,12 @@
 		&>
 %	} elsif ($q->{q_input_type} eq 'radio') {
 		<& ".radio", name=> "q$q_id", checked => $answers->{"q$q_id"}, labels => \@labels, values => \@values &>
+%	} elsif ($q->{q_input_type} eq 'checkbox') {
+%		my $onchange = $triggered == $other->{q_id} ? "show_other('q$q_id', 'cq$triggered', '$triggerer');" : '';
+		<& ".checkbox", name=> "q$q_id", labels => \@labels, values => \@values, 
+			checked => $answers->{"q$q_id"}, 
+			triggerer => $triggerer, triggered => $triggered == $other->{q_id} ? $triggered : 0
+		&>
 %	} else {
 		<input type="text" class="conStylized_box4" name="q<% $q_id%>" id="q<% $q_id%>" value="<% $answers->{"q$q_id"} |html %>" />
 %	}
@@ -39,7 +51,7 @@
 </tr>
 %	if ($other) {
 %	my $show_other = defined $other_answered->{q_triggers} && $other_answered->{q_triggers} == $other->{q_id};
-<!-- OTHER answer for this question = <% $answers->{"q$q_id"} %>-->
+<!-- OTHER answer for this question = <% "q$q_id" %> / <% $answers->{"q$q_id"} %>-->
 <tr id="cq<% $other->{q_id} %>" style="display: <% $show_other ? "table-row" : "none" %>; background-color: <% $depth ? $colors[$depth] : "inherit"%>;" parent="<% $parent %>">
 	<td style="text-align: right;"><small><% $other->{q_label} %> » </small></td>
 	<td>
@@ -112,6 +124,32 @@
 		<div style="cursor:pointer;">
 			<input type="radio" name="<% $name %>" id="<% $name%>-<% $i %>" value="<% $values->[$i] %>" <% $chk %>/>&nbsp;
 			<span onclick="javascript:$('<% $name %>-<% $i %>').click();"><% $labels->[$i] |html%></span>
+		</div>
+%	}
+</%def>
+%#-----------------------------
+<%def .checkbox>
+<%args>
+	$name => 'checkbox'
+	$checked => [],
+	$labels => [],
+	$values => [],
+	$triggerer => 0
+	$triggered => 0
+</%args>
+<%init>
+	$checked = defined $checked && ref $checked eq "" ? [ $checked ] : $checked;
+	my %checked = map { $_ => 1} @$checked;
+</%init>
+%	for (my $i = 0; $i < scalar @$labels; $i++) {
+%		my $chk = defined $checked{$values->[$i]} ? "checked=\"checked\"" : "";
+%		my $onchange = $triggerer && $triggered && $values->[$i] == $triggerer 
+%			? " onchange=\"javascript:show_other('$name-$i','cq$triggered','$triggerer')\"" : "";
+		<div style="cursor:pointer;">
+			<input type="checkbox" name="<% $name %>" id="<% $name%>-<% $i %>" value="<% $values->[$i] %>" <% $chk %><% $onchange%>/>&nbsp;
+%#			<input type="checkbox" name="q<% $values->[$i] %>" id="<% $name%>-<% $i %>" value="<% $values->[$i] %>" <% $chk %>/>&nbsp;
+			<span onclick="javascript:$('<% $name %>-<% $i %>').click();"><% $labels->[$i] |html%></span>
+%#			<% $labels->[$i] |html%>
 		</div>
 %	}
 </%def>

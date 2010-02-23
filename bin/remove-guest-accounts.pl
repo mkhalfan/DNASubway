@@ -44,7 +44,7 @@ for my $u (@users) {
 	next unless $u->created;
 	my ($y2, $m2, $d2) = parse_datetime($u->created);
 	my $dd = Delta_Days(($y2, $m2, $d2), ($y1, $m1, $d1));
-	next if $dd < 2;
+	next if $dd < 1;
 	print STDERR  $u, ' ', $u->username, '; dd=', $dd, $/;
 
 

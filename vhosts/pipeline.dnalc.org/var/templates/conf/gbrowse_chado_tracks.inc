@@ -15,7 +15,7 @@ html  = <div style="width:100%">
            </li>
            <li onmouseup="SelectArea.prototype.cancelRubber()">
              <span style="color:blue;cursor:pointer" onclick="parent.createTargetPoject('SELECTION');//parent.close_windows()">
-				Submit to TARGeT
+				Send NAME to TARGeT
 			</span>
            </li>
        </ul>

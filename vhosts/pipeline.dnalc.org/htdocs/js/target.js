@@ -353,7 +353,7 @@ Event.observe(window, 'load', function() {
 			if (el.hasAttribute('id') && el.id.indexOf('sg_') == 0) {
 				if (el.hasAttribute('cn')) {
 					//console.info(el.getAttribute('cn'));
-					new Tip(el, el.getAttribute('cn'), {width: 'auto'});
+					new Tip(el, el.getAttribute('cn'), {style: 'creamy', width: 'auto', border: 1, radius: 1});
 				}
 			}
 		});

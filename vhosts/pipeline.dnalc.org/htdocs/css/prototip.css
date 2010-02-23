@@ -65,7 +65,9 @@
 /* creamy */
 .prototip .creamy {
 	width: 250px;
-	color: #bb9c61;
+	color: brown;
+	font-size: smaller;
+	/*color: #bb9c61;*/
 }
 .prototip .creamy .toolbar {
 	background: #f3edc2;
