@@ -22,7 +22,9 @@ use IO::File ();
 	# default configuration directory;
 	#my $_def_cf_dir = '/home/cornel/projects/pipeline/lib/perl/config';
 	#my $_def_cf_dir = '/home/luj/projects/pipeline/lib/perl/config';
-	my $_def_cf_dir = '/var/www/lib/perl/config';
+	my $_def_cf_dir = -d '/home/gearman/dnasubway/lib/perl/config'
+				? '/home/gearman/dnasubway/lib/perl/config'
+				: '/var/www/lib/perl/config';
 
 	sub new {
 		my ($class, $cfdir) = @_;

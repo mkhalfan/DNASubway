@@ -1,7 +1,7 @@
 #!/usr/bin/perl 
 
 use strict;
-use lib "/var/www/lib/perl";
+use lib ("/var/www/lib/perl", "/home/gearman/dnasubway/lib/perl");
 
 use Data::Dumper;
 use Gearman::Worker ();

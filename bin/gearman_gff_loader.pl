@@ -1,7 +1,7 @@
 #!/usr/bin/perl 
 
 use strict;
-use lib "/var/www/lib/perl";
+use lib ("/var/www/lib/perl", "/home/gearman/dnasubway/lib/perl");
 
 use Data::Dumper;
 use Gearman::Worker ();
@@ -18,7 +18,7 @@ sub run_load_analysis_results {
 
 	sleep(5);
 	
-	my $cmd = '/var/www/bin/load_analysis_results.pl';
+	my $cmd = $config->{EXE_PATH} . '/load_analysis_results.pl';
 	my @args = ('--username', $username,
 				'--profile', $profile,
 				'--algorithm', $alg,
