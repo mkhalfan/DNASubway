@@ -705,13 +705,17 @@ use Carp;
 			print STDERR  "SKIPPING FILE (too small): ", $gff_file, $/;
 			return;
 		}
-		my $profile = sprintf("%s_%d", $username, $self->project->id);
-		my $cmd = '/var/www/bin/load_analysis_results.pl';
+		#my $profile = sprintf("%s_%d", $username, $self->project->id);
+		my $profile = $self->pmanager->chado_user_profile;
+		my $config = $self->pmanager->config;
+
+		my $cmd = $config->{EXE_PATH} . '/load_analysis_results.pl';
 		my @args = ('--username', $username, 
 				'--profile', $profile,
 				'--algorithm', $routine,
 				'--gff', $gff_file);
 		print STDERR  "\n\nLOADING DATA:\n", $cmd, " ", "@args", $/;
+		print STDERR  '-' x 20, $/;
 		system($cmd, @args);
 		return 1;
 	}
