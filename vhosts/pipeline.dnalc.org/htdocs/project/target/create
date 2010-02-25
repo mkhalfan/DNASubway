@@ -105,8 +105,6 @@
 	use DNALC::Pipeline::TargetProject ();
 	use DNALC::Pipeline::TargetSample ();
 	use Bio::SeqIO ();
-	use Gearman::Client();
-	use DNALC::Pipeline::CacheMemcached ();
 	use Data::Dumper;
 </%once>
 <%init>

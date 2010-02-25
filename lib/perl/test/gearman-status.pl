@@ -21,12 +21,20 @@
 use strict;
 use warnings;
 
+use DNALC::Pipeline::Config();
 use Net::Telnet::Gearman;
 use Data::Dumper;
 
+my $pcf = DNALC::Pipeline::Config->new->cf('PIPELINE');
+
+my $host = $pcf->{GEARMAN_SERVERS} && 'ARRAY' eq ref $pcf->{GEARMAN_SERVERS}
+				? $pcf->{GEARMAN_SERVERS}->[0]
+				: '127.0.0.1:7003';
+my ($ip, $port) = split /:/, $host;
+
 my $session = Net::Telnet::Gearman->new(
-	Host => '127.0.0.1',
-	Port => 7003,
+	Host => $ip,
+	Port => $port || 7003,
 );
 
 my @workers   = $session->workers();

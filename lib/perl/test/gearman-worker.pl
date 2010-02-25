@@ -11,6 +11,8 @@ use DNALC::Pipeline::Process::FGenesH ();
 use DNALC::Pipeline::Project ();
 use DNALC::Pipeline::App::WorkflowManager ();
 
+use DNALC::Pipeline::Config();
+
 use Data::Dumper;
 use Gearman::Worker ();
 use Storable qw(freeze);
@@ -116,8 +118,10 @@ sub run_blastx_user {
 }
 #-------------------------------------------------
 
+my $pcf = DNALC::Pipeline::Config->new->cf('PIPELINE');
+
 my $worker = Gearman::Worker->new;
-$worker->job_servers('localhost');
+$worker->job_servers(@{$pcf->{GEARMAN_SERVERS}});
 
 $worker->register_function("augustus", \&run_augustus);
 $worker->register_function("repeat_masker", \&run_repeatmasker);

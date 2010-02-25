@@ -11,14 +11,18 @@ use DNALC::Pipeline::Config();
 
 use Gearman::Client ();
 
+# XXX - use the GEARMAN_SERVERS entry from config/PIPELINE for the IPs
+
 my $tpid = 54;
+my $pcf = DNALC::Pipeline::Config->new->cf('PIPELINE');
 my $client = Gearman::Client->new;
-my $sx = $client->job_servers('127.0.0.1');
+my $sx = $client->job_servers(@{$pcf->{GEARMAN_SERVERS}});
 
 #my $h = $client->dispatch_background( target => $tpid );
 #__END__;
 
 my $tp = DNALC::Pipeline::TargetProject->retrieve($tpid);
+die "Target project not found: ", $tpid, $/;
 
 my $cf = DNALC::Pipeline::Config->new->cf('TARGET');
 my $ua = LWP::UserAgent->new;

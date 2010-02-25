@@ -7,6 +7,9 @@ use Storable qw/thaw freeze/;
 use Net::Telnet::Gearman;
 
 
+
+# XXX - use the GEARMAN_SERVERS entry from config/PIPELINE for the IPs 
+
 my $session = Net::Telnet::Gearman->new(
 	Host => '127.0.0.1',
 	Port => 7003,

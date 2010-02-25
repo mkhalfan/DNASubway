@@ -140,8 +140,9 @@ sub run_target {
 }
 #-------------------------------------------------
 
+my $pcf = DNALC::Pipeline::Config->new->cf('PIPELINE');
 my $worker = Gearman::Worker->new;
-$worker->job_servers('localhost');
+$worker->job_servers(@{$pcf->{GEARMAN_SERVERS}});
 $worker->register_function("target", \&run_target);
 
 $worker->work while 1;

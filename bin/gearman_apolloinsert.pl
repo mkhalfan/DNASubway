@@ -9,10 +9,11 @@ use DNALC::Pipeline::Config ();
 
 use Storable qw/nfreeze/;
 
+my $config = DNALC::Pipeline::Config->new->cf('PIPELINE');
+
 sub run_apolloinsert {
 	my $gearman = shift;
 	my $args = $gearman->arg;
-    my $config = DNALC::Pipeline::Config->new->cf('PIPELINE');
 	my $apollo = $config->{APOLLO_HEADLESS};
 	if (defined $ENV{DISPLAY}) {
 		print STDERR  "DISPLAY = ", $ENV{DISPLAY}, $/;
@@ -40,7 +41,7 @@ my $stop_if = sub {
 }; 
 
 my $worker = Gearman::Worker->new;
-$worker->job_servers('localhost');
+$worker->job_servers(@{$config->{GEARMAN_SERVERS}});
 
 $worker->register_function("apollo_insert", \&run_apolloinsert);
 

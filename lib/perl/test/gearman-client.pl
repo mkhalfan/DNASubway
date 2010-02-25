@@ -1,12 +1,14 @@
 #!/usr/lib/perl -w
 
 use strict;
+use DNALC::Pipeline::Config();
 use Gearman::Client ();
 use Data::Dumper;
 use Storable qw/thaw freeze/;
 
+my $pcf = DNALC::Pipeline::Config->new->cf('PIPELINE');
 my $client = Gearman::Client->new;
-my $sx = $client->job_servers('127.0.0.1');
+my $sx = $client->job_servers(@{$pcf->{GEARMAN_SERVERS}});
 
 #my $h = $client->dispatch_background( augustus => 98 );
 #my $h = $client->dispatch_background( trna_scan => 98 );
