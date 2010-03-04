@@ -11,6 +11,7 @@
 <form id="form_reg" method="post">
 <input type="hidden" name="faction" id="faction" value="" />
 	<table class="register-table">
+%	if (0) {
 		<tr>
 			<td class="label">Title:</td>
 			<td><select name="title" id="title" class="conStylized_box4"/>
@@ -21,6 +22,7 @@
 %	}
 			</select></td>
 		</tr>
+%	}
 %	for (@$fields) {
 %		my $type = defined $_->{type} ? $_->{type}  : 'text';
 		<tr>
@@ -41,7 +43,7 @@
 		</tr>
 <& "./_user_profile", parent => $tree_root, questions => $questions, answers => $s &>
 	</table>
-	<div style="text-align: center"><input type="submit" name="fsubmit" value="Register" /></div
+	<div style="text-align: center"><input type="submit" name="fsubmit" value="Register" /></div>
 </form>
 </div>
 

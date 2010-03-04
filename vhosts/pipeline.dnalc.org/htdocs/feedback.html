@@ -1,1 +1,190 @@
-<div id="container" style="margin-left: 160px;">	<div id="container_pageTitle_text">Feedback</div>	<div class="clear"></div>	<div class="container_text">% if ( $fb ) {	<h3>Thank you for your feedback.</h3>% } else {<form method="post"><table border="0">    <tr>        <td class="fb-lbl">Name:</td>        <td><input class="fb" type="text" name="fb_name" value="<% $fb_name |html%>" maxlength="200" /></td>    </tr>    <tr>        <td class="fb-lbl">Email:</td>        <td><input class="fb" type="text" name="fb_email" value="<% $fb_email |html%>" maxlength="128" /></td>    </tr>    <tr>        <td class="fb-lbl">Refer to:</td>        <td>        <select class="fb" name="fb_category">        <option value="">Please choose one</option>%	for my $s (@categories) {%		my $sel = $s eq $fb_category ? "selected=\"selected\"" : '';            <option value="<% $s %>" <% $sel %>><% $s %></option>% }        </select>        </td>    </tr>    <tr>        <td class="fb-lbl">Your comments:</td>        <td><textarea class="fb" name="fb_comment" rows="5" cols="50"><% $fb_comment |html %></textarea></td>    </tr>	<tr>        <td class="fb-lbl" colspan="2">Please insert the two words you see below:</td>    </tr>    <tr>        <td>&nbsp;</td>        <td>		<!-- -->		<script type="text/javascript">			var RecaptchaOptions = { theme : 'clean' };		</script>		<script type="text/javascript" src="http://api.recaptcha.net/challenge?k=<% $recaptcha->{public} %>"></script>		<noscript>			<iframe src="http://api.recaptcha.net/noscript?k=<% $recaptcha->{public} %>"			   height="300" width="500" frameborder="0"></iframe><br/>		   <textarea name="recaptcha_challenge_field" rows="3" cols="40"></textarea>		   <input type="hidden" name="recaptcha_response_field" value="manual_challenge" />		</noscript>		<!-- -->        </td>    </tr>    <tr>        <td>&nbsp;</td>        <td><input type="submit" value="Send" /></td>    </tr></table></form>% }</div></div>%#-------------------------------------------------------------------<%args>	$fb_category => ''	$fb_email => ''	$fb_name => ''	$fb_comment => ''	$recaptcha_challenge_field => ''	$recaptcha_response_field => ''	$fb => 0</%args>%#-------------------------------------------------------------------<%once>	use DNALC::Pipeline::Utils qw/random_string/;	use DNALC::Pipeline::Config ();	use DNALC::Pipeline::Feedback ();	use Email::Valid ();	use MIME::Lite ();	use Captcha::reCAPTCHA ();		my @categories = qw/General Site Content Technical Help Other/;</%once>%#-------------------------------------------------------------------<%init>	my $s = $m->session->{pipeline};	my $cf = DNALC::Pipeline::Config->new->cf(q{PIPELINE});	my $recaptcha = $cf->{RECAPTCHA};	my $has_err = undef;	if ($r->method eq q{POST}) {		if ( $fb_email ne "" && !Email::Valid->address($fb_email) ) {			$has_err = 1;			$m->comp("/_message_add", "Email is invalid.");		}		unless ($fb_category) {			$has_err = 1;			$m->comp("/_message_add", "Please choose the section you are referring to.");		}		unless ($fb_comment) {			$has_err = 1;			$m->comp("/_message_add", "Your comments are missing.");		}		else {			$fb_comment = substr $fb_comment, 0, 5000;		}		my $c = Captcha::reCAPTCHA->new;		my $cresult = $c->check_answer(						$recaptcha->{private}, $ENV{REMOTE_ADDR} || $ENV{HTTP_X_FORWARDED_FOR},						$recaptcha_challenge_field, $recaptcha_response_field					);		unless ($cresult->{is_valid}) {			$has_err = 1;			$m->comp("/_message_add", "The reCaptcha words are invalid.");		}		if ($has_err) {			$s->{fb} = {					name => $fb_name,					email => $fb_email,					category => $fb_category,					comment => $fb_comment,				};			$m->redirect("./feedback.html");		}				my $feedback = eval {				DNALC::Pipeline::Feedback->create({					name => $fb_name || "Anonymous",					email => $fb_email,					category => $fb_category,					comment => $fb_comment,				});			};		if ($@) {			print STDERR "\nError storing feedback:\n", $@, $/;			#$m->comp("/_message_add", "The reCaptcha words are invalid.");		}				# forward the feedback		my $text = "name: " . ($fb_name ? $fb_name : 'Anonymous') . "\n";		$text .= "email: " . $fb_email . "\n" if $fb_email;		$text .= "message:\n" . $fb_comment;		my $msg = MIME::Lite->new (					From => '"Admin" <dnalcadmin@cshl.edu>',					To	 => 'ghiban@cshl.edu',					Subject => "[DNA Subway] Feedback",					Type	=> 'text/plain',					Data => $text				);		eval {			$msg->send("smtp", $cf->{SMTP_SERVER}, Timeout=>30);		};		if ($@) {			print STDERR "Error: " . $@ . "\n";			$msg->send();		}				delete $s->{fb} if defined $s->{fb};		$m->redirect("./feedback.html?fb=1");	}	else {		if (!$fb) {			if (defined $s->{fb}) {				$fb_name = $s->{fb}->{name};				$fb_email = $s->{fb}->{email};				$fb_category = $s->{fb}->{category};				$fb_comment = $s->{fb}->{comment};			}			elsif ($s->{logged_in}){				my $user = DNALC::Pipeline::User->retrieve($s->{user_id});				$fb_name = $user->full_name;				$fb_email = $user->email;			}		}	}</%init>%#-------------------------------------------------------------------
+<div id="container" style="margin-left: 160px;">
+	<div id="container_pageTitle_text">Feedback</div>
+	<div class="clear"></div>
+	<div class="container_text">
+% if ( $fb ) {
+	<h3>Thank you for your feedback.</h3>
+% } else {
+<form method="post">
+<table border="0">
+    <tr>
+        <td class="fb-lbl">Name:</td>
+        <td><input class="fb" type="text" name="fb_name" value="<% $fb_name |html%>" maxlength="200" /></td>
+    </tr>
+    <tr>
+        <td class="fb-lbl">Email:</td>
+        <td><input class="fb" type="text" name="fb_email" value="<% $fb_email |html%>" maxlength="128" /></td>
+    </tr>
+    <tr>
+        <td class="fb-lbl">Refer to:</td>
+        <td>
+        <select class="fb" name="fb_category">
+        <option value="">Please choose one</option>
+%	for my $s (@categories) {
+%		my $sel = $s eq $fb_category ? "selected=\"selected\"" : '';
+            <option value="<% $s %>" <% $sel %>><% $s %></option>
+% }
+        </select>
+        </td>
+    </tr>
+    <tr>
+        <td class="fb-lbl">Your comments:</td>
+        <td><textarea class="fb" name="fb_comment" rows="5" cols="50"><% $fb_comment |html %></textarea></td>
+    </tr>
+	<tr>
+        <td class="fb-lbl" colspan="2">Please insert the two words you see below:</td>
+    </tr>
+    <tr>
+        <td>&nbsp;</td>
+        <td>
+		<!-- -->
+		<script type="text/javascript">
+			var RecaptchaOptions = { theme : 'clean' };
+		</script>
+		<script type="text/javascript" src="http://api.recaptcha.net/challenge?k=<% $recaptcha->{public} %>"></script>
+		<noscript>
+			<iframe src="http://api.recaptcha.net/noscript?k=<% $recaptcha->{public} %>"
+			   height="300" width="500" frameborder="0"></iframe><br/>
+		   <textarea name="recaptcha_challenge_field" rows="3" cols="40"></textarea>
+		   <input type="hidden" name="recaptcha_response_field" value="manual_challenge" />
+		</noscript>
+		<!-- -->
+        </td>
+    </tr>
+    <tr>
+        <td>&nbsp;</td>
+        <td><input type="submit" value="Send" /></td>
+    </tr>
+</table>
+</form>
+% }
+</div>
+</div>
+
+%#-------------------------------------------------------------------
+<%args>
+	$fb_category => ''
+	$fb_email => ''
+	$fb_name => ''
+	$fb_comment => ''
+	$recaptcha_challenge_field => ''
+	$recaptcha_response_field => ''
+	$fb => 0
+</%args>
+%#-------------------------------------------------------------------
+<%once>
+	use DNALC::Pipeline::Utils qw/random_string/;
+	use DNALC::Pipeline::Config ();
+	use DNALC::Pipeline::Feedback ();
+	use Email::Valid ();
+	use MIME::Lite ();
+	use Captcha::reCAPTCHA ();
+	
+	my @categories = qw/General Site Content Technical Help Other/;
+</%once>
+%#-------------------------------------------------------------------
+<%init>
+	my $s = $m->session->{pipeline};
+
+	my $cf = DNALC::Pipeline::Config->new->cf(q{PIPELINE});
+	my $recaptcha = $cf->{RECAPTCHA};
+	my $has_err = undef;
+
+	if ($r->method eq q{POST}) {
+
+		if ( $fb_email ne "" && !Email::Valid->address($fb_email) ) {
+			$has_err = 1;
+			$m->comp("/_message_add", "Email is invalid.");
+		}
+
+		unless ($fb_category) {
+			$has_err = 1;
+			$m->comp("/_message_add", "Please choose the section you are referring to.");
+		}
+		unless ($fb_comment) {
+			$has_err = 1;
+			$m->comp("/_message_add", "Your comments are missing.");
+		}
+		else {
+			$fb_comment = substr $fb_comment, 0, 5000;
+		}
+
+		my $c = Captcha::reCAPTCHA->new;
+		my $cresult = $c->check_answer(
+						$recaptcha->{private}, $ENV{REMOTE_ADDR} || $ENV{HTTP_X_FORWARDED_FOR},
+						$recaptcha_challenge_field, $recaptcha_response_field
+					);
+		unless ($cresult->{is_valid}) {
+			$has_err = 1;
+			$m->comp("/_message_add", "The reCaptcha words are invalid.");
+		}
+
+		if ($has_err) {
+			$s->{fb} = {
+					name => $fb_name,
+					email => $fb_email,
+					category => $fb_category,
+					comment => $fb_comment,
+				};
+			$m->redirect("./feedback.html");
+		}
+		
+		my $feedback = eval {
+				DNALC::Pipeline::Feedback->create({
+					name => $fb_name || "Anonymous",
+					email => $fb_email,
+					category => $fb_category,
+					comment => $fb_comment,
+				});
+			};
+		if ($@) {
+			print STDERR "\nError storing feedback:\n", $@, $/;
+			#$m->comp("/_message_add", "The reCaptcha words are invalid.");
+		}
+		
+		# forward the feedback
+		my $text = "name: " . ($fb_name ? $fb_name : 'Anonymous') . "\n";
+		$text .= "email: " . $fb_email . "\n" if $fb_email;
+		$text .= "message:\n" . $fb_comment;
+
+		my $msg = MIME::Lite->new (
+					From => '"Admin" <dnalcadmin@cshl.edu>',
+					To	 => 'ghiban@cshl.edu',
+					Subject => "[DNA Subway] Feedback",
+					Type	=> 'text/plain',
+					Data => $text
+				);
+		eval {
+			if (defined $cf->{SMTP_SERVER} && $cf->{SMTP_SERVER} ne "") {
+				$msg->send("smtp", $cf->{SMTP_SERVER}, Timeout=>30);
+			}
+			else {
+				$msg->send;
+			}
+
+		};
+		if ($@) {
+			print STDERR "Error: " . $@ . "\n";
+			$msg->send();
+		}
+		
+		delete $s->{fb} if defined $s->{fb};
+		$m->redirect("./feedback.html?fb=1");
+	}
+	else {
+		if (!$fb) {
+			if (defined $s->{fb}) {
+				$fb_name = $s->{fb}->{name};
+				$fb_email = $s->{fb}->{email};
+				$fb_category = $s->{fb}->{category};
+				$fb_comment = $s->{fb}->{comment};
+			}
+			elsif ($s->{logged_in} && $s->{username} !~ /^guest_/){
+				my $user = DNALC::Pipeline::User->retrieve($s->{user_id});
+				$fb_name = $user->full_name;
+				$fb_email = $user->email;
+			}
+		}
+	}
+</%init>
+%#-------------------------------------------------------------------
