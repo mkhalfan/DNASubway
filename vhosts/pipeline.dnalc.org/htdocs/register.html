@@ -216,18 +216,23 @@ DNALC Team";
 				# send mail to the applicant
 				my $msg = MIME::Lite->new (
 							From => '"Admin" <dnalcadmin@cshl.edu>',
-							To	 => $s->{email},
+							To	=> $s->{email},
 							Subject => "Set your password",
 							Type	=> 'text/plain',
-							Data => $text
+							Data	=> $text
 						);
 				eval {
-					$msg->send("smtp", $cf->{SMTP_SERVER}, Timeout=>30);
+					if (defined $cf->{SMTP_SERVER} && $cf->{SMTP_SERVER} ne "") {
+						$msg->send("smtp", $cf->{SMTP_SERVER}, Timeout=>30);
+					}
+					else {
+						$msg->send;
+					}
 					
 				};
 				if ($@) {
 					print STDERR "Error: " . $@ . "\n";
-					$msg->send();
+					$msg->send;
 				}
 			}			
 

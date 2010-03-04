@@ -12,6 +12,7 @@
 %#-------------------------------------------------
 <%once>
 	use Gearman::Client ();
+	use DNALC::Pipeline::Config ();
 	use DNALC::Pipeline::App::ProjectManager ();
 	use DNALC::Pipeline::App::WorkflowManager ();
 	use DNALC::Pipeline::CacheMemcached ();
@@ -41,7 +42,7 @@
 	
 	my $memcached = DNALC::Pipeline::CacheMemcached->new;
 	my $mc_key = "status-$t-$pid";
-	if ($memcached->get($mc_key) =~ /processing/i) {
+	if ($memcached && $memcached->get($mc_key) =~ /processing/i) {
 		print "{'status':'success','running' : 1, 'known' : 1, 'output':''}";
 		return;
 	}
