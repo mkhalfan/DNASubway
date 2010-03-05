@@ -5,7 +5,7 @@
 % if ( $fb ) {
 	<h3>Thank you for your feedback.</h3>
 % } else {
-<form method="post">
+<form method="post" onsubmit="$('submit_btn').hide();">
 <table border="0">
     <tr>
         <td class="fb-lbl">Name:</td>
@@ -30,7 +30,8 @@
     <tr>
         <td class="fb-lbl">Your comments:</td>
         <td><textarea class="fb" name="fb_comment" rows="5" cols="50"><% $fb_comment |html %></textarea></td>
-    </tr>
+	</tr>
+%	if (!$recaptcha_ok) {
 	<tr>
         <td class="fb-lbl" colspan="2">Please insert the two words you see below:</td>
     </tr>
@@ -50,10 +51,11 @@
 		</noscript>
 		<!-- -->
         </td>
-    </tr>
+	</tr>
+%	}
     <tr>
         <td>&nbsp;</td>
-        <td><input type="submit" value="Send" /></td>
+        <td><input id="submit_btn" type="submit" value="Send" /></td>
     </tr>
 </table>
 </form>
@@ -89,6 +91,7 @@
 	my $cf = DNALC::Pipeline::Config->new->cf(q{PIPELINE});
 	my $recaptcha = $cf->{RECAPTCHA};
 	my $has_err = undef;
+	my $recaptcha_ok = $s->{recaptcha_ok};
 
 	if ($r->method eq q{POST}) {
 
@@ -109,14 +112,19 @@
 			$fb_comment = substr $fb_comment, 0, 5000;
 		}
 
-		my $c = Captcha::reCAPTCHA->new;
-		my $cresult = $c->check_answer(
-						$recaptcha->{private}, $ENV{REMOTE_ADDR} || $ENV{HTTP_X_FORWARDED_FOR},
-						$recaptcha_challenge_field, $recaptcha_response_field
-					);
-		unless ($cresult->{is_valid}) {
-			$has_err = 1;
-			$m->comp("/_message_add", "The reCaptcha words are invalid.");
+		if (!$s->{recaptcha_ok}) {
+			my $c = Captcha::reCAPTCHA->new;
+			my $cresult = $c->check_answer(
+							$recaptcha->{private}, $ENV{REMOTE_ADDR} || $ENV{HTTP_X_FORWARDED_FOR},
+							$recaptcha_challenge_field, $recaptcha_response_field
+						);
+			unless ($cresult->{is_valid}) {
+				$has_err = 1;
+				$m->comp("/_message_add", "The reCaptcha words are invalid.");
+				}
+			else {
+				$s->{recaptcha_ok} = 1;
+			}
 		}
 
 		if ($has_err) {
@@ -145,6 +153,7 @@
 		# forward the feedback
 		my $text = "name: " . ($fb_name ? $fb_name : 'Anonymous') . "\n";
 		$text .= "email: " . $fb_email . "\n" if $fb_email;
+		$text .= "client IP: " . $ENV{REMOTE_ADDR} . ' ' . $ENV{HTTP_X_FORWARDED_FOR} . "\n";
 		$text .= "message:\n" . $fb_comment;
 
 		my $msg = MIME::Lite->new (
@@ -169,6 +178,7 @@
 		}
 		
 		delete $s->{fb} if defined $s->{fb};
+		delete $s->{recaptcha_ok} if defined $s->{recaptcha_ok};
 		$m->redirect("./feedback.html?fb=1");
 	}
 	else {
