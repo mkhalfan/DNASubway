@@ -93,6 +93,10 @@ my $s = $m->session->{pipeline_reg};
 
 my @err = ();
 
+if ($faction ne "") {
+	push @err, "";
+}
+
 my $tree_root = 2;
 my $questions = undef;#$m->cache->get("question-tree-$tree_root");
 unless (defined $questions) {
@@ -103,8 +107,8 @@ else {
 	#print STDERR "cache: ", "question-tree-$tree_root", $/;
 }
 
-print STDERR "-" x 20, $/;
-print STDERR "Session:\t", Dumper($s), $/;
+#print STDERR "-" x 20, $/;
+#print STDERR "Session:\t", Dumper($s), $/;
 
 if ($r->method eq "POST") {
 
@@ -114,7 +118,7 @@ if ($r->method eq "POST") {
 		$s->{$_} = substr $ARGS{$_}, 0, $VALUE_MAX_LEN;
 		$user_profile_data->{$_} = $s->{$_} if $_ =~ /^q\d+/;
 	}
-	print STDERR "User profile data:\t", Dumper($user_profile_data), $/;
+	#print STDERR "User profile data:\t", Dumper($user_profile_data), $/;
 
 	my $cf = DNALC::Pipeline::Config->new->cf('PIPELINE');
 
@@ -213,7 +217,7 @@ Thank you for creating an account.\n
 Your unsername is: \"$s->{username}\" (without the quotes).\n
 To set your password follow this link:
 $cf->{APOLLO_PROJECT_HOME}/resetpass.html?c=$code\n
-DNALC Team";
+DNASubway Team";
 
 				# send mail to the applicant
 				my $msg = MIME::Lite->new (
