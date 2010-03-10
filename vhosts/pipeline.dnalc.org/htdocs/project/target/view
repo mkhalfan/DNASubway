@@ -15,6 +15,7 @@
 %		my $gid = $_->id;
 	<span id="sg_<% $gid %>" class="conYellowline_ConCell1" cn="<% $_->common_name |html %>"><input class="conRadiobox_align" type="checkbox" name="g" id="g_<% $_->id %>" value="<% $_->id %>" <% (grep {$_ eq $gid } @tp_genomes)  ? "checked=\"checked\"" : "" %> />&nbsp; <% $_->organism %></span>
 %	}
+<span class="conYellowline_keys"></span>
  </span><!--END of CLASS conYellowline_ConColumn1-->
  <span class="conYellowline_ConColumn1">
 	<span class="conYellowline_ConCellTitle">Dicotyledons</span>
@@ -49,7 +50,7 @@
 			<param name="windowHeight" value="500">
 			<param name="windowWidth" value="650">
 			<param name="showFullId" value="false">
-			<param name="label" value="View Alignment">
+			<param name="label" value="Alignment View">
 			<param name="defaultColour" value="Clustal">
 			<p id="java_install">To play, <a href="http://java.sun.com/webapps/getjava/BrowserRedirect?host=java.com">install Java now</a>.</p>
 		</applet>
@@ -80,7 +81,10 @@
 
 % if ($tp) {
 <div id="conRun_yellowline">
-	<div class="bt_Runyellowline"><a href="javascript:;" style="<% $tp && $tp->status eq "processing" ? "display:none" : "" %>" id="launch_btn" onclick="launch_target()">RUN</a></div>
+	<div class="con_browserBT ">
+		<span class="conIndicator_boxBrowse"><div id="launch_btn_ind" class="<% $tp->status ne "processing" ? "conIndicator_Rb_disabled" : "conIndicator_processing"%>"></div></span>
+		<span class="bt_Runyellowline"><a id="launch_btn" href="javascript:;" onclick="launch_target()">RUN</a></span>
+	</div><!--END of ID conRun_yellowline-->
 </div>
 % }
 
@@ -115,9 +119,9 @@
 			<span class="conProjectInfo_Cell2">: DNALC</span>
 		</div>
 		<div class="conProjectInfo_Row">
-			<span class="conProjectInfo_Cell1">Sequence</span>
-			<span class="conProjectInfo_Cell3">: </span>
-			<span class="conProjectInfo_CellBT"><a href="javascript:;" onclick="javascript:launch_viewseq('<% $tid %>')">View</a></span>
+			<span class="conProjectInfo_Cell1"><a href="javascript:;" onclick="javascript:launch_viewseq('<% $tid %>')">Sequence</a></span>
+			<span class="conProjectInfo_Cell2"></span>
+%#			<span class="conProjectInfo_CellBT"><a href="javascript:;" onclick="javascript:launch_viewseq('<% $tid %>')">View</a></span>
 		</div>
 % if ($is_owner) {
         <div class="conProjectInfo_Row">
@@ -189,7 +193,7 @@
 		my $genomes = $m->cache->get("target-genomes");
 		unless (defined $genomes) {
 				$genomes = [ grep {$_->active} DNALC::Pipeline::TargetGenome->retrieve_all ];
-				$m->cache->set("target-genomes", $genomes, "10m"); # set cache for 10 minutes
+				$m->cache->set("target-genomes", $genomes, "30m"); # set cache for 30 minutes
 		}
 		@genomes = @$genomes;
 	}
@@ -202,10 +206,10 @@
 	else {
 		@tp_genomes = map {$_->genome_id->id } $tp->genomes;
 		if ($tp->status eq 'done-empty') {
-			$message = 'No homologs found. Try searching other genomes.';
+			$message = 'No homologs found. Search other genomes.';
 		}
 		elsif ($tp->status eq 'done') {
-			$message = 'Done. Check results.';
+			$message = "";#"Done. Check results.";
 			my $workdir = $tp->work_dir;
 			for (<$workdir/*>) {
 				my $file = $m->comp('../.comp/filepath_to_web', file => $_, just_return => 1);
@@ -219,10 +223,10 @@
 			}
 		}
 		elsif ($tp->status eq 'processing') {
-			$message = 'Processing.';
+			$message = '';
 		}
 		elsif ($tp->status eq 'failed') {
-			$message = 'Failed to get the results from TARGeT.';
+			$message = "";#"Failed to get the results from TARGeT.";
 		}
 		if ($tp->user_id != $s->{user_id}) {
 			my $user = DNALC::Pipeline::User->retrieve($tp->user_id);

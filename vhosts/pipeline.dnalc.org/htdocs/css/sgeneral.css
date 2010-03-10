@@ -1007,3 +1007,22 @@ width: 400px;
 	color: #FF6600;
 }
 
+
+/*//---------Sticker---------------*/
+
+.bt_plantsticker {
+	width:226px;
+	height: 100px;
+	display: block;
+	margin-right: 40px;
+	position: relative;
+	float: right;
+}
+.bt_plantsticker a {
+	width:226px;
+	height: 100px;
+	display: block;
+	position: relative;
+	float: right;
+}
+

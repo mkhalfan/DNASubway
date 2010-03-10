@@ -76,6 +76,14 @@ Prototip.Styles = {
     stem: { height: 12, width: 15 }
   },
   
+   'brick': {
+    className: 'red',
+    border: 5,
+    borderColor: '#7E2C18',
+    radius: 5,
+    stem: { height: 12, width: 15 }
+  },
+  
   'protogrey': {
     className: 'protogrey',
     border: 6,

@@ -38,7 +38,7 @@ function step_one() {
 }
 
 function select_source(el) {
-	if (el && el.value == 'upload') {
+	if (el && (el.value == 'upload' || el.value == 'paste')) {
 		$('specie').selectedIndex = -1;
 	}
 	else if (el && el.value == 'sample') {

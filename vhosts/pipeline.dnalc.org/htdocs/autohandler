@@ -51,6 +51,15 @@
 			</div>
 		</form>
         </div> <!--END of ID member form-->
+        
+        <span class="bt_plantsticker" id="tt_brick"></span>
+<script type="text/javascript" language="javascript">
+new Tip('tt_brick', "Bioinformatics analysis routines in  <i>DNA Subway</i>  work best with plant genomic DNA. In order to expand its capacity for comparative genomic analyses,  <i>DNA Subway</i> will also handle animal DNA sequences in the future.", {
+		title: "Optimized for Plants",
+		style: 'brick'
+	});
+</script>
+
 	</div>	<!--END of ID home_header_BG -->
 % } else {
 	<!-- <a href="/project/">View map</a> -->
@@ -63,6 +72,13 @@
 				<span class="bt_projects"><a href="/project/browse" title="[Browse Projects]"></a></span>
 			</div>
 		</div>
+         <span class="bt_plantsticker" id="tt_brick"></span>
+<script type="text/javascript" language="javascript">
+new Tip('tt_brick', "Bioinformatics analysis routines in  <i>DNA Subway</i>  work best with plant genomic DNA. In order to expand its capacity for comparative genomic analyses,  <i>DNA Subway</i> will also handle animal DNA sequences in the future.", {
+		title: "Optimized for Plants",
+		style: 'brick'
+	});
+</script>
 	</div>
 % }
 	<div id="home_header_bottomline"></div>	

@@ -4,6 +4,13 @@ var intervalID = 0;
 function launch_target () {
 	var inputs = $$('input');
 	var genomes = [];
+	
+	var btn_ind = $('launch_btn_ind');
+	if (btn_ind.hasClassName('conIndicator_processing')) {
+		//alert('');
+		//console.info('already processing');
+		return;
+	}
 
 	inputs.each(function(item) {
 	  if (item.type == 'checkbox' && item.id.substr(0,2) == 'g_' && item.checked)
@@ -20,11 +27,16 @@ function launch_target () {
 			return;
 	}
 	
-	$('launch_btn').hide();
-	$('message').update("Processing.");
+	//$('message').update("Processing.");
+	/*$('launch_btn').hide();*/
+	
 	/*$('alignment_span').update('<a href="#">Multiple<br/>Alignment</a>');
 	$('tree_btn').onclick = null;
 	$('tree_btn').stopObserving ('click');*/
+	
+	btn_ind.removeClassName('conIndicator_not-processed');
+	btn_ind.removeClassName('conIndicator_error');
+	btn_ind.addClassName('conIndicator_processing');
 
 	var tid = $('tid') ? $('tid').value : 0;
 	var params = { 'tid' : tid, 'g' : genomes};
@@ -37,9 +49,10 @@ function launch_target () {
 			//debug(response);
 			var r = response.evalJSON();
 			dbg = r;
+
 			if (r.status == 'success') {
 				var h = r.h || '';
-				intervalID = setInterval(function (){ check_status(tid, h)}, 10000);
+				intervalID = setInterval(function (){ check_status(tid, h)}, 15000);
 				$('alignment_span').update('<a href="#">Alignment<br/>View</a>');
 				$('tree_btn').onclick = null;
 				$('tree_btn').stopObserving ('click');
@@ -50,26 +63,32 @@ function launch_target () {
 				var tree_ind = $('tree_ind');
 				tree_ind.removeClassName('conIndicator_Rb');
 				tree_ind.addClassName('conIndicator_Rb_disabled');
+				
 			}
 			else  if (r.status == 'error') {
+				$('message').update('');
 				alert(r.message);
-				$('launch_btn').show();
+				//$('launch_btn').show();
+				btn_ind.removeClassName('conIndicator_processing');
+				btn_ind.addClassName('conIndicator_error');
 			}
 			else {
 				alert('Unknown status!');
+				//btn_ind.addClassName('conIndicator_not-processed');
 			}
 			//$('launch_btn').show();
 		},
 		onFailure: function(){
 				alert("Something went wrong.");
 				clearInterval(intervalID);
-				$('launch_btn').show();
+				//$('launch_btn').show();
 		}
 	});
 }
 
 
 function check_status (tid, h) {
+	var btn_ind = $('launch_btn_ind');
 	var params = { 'tid' : tid, 'h' : h};
 	sent = params;
 	new Ajax.Request('/project/target/check_status',{
@@ -84,8 +103,9 @@ function check_status (tid, h) {
 			if (r.status != "processing") {
 				clearInterval(intervalID);
 				//console.info("clearing id = " + intervalID);
+				btn_ind.removeClassName('conIndicator_processing');
 				if (r.status == 'done') {
-					$('message').update("Done. Check results.");
+					//$('message').update("Done. Check results.");
 					if (r.files && r.files['fasta']) {
 						var abtn = $('alignment_span');
 						abtn.update('<applet archive="/files/jalview/jalviewApplet.jar" name="Jalview_muscle_1" code="jalview.bin.JalviewLite" height="35" width="110">'
@@ -94,7 +114,7 @@ function check_status (tid, h) {
 							+ '<param name="windowHeight" value="500">'
 							+ '<param name="windowWidth" value="650">'
 							+ '<param name="showFullId" value="false">'
-							+ '<param name="label" value="View Alignment">'
+							+ '<param name="label" value="Alignment View">'
 							+ '<param name="defaultColour" value="Clustal">'
 							+ '</applet>'
 						);
@@ -103,22 +123,26 @@ function check_status (tid, h) {
 						abtn_ind.addClassName('conIndicator_Rb');
 					}
 					if (r.files && r.files['nw']) {
-						var start = top.document.location.href.indexOf('.org')
-						var server = top.document.location.href.substr(0,start +4);
+						//var start = top.document.location.href.indexOf('.org')
+						//var server = top.document.location.href.substr(0,start +4);
+						var loc = document.location;
+						var server = loc.protocol + '//' + loc.hostname;
 						$('tree_btn').observe('click', function() {
-							
 							window.open('/files/phylowidget/bare.html?tree=' + server + r.files['nw'], 'target_tree', 'status=0,height=500,width=600');
 						});
 						var tree_ind = $('tree_ind');
 						tree_ind.removeClassName('conIndicator_Rb_disabled');
 						tree_ind.addClassName('conIndicator_Rb');
 					}
+					btn_ind.addClassName('conIndicator_not-processed');
 				}
 				else if (r.status == "done-empty") {
-					$('message').update("No homologs found. Try searching other genomes.");
+					$('message').update("No homologs found. Search other genomes.");
+					btn_ind.addClassName('conIndicator_not-processed');
 				}
 				else if (r.status == "failed") {
 					$('message').update("Failed to get the results from Target.");
+					btn_ind.addClassName('conIndicator_error');
 				}
 				$('launch_btn').show();
 			}
@@ -326,6 +350,40 @@ function set_public(np) {
 	});
 }
 
+/* triggers when a checkbox is changed */
+function updateRunButton(event) {
+	var btn_ind = $('launch_btn_ind');
+	if (btn_ind.hasClassName('conIndicator_processing')) {
+//		console.info('still processing..');
+		return;
+	}
+	var cnt = 0;
+	$$('input.conRadiobox_align').each(function(element) {
+	  //var element = event.element();
+	  //console.info(element.getAttribute('id') + ' ' + element.id);
+	  if (element.checked == true) {
+		
+		cnt++;
+	  }
+	});
+	//console.info(cnt);
+	/*conIndicator_Rb_disabled
+	  conIndicator_not-processed
+	  conIndicator_processing */
+	if (cnt) {
+		btn_ind.removeClassName('conIndicator_Rb_disabled');
+		btn_ind.removeClassName('conIndicator_error');
+		//btn_ind.removeClassName('conIndicator_processing');
+		btn_ind.addClassName('conIndicator_not-processed');
+	}
+	else {
+		btn_ind.removeClassName('conIndicator_error');
+		btn_ind.removeClassName('conIndicator_not-processed');
+		//btn_ind.removeClassName('conIndicator_processing');
+		btn_ind.addClassName('conIndicator_Rb_disabled');
+	}
+}
+
 //-------------
 // keep this at the end
 Event.observe(window, 'load', function() {
@@ -343,9 +401,9 @@ Event.observe(window, 'load', function() {
 	if ($('tid')) {
 		var tid = $('tid').value;
 		var spans = $$('span');
-		var btn = $('launch_btn');
-		if (btn && btn.style.display == 'none') {
-				intervalID = setInterval(check_status, 10000, tid, -1);
+		var btn = $('launch_btn_ind');
+		if (btn && btn.hasClassName('conIndicator_processing')) {
+			intervalID = setInterval(check_status, 10000, tid, -1);
 		}
 		
 		// load tooltips
@@ -355,6 +413,15 @@ Event.observe(window, 'load', function() {
 					//console.info(el.getAttribute('cn'));
 					new Tip(el, el.getAttribute('cn'), {style: 'creamy', width: 'auto', border: 1, radius: 1});
 				}
+			}
+		});
+
+		updateRunButton();
+		// set events for checkboxes, so we may trigger update button
+		$$('input.conRadiobox_align').each(function(el) {
+			if (el.getAttribute('name') == 'g') {
+				//console.info("** >" + el.id);
+				el.observe('click', updateRunButton);
 			}
 		});
 	}

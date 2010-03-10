@@ -188,6 +188,16 @@
 /*----right content--------right content--------right content--------right content--------right content--------right content--------right content----*/
 
 /*----redLIne project----*/
+#con_star{
+	width: 300px;
+	height: 20px;
+	font-size: .95em;
+	color: #3399CC;
+	text-align: left;
+	position: relative;
+	float: left;
+	}
+	
 #conRedlineLeft1 {
 	width: 470px;
 	height: 560px;
@@ -1115,6 +1125,16 @@
 /*//----------PUBLIC PROJECT START here PUBLIC PROJECT  START------------*/
 
 /*---YELLOWLINE NEW PROJECT------*/
+
+.conYellowline_keys{
+  width: 92px;
+  height: 136px;
+  margin: 12px 0px 0px 30px;
+  background: url("/images/v2/keys.jpg") bottom left no-repeat;
+  position: relative;
+  float: left;
+}
+
 #conYellowlineLeft1 {
 	width: 470px;
 	height: auto;
@@ -1142,7 +1162,7 @@
 
 #conYellowlineLeft2 {
 	width: 519px;
-	height: 260px;
+	height: 290px;
 	background: url("/images/v2/map-yellowline_L2.jpg") top left no-repeat;
 	float: left;
 	position: relative;
@@ -1153,7 +1173,7 @@
 	
 .conYellowline_ConColumn1{
   width:173px;
-  height: 216px;
+  height: 246px;
   position: relative;
   float:left;
   }	
@@ -1163,7 +1183,7 @@
   position: relative;
   float: left;
   color: #000;
-  font-size: 0.7em;
+  font-size: 0.75em;
   text-align: left; 
   margin-left:10px;
 }
@@ -1182,41 +1202,43 @@
 }
 
 #conRun_yellowline{
-	width: 120px;
-	height: 48px;
+	width: 126px;
+	height: 43px;
 	background: url("/images/v2/map-yellowline_L2_line.jpg") top left no-repeat;
 	position: relative;
 	float: left;
-	padding: 0px 10px 0px 430px;
+	padding: 5px 10px 0px 440px;
 	margin-bottom: 10px;
 }
 
 .bt_Runyellowline {
-	width:120px;
-	height:28px;
-	padding-top: 8px;
+	width:100px;
+	height: 34px;
 	position: relative;	
-	float: left;
+	float: right;
 }
 
 
 .bt_Runyellowline a {
-	width:120px;
-	height:20px;
-	padding-top: 8px;
-	background: url("/images/v2/bt_runAll_sm1.png") top no-repeat;
+	width:100px;
+	height: 22px;
+	background: url("/images/v2/bt_browserYellow1.png") top no-repeat;
 	display: block;
 	position: relative;
-	float: left;
+	float: right;
+	padding-top: 12px;
 	color: #555;
-	font-size: .9em;
-	text-align: center; text-decoration: none;
-	line-height: 0.8em;
+	font-size: 0.75em;
+	text-align: center; text-decoration: none; line-height: 0.95em;
+}
+
+.bt_Runyellowline a.disabled:hover {
+	background: url("/images/v2/bt_browserYellow1.png") top no-repeat;
+	cursor: default;
 }
 
 .bt_Runyellowline a:hover {
-	background: url("/images/v2/bt_runAll_sm2.png") top no-repeat;
-
+	background: url("/images/v2/bt_browserBnY2.png") top no-repeat;
 }
 	
 /*---YELLOWLINE Console--right browse---*/

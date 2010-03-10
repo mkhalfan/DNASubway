@@ -11,7 +11,7 @@
 <form id="forma1" enctype="multipart/form-data" method="post">
 <div id="conRedlineLeft1"> 
 	<div id="conProject_newLeft"> 
-		<div class="conNewPro_title">Select Sequence Source</div> 
+		<div class="conNewPro_title">Select Sequence Source *</div> 
 
 		<div class="conNewPro_label">
 			<input class="conRadiobox_align" type="radio" name="seq_src" id="seq_src_upload" value="upload" onclick="select_source(this)" <% $seq_src eq "upload" ? "checked=\"checked\"" : ""%>/>&nbsp; 
@@ -20,8 +20,8 @@
 		</div>
 
 		<div class="conNewPro_label">
-			<input class="conRadiobox_align" type="radio" name="seq_src" id="seq_src_paste" value="paste" <% $seq_src eq "paste" ? "checked=\"checked\"" : ""%> />&nbsp; 
-			Enter a sequence:
+			<input class="conRadiobox_align" type="radio" name="seq_src" id="seq_src_paste" value="paste" onclick="select_source(this)" <% $seq_src eq "paste" ? "checked=\"checked\"" : ""%> />&nbsp; 
+			Enter a sequence in <a href="http://en.wikipedia.org/wiki/FASTA_format#Format">FASTA format</a> <small>(max 100kb)</small>:
 			<textarea class="conStylized_box2" name="sequence" id="notebox" rows="5" cols="30" onfocus="set_source('paste');"><% $sequence |html %></textarea>
 		</div>
 
@@ -37,11 +37,12 @@
 			</select>
 		</div>
 		<div style="clear: both;">&nbsp;</div>
-        <div class="conNewPro_title">Short description</div>
+        <div class="conNewPro_title">Description</div>
         <div class="conNewPro_label">&nbsp;&nbsp;&nbsp;&nbsp; Total characters (max.140): &nbsp;<span id="desc_len"><% length $description %></span></div>
 		<div>
 			<textarea id="description" name="description" cols="40" class="conStylized_box5" onkeyup="check_description_length(event);"><% $description |html %></textarea>
 		</div>
+        <div style="clear: both;">&nbsp;</div>
         <div style="clear: both;">&nbsp;</div>
         
 	</div>
@@ -51,13 +52,13 @@
 <div id="conRedlineRight1">
 
  <div id="conProject_newRight"> 
-            	<div class="conNewPro_title">Name Your Project</div>   
+            	<div class="conNewPro_title">Name Your Project *</div>   
 				<div class="conNewPro_label1">
 					<label>Project title:</label>
 					<input class="conStylized_box4" type="text" name="name" id="name" value="<% $name|html%>" maxlength="40" />
  				</div>
 				<div style="clear: both;">&nbsp;</div>
-                 <div class="conNewPro_title">Organism</div>   
+                 <div class="conNewPro_title">Organism *</div>   
             		 <div class="conNewPro_label1">
 						<label>Scientific name (genus species):</label>
 								<input class="conStylized_box4" type="text" name="organism" id="organism" value="<% $organism |html%>" maxlength="128"  />
@@ -86,6 +87,8 @@
  				 </div>
 				<div style="clear: both;">&nbsp;</div> <div style="clear: both;">&nbsp;</div> 
               <div class="conBT_continue"><a id="step_one_btn" href="javascript:void(0);" onclick="javascript:step_one();"></a></div>
+              <div style="clear: both;">&nbsp;</div>
+              <div id="con_star"><b>*</b> Required information</div>
                         
             </div><!--END of ID conProject_newRight-->
 

@@ -147,4 +147,4 @@ feature     = gene:user
 glyph       = gene
 bgcolor     = rgb(51,102,255)
 das category = transcription
-key         = User created models
+key         = User Annotation

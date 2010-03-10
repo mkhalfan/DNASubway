@@ -16,7 +16,7 @@
         <td><input class="fb" type="text" name="fb_email" value="<% $fb_email |html%>" maxlength="128" /></td>
     </tr>
     <tr>
-        <td class="fb-lbl">Refer to:</td>
+        <td class="fb-lbl">Subject:</td>
         <td>
         <select class="fb" name="fb_category">
         <option value="">Please choose one</option>
@@ -170,7 +170,6 @@
 			else {
 				$msg->send;
 			}
-
 		};
 		if ($@) {
 			print STDERR "Error: " . $@ . "\n";

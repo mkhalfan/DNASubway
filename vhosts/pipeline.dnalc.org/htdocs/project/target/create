@@ -9,17 +9,17 @@
 %	}
 </div>
 % }
-	<div class="conNewPro_title">Select Sequence Source</div>
-		<div class="conNewPro_label1">
+	<div class="conNewPro_title">Select Sequence Source *</div>
+		<div class="conNewPro_label">
 			<input class="conRadiobox_align" type="radio" name="seq_src" id="seq_src_paste" value="paste" <% $seq ne "" ? "checked=\"checked\"" : "" %> />&nbsp; 
-			Enter a Sequence in FASTA Format: 
+			Enter a sequence in <a href="http://en.wikipedia.org/wiki/FASTA_format#Format">FASTA format</a> <small>(max 10kb)</small>:
 			<textarea class="conStylized_box2" name="seq" id="seq" rows="5" cols="30" onfocus="set_source('paste');"><% $seq_src eq "sample" ? "" : $seq |html%></textarea>
 		</div>
 % unless ($pm->project) {
-		<div style="clear: both;">&nbsp;</div>
+		
 		<div class="conNewPro_label1">
-			<input class="conRadiobox_align" type="radio" name="seq_src" id="seq_src_sample" value="sample" <% $seq_src eq "sample" ? "checked=\"checked\"" : "" %>  />&nbsp; Select a Sample Sequence:  
-			<select class="conStylized_box3" id="sample" name="sample" size="5" style="width: 380px;" onchange="set_source('sample');">
+			<input class="conRadiobox_align" type="radio" name="seq_src" id="seq_src_sample" value="sample" <% $seq_src eq "sample" ? "checked=\"checked\"" : "" %>  />&nbsp; Select a sample sequence:  
+			<select class="conStylized_box3" id="sample" name="sample" size="6" style="width: 370px;" onchange="set_source('sample');">
 % for my $ss (@samples) {
 %	my $sel = $seq_src eq "sample" && $ss->id == $sample ? "selected=\"selected\"" : "";
 			<option id="o<%$ss->id%>" value="<% $ss->id %>" extra="type:<% $ss->type %>;function_name:<% $ss->function_name%>;class_name:<% $ss->class_name%>;name:<%$ss->name%>;"\
@@ -28,34 +28,40 @@
 			</select>
 		</div>
 % }
-		<div style="clear: both;">&nbsp;</div>
+		
 		<div class="conNewPro_label1">
 			<label>Sequence type:</label>
-			<div style="padding-left: 100px;">
-			<input class="conRadiobox_align" type="radio" name="type" id="type_d" value="d" <% "d" eq $type ? "checked=\"checked\"" : ""%> <% $disable_type ? "disabled=\"disabled\"" : ""%>/> DNA<br/>
-			<input class="conRadiobox_align" type="radio" name="type" id="type_p" value="p" <% "p" eq $type ? "checked=\"checked\"": ""%> <% $disable_type ? "disabled=\"disabled\"" : ""%>/> Protein
-			</div>
-		</div>
+			<div style="clear: both;">&nbsp;</div>
+					<div class="conNewPro_label1">
+
+			<span class="conNewPro_smallContainer">
+			<input class="conRadiobox_align" type="radio" name="type" id="type_d" value="d" <% "d" eq $type ? "checked=\"checked\"" : ""%> <% $disable_type ? "disabled=\"disabled\"" : ""%>/> DNA</span>
+			<span class="conNewPro_smallContainer">
+			<input class="conRadiobox_align" type="radio" name="type" id="type_p" value="p" <% "p" eq $type ? "checked=\"checked\"": ""%> <% $disable_type ? "disabled=\"disabled\"" : ""%>/> Protein</span> 
+			</div>		
+            </div>
 		<div style="clear: both;">&nbsp;</div>
 		<div class="conNewPro_title">Description</div>
-		<div class="conNewPro_label1">
-			<textarea id="description" name="description" cols="40" class="conStylized_box" onkeyup="check_description_length(event);"><% $description |html %></textarea>
-			<span id="desc_len"><% length $description %></span>
+        <div class="conNewPro_label">&nbsp;&nbsp;&nbsp;&nbsp; Total characters (max.140): &nbsp;<span id="desc_len"><% length $description %></span></div>
+		<div>
+			<textarea id="description" name="description" cols="40" class="conStylized_box5" onkeyup="check_description_length(event);"><% $description |html %></textarea>
+		
+        
 		</div>
 	</div><!--END of ID conProject_newLeft-->
 </div><!--END of ID conRedlineLeft1-->
 
 <div id="conYellowlineRight1">
 	<div id="conProject_newRight"> 
-		<div class="conNewPro_title">Name Your Project</div>   
+		<div class="conNewPro_title">Name Your Project *</div>   
 		<div class="conNewPro_label1">
-			<label>Project Title:</label>
+			<label>Project title:</label>
 			<input class="conStylized_box4" type="text" name="name" id="name" value="<% $name|html %>" maxlength="128" />
 		</div>
 		<div style="clear: both;">&nbsp;</div>
-		<div class="conNewPro_title">Organism</div>
+		<div class="conNewPro_title">Organism *</div>
 		<div class="conNewPro_label1">
-			<label>Scientific name (Genus Species):</label>
+			<label>Scientific name (Genus species):</label>
 			<input class="conStylized_box4" type="text" name="organism" id="organism" value="<% $organism |html%>" maxlength="128" />
 		</div>
 		<div class="conNewPro_label1">
@@ -78,6 +84,10 @@
 		</div> 
 		<div style="clear: both;">&nbsp;</div>
 		<div class="conBT_continue"><a href="javascript:;" onclick="document.forms['forma'].submit()"></a></div>
+        
+        <div style="clear: both;">&nbsp;</div>
+              <div id="con_star"><b>*</b> Required information</div>
+              
 	</div><!--END of ID conProject_newRight-->
 </div><!--END of ID conRedlineRight1-->
                    
