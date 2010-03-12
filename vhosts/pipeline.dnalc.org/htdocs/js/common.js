@@ -56,6 +56,7 @@ function show_messages(html, isError) {
 					btn.remove();
 				}
 			});
+			_w.setResizable(false);
 		} catch (e) {};
 	}
 
@@ -148,11 +149,14 @@ function erase_cookie(name) {
 
 //------------------------
 function show_edit() {
+	$('desc_limit_label').show();
 	$('conProjectInfo_edit').update('<div class="bt_projectInfo_done"><a href="javascript:;" onclick="update_info();"></a></div><div class="bt_projectInfo_cancel"><a href="javascript:;" onclick="hide_edit();"></a></div>');
 	var ddiv = $('description_container');
 	ddiv.setAttribute('origdesc', ddiv.innerHTML);
-	var ta = new Element('textarea', {id:'description', style:'width:100%;height: 80px;'});
+	var ta = new Element('textarea', {id:'description', style:'width:100%;height: 60px;'});
 	ta.value = ddiv.innerHTML;
+	//onkeyup="check_description_length(event);"
+	Event.observe(ta, 'keyup', check_description_length);
 	ddiv.update(ta);
 
 	var tdiv = $('conProjectInfo_projecttitle');
@@ -164,6 +168,7 @@ function show_edit() {
 }
 
 function hide_edit() {
+	$('desc_limit_label').hide();
 	$('conProjectInfo_edit').update('<div class="bt_projectInfo_edit"><a href="javascript:;" onclick="show_edit();"></a></div>');
 	var ddiv = $('description_container');
 	ddiv.update( ddiv.readAttribute('origdesc'));

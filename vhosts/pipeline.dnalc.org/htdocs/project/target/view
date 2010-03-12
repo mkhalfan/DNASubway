@@ -2,7 +2,9 @@
 <div id="conYellowlineLeft2">
 <input type="hidden" id="tid" value="<% $tid %>" />
 <input type="hidden" id="tstatus" value="<% $tp ? $tp->status : "" %>" />
+% if ($is_owner) {
 <input type="hidden" id="isowner" value="<% $is_owner %>"/>
+% }
  <span class="conYellowline_ConColumn1">
 	<span class="conYellowline_ConCellTitle">Mosses</span>
 %	for (sort {$a->{organism} cmp $b->{organism} } grep {$_->clade =~ /mosses/} @genomes) {
@@ -38,7 +40,7 @@
 
 <div id="conYellowlineRight2">
     <div class="con_browserBT ">
-		<span class="conIndicator_boxBrowse"><div id="alignment_ind" class="conIndicator_Rb<% $files{fasta} ? "" : "_disabled"%>"></div></span>
+		<span class="conIndicator_boxBrowse"><div id="alignment_ind" class="<% $files{fasta} ? "conIndicator_done" : "conIndicator_Rb_disabled"%>"></div></span>
 		<span class="bt_browserYellow" id="alignment_span">
 %	if (defined $files{fasta}) {
 		<applet archive="/files/jalview/jalviewApplet.jar" name="Jalview" 
@@ -50,24 +52,26 @@
 			<param name="windowHeight" value="500">
 			<param name="windowWidth" value="650">
 			<param name="showFullId" value="false">
-			<param name="label" value="Alignment View">
+			<param name="label" value="Alignment Viewer">
 			<param name="defaultColour" value="Clustal">
 			<p id="java_install">To play, <a href="http://java.sun.com/webapps/getjava/BrowserRedirect?host=java.com">install Java now</a>.</p>
 		</applet>
 %	} else {
-	<a href="#">Alignment<br/>View</a>
+	<a href="#" class="disabled">Alignment<br/>Viewer</a>
 %	}
 		</span>
 	</div>
     
 <span id="con_browserYellowSpacer"></span>
  <div class="con_browserBT ">
-    <span class="conIndicator_boxBrowse"><div id="tree_ind" class="conIndicator_Rb<% $tree_url ? "" : "_disabled" %>"></div></span>
+    <span class="conIndicator_boxBrowse"><div id="tree_ind" class="<% $tree_url ? "conIndicator_done" : "conIndicator_Rb_disabled" %>"></div></span>
 	<span class="bt_browserYellow"><a href="javascript:;" id="tree_btn"\
 % 	if ( $tree_url) {
 		onclick="window.open('/files/phylowidget/bare.html?tree=<% $tree_url %>', 'target_tree', 'status=0,height=550,width=650')"
+% 	} else {
+		class="disabled"
 % 	}
-	>Tree<br/>View</a></span>
+	>Tree<br/>Viewer</a></span>
     
     </div>
 % if ($tree_url && 0) {
@@ -84,10 +88,10 @@
 	<div class="con_browserBT ">
 % if ($is_owner) {
 		<span class="conIndicator_boxBrowse"><div id="launch_btn_ind" class="<% $tp->status ne "processing" ? "conIndicator_Rb_disabled" : "conIndicator_processing"%>"></div></span>
-		<span class="bt_Runyellowline"><a id="launch_btn" href="javascript:;" onclick="launch_target()">RUN</a></span>
+		<span class="bt_Runyellowline"><a id="launch_btn" href="javascript:;" onclick="launch_target()"class="<% $tp->status eq "processing" ? "disabled" : ""%>">RUN</a></span>
 % } else {
-		<span class="conIndicator_boxBrowse"><div id="launch_btn_ind" class="conIndicator_disabled"></div></span>
-		<span class="bt_Runyellowline"><a id="launch_btn" href="javascript:;">RUN</a></span>
+		<span class="conIndicator_boxBrowse"><div id="launch_btn_ind" class="conIndicator_Rb_disabled"></div></span>
+		<span class="bt_Runyellowline"><a id="launch_btn" class="disabled" href="javascript:;">RUN</a></span>
 % }
 	</div><!--END of ID conRun_yellowline-->
 </div>
@@ -156,6 +160,7 @@
 		</div>
 	</span><!--END of span conProjectInfo_column2-->
 	<span class="conProjectInfo_column3">
+		<div id="desc_limit_label" class="conNewPro_label" style="display: none;">Total characters (max.140): &nbsp;<span id="desc_len"><% $tp ? length $tp->description : 0 %></span></div>
 		<div id="description_container" origdesc="" class="conProjectInfo_description"><% $tp ? $tp->description : "" |html %></div>
 	</span> <!--END of span conProjectInfo_column2-->                   							
 

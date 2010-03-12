@@ -39,12 +39,11 @@
 	my $pm = DNALC::Pipeline::App::ProjectManager->new();
 	$client->job_servers(@{$pm->config->{GEARMAN_SERVERS}});
 	
-	my $jst = $client->get_status($h);
+	my $jst = $h != -1 ? $client->get_status($h) : undef;
 	if ($jst && $jst->known) {
 		$status_str = 'processing';
 	}
 	else {
-
 		my $tp = DNALC::Pipeline::TargetProject->retrieve($tid);
 
 		if ($tp) {

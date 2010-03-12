@@ -18,6 +18,12 @@
 		$m->redirect('/project/');
 	}
 
+	unless ($proj->sample) {
+		print "# ERROR: project not based on a sample sequence.";
+		return;
+	}
+	my $sample = DNALC::Pipeline::Sample->new($proj->sample);
+
 	my $pcf = $pm->config;
 	my $use_cache = 1;
 	
@@ -80,9 +86,6 @@
 
 	#print $gff_file, $/;
 	if (-f $gff_file) {
-		#$r->headers_out->add('Content-Disposition' => 'attachment;filename=gff3.gff');
-		#my ($sample) = grep {$_->{id} == $proj->sample} @{ $pcf->{samples} };
-		my $sample = DNALC::Pipeline::Sample->new($proj->sample);
 		my $col1 = $sample->segment . ':' . $sample->start . '..' . $sample->stop;
 		print q{[gene:AUGUSTUS]
 glyph = gene

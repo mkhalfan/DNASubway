@@ -1,4 +1,4 @@
-var dbg;
+//var dbg;
 var intervalID = 0;
 
 function launch_target () {
@@ -17,7 +17,8 @@ function launch_target () {
 		genomes.push(item.id.replace(/^g_/, ''));
 	});
 	if (genomes.length == 0) {
-		alert("You must pick at least one genome.");
+		//alert("You must pick at least one genome.");
+		show_errors("You must pick at least one genome.");
 		return;
 	}
 	
@@ -38,6 +39,7 @@ function launch_target () {
 	btn_ind.removeClassName('conIndicator_not-processed');
 	btn_ind.removeClassName('conIndicator_error');
 	btn_ind.addClassName('conIndicator_processing');
+	$('launch_btn').addClassName('disabled');
 
 	var tid = $('tid') ? $('tid').value : 0;
 	var params = { 'tid' : tid, 'g' : genomes};
@@ -49,20 +51,21 @@ function launch_target () {
 			var response = transport.responseText || "{'status':'error', 'message':'No response'}";
 			//debug(response);
 			var r = response.evalJSON();
-			dbg = r;
+			//dbg = r;
 
 			if (r.status == 'success') {
 				var h = r.h || '';
 				intervalID = setInterval(function (){ check_status(tid, h)}, 15000);
-				$('alignment_span').update('<a href="#">Alignment<br/>Viewer</a>');
+				$('alignment_span').update('<a href="#" class="disabled">Alignment<br/>Viewer</a>');
 				$('tree_btn').onclick = null;
 				$('tree_btn').stopObserving ('click');
+				$('tree_btn').addClassName('disabled');
 				
 				var alignment_ind = $('alignment_ind');
-				alignment_ind.removeClassName('conIndicator_Rb');
+				alignment_ind.removeClassName('conIndicator_done');
 				alignment_ind.addClassName('conIndicator_Rb_disabled');
 				var tree_ind = $('tree_ind');
-				tree_ind.removeClassName('conIndicator_Rb');
+				tree_ind.removeClassName('conIndicator_done');
 				tree_ind.addClassName('conIndicator_Rb_disabled');
 				
 			}
@@ -97,9 +100,9 @@ function check_status (tid, h) {
 		parameters: params, 
 		onSuccess: function(transport){
 			var response = transport.responseText || "{'status':'error', 'message':'No response'}";
-			//debug(response);
+			if (console) console.info(response);
 			var r = response.evalJSON();
-			dbg = r;
+			//dbg = r;
 			//console.info(r.status);
 			if (r.status != "processing") {
 				clearInterval(intervalID);
@@ -121,7 +124,7 @@ function check_status (tid, h) {
 						);
 						var abtn_ind = $('alignment_ind');
 						abtn_ind.removeClassName('conIndicator_Rb_disabled');
-						abtn_ind.addClassName('conIndicator_Rb');
+						abtn_ind.addClassName('conIndicator_done');
 					}
 					if (r.files && r.files['nw']) {
 						//var start = top.document.location.href.indexOf('.org')
@@ -131,9 +134,10 @@ function check_status (tid, h) {
 						$('tree_btn').observe('click', function() {
 							window.open('/files/phylowidget/bare.html?tree=' + server + r.files['nw'], 'target_tree', 'status=0,height=500,width=600');
 						});
+						$('tree_btn').removeClassName('disabled');
 						var tree_ind = $('tree_ind');
 						tree_ind.removeClassName('conIndicator_Rb_disabled');
-						tree_ind.addClassName('conIndicator_Rb');
+						tree_ind.addClassName('conIndicator_done');
 					}
 					btn_ind.addClassName('conIndicator_not-processed');
 				}
@@ -145,7 +149,8 @@ function check_status (tid, h) {
 					$('message').update("Failed to get the results from Target.");
 					btn_ind.addClassName('conIndicator_error');
 				}
-				$('launch_btn').show();
+				//$('launch_btn').show();
+				$('launch_btn').removeClassName('disabled');
 			}
 			else {
 				//console.info("status = " + r.status);
@@ -237,7 +242,7 @@ function populate_fields(src) {
 				}
 			});
 		}
-		dbg = extra;
+		//dbg = extra;
 		if (extra.name)
 			$('gp_name').value = extra.name;
 		if (extra.class_name)
@@ -315,35 +320,37 @@ function set_public(np) {
 
 /* triggers when a checkbox is changed */
 function updateRunButton(event) {
-	var btn_ind = $('launch_btn_ind');
-	if (btn_ind.hasClassName('conIndicator_processing')) {
-//		console.info('still processing..');
+
+	if (!$('isowner') || $('isowner').value != "1") {
 		return;
 	}
+	var btn = $('launch_btn');
+	var btn_ind = $('launch_btn_ind');
+	if (btn_ind.hasClassName('conIndicator_processing')) {
+		//console.info('still processing..');
+		return;
+	}
+
 	var cnt = 0;
 	$$('input.conRadiobox_align').each(function(element) {
-	  //var element = event.element();
-	  //console.info(element.getAttribute('id') + ' ' + element.id);
 	  if (element.checked == true) {
-		
 		cnt++;
 	  }
 	});
-	//console.info(cnt);
-	/*conIndicator_Rb_disabled
-	  conIndicator_not-processed
-	  conIndicator_processing */
+
 	if (cnt) {
 		btn_ind.removeClassName('conIndicator_Rb_disabled');
 		btn_ind.removeClassName('conIndicator_error');
 		//btn_ind.removeClassName('conIndicator_processing');
 		btn_ind.addClassName('conIndicator_not-processed');
+		btn_ind.removeClassName('disabled');
 	}
 	else {
 		btn_ind.removeClassName('conIndicator_error');
 		btn_ind.removeClassName('conIndicator_not-processed');
 		//btn_ind.removeClassName('conIndicator_processing');
 		btn_ind.addClassName('conIndicator_Rb_disabled');
+		btn_ind.addClassName('disabled');
 	}
 }
 
@@ -357,7 +364,14 @@ Event.observe(window, 'load', function() {
 		var spans = $$('span');
 		var btn = $('launch_btn_ind');
 		if (btn && btn.hasClassName('conIndicator_processing')) {
-			intervalID = setInterval(check_status, 10000, tid, -1);
+			if (navigator.userAgent.indexOf('MSIE') != -1) {
+				var callback = "check_status(" + tid + ", -1)";
+				//if (console) console.info(callback);
+				intervalID = setInterval(callback, 20000);
+			}
+			else {
+				intervalID = setInterval(check_status, 20000, tid, -1);
+			}
 		}
 		
 		// load tooltips
