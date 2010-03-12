@@ -13,7 +13,7 @@
 <%init>
 	$r->content_type("text/plain");
 
-	$m->session->{pipeline} ||= {};
+	#$m->session->{pipeline} ||= {};
 	my $s = $m->session->{pipeline};
 
 	if ($g && '' eq ref $g) {
@@ -26,7 +26,7 @@
 	my $h = '';
 	my $message = '';
 
-	if ($tp && @$g && $tp->status ne "processing") {
+	if ($tp && $tp->user_id == $s->{user_id} && @$g && $tp->status ne "processing") {
 
 		$ok = 1;
 		# check if the genome list is different than the previous one

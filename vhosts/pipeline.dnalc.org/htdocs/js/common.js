@@ -1,3 +1,7 @@
+// global w to keep track of the popup window
+
+var w;
+
 function gl_hide_definition() {
 	$$('span.con_GlossaryTextbox').each(function(sp) {
 		if (sp.style.display == 'block') {
@@ -20,12 +24,12 @@ function show_messages(html, isError) {
 		//alert(html);
 		return;
 	}
-	var resizable = true;
+
 	var options = {	
 			resizable: false,
-        	width: 400,
+        	width: 360,
 	        height: 200,
-	        shadow: true,
+	        shadow: false,
 	        draggable: false
 		};
 	if (navigator.userAgent.indexOf('MSIE') != -1) {
@@ -34,13 +38,30 @@ function show_messages(html, isError) {
 	}
 	var _w = new UI.Window(options).center();
 	html = "<div class=\"conNewPro_title\" style=\"vertical-align: middle; padding: 20px\">" + html + "</div>";
-	if (isError) {
+	/*if (isError) {
 		_w.setHeader("Error");
-	}	
+	}
+	else {
+		_w.setHeader("Notice");
+	}*/
+	_w.header.removeClassName('move_handle');
+	_w.setHeader("Message");
 	_w.setContent(html);
+	if (navigator.userAgent.indexOf('MSIE') != -1) {
+		// remove buttons from IE
+		try {
+			var btns = _w.buttons.childElements();
+			btns.each(function(btn){
+				if(btn.hasClassName('minimize') || btn.hasClassName('maximize') ) {
+					btn.remove();
+				}
+			});
+		} catch (e) {};
+	}
+
 	_w.show(true);
 	_w.activate();
-	return _w;
+	return w = _w;
 }
 
 function show_errors(html) {
@@ -48,7 +69,7 @@ function show_errors(html) {
 	if (!html || !UI) {
 		return;
 	}
-	show_messages(html, 1);
+	return show_messages(html, 1);
 }
 //------------------------
 
@@ -201,7 +222,7 @@ Event.observe(window, 'load', function() {
 	if (err) {
 		var html = err.innerHTML;
 		if (html) {
-			show_errors(html);
+			w = show_errors(html);
 		}
 	}
 	
@@ -210,7 +231,17 @@ Event.observe(window, 'load', function() {
 	if (mess) {
 		var html = mess.innerHTML;
 		if (html) {
-			show_messages(html);
+			w = show_messages(html);
 		}
+	}
+});
+
+Event.observe(document, 'keypress', function(ev) {
+	if (ev.keyCode == 27) { //ESC
+    	//debug('w=' + w);
+	    try {
+    	    if (w)
+        	    w.close();
+	    } catch (e) {}
 	}
 });

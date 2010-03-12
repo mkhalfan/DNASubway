@@ -5,7 +5,7 @@
 /*If the ID or CLASS name start with con, please see content.css document. */
 
 * {margin: 0px auto ;}
-* a {outline: none;}
+/* a {outline: none;}*/
 html {
 	margin: 0px;
 	padding: 0px;

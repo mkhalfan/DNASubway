@@ -1,9 +1,8 @@
-var dbg, w;
 
 function step_one() {
 	if (! $('seq_src_upload').checked && !$('seq_src_sample').checked && !$('seq_src_paste').checked) {
 		//alert("Source not selected!");
-		show_messages("Sequence source not selected!", 1);
+		show_messages("Sequence source not selected!");
 		return;
 	}
 
@@ -17,23 +16,56 @@ function step_one() {
 			has_actg = true;
 		}
 		else {
-			show_messages('The sequence is invalid.', 1);
+			show_messages('The sequence missing or is invalid.');
 			return;
 		}
 	}
 
 	if (!has_file && !has_sample && !has_actg) {
-		alert("You must select a file to upload or a sample organism!");
+		show_messages("You must select a file to upload or a sample organism!");
 		return;
 	}
+	
+	if ($('name') && $('name').value == '') {
+		show_messages("Please provide a title for you project!");
+		return;
+	}
+	
+//----------------------------------------
+	if (!UI) {
+		alert('UI is missing!');
+		return;
+	}
+	var options = {	
+			resizable: false,
+        	width: 340,
+	        height: 180,
+	        shadow: false,
+	        draggable: false,
+			close: false
+		};
+	/*if (navigator.userAgent.indexOf('MSIE') != -1) {
+		// IE doen't like this option!!!
+		delete options['resizable'];
+	}*/
+	var _w = new UI.Window(options).center();
+	html = "<p>&nbsp;</p><div class=\"conNewPro_title\" style=\"padding-left: 20px; padding-top: 20px;\">"
+		+ "Creating project. Stand by.."
+		+ ($('isnew') && $('isnew').value == "1" ? "<p>&nbsp;</p><small>(Your first project may take longer to create.)</small>" : '')
+		+ "</div>";
+	_w.setHeader("Notice");
+	_w.setContent(html);
+	_w.show(true);
+	_w.activate();
+//----------------------------------------
 
-	w = show_messages("Creating project. Do not close this message. <p>Stand by..</p>");
+	/*w = show_messages("");
 	document.observe('window:destroyed', function(event) {
 		if (w.id == event.memo.window.id) {
 			$('step_one_btn').onclick = null;
 			w = show_messages("Creating project. Do not close this message. <p>Stand by..</p>");
 		}
-	});
+	});*/
 	f.submit();
 }
 
@@ -84,38 +116,6 @@ function populate_fields(src) {
 	}
 }
 
-/*
-function show_message(html, isError) {
-
-	if (!html || !UI) {
-		return;
-	}
-	var resizable = true;
-	var options = {	
-			resizable: false,
-        	width: 400,
-	        height: 200,
-	        shadow: true,
-	        draggable: false
-		};
-	if (navigator.userAgent.indexOf('MSIE') != -1) {
-		// IE doen't like this option!!!
-		delete options['resizable'];
-	}
-	
-	// defined earlier as a global variable
-	_w = new UI.Window(options).center();
-	html = "<div class=\"conNewPro_title\" style=\"vertical-align: middle; padding: 20px\">" + html + "</div>";
-	_w.setContent(html);
-	if (isError) {
-		_w.setHeader("Error");
-	}
-	_w.show(true);
-	_w.activate();
-	return _w;
-}
-*/
-
 function use_organism(obj) {
 	
 	try {
@@ -124,7 +124,8 @@ function use_organism(obj) {
 		if (ary && ary.length == 2) {
 			$('organism').value = ary[0];
 			$('common_name').value = ary[1];
-			_w.close();
+			if (w) // global w, for the curent popup
+				w.close();
 		}
 	}
 	catch (e) {}

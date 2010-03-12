@@ -2,7 +2,7 @@
 <div id="container_rightContent">
 <div id="container_pageTitle"> public projects</div>
 <br clear="all"/>
-%	if (0 && exists $m->session->{messages}) {
+%	if (exists $m->session->{messages}) {
 <div id="error_list" style="display:none;">	
 <& /_messages &>
 </div>

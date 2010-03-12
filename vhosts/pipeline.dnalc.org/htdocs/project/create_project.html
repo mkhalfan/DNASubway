@@ -89,12 +89,15 @@
               <div class="conBT_continue"><a id="step_one_btn" href="javascript:void(0);" onclick="javascript:step_one();"></a></div>
               <div style="clear: both;">&nbsp;</div>
               <div id="con_star"><b>*</b> Required information</div>
-                        
+
             </div><!--END of ID conProject_newRight-->
 
-</div><!--END of ID conRedlineRight1-->                    
+</div><!--END of ID conRedlineRight1-->
+% if ($s->{new_user}) {
+<input type="hidden" id="isnew" value="1" />
+% }
 </form>
-</div><!--END of ID container_rightContent-->  
+</div><!--END of ID container_rightContent-->
 %#-----------------------------------------------------------------
 <%args>
 	$name => ''

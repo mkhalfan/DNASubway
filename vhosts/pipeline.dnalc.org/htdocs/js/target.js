@@ -27,6 +27,7 @@ function launch_target () {
 			return;
 	}
 	
+	$('message').update("");
 	//$('message').update("Processing.");
 	/*$('launch_btn').hide();*/
 	
@@ -53,7 +54,7 @@ function launch_target () {
 			if (r.status == 'success') {
 				var h = r.h || '';
 				intervalID = setInterval(function (){ check_status(tid, h)}, 15000);
-				$('alignment_span').update('<a href="#">Alignment<br/>View</a>');
+				$('alignment_span').update('<a href="#">Alignment<br/>Viewer</a>');
 				$('tree_btn').onclick = null;
 				$('tree_btn').stopObserving ('click');
 				
@@ -114,7 +115,7 @@ function check_status (tid, h) {
 							+ '<param name="windowHeight" value="500">'
 							+ '<param name="windowWidth" value="650">'
 							+ '<param name="showFullId" value="false">'
-							+ '<param name="label" value="Alignment View">'
+							+ '<param name="label" value="Alignment Viewer">'
 							+ '<param name="defaultColour" value="Clustal">'
 							+ '</applet>'
 						);
@@ -168,9 +169,9 @@ function launch_tree(nw) {
 
 	function openWindow(url) {
 		new UI.URLWindow({
-			width: 700, 
+			width: 800, 
 			height: 600,
-			shadow: true,
+			shadow: false,
 			url: url 
 		}).show();  
 	}
@@ -197,52 +198,14 @@ function launch_viewseq(tid) {
 	openWindow("/project/target/view_seq/" +  tid);
 }
 
-/*
-function show_errors(html) {
-
-	if (!html || !UI) {
-		return;
-	}
-	var resizable = true;
-	var options = {	
-			resizable: false,
-        	width: 400,
-	        height: 200,
-	        shadow: true,
-	        draggable: false
-		};
-	if (navigator.userAgent.indexOf('MSIE') != -1) {
-		// IE doen't like this option!!!
-		delete options['resizable'];
-	}
-	var w = new UI.Window(options).center();
-	html = "<div class=\"conNewPro_title\" style=\"vertical-align: middle; padding: 20px\">" + html + "</div>";
-	w.setContent(html);
-	w.show(true);
-
-}
-*/
-
-function select_source(el) {
-	alert('select_source() ????');
-	if (el && el.value == 'upload') {
-		$('sample').selectedIndex = -1;
-		//$('sample_info').update('');
-	}
-	else if (el && el.value == 'sample') {
-		//$('organism_info').hide();
-	}
-	populate_fields(el.value);
-}
-
-
 function set_source(s) {
 	var el = $('seq_src_' + s);
 	if (el) {
 		el.click();
-		//if (s == 'sample') {
 		populate_fields(s);
-		//}
+		if (s != 'sample') {
+			$('sample').selectedIndex = -1;
+		}
 	}
 }
 
@@ -387,15 +350,6 @@ function updateRunButton(event) {
 //-------------
 // keep this at the end
 Event.observe(window, 'load', function() {
-	// check for errors
-	var err = $("error_list");
-	if (err) {
-		var html = err.innerHTML;
-		if (html) {
-			show_errors(html);
-		}
-	}
-
 	
 	// re-check processing routines' status
 	if ($('tid')) {

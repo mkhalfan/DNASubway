@@ -24,9 +24,9 @@ var rnames = {
 function check_status (pid, op, h) {
 	var b = $(op + '_btn');
 	var ind = $(op + '_st');
-	/*alert(op + ' - ' + h);
+	/*alert(op + ' - ' + h);*/
 	if (!op || !h)
-		return;*/
+		return;
 	var params = { 'pid' : pid, 't' : op, 'h' : h};
 	sent = params;
 	new Ajax.Request('/project/check_status',{
@@ -34,13 +34,12 @@ function check_status (pid, op, h) {
 		parameters: params, 
 		onSuccess: function(transport){
 			var response = transport.responseText || "{'status':'error', 'message':'No response'}";
-			debug(response);
+			//debug(op + ': ' + response);
 			var r = response.evalJSON();
-			dbg = r;
-			//alert(r);
+			//dbg = r;
 			if (r.status == 'success') {
 				var file = r.output || '#';
-				if (r.running == 0 && r.known == 1) {
+				/*if (r.running == 0 && r.known == 1) {
 					//s.update(' Job waiting in line.');
 				}
 				else if (r.running == 1 && r.known == 1) {
@@ -48,17 +47,17 @@ function check_status (pid, op, h) {
 					//s.addClassName('processing');
 					//s.update(' Job running.');
 				}
-				else if (r.running == 0) {
-					clearInterval(intervalID[op]);
-					b.removeClassName('processing');
+				else*/
+				if (r.running == 0 && !r.known) {
+					//b.removeClassName('processing');
+					b.removeClassName('disabled');
 					b.addClassName('done');
 					b.onclick = function () { launch(null, file, rnames[op])};
-					//b.title = 'Click to view results';
-					//b.update('View');
 
 					ind.removeClassName(ind.className);
 					ind.addClassName('conIndicator_done');
-					//ind.title = 'Done';
+					window.clearInterval(intervalID[op]);
+					//debug(op + ": - just stoped it!");
 
 					if (op == 'repeat_masker') {
 						for (var i = 0; i < routines.length; i++) {
@@ -72,15 +71,11 @@ function check_status (pid, op, h) {
 								if (i < 7 ) {
 									//rt_ind.title = 'Not processed';
 								}
-								//console.log('IND enabled ' + routines[i]);
 							}
 							if (rt && rt.className == 'disabled') {
-								//console.log('RT enabling.. ' + routines[i]);
 								rt.removeClassName('disabled');
 								rt.addClassName('not-processed');
 								if (i < 7 ) {
-									//rt.title = 'Click to process';
-									//console.log('RT enabled btn.. ' + this.id);
 									rt.onclick = function () {
 												var routine = this.id.replace('_btn','');
 												run(routine);
@@ -128,8 +123,9 @@ function check_status (pid, op, h) {
 				} else {}
 			}
 			else  if (r.status == 'error') {
-				clearInterval(intervalID[op]);
-				b.removeClassName('processing');
+				window.clearInterval(intervalID[op]);
+				//b.removeClassName('processing');
+				b.removeClassName('disabled');
 				b.addClassName('error');
 				//b.title = 'Click to try again';
 				b.onclick = function () {
@@ -142,12 +138,12 @@ function check_status (pid, op, h) {
 			else {
 				//s.update('Unknown status!');
 				alert('Unknown status!');
-				clearInterval(intervalID[op]);
+				window.clearInterval(intervalID[op]);
 			}
 		},
 		onFailure: function(){
 				alert("Something went wrong.");
-				clearInterval(intervalID[op]);
+				window.clearInterval(intervalID[op]);
 			}
 	});
 
@@ -162,7 +158,8 @@ function run (op) {
 	if (b) {
 		b.onclick = null;
 		b.removeClassName(b.className);
-		b.addClassName('processing');
+		//b.addClassName('processing');
+		b.addClassName('disabled');
 		//b.title = 'Processing';
 	}
 	if (ind) {
@@ -179,9 +176,9 @@ function run (op) {
 		parameters: { 't' : op, pid : p}, 
 		onSuccess: function(transport){
 			var response = transport.responseText || "{'status':'error', 'message':'No response'}";
-			debug(response);
+			//debug(response);
 			var r = response.evalJSON();
-			dbg = r;
+			//dbg = r;
 			//alert('after launch job:\n' + response + ' ' + r.h);
 			if (r.status == 'success') {
 				var h = r.h || '';
@@ -454,19 +451,30 @@ Event.observe(window, 'load', function() {
 	if ($('isowner').value != "1") 
 		return;
 	
+	var pid = $('pid').value;
 	var as = $$('a');
 	for (var i = 0; i < as.length; i++ ) {
 	    var stat = as[i].readAttribute('status');
 		if (!stat)
 			continue;
 		if (stat == 'processing') {
-			var p = $('pid').value;
+			
 			var op = as[i].id.replace('_btn', '');
 			var delay = parseInt(as[i].readAttribute('delay'), 10);
 			if (isNaN(delay) || delay <= 10) {
 				delay = 10;
 			}
-			intervalID[op] = setInterval(check_status, delay * 1000, p, op, -1);
+			
+			if (navigator.userAgent.indexOf('MSIE') != -1) {
+				var callback = "check_status(" + pid + ", '" + op + "', -1)";
+				//debug(callback);
+				intervalID[op] = setInterval(callback, 20000);
+			}
+			else {
+				intervalID[op] = setInterval(check_status, delay * 1000, pid, op, -1);
+			}
+
+			//debug(" ** " + op + " : interval_id = " + intervalID[op]);
 		}
 	}
 });

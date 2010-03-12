@@ -82,13 +82,18 @@
 % if ($tp) {
 <div id="conRun_yellowline">
 	<div class="con_browserBT ">
+% if ($is_owner) {
 		<span class="conIndicator_boxBrowse"><div id="launch_btn_ind" class="<% $tp->status ne "processing" ? "conIndicator_Rb_disabled" : "conIndicator_processing"%>"></div></span>
 		<span class="bt_Runyellowline"><a id="launch_btn" href="javascript:;" onclick="launch_target()">RUN</a></span>
+% } else {
+		<span class="conIndicator_boxBrowse"><div id="launch_btn_ind" class="conIndicator_disabled"></div></span>
+		<span class="bt_Runyellowline"><a id="launch_btn" href="javascript:;">RUN</a></span>
+% }
 	</div><!--END of ID conRun_yellowline-->
 </div>
 % }
 
-<div id="message" style="color: #F47721;text-align:left; padding-top: 14px;"><% $message %></div>
+<div id="message" style="color: #F47721;text-align:left; padding-top: 14px;font-size: small"><% $message %></div>
 
 <div id="conProjectInfo">
 	<div id="conProjectInfo_header">
@@ -226,7 +231,7 @@
 			$message = '';
 		}
 		elsif ($tp->status eq 'failed') {
-			$message = "";#"Failed to get the results from TARGeT.";
+			$message = "Failed to get the results from TARGeT.";
 		}
 		if ($tp->user_id != $s->{user_id}) {
 			my $user = DNALC::Pipeline::User->retrieve($tp->user_id);

@@ -1,7 +1,7 @@
 <div style="width: 80%;">
 
 % if ($faction ne 'reload' && @err) {
-<div class="error" style="color: red; ">
+<div style="display:none" id="error_list">
 %	for (@err) {
 		<div><% $_ %></div>
 %	}
@@ -130,8 +130,8 @@ if ($r->method eq "POST") {
 		}
 	}
 	
-	if ($s->{username} && length($s->{username}) < 6) {
-		push @err, "Username is too short. Use at least 6 chars.";
+	if ($s->{username} && length($s->{username}) < 3) {
+		push @err, "Username is too short. Use at least 3 chars.";
 	}
 	
 	if (! defined $s->{country}  || $s->{country} eq '') {
@@ -214,7 +214,7 @@ if ($r->method eq "POST") {
 			if ($code) {
 				my $text = "Dear user,\n
 Thank you for creating an account.\n
-Your unsername is: \"$s->{username}\" (without the quotes).\n
+Your username is: \"$s->{username}\" (without the quotes).\n
 To set your password follow this link:
 $cf->{APOLLO_PROJECT_HOME}/resetpass.html?c=$code\n
 DNASubway Team";

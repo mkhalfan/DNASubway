@@ -89,7 +89,7 @@ new Tip('tt_brick', "Bioinformatics analysis routines in  <i>DNA Subway</i>  wor
 <div id="containerBody">
 
 % if (exists $m->session->{messages}) {
-<div style="display:none" id="error_list">	
+<div style="display:none" id="message_list">	
 	<& "/_messages" &>
 </div>
 % }

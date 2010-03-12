@@ -1,5 +1,5 @@
 % if ($status) {
-{'status':'<%$success%>','running' : <% $status->{running} %>, 'known' : '<% $status->{known} %>', 'output':'<& './.comp/filepath_to_web', file => $output &>'}
+{'status':'<%$success%>','running' : <% $status->{running} %>, 'known' : <% $status->{known} %>, 'output':'<& './.comp/filepath_to_web', file => $output &>'}
 % } else {
 {'status':'error','message':'???'}
 % }
@@ -42,9 +42,15 @@
 	
 	my $memcached = DNALC::Pipeline::CacheMemcached->new;
 	my $mc_key = "status-$t-$pid";
-	if ($memcached && $memcached->get($mc_key) =~ /processing/i) {
-		print "{'status':'success','running' : 1, 'known' : 1, 'output':''}";
-		return;
+	if ($memcached) {
+		if ($memcached->get($mc_key) =~ /processing/i) {
+			print "{'status':'success','running' : 1, 'known' : 1, 'output':''}";
+			return;
+		}
+		elsif ($memcached->get($mc_key) =~ /error/i) {
+			print "{'status':'error','message':'Failed to process task.'}";
+			return;
+		}
 	}
 	
 	my $pm = DNALC::Pipeline::App::ProjectManager->new($pid);
@@ -58,12 +64,14 @@
 	if ($h eq '-1') {
 		my $wfm = DNALC::Pipeline::App::WorkflowManager->new( $proj );
 		my $task_status = $wfm->get_status($t);
-		$status = {
+		if ($task_status->name ne 'error') {
+			$status = {
 					running => $task_status->name eq 'processing' ? 1 : 0,
 					known => $task_status->name eq 'processing' ? 1 : 0
 				};
-		print STDERR  "STAT = ", $pm->get_gff3_file($t), $/;
-		$output = $task_status->name eq 'done' ? $pm->get_gff3_file($t) : '';
+			print STDERR  "STAT = ", $pm->get_gff3_file($t), $/;
+			$output = $task_status->name eq 'done' ? $pm->get_gff3_file($t) : '';
+		}
 	}
 	else {
 		my $pcf = DNALC::Pipeline::Config->new->cf('PIPELINE');
