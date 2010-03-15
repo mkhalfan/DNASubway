@@ -7,8 +7,6 @@ function launch_target () {
 	
 	var btn_ind = $('launch_btn_ind');
 	if (btn_ind.hasClassName('conIndicator_processing')) {
-		//alert('');
-		//console.info('already processing');
 		return;
 	}
 
@@ -23,7 +21,7 @@ function launch_target () {
 	}
 	
 	if ($('tstatus').value == 'done') {
-		if (!confirm("You are about to remove the results of your search.\n"
+		if (!confirm("You are about to remove the results of your previous search.\n"
 						+ "Are you sure you want to continue?"))
 			return;
 	}
@@ -343,14 +341,14 @@ function updateRunButton(event) {
 		btn_ind.removeClassName('conIndicator_error');
 		//btn_ind.removeClassName('conIndicator_processing');
 		btn_ind.addClassName('conIndicator_not-processed');
-		btn_ind.removeClassName('disabled');
+		btn.removeClassName('disabled');
 	}
 	else {
 		btn_ind.removeClassName('conIndicator_error');
 		btn_ind.removeClassName('conIndicator_not-processed');
 		//btn_ind.removeClassName('conIndicator_processing');
 		btn_ind.addClassName('conIndicator_Rb_disabled');
-		btn_ind.addClassName('disabled');
+		btn.addClassName('disabled');
 	}
 }
 
