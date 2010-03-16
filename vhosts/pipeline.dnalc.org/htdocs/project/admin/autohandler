@@ -27,9 +27,9 @@
 </head>
 <body>
 <div>
-	<a href="/project/admin/samples/">samples</a>
-	<a href="/project/admin/target_samples/">target samples</a>
-%#	<a href="#">users</a>
+	<a href="/project/admin/samples/index.html">samples</a>
+	<a href="/project/admin/target_samples/index.html">target samples</a>
+%#	<a href="/project/admin/users/">users</a>
 %#	<a href="#">projects</a>
 </div>
 <div id="main">
@@ -55,7 +55,7 @@
 
 	my $now = time();
 	if ($s->{logged_in} && ($now - $s->{last} > 3600)) {
-		$m->comp("/_message_add", "It's been a while since your last visit: " . duration ($now - $s->{last}));
+		$m->comp("/_message_add", "Your session expired!");
 		$s->{logged_in} = 0;
 		delete $s->{logged_in};
 		delete $s->{user_id};
