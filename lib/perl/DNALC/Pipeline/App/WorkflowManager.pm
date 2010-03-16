@@ -143,7 +143,7 @@ use Carp;
 		my $mc_key = "status-$task_name-" . $self->project->id;
 		my $mc_status = $self->{_mc}->get($mc_key);
 		if ($mc_status) {
-			print STDERR  " \@\@ 10. MC status for task_id = ", $task_name, ' == ', $mc_status, $/;
+			#print STDERR  " \@\@ 10. MC status for task_id = ", $task_name, ' == ', $mc_status, $/;
 			return DNALC::Pipeline::TaskStatus->retrieve( $status_map{$mc_status} );
 		}
 		
