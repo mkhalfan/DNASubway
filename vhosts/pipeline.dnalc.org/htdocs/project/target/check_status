@@ -50,6 +50,10 @@
 			$status_str = $tp->status;
 			if ($status_str eq "done") {
 				my $workdir = $tp->work_dir;
+
+				# wait for the fs to sync (commonly seen in NFS environment)
+				sleep(2);
+
 				for (<$workdir/*>) {
 					my $file = $m->comp('../.comp/filepath_to_web', file => $_, just_return => 1);
 					if ($file =~ /\.(\w{2,5})$/) {
