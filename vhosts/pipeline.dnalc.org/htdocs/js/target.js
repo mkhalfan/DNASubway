@@ -108,36 +108,41 @@ function check_status (tid, h) {
 				btn_ind.removeClassName('conIndicator_processing');
 				if (r.status == 'done') {
 					//$('message').update("Done. Check results.");
-					if (r.files && r.files['fasta']) {
-						var abtn = $('alignment_span');
-						abtn.update('<applet archive="/files/jalview/jalviewApplet.jar" name="Jalview_muscle_1" code="jalview.bin.JalviewLite" height="35" width="110">'
-							+ '<param name="file" value="' + r.files['fasta'] + '">'
-							+ '<param name="showAnnotation" value="true">'
-							+ '<param name="windowHeight" value="500">'
-							+ '<param name="windowWidth" value="650">'
-							+ '<param name="showFullId" value="false">'
-							+ '<param name="label" value="Alignment Viewer">'
-							+ '<param name="defaultColour" value="Clustal">'
-							+ '</applet>'
-						);
-						var abtn_ind = $('alignment_ind');
-						abtn_ind.removeClassName('conIndicator_Rb_disabled');
-						abtn_ind.addClassName('conIndicator_done');
+					if (r.files) {
+						if (r.files['fasta']) {
+							var abtn = $('alignment_span');
+							abtn.update('<applet archive="/files/jalview/jalviewApplet.jar" name="Jalview_muscle_1" code="jalview.bin.JalviewLite" height="35" width="110">'
+								+ '<param name="file" value="' + r.files['fasta'] + '">'
+								+ '<param name="showAnnotation" value="true">'
+								+ '<param name="windowHeight" value="500">'
+								+ '<param name="windowWidth" value="650">'
+								+ '<param name="showFullId" value="false">'
+								+ '<param name="label" value="Alignment Viewer">'
+								+ '<param name="defaultColour" value="Clustal">'
+								+ '</applet>'
+							);
+							var abtn_ind = $('alignment_ind');
+							abtn_ind.removeClassName('conIndicator_Rb_disabled');
+							abtn_ind.addClassName('conIndicator_done');
+						}
+						if (r.files['nw']) {
+							//var start = top.document.location.href.indexOf('.org')
+							//var server = top.document.location.href.substr(0,start +4);
+							var loc = document.location;
+							var server = loc.protocol + '//' + loc.hostname;
+							$('tree_btn').observe('click', function() {
+								window.open('/files/phylowidget/bare.html?tree=' + server + r.files['nw'], 'target_tree', 'status=0,height=500,width=600');
+							});
+							$('tree_btn').removeClassName('disabled');
+							var tree_ind = $('tree_ind');
+							tree_ind.removeClassName('conIndicator_Rb_disabled');
+							tree_ind.addClassName('conIndicator_done');
+						}
+						btn_ind.addClassName('conIndicator_not-processed');
 					}
-					if (r.files && r.files['nw']) {
-						//var start = top.document.location.href.indexOf('.org')
-						//var server = top.document.location.href.substr(0,start +4);
-						var loc = document.location;
-						var server = loc.protocol + '//' + loc.hostname;
-						$('tree_btn').observe('click', function() {
-							window.open('/files/phylowidget/bare.html?tree=' + server + r.files['nw'], 'target_tree', 'status=0,height=500,width=600');
-						});
-						$('tree_btn').removeClassName('disabled');
-						var tree_ind = $('tree_ind');
-						tree_ind.removeClassName('conIndicator_Rb_disabled');
-						tree_ind.addClassName('conIndicator_done');
+					else {
+						top.document.location.reload();
 					}
-					btn_ind.addClassName('conIndicator_not-processed');
 				}
 				else if (r.status == "done-empty") {
 					$('message').update("No homologs found. Search other genomes.");
