@@ -219,6 +219,66 @@ function update_info() {
 			}
 	});
 }
+
+//------------------------
+
+function openWindow(url, title, opts) {
+	UI.defaultWM.options.blurredWindowsDontReceiveEvents = true;
+
+	var options = opts ? opts : {
+		width: 900, 
+		height: 496,
+		shadow: false,
+		draggable: true,
+		resizable: false,
+		url: url
+	};
+	
+	if (navigator.userAgent.indexOf('MSIE') != -1) {
+		// IE doen't like this option!!!
+		delete options['resizable'];
+	}
+
+	var w = new UI.URLWindow( options ).center();
+	if (title) {
+		w.setHeader(title);
+	}
+	
+	if (navigator.userAgent.indexOf('MSIE') != -1) {
+		try {
+			var btns = w.buttons.childElements();
+			btns.each(function(btn){
+				if(btn.hasClassName('minimize') || btn.hasClassName('maximize') ) {
+					btn.remove();
+				}
+			});
+			w.setResizable(false);
+		} catch (e) {};
+	}
+
+	var p = w.getPosition();
+	w.setPosition(110, p.left);
+	w.show();
+	w.focus();
+	//windows.push(w);
+	return w;
+}
+
+//------------------------
+
+function launch_tour() {
+	openWindow('/files/tour/index.html',
+				'DNA Subway tour', {
+				width: 750, 
+				height: 520,
+				shadow: false,
+				draggable: true,
+				resizable: false,
+				url: '/files/tour/index.html'
+			}
+		);
+}
+
 //------------------------
 
 Event.observe(window, 'load', function() {

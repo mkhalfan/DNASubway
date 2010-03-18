@@ -294,34 +294,6 @@ function close_windows() {
 	windows = [];
 }
 
-function openWindow(url, title) {
-	UI.defaultWM.options.blurredWindowsDontReceiveEvents = true;
-
-	var options = {
-		width: 900, 
-		height: 496,
-		shadow: false,
-		draggable: true,
-		resizable: true,
-		url: url
-	};
-	if (navigator.userAgent.indexOf('MSIE') != -1) {
-		// IE doen't like this option!!!
-		delete options['resizable'];
-	}
-
-	var w = new UI.URLWindow( options ).center();
-	if (title) {
-		w.setHeader(title);
-	}
-
-	var p = w.getPosition();
-	w.setPosition(110, p.left);
-	w.show();
-	w.focus();
-	//windows.push(w);
-}
-
 function launch(what, where, title) {
 	
 	var urls = {

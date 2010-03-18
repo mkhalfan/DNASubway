@@ -176,7 +176,7 @@ h5{
 #home_intro {
 	width: 600px;
 	height: 126px;
-	padding: 20px 200px 0px 200px;
+	padding: 20px 200px 0px 48px;
 	background-color: #fff;
 	font-size: 1em;
 	font-family: helvetica, sans-serif;	
@@ -1026,3 +1026,32 @@ width: 400px;
 	float: right;
 }
 
+/*//---------TOUR---------------*/
+#con_tour{
+width:130px;
+height:50px;
+position: relative;
+padding: 20px 0px 0px 20px;
+float: left;
+}
+
+.bt_tour{
+	width:130px;
+	height: 50px;
+	position: relative;	
+	float: right;
+}
+
+.bt_tour a {
+	width:130px;
+	height: 50px;
+	background: url("/images/v2/bt_tour1.png") right no-repeat;
+	display: block;
+	position: relative;
+	float: right;
+}
+
+.bt_tour a:hover {
+	background: url("/images/v2/bt_tour2.png") right no-repeat;
+	
+}
