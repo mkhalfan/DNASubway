@@ -153,12 +153,17 @@
 		# forward the feedback
 		my $text = "name: " . ($fb_name ? $fb_name : 'Anonymous') . "\n";
 		$text .= "email: " . $fb_email . "\n" if $fb_email;
-		$text .= "client IP: " . $ENV{REMOTE_ADDR} . ' ' . $ENV{HTTP_X_FORWARDED_FOR} . "\n";
+		$text .= "client IP: " . $ENV{REMOTE_ADDR} . ' ' . $ENV{HTTP_X_FORWARDED_FOR} . "\n\n";
 		$text .= "message:\n" . $fb_comment;
+
+		print STDERR "------FEEDBACK---------------------\n";
+		print STDERR $text, $/;
+		print STDERR "------/FEEDBACK---------------------\n";
 
 		my $msg = MIME::Lite->new (
 					From => '"Admin" <dnalcadmin@cshl.edu>',
-					To	 => 'hilgert@cshl.edu; ghiban@cshl.edu',
+					To	=> 'hilgert@cshl.edu',
+					Cc	=> 'ghiban@cshl.edu',
 					Subject => "[DNA Subway] Feedback",
 					Type	=> 'text/plain',
 					Data => $text
