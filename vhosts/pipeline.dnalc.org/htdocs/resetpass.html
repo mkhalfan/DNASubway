@@ -72,7 +72,6 @@
 				push @err, "Passwords do not match.";
 			}
 			unless (@err) {
-				print STDERR "[$p] =?= [$p2]", $/;
 				$u->password($p);
 				$u->crypt_password();
 				$u->update;

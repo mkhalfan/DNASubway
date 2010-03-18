@@ -151,13 +151,14 @@ if ($r->method eq "POST") {
 
 	if ($guest) {
 		if ($name && $name =~ /^guest_/) {
-			($user) = DNALC::Pipeline::User->search(username => $name);
+			($user) = DNALC::Pipeline::User->search(username => $name, active => "true");
 			$name = undef unless $user;
 		}
 
 		# if (!$name || $name !~ /guest/)
 		unless ($name && $name =~ /^guest_/) {
 			my $rand = lc random_string(6, 8);
+
 			$name = "guest_$rand";
 			my $chado_db = $name;
 			
