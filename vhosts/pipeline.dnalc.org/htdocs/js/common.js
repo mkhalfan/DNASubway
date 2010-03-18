@@ -230,7 +230,7 @@ function openWindow(url, title, opts) {
 		height: 496,
 		shadow: false,
 		draggable: true,
-		resizable: false,
+		resizable: true,
 		url: url
 	};
 	
@@ -242,18 +242,6 @@ function openWindow(url, title, opts) {
 	var w = new UI.URLWindow( options ).center();
 	if (title) {
 		w.setHeader(title);
-	}
-	
-	if (navigator.userAgent.indexOf('MSIE') != -1) {
-		try {
-			var btns = w.buttons.childElements();
-			btns.each(function(btn){
-				if(btn.hasClassName('minimize') || btn.hasClassName('maximize') ) {
-					btn.remove();
-				}
-			});
-			w.setResizable(false);
-		} catch (e) {};
 	}
 
 	var p = w.getPosition();
@@ -267,7 +255,7 @@ function openWindow(url, title, opts) {
 //------------------------
 
 function launch_tour() {
-	openWindow('/files/tour/index.html',
+	var w = openWindow('/files/tour/index.html',
 				'DNA Subway tour', {
 				width: 750, 
 				height: 520,
@@ -277,6 +265,18 @@ function launch_tour() {
 				url: '/files/tour/index.html'
 			}
 		);
+
+	if (navigator.userAgent.indexOf('MSIE') != -1) {
+		try {
+			var btns = w.buttons.childElements();
+			btns.each(function(btn){
+				if(btn.hasClassName('minimize') || btn.hasClassName('maximize') ) {
+					btn.remove();
+				}
+			});
+			w.setResizable(false);
+		} catch (e) {};
+	}
 }
 
 //------------------------
