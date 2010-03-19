@@ -17,6 +17,8 @@
 	use DNALC::Pipeline::App::WorkflowManager ();
 	use DNALC::Pipeline::CacheMemcached ();
 	use DNALC::Pipeline::Config ();
+	use Crypt::Simple;
+	use URI::Escape;
 	use Data::Dumper;
 
 	my @routines = qw/trna_scan augustus fgenesh repeat_masker/;
@@ -74,6 +76,7 @@
 		}
 	}
 	else {
+		$h = decrypt(uri_unescape($h));
 		my $pcf = DNALC::Pipeline::Config->new->cf('PIPELINE');
 		my $client = Gearman::Client->new;
 		$client->job_servers(@{$pcf->{GEARMAN_SERVERS}});

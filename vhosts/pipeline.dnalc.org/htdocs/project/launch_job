@@ -9,6 +9,8 @@
 	use DNALC::Pipeline::App::WorkflowManager ();
 	use DNALC::Pipeline::Utils qw(isin);
 	use DNALC::Pipeline::CacheMemcached ();
+	use Crypt::Simple;
+	use URI::Escape;
 	use Data::Dumper;
 
 	use Gearman::Client ();
@@ -82,9 +84,10 @@
 	$client->job_servers(@{$pcf->{GEARMAN_SERVERS}});
 	my $h = $client->dispatch_background( $t => $pid);
 	if ($h) {
+		$h = uri_escape(encrypt($h));
 		$memcached->set($mc_key, 'processing');
 	}
-	#print STDERR  "Launched [$t], h = ", $h, $/;
+	print STDERR  "Launched [$t], h = ", $h, $/;
 </%init>
 %#-------------------------------------------------
 <%flags>
