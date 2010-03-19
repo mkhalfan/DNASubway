@@ -1029,7 +1029,7 @@ width: 400px;
 /*//---------TOUR---------------*/
 #con_tour{
 width:130px;
-height:50px;
+height:110px;
 position: relative;
 padding: 20px 0px 0px 20px;
 float: left;
@@ -1053,5 +1053,27 @@ float: left;
 
 .bt_tour a:hover {
 	background: url("/images/v2/bt_tour2.png") right no-repeat;
+	
+}
+
+.bt_poster{
+	width:130px;
+	height: 50px;
+	position: relative;	
+	float: right;
+}
+
+.bt_poster a {
+	width:130px;
+	height: 50px;
+	background: url("/images/v2/bt_poster1.png") right no-repeat;
+	display: block;
+	margin-top: 10px;
+	position: relative;
+	float: right;
+}
+
+.bt_poster a:hover {
+	background: url("/images/v2/bt_poster2.png") right no-repeat;
 	
 }
