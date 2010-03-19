@@ -24,12 +24,17 @@ use common::sense;
 
 use Date::Calc qw/Today Delta_Days/;
 use DNALC::Pipeline::User ();
+use DNALC::Pipeline::Utils qw(random_string);
 use DNALC::Pipeline::Config ();
 use DNALC::Pipeline::Project ();
 use DNALC::Pipeline::App::ProjectManager ();
 use DNALC::Pipeline::App::Utils ();
 use DNALC::Pipeline::TargetProject ();
 
+use File::Copy;
+use Data::Dumper;
+
+#-----------------------------------------------------------------------------
 
 my $GBROWSE_TMP_ROOT = '/var/www/html/gbrowse/tmp';
 
@@ -38,7 +43,12 @@ my $cf = DNALC::Pipeline::Config->new->cf('PIPELINE');
 
 my ($y1, $m1, $d1) = Today();
 
-my @users = DNALC::Pipeline::User->search_like(username => 'guest%');
+my ($the_guest) = DNALC::Pipeline::User->search(username => 'guest');
+
+#print STDERR Dumper( $the_guest), $/;
+
+my @users = DNALC::Pipeline::User->search_like(username => 'guest_%');
+my $counter = 0;
 for my $u (@users) {
 	next if $u->username eq 'guest';
 	next unless $u->created;
@@ -47,6 +57,7 @@ for my $u (@users) {
 	next if $dd < 1;
 	print STDERR  $u, ' ', $u->username, '; dd=', $dd, $/;
 
+	#next;
 
 	&remove_gbrowse_tmp_files($u->username);
 	&remove_projects($u);
@@ -55,6 +66,7 @@ for my $u (@users) {
 	&drop_chadodb($u);
 
 	$u->delete;
+	last if $counter++ > 0;
 }
 
 #----------------------------------------------------------------------
@@ -104,9 +116,32 @@ sub remove_projects {
 		# project dir
 		my $dir = $pm->work_dir;
 		print STDERR  "p.$p DIR => ", $dir, $/;
-		DNALC::Pipeline::App::Utils->remove_dir($dir);
+		if ($p->sample) {
+			DNALC::Pipeline::App::Utils->remove_dir($dir);
+		} else {
+			# keep fasta file
+			my $fasta = $dir . '/fasta.fa';
+			if (-f $fasta) {
+				my $tmp_fasta = '/tmp/fasta-' . random_string(8,10);
+				move $fasta, $tmp_fasta;
+				DNALC::Pipeline::App::Utils->remove_dir($dir, 'keep_root');
+				move $tmp_fasta, $fasta;
+				print STDERR  'Keeping fasta file: ', $fasta, $/;
+			}
+			else {
+				DNALC::Pipeline::App::Utils->remove_dir($dir);
+			}
+		}
 		print STDERR  "Project = $p", $/;
-		$p->delete;
+		$p->user_id($the_guest->id);
+		$p->update;
+		my ($mp) = DNALC::Pipeline::MasterProject->search(project_id => $p->id, project_type => 'annotation');
+		if ($mp && $mp->public =~ /t/i) {
+			$mp->public('f');
+			$mp->user_id($the_guest->id);
+			$mp->update;
+		}
+		#$p->delete;
 
 		print STDERR  "----", $/;
 	}
