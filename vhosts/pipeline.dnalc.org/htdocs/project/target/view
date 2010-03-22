@@ -11,7 +11,12 @@
 %		my $gid = $_->id;
 	<span id="sg_<% $gid %>" class="conYellowline_ConCell1" cn="<% $_->common_name |html %>"><input class="conRadiobox_align" type="checkbox" name="g" id="g_<% $_->id %>" value="<% $_->id %>" <% (grep {$_ eq $gid } @tp_genomes)  ? "checked=\"checked\"" : "" %> />&nbsp; <% $_->organism %></span>
 %	}
-	<span class="conYellowline_ConCell1"> &nbsp; </span>
+
+	<span class="conYellowline_ConCellTitle">Lycophytes</span>
+%	for (sort {$a->{organism} cmp $b->{organism} } grep {$_->clade =~ /lycophytes/} @genomes) {
+%		my $gid = $_->id;
+	<span id="sg_<% $gid %>" class="conYellowline_ConCell1" cn="<% $_->common_name |html %>"><input class="conRadiobox_align" type="checkbox" name="g" id="g_<% $_->id %>" value="<% $_->id %>" <% (grep {$_ eq $gid } @tp_genomes)  ? "checked=\"checked\"" : "" %> />&nbsp; <% $_->organism %></span>
+%	}   
 	<span class="conYellowline_ConCellTitle">Algae</span>
 %	for (sort {$a->{organism} cmp $b->{organism} } grep {$_->clade =~ /algi/} @genomes) {
 %		my $gid = $_->id;

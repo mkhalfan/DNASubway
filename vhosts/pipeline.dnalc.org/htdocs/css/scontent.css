@@ -1186,7 +1186,7 @@
   position: relative;
   float: left;
   color: #000;
-  font-size: 0.75em;
+  font-size: 0.7em;
   text-align: left; 
   margin-left:10px;
 }
@@ -1194,11 +1194,11 @@
 
 .conYellowline_ConCellTitle{
   width: 143px;
-  height: 27px;
+  height: 25px;
   position: relative;
   float: left;
   color: #000;
-  font-size: 0.85em;
+  font-size: 0.80em;
   text-align: left; 
   font-weight: bold;
   margin-left:26px;
