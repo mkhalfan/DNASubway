@@ -124,6 +124,27 @@
 	background: url("/images/v2/bt_glossary2.jpg") left no-repeat;
 
 }
+.bt_Guide {
+	width:140px;
+	height: 40px;
+	position: relative;	
+    float: left;
+}
+
+.bt_Guide  a {
+	width:140px;
+	height: 40px;
+	background: url("/images/v2/bt_guide1.jpg") left no-repeat;
+	display: block;
+	position: relative;
+	float: left;
+	margin: 10px 0px 10px 0px;
+}
+
+.bt_Guide a:hover {
+
+	background: url("/images/v2/bt_guide2.jpg") left no-repeat;
+}
 .bt_MyProjects {
 	width:140px;
 	height: 50px;

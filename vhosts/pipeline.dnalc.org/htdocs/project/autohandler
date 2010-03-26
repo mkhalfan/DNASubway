@@ -50,10 +50,10 @@
 	<span class="bt_redStart"><a href="/project/create_project.html" class="<% $class_r %>"></a></span>
 	<span class="bt_yellowStart"><a href="/project/target/create" class="<% $class_y %>"></a></span>
 	<span class="bt_blueStart">&nbsp;<!--<a href="#" style="cursor: default;"></a>--></span>
-     
-% if ($m->request_comp->attr('show_glossary')) {
     <span class="spacer_btGlossary"></span> 
     <span class="spacer_btGlossary"></span>
+     
+% if ($m->request_comp->attr('show_glossary')) {
   <!-- Glossary Panel STart -->                       
   <span class="bt_Glossary">
     <a href="javascript:;" onclick="$('glossarypanel').style.display = 'block';"></a>
@@ -75,7 +75,10 @@
 	</div> <!--END of ID 'PopUp'-->
     
   </span> <!--END of ID bt_Glossary-->
-% }  
+% } else {
+	<span class="bt_Glossary"></span>
+% }
+  <span class="bt_Guide"><a href="/files/pdf/DNA_Subway_Guide.pdf"></a></span>
 </div><!--END of ID container_leftMenu-->
 
 <!-- end header -->
