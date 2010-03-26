@@ -136,5 +136,9 @@ my $pages = int($pager->total_entries/$epp) + ($pager->total_entries % $epp > 0 
 	js => []
 </%attr>
 %#---------------------------------
+<%method title>\
+My projects -
+</%method>\
+%#---------------------------------
 
 %# vim: ft=mason

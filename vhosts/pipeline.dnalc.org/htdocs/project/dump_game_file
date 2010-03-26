@@ -26,7 +26,7 @@
 	}
 
 	unless ($err) {
-		print STDERR "common-name for pid = $pid = ", $pmanager->cleaned_common_name, $/;
+		#print STDERR "common-name for pid = $pid = ", $pmanager->cleaned_common_name, $/;
 		
 		my $cutil = DNALC::Pipeline::Chado::Utils->new;
 		$cutil->profile( $pmanager->chado_user_profile );
@@ -49,11 +49,12 @@
 				apollo_desc => $config->{APOLLO_DESC},
 				pid			=> $pid,
 			});
-		my $javacmd = "$apollo -H -w $game_file -o game -l $req_region -i chadoDB -C $conf_file > /dev/null";
+		my $javacmd = "$apollo -H -w $game_file -o game -l $req_region -i chadoDB -C $conf_file > /dev/null 2>&1";
 		#my $javacmd = "$apollo -H -w $game_file -o game -l $req_region -i chadoDB -C $conf_file";
 		print STDERR  $javacmd , $/;
-		print STDERR  "\njnlp = $jnlp\n", $/;
-		print STDERR  "\ngame = $game_file\n", $/;
+		#print STDERR  "\njnlp = $jnlp\n", $/;
+		#print STDERR  "\ngame = $game_file\n", $/;
+
 		my $rc = system($javacmd);
 		if ($rc == 0 && -f $game_file) {
 			$status = 'success';
