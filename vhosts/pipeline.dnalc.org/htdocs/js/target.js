@@ -1,4 +1,4 @@
-//var dbg;
+var dbg;
 var intervalID = 0;
 
 function launch_target () {
@@ -98,10 +98,20 @@ function check_status (tid, h) {
 		parameters: params, 
 		onSuccess: function(transport){
 			var response = transport.responseText || "{'status':'error', 'message':'No response'}";
-			if (console) console.info(response);
+			/*if ($('debg')) {
+				$('debg').update(response);
+			}
+			else {
+				var d = new Element('textarea', {id:'debg'}).update(response);
+				$('body').insert(d);
+			}
+			//alert("1. " + response);
+			//if (console) console.info(response);
+			alert("2. " + response);*/
 			var r = response.evalJSON();
+			//alert(r.status + " - " + r['status']);
 			//dbg = r;
-			//console.info(r.status);
+			//if (console) console.info(r.status);
 			if (r.status != "processing") {
 				clearInterval(intervalID);
 				//console.info("clearing id = " + intervalID);
@@ -111,23 +121,24 @@ function check_status (tid, h) {
 					if (r.files) {
 						if (r.files['fasta']) {
 							var abtn = $('alignment_span');
-							abtn.update('<applet archive="/files/jalview/jalviewApplet.jar" name="Jalview_muscle_1" code="jalview.bin.JalviewLite" height="35" width="110">'
-								+ '<param name="file" value="' + r.files['fasta'] + '">'
-								+ '<param name="showAnnotation" value="true">'
-								+ '<param name="windowHeight" value="500">'
-								+ '<param name="windowWidth" value="650">'
-								+ '<param name="showFullId" value="false">'
-								+ '<param name="label" value="Alignment Viewer">'
-								+ '<param name="defaultColour" value="Clustal">'
-								+ '</applet>'
+							abtn.childElements().each(function(item){
+									if ('A' == item.nodeName) {
+										item.removeClassName('disabled');
+										item.observe('click', function() {
+											launch_jalview(r.files['fasta']);
+										});
+									}
+								}
 							);
 							var abtn_ind = $('alignment_ind');
 							abtn_ind.removeClassName('conIndicator_Rb_disabled');
 							abtn_ind.addClassName('conIndicator_done');
+							//try {
+								if ($('jalview_ifr'))
+									$('jalview_ifr').remove();
+							//} catch (e) {}
 						}
 						if (r.files['nw']) {
-							//var start = top.document.location.href.indexOf('.org')
-							//var server = top.document.location.href.substr(0,start +4);
 							var loc = document.location;
 							var server = loc.protocol + '//' + loc.hostname;
 							$('tree_btn').observe('click', function() {
@@ -168,7 +179,6 @@ function check_status (tid, h) {
 	});
 }
 
-
 function launch_tree(nw) {
 	if (!nw)
 		return;
@@ -187,6 +197,25 @@ function launch_tree(nw) {
 	openWindow("/files/phylowidget/bare.html?tree=" +  nw);
 }
 
+function launch_jalview(fa) {
+	if (!fa)
+		return;
+
+	if ($('jalview_ifr')) {
+		$('jalview_ifr').contentWindow.location.reload();
+	}
+	else {
+		var jlv = new Element('iframe', {id: 'jalview_ifr', src: './view_alignment?f=' + fa, width: '0px', height:'0px'});
+		$('body').insert(jlv);
+		$('alignment_ind').removeClassName('conIndicator_done');
+		$('alignment_ind').addClassName('conIndicator_processing');
+		new PeriodicalExecuter(function(p){
+				$('alignment_ind').removeClassName('conIndicator_processing');
+				$('alignment_ind').addClassName('conIndicator_done');
+				p.stop();
+		}, 5);
+	}
+}
 
 function launch_viewseq(tid) {
 	if (!tid)

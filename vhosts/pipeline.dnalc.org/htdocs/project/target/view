@@ -46,25 +46,12 @@
 <div id="conYellowlineRight2">
     <div class="con_browserBT ">
 		<span class="conIndicator_boxBrowse"><div id="alignment_ind" class="<% $files{fasta} ? "conIndicator_done" : "conIndicator_Rb_disabled"%>"></div></span>
-		<span class="bt_browserYellow" id="alignment_span">
+		
 %	if (defined $files{fasta}) {
-		<applet archive="/files/jalview/jalviewApplet.jar" name="Jalview" 
-			codebase="/files/jalview/" 
-			code="jalview.bin.JalviewLite"
-			height="35" width="110">
-			<param name="file" value="<% $files{fasta} %>">
-			<param name="showAnnotation" value="true">
-			<param name="windowHeight" value="500">
-			<param name="windowWidth" value="650">
-			<param name="showFullId" value="false">
-			<param name="label" value="Alignment Viewer">
-			<param name="defaultColour" value="Clustal">
-			<p id="java_install">To play, <a href="http://java.sun.com/webapps/getjava/BrowserRedirect?host=java.com">install Java now</a>.</p>
-		</applet>
+	<span class="bt_browserYellow" id="alignment_span"><a href="#" onclick="launch_jalview('<% $files{fasta} %>')">Alignment<br/>Viewer</a></span>
 %	} else {
-	<a href="#" class="disabled">Alignment<br/>Viewer</a>
+	<span class="bt_browserYellow" id="alignment_span"><a href="#" class="disabled">Alignment<br/>Viewer</a></span>
 %	}
-		</span>
 	</div>
     
 <span id="con_browserYellowSpacer"></span>
@@ -79,11 +66,6 @@
 	>Tree<br/>Viewer</a></span>
     
     </div>
-% if ($tree_url && 0) {
-	<a href="javascript:;" onclick="launch_tree('<% $tree_url %>')">tree1</a>
-	<a href="/files/phylowidget/bare.html?tree=<% $tree_url %>" target="_blank">tree2</a>
-	<a href="#" onclick="window.open('/files/phylowidget/bare.html?tree=<% $tree_url %>', 'target_tree', 'status=0,height=600,width=600')">tree3</a>
-% }
 </div><!--END of ID conYellowlineRight2--> 
 
 <br clear="both"/>

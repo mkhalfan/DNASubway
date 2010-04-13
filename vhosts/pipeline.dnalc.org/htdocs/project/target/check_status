@@ -21,6 +21,7 @@
 </%once>
 %#-------------------------------------------------
 <%init>
+	$r->no_cache(1);
 	$r->content_type("text/plain");
 
 	$m->session->{pipeline} ||= {};
