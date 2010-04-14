@@ -1,0 +1,30 @@
+%#--------------------------------
+<%args>
+	$f => ''
+</%args>
+%#--------------------------------
+<html>
+<body>
+% if ($f) {
+<applet archive="/files/jalview/jalviewApplet.jar" name="Jalview" 
+	codebase="/files/jalview/" 
+	code="jalview.bin.JalviewLite" height="15" width="110">
+	<param name="file" value="<% $f %>">
+	<param name="showAnnotation" value="true">
+	<param name="wrap" value="false">
+	<param name="nojmol" value="true">
+	<param name="windowHeight" value="500">
+	<param name="windowWidth" value="750">
+	<param name="showFullId" value="false">
+	<param name="defaultColour" value="Clustal">
+	<param name="showbutton" value="false" />
+%#	<p id="java_install"><a href="http://java.sun.com/webapps/getjava/BrowserRedirect?host=java.com">Install Java</a>.</p>
+</applet>
+% }
+</body>
+</html>
+%#--------------------------------
+<%flags>
+	inherit => undef
+</%flags>
+%#--------------------------------
