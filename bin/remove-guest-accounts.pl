@@ -66,7 +66,7 @@ for my $u (@users) {
 	&drop_chadodb($u);
 
 	$u->delete;
-	last if $counter++ > 0;
+	last if $counter++ >= 5;
 }
 
 #----------------------------------------------------------------------
@@ -133,6 +133,7 @@ sub remove_projects {
 			}
 		}
 		print STDERR  "Project = $p", $/;
+		$p->name($u->username . '|' . $p->name);
 		$p->user_id($the_guest->id);
 		$p->update;
 		my ($mp) = DNALC::Pipeline::MasterProject->search(project_id => $p->id, project_type => 'annotation');
