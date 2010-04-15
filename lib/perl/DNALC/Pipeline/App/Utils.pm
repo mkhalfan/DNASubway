@@ -225,7 +225,7 @@ sub format_datetime {
 }
 
 sub remove_dir {
-	my ($class, $dir) = @_;
+	my ($class, $dir, $keep_root) = @_;
 
 	if (-d $dir) {
 		my @dir_content = <$dir/*>;
@@ -237,7 +237,7 @@ sub remove_dir {
 				unlink $of;
 			} 
 		}
-		rmdir $dir;
+		rmdir $dir unless $keep_root;
 	}
 }
 
