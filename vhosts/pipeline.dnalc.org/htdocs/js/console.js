@@ -65,7 +65,6 @@ function check_status (pid, op, h) {
 							var rt_ind = $(routines[i] + '_st');
 							
 							if (rt_ind && rt_ind.className == 'conIndicator_disabled') {
-								//console.log('IND enabling: ' + routines[i] + " // " + rt_ind.className);
 								rt_ind.removeClassName('conIndicator_disabled');
 								rt_ind.addClassName('conIndicator_not-processed');
 								if (i < 7 ) {
@@ -82,9 +81,7 @@ function check_status (pid, op, h) {
 											};
 								}
 								else {
-									//console.log('enabling btn.. ' + rt.id);
 									rt.onclick = function () {
-												//console.log('clicked: ' + routine + ' ' + rnames[routine]);
 												var routine = this.id.replace('_btn','');
 												launch(routine, null, rnames[routine]);
 											};
@@ -169,7 +166,6 @@ function run (op) {
 	}
 	var delay = b ? parseFloat(b.getAttribute('delay')) : 10;
 	delay = !isNaN(delay) ? (delay * 1000) : 10000;
-	//console.info('delay for ' + op + ' = ' + delay);
 
 	new Ajax.Request('/project/launch_job',{
 		method:'get',
@@ -220,6 +216,12 @@ function run (op) {
 				alert('Something went wrong!\nAborting...');
 			}
 	});
+	
+	try {
+		pageTracker._trackEvent(rnames[op] || op, "run");
+	} catch (e) {
+		debug(e.toString());
+	};
 }
 
 
@@ -259,7 +261,7 @@ function launch_apollo() {
 		parameters: params, 
 		onSuccess: function(transport){
 			var response = transport.responseText || "{'status':'error', 'message':'No response'}";
-			debug(response);
+			//debug(response);
 			var r = response.evalJSON();
 			if (r.status == 'success') {
 				var upl = new Element('iframe', {src: r.file, width: '0px', height:'0px'});
@@ -285,6 +287,12 @@ function launch_apollo() {
 				abtn.setAttribute("working", 0);
 			}
 	});
+	
+	try {
+		pageTracker._trackEvent("Apollo", "view");
+	} catch (e) {
+		debug(e.toString());
+	};
 }
 
 function close_windows() {
@@ -325,6 +333,12 @@ function launch(what, where, title) {
 					: where;
 	var window_title = title ? title : urls[what] ? urls[what][1] : null;
 	openWindow( uri, title);
+	
+	try {
+		pageTracker._trackEvent(title, "view");
+	} catch (e) {
+		debug(e.toString());
+	};
 }
 
 function createTargetPoject(sel) {

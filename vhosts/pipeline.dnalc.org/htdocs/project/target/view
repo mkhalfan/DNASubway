@@ -59,7 +59,7 @@
     <span class="conIndicator_boxBrowse"><div id="tree_ind" class="<% $tree_url ? "conIndicator_done" : "conIndicator_Rb_disabled" %>"></div></span>
 	<span class="bt_browserYellow"><a href="javascript:;" id="tree_btn"\
 % 	if ( $tree_url) {
-		onclick="window.open('/files/phylowidget/bare.html?tree=<% $tree_url %>', 'target_tree', 'status=0,height=550,width=650')"
+		onclick="window.open('/files/phylowidget/bare.html?tree=<% $tree_url %>', 'target_tree', 'status=0,height=550,width=750')"
 % 	} else {
 		class="disabled"
 % 	}
