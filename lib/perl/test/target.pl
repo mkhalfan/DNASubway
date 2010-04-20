@@ -10,10 +10,11 @@ use DNALC::Pipeline::TargetProject ();
 use DNALC::Pipeline::Config();
 
 use Gearman::Client ();
+use Time::HiRes qw(gettimeofday tv_interval);
 
 # XXX - use the GEARMAN_SERVERS entry from config/PIPELINE for the IPs
 
-my $tpid = 54;
+my $tpid = 69;
 my $pcf = DNALC::Pipeline::Config->new->cf('PIPELINE');
 my $client = Gearman::Client->new;
 my $sx = $client->job_servers(@{$pcf->{GEARMAN_SERVERS}});
@@ -22,7 +23,7 @@ my $sx = $client->job_servers(@{$pcf->{GEARMAN_SERVERS}});
 #__END__;
 
 my $tp = DNALC::Pipeline::TargetProject->retrieve($tpid);
-die "Target project not found: ", $tpid, $/;
+die "Target project not found: ", $tpid, $/ unless $tp;
 
 my $cf = DNALC::Pipeline::Config->new->cf('TARGET');
 my $ua = LWP::UserAgent->new;
@@ -36,6 +37,8 @@ my $seq = $tp->seq;
 my @genomes = map {$_->genome_id->id} $tp->genomes;
 my %genomes = map {my $o = $_->genome_id->organism; $o =~ s/\s+/_/g;$_->genome_id->id => $o} $tp->genomes;
 
+push @genomes, ("Gm_pz5", 'Rc_pz5', 'Pp_pz5', 'Osj_pz5', 'Bd_pz5', 'Sb1');
+
 my $query = {
 	'orgn[]' => \@genomes,
 	'_querys_0' => $seq,
@@ -44,9 +47,10 @@ my $query = {
 
 #print STDERR Dumper( $query ), $/;
 
-my $xml_url = $server . '/Visitors/143_48_90_149/temp_121130310.xml';
+my $xml_url = '';#$server . '/Visitors/143_48_90_149/temp_121130310.xml';
 
 unless ($xml_url) {
+	my $t0 = [gettimeofday];
 	$res = $ua->post($post_url, $query);
 	unless ($res->is_success) {
 		print $res->status_line, "\n";
@@ -60,7 +64,10 @@ unless ($xml_url) {
 			$xml_url = $server . $1;
 		}
 	}
+	print STDERR "elapsed = ", tv_interval ( $t0 ), $/;
 }
+
+__END__
 
 if ($xml_url) {
 	#print $xml_url, $/;

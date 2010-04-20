@@ -11,13 +11,16 @@ use LWP::UserAgent;
 use XML::Simple;
 use DNALC::Pipeline::TargetProject ();
 use DNALC::Pipeline::Config();
-
+use Archive::Tar;
+use File::Basename;
 
 sub run_target {
 	my $gearman = shift;
 	my $tpid = $gearman->arg;
 
 	my $tp = DNALC::Pipeline::TargetProject->retrieve($tpid);
+	return unless $tp;
+	#print STDERR  'Working on Target Project: ', $tp->id, $/;
 
 	my $cf = DNALC::Pipeline::Config->new->cf('TARGET');
 	my $ua = LWP::UserAgent->new;
@@ -39,12 +42,15 @@ sub run_target {
 	};
 
 
-	my $xml_url;# = $server . '/Visitors/143_48_90_149/temp_0828144132.xml';
+	my $xml_url;# = $server . '/Visitors/143_48_90_149/temp_0310151334.xml';
 	#print STDERR Dumper( $query ), $/;
+
+	#----------------------------------------------------------------
+	my $archive = '';
 
 	unless ($xml_url) {
 		$res = $ua->post($post_url, $query);
-		#print STDERR Dumper( $res ), $/;
+		print STDERR 'got POST response; is_success: ', $res->is_success, $/;
 		unless ($res->is_success) {
 			print STDERR $res->status_line, "\n";
 			$tp->status('failed');
@@ -59,11 +65,12 @@ sub run_target {
 			}
 		}
 	}
-	print STDERR $xml_url, $/;
 
 	if ($xml_url) {
 		#print $xml_url, $/;
+		print STDERR "getting XML file: ", $xml_url, $/;
 		$res = $ua->get($xml_url);
+		print STDERR "got XML file.. ", $/;
 		unless ($res->is_success) {
 			print STDERR $res->status_line, "\n";
 			$tp->status('failed');
@@ -75,13 +82,16 @@ sub run_target {
 			my $xml_str = $res->content;
 			my $ref = XMLin($xml_str);
 			my $steps = $ref->{run}->{steps}->{step};
+
+			if ($ref->{run}->{other} && $ref->{run}->{other}->{archive}) {
+				$archive = $ref->{run}->{other}->{archive};
+			}
+
 			if ($steps) {
-				$tp->create_work_dir;
-			
 				if ( defined $steps->{Tree}) {
 					my ($nw_file)  = grep {/\.nw$/} @{$steps->{Tree}->{program}->{output}};
-					my ($jpg_file) = grep {/\.jpg$/} @{$steps->{Tree}->{program}->{output}};
-					push @files, $jpg_file if $jpg_file;
+					#my ($jpg_file) = grep {/\.jpg$/} @{$steps->{Tree}->{program}->{output}};
+					#push @files, $jpg_file if $jpg_file;
 					push @files, $nw_file if $nw_file;
 				}
 
@@ -91,17 +101,21 @@ sub run_target {
 				}
 			}
 
-			print STDERR Dumper( \@files ), $/;
+			#print STDERR Dumper( \@files ), $/;
 			if (@files) {
+				$tp->create_work_dir;
+
+				push @files, $archive if $archive;
+
 				for (@files) {
 					$_ =~ s{^\./}{/};
 					my $file_url = $server . $_;
 					#print STDERR  $file_url, $/;
 					my ($ext) = ($_ =~ /\.(\w{2,5})$/);
-					$ext ||= 'txt';
+					$ext ||= 'dat';
 					$res = $ua->get( $file_url );
 					unless ($res->is_success) {
-						print STDERR 'Err: ', $res->status_line, "\n";
+						print STDERR 'Err: ', $res->status_line, "for file: ", $file_url, "\n";
 					}
 					else {
 						my $content = $res->content;
@@ -109,21 +123,41 @@ sub run_target {
 						my $fh = IO::File->new;
 						if ($fh->open( $file , 'w')) {
 							if ($ext eq 'nw') {
-								$content =~ s/([a-z0-9_]+)_AS_/$genomes{$1} . '_AS_'/gei;
+								#print STDERR  $content, $/, $/;
+								#$content =~ s/([a-z0-9_]+)_AS_/$genomes{$1} . '_AS_'/gei;
+								$content =~ s/(\d+)_([A-Z][a-z0-9_]+):0/$2-$1-$tpid:0/gi;
+								#print STDERR  $content, $/;
 							}
 							elsif ($ext eq 'fasta') {
-								$content =~ s/^>([a-z0-9_]+)_AS_/'>' . $genomes{$1} . '_AS_'/mgei;
+								#$content =~ s/^>([a-z0-9_]+)_AS_/'>' . $genomes{$1} . '_AS_'/mgei;
+								$content =~ s/^>(\d+)_([A-Z][a-z0-9_]+)/>$2-$1-$tpid/mgi;
 								#print STDERR $content, $/;
 							}
 							else {
-								$fh->binmode if $ext eq 'jpg';
+								$fh->binmode if $ext =~ /(?:gz|jpg)/;
 							}
 							print $fh $content;
 							$fh->close;
+
+							if ($ext eq 'gz') {
+								$archive = $file;
+							}
 						}
 						else {
 							print STDERR  "Unable to write file: ", $file, $/;
 						}
+					}
+				}
+				if ($archive && -f $archive && Archive::Tar->can_handle_compressed_files) {
+					my $tar = Archive::Tar->new($archive, 1);
+					$tar->setcwd( $work_dir );
+					my @list = grep {$_->{name} =~ /\.flank$/ 
+							&& $_->{size}} $tar->list_files([qw/name size/]);
+					for (@list) {
+						my $filename = basename($_->{name});
+						$filename =~ s/temp_\d+-//;
+						$tar->extract_file( $_->{name}, $filename );
+						print $filename, $/;
 					}
 				}
 				$tp->status('done');
