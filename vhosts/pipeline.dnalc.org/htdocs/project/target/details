@@ -107,7 +107,7 @@
 	<div>Organism: <% $genome->organism %></div>
 </p>
 % if ($phytosome_map{$gid}) {
-<a href="http://www.phytozome.org/cgi-bin/gbrowse/<% $phytosome_map{$gid} %>?start=<% $start %>;stop=<% $stop %>;ref=<% $ref %>;width=800;cache=on;drag_and_drop=on;show_tooltips=on;grid=on;label=Transcripts">Launch Phytosome</a>
+<a href="http://www.phytozome.org/cgi-bin/gbrowse/<% $phytosome_map{$gid} %>?start=<% $start %>;stop=<% $stop %>;ref=<% $ref %>;width=800;cache=on;drag_and_drop=on;show_tooltips=on;grid=on;label=Transcripts">Launch Phytozome</a>
 % }
 <pre>
 <% $header %>
