@@ -3,6 +3,14 @@
 	$f => ''
 </%args>
 %#--------------------------------
+<%once>
+	use DNALC::Pipeline::Config ();
+</%once>
+%#--------------------------------
+<%init>
+	my $pcf = DNALC::Pipeline::Config->new->cf('PIPELINE');
+</%init>
+%#--------------------------------
 <html>
 <body>
 % if ($f) {
@@ -18,10 +26,9 @@
 	<param name="showFullId" value="false">
 	<param name="defaultColour" value="Clustal">
 	<param name="linkLabel_1" value="Details" />
-%#	<param name="linkUrl_1" value="http://pipeline-dev.dnalc.org/project/target/details?hn=Al1-2-70" />
-	<param name="linkUrl_1" value="http://pipeline-dev.dnalc.org/project/target/details?hn=$SEQUENCE_ID$" />
-%#	<param name="debug" value="true" />
+	<param name="linkUrl_1" value="<% $pcf->{PROJECT_HOME} %>/project/target/details?hn=$SEQUENCE_ID$" />
 	<param name="showbutton" value="false" />
+%#	<param name="debug" value="true" />
 %#	<p id="java_install"><a href="http://java.sun.com/webapps/getjava/BrowserRedirect?host=java.com">Install Java</a>.</p>
 </applet>
 % }
