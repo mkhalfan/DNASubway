@@ -95,11 +95,13 @@
 </%init>
 <html>
 <body>
+<!--
 <pre>
 	hn = <% $hn %>
 	tpid = <% $tpid |html%>
 	gid = [<% $gid |html%>]
 </pre>
+-->
 % if ($tp && $genome) {
 <p>Project name: <% $tp->name%><br/>
 	<div>Organism: <% $genome->organism %></div>
@@ -112,7 +114,8 @@
 <% $seq %>
 </pre>
 % } else {
-To view the sequence of the query, go back to your project's page.
+<p>The query sequence used to generate the alignment and/or tree view, can be accessed in the page for this project in DNA Subway.</p>
+Close this window to continue.
 % }
 </body>
 </html>
