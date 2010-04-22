@@ -25,7 +25,7 @@
 		Gm_pz5    => 'soybean',
 		Me_pz5    => 'cassava',
 		Mt_pz5    => 'medicago',
-		Osj_pz5a  => 'rice',
+		Osj_v6    => 'rice',
 		Pp_pz5    => 'physcomitrella',
 		Rc_pz5    => 'castorbean',
 		Vv_pz5    => 'grape',
