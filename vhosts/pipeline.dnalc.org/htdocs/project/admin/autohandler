@@ -4,7 +4,7 @@
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <meta name="author" content="Dolan DNA Learning Center" />
 <meta http-equiv="Content-Language" content="en" />
-<title><& SELF:title &> Pipeline</title>
+<title><& SELF:title &> DNA Subway</title>
 <script type="text/javascript" src="/js/prototype-1.6.0.3.js"></script>
 %#<script type="text/javascript" src="/js/prototype.js"></script>
 % if ($m->request_comp->attr_if_exists('js') && @{$m->request_comp->attr('js')}) { 
@@ -29,6 +29,7 @@
 <div>
 	<a href="/project/admin/samples/index.html">samples</a>
 	<a href="/project/admin/target_samples/index.html">target samples</a>
+	<a href="/project/admin/stats/index.html">stats</a>
 %#	<a href="/project/admin/users/">users</a>
 %#	<a href="#">projects</a>
 </div>
@@ -67,9 +68,9 @@
 	
 	my $pcf = DNALC::Pipeline::Config->new->cf("PIPELINE");
 	my $user = $s->{username};
-	my $is_admin = grep {/$user/} @{$pcf->{ADMINS}};
+	my $is_admin = grep {/^$user$/} @{$pcf->{ADMINS}};
 	unless ($is_admin) {
-		$m->comp("/_message_add", "Resource unavailable.", "error");
+		$m->comp("/_message_add", "Resource not available.", "error");
 		$m->redirect("/");
 	}
 	

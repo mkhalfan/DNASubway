@@ -229,7 +229,7 @@
 		</div>
 		<div class="conProjectInfo_Row">
 			<span class="conProjectInfo_Cell1">Affiliation</span>
-			<span class="conProjectInfo_Cell2">: DNALC</span>
+			<span class="conProjectInfo_Cell2">: <% $institution |html %></span>
 		</div>
 % if ($is_owner) {
         <div class="conProjectInfo_Row">
@@ -286,6 +286,7 @@
 	use DNALC::Pipeline::App::Utils ();
 	use DNALC::Pipeline::MasterProject ();
 	use DNALC::Pipeline::User ();
+	use DNALC::Pipeline::UserProfile ();
 	use DNALC::Pipeline::Utils qw/nicebasepairs/;
 
 	my %routines = (
@@ -323,7 +324,7 @@ unless ($proj) {
 my $user = DNALC::Pipeline::User->retrieve($proj->user_id);
 
 my %status = ();
-my ($history, $rm_status, $trimmed_common_name);
+my ($history, $rm_status, $trimmed_common_name, $institution);
 
 my $is_owner = $s->{user_id} == $user->user_id;
 my ($mp) = DNALC::Pipeline::MasterProject->search(user_id => $user->id, project_id => $proj->id);
@@ -374,6 +375,9 @@ else { # most likely is GET
 	}
 	$rm_status = $status{repeat_masker};
 	$trimmed_common_name = $pm->cleaned_common_name;
+	
+	$institution = $is_owner ? $s->{institution} : DNALC::Pipeline::UserProfile->get_user_institution($user->id);
+	$institution ||= "-";
 }
 
 </%init>

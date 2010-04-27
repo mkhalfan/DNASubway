@@ -137,6 +137,7 @@ Start a project by selecting one of the "subway lines" (red, yellow). Register a
 <%once>
 	use DNALC::Pipeline::Utils qw/random_string/;
 	use DNALC::Pipeline::User ();
+	use DNALC::Pipeline::UserProfile ();
 	use DNALC::Pipeline::Config ();
 	use Time::Duration qw/duration/;
 </%once>
@@ -205,6 +206,7 @@ if ($r->method eq "POST") {
 		$s->{username} = $user->username;
 		$s->{full_name} = $user->full_name;
 		$s->{user_id} = $user->id;
+		$s->{institution} = DNALC::Pipeline::UserProfile->get_user_institution($user->id);
 		$s->{logged_in} = 1;
 		
 		$user->increment_login_count;

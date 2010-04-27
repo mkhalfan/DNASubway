@@ -112,7 +112,7 @@
 		</div>
 		<div class="conProjectInfo_Row">
 			<span class="conProjectInfo_Cell1">Affiliation</span>
-			<span class="conProjectInfo_Cell2">: DNALC</span>
+			<span class="conProjectInfo_Cell2">: <% $institution |html %></span>
 		</div>
 		<div class="conProjectInfo_Row">
 			<span class="conProjectInfo_Cell1"><a href="javascript:;" onclick="javascript:launch_viewseq('<% $tid %>')">Sequence</a></span>
@@ -161,6 +161,7 @@
 	use DNALC::Pipeline::TargetGenome ();
 	use DNALC::Pipeline::TargetProject ();
 	use DNALC::Pipeline::User ();
+	use DNALC::Pipeline::UserProfile ();
 	use Data::Dumper;
 </%once>
 <%init>
@@ -177,6 +178,7 @@
 	my $is_owner = 0;
 	my $is_public = undef;
 	my $mp = undef;
+	my $institution = '';
 	
 	my $message = '';
 
@@ -228,14 +230,17 @@
 		if ($tp->user_id != $s->{user_id}) {
 			my $user = DNALC::Pipeline::User->retrieve($tp->user_id);
 			$user_fullname = $user->full_name;
+			$institution = DNALC::Pipeline::UserProfile->get_user_institution($user->id);
 		}
 		else {
 			$user_fullname = $s->{full_name};
+			$institution = $s->{institution};
 			$is_owner = 1;
 		}
 
 		($mp) = DNALC::Pipeline::MasterProject->search(user_id => $tp->user_id, project_id => $tp->id);
 		$is_public = $mp->public;
+		$institution ||= "-";
 	}
 
 </%init>
