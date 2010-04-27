@@ -1,0 +1,45 @@
+
+<table>
+	<tr>
+		<td></td>
+		<td></td>
+	</tr>
+	<tr>
+		<td><strong>Registered users:</strong></td>
+		<td><% $reg_users_cnt %></td>
+	</tr>
+% if (@task_cnt_registered_users) {
+	<tr>
+		<td colspan="2"><strong>Tasks called by registered users:</strong><sup>*</sup></td>
+	</tr>
+%	for (@task_cnt_registered_users) {
+	<tr>
+		<td><% $_->{name} %></td><td><% $_->{num} %></td>
+	</tr>
+%	}
+% }
+% if (@task_cnt_guest_users) {
+	<tr>
+		<td colspan="2"><strong>Tasks called by guest users:</strong><sup>*</sup></td>
+	</tr>
+%	for (@task_cnt_guest_users) {
+	<tr>
+		<td><% $_->{name} %></td><td><% $_->{num} %></td>
+	</tr>
+%	}
+% }
+</table>
+<div><em><sup>*</sup> Sucessful tasks only</em></div>
+
+<%args>
+</%args>
+<%once>
+	use Data::Dumper;
+	use DNALC::Pipeline::Statistics ();
+</%once>
+<%init>
+
+	my $reg_users_cnt = DNALC::Pipeline::Statistics->count_registered_users;
+	my @task_cnt_registered_users = DNALC::Pipeline::Statistics->count_task_registered_users;
+	my @task_cnt_guest_users = DNALC::Pipeline::Statistics->count_task_guest_users;
+</%init>
