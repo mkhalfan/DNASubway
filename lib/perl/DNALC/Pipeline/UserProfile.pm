@@ -185,7 +185,7 @@ sub validate_user_profile_data {
 
 #-----------------------------------------------------------------------------
 # stors directly the answers into user's  profile
-# used for simle questions, not found within a tree structure
+# used for simple questions, not found in a tree structure
 sub store_user_profile_directly {
 	my ($class, $user_id, $data) = @_;
 
@@ -208,6 +208,55 @@ sub store_user_profile_directly {
 					carp 'ERROR executing query: ', $sth->errstr;
 					return; };
 	}
+}
+
+#-----------------------------------------------------------------------------
+sub get_user_institution {
+	my ($class, $user_id) = @_;
+	my $institution = '';
+	return $institution unless $user_id;
+
+	my @qids = ();
+	my $dbh = $class->getDBH;
+	my $sth = $dbh->prepare_cached(
+				q{SELECT q_id FROM user_profile_question WHERE q_id IN (
+					SELECT q_triggers FROM user_profile_question WHERE q_parent_id = ?
+				) AND q_type = ?}) or do {
+					carp 'ERROR preparing query: ', $dbh->errstr;
+					return; };
+	$sth->execute(12, 'q') or do {
+					carp 'ERROR execute query: ', $sth->errstr;
+					return; };
+	while (my ($id) = $sth->fetchrow_array) {
+		push @qids, $id;
+	}
+	return $institution unless @qids;
+
+	#my $sql = 'SELECT a_question_id, q_label, a_value';
+	my $sql = 'SELECT a_value
+		FROM user_profile_answer
+		LEFT JOIN user_profile_question ON a_question_id = q_id
+		WHERE a_user_id = ?
+		AND a_question_id IN (';
+	my @args = ($user_id);
+	for (@qids) {
+		$sql .= q{SELECT q_id FROM sub_questions(?)
+			WHERE q_type = 'q' AND q_input_type = '' AND lower(q_label) LIKE '%institution%'
+			UNION };
+		push @args, $_;
+	}
+	$sql =~ s/UNION $/)/;
+
+	$sth = $dbh->prepare($sql) or do {
+					carp 'ERROR preparing query: ', $dbh->errstr;
+					return; };
+
+	$sth->execute( @args ) or do {
+                    carp 'ERROR executing query: ', $sth->errstr;
+                    return; };
+	($institution) = $sth->fetchrow_array;
+	$sth->finish;
+	$institution ||= '';
 }
 
 1;
