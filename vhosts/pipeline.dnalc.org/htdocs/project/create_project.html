@@ -15,13 +15,13 @@
 
 		<div class="conNewPro_label">
 			<input class="conRadiobox_align" type="radio" name="seq_src" id="seq_src_upload" value="upload" onclick="select_source(this)" <% $seq_src eq "upload" ? "checked=\"checked\"" : ""%>/>&nbsp; 
-			Upload a sequence file in <a href="http://en.wikipedia.org/wiki/FASTA_format#Format">FASTA format</a> <small>(max 100kb)</small>:
+			Upload a sequence file in <a href="http://en.wikipedia.org/wiki/FASTA_format#Format">FASTA format</a> <small>(max <% $seq_max_len %>kb)</small>:
 			<input class="conStylized_box1" type="file" id="seq_file" name="seq_file"  onchange="set_source('upload')" onclick="set_source('upload')"  />
 		</div>
 
 		<div class="conNewPro_label">
 			<input class="conRadiobox_align" type="radio" name="seq_src" id="seq_src_paste" value="paste" onclick="select_source(this)" <% $seq_src eq "paste" ? "checked=\"checked\"" : ""%> />&nbsp; 
-			Enter a sequence in <a href="http://en.wikipedia.org/wiki/FASTA_format#Format">FASTA format</a> <small>(max 100kb)</small>:
+			Enter a sequence in <a href="http://en.wikipedia.org/wiki/FASTA_format#Format">FASTA format</a> <small>(max <%$seq_max_len%>kb)</small>:
 			<textarea class="conStylized_box2" name="sequence" id="notebox" rows="5" cols="30" onfocus="set_source('paste');"><% $sequence |html %></textarea>
 		</div>
 
@@ -129,6 +129,7 @@ my $s = $m->session->{pipeline};
 
 my $cf = DNALC::Pipeline::Config->new;
 my $pcf = $cf->cf('PIPELINE');
+my $seq_max_len = int(($pcf->{sequence_length} || 50_000) / 1_000);
 
 my @samples = DNALC::Pipeline::Sample->search( active => 1, {order_by => "organism, segment, start"});
 
