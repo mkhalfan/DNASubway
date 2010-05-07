@@ -14,6 +14,7 @@ use DNALC::Pipeline::App::WorkflowManager ();
 use DNALC::Pipeline::Config();
 
 use Data::Dumper;
+use File::Basename;
 use Gearman::Worker ();
 use Storable qw(freeze);
 
@@ -87,16 +88,17 @@ $worker->register_function("snap", \&run_snap);
 $worker->register_function("fgenesh", \&run_fgenesh);
 
 #-------------------------------------------------
+my $script_name = fileparse($0);
+$script_name =~ s/\.[^.]*$//;
+
 my $work_exit = 0;
 my ($is_idle, $last_job_time);
 
 my $stop_if = sub { 
 	($is_idle, $last_job_time) = @_; 
-	#print STDERR  "Routines worker is idle = $is_idle", $/;
 
 	if ($work_exit) { 
-		#$work_exit = 0;
-		print STDERR  "*** Routines worker exiting.. \n", $/;
+		print STDERR  "*** [$script_name] exiting.. \n", $/;
 		return 1; 
 	}
 	return 0; 
@@ -104,12 +106,11 @@ my $stop_if = sub {
 
 #-------------------------------------------------
 
-$worker->register_function(routines_workers_exit => sub { 
+$worker->register_function("${script_name}_exit" => sub { 
 	$work_exit = 1; 
 });
 
 #-------------------------------------------------
-#$worker->work while 1;
 $worker->work( stop_if => $stop_if ) while !$work_exit;
 
 exit 0;

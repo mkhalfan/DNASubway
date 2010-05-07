@@ -38,11 +38,17 @@ my $session = Net::Telnet::Gearman->new(
 );
 
 my @workers   = $session->workers();
-print STDERR Dumper( \@workers), $/;
-#my @functions = $session->status();
+my @functions = $session->status();
+print STDERR  scalar(@workers), $/;
+print STDERR  scalar(@functions), $/;
+#print STDERR Dumper( \@workers), $/;
 #print STDERR Dumper( \@functions), $/;
 #my $version   = $session->versioI#n();
 
+for (@functions) {
+	print $_->name, ' ', $_->running, $/;
+}
+__END__
 my $result    = $session->maxqueue( routines_check_stop_if => 10 );
 print STDERR  "Set maxque for routines_check_stop_if to 10: ", $result, $/;
 
