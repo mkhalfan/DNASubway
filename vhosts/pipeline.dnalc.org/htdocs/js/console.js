@@ -227,9 +227,9 @@ function run (op) {
 
 function launch_apollo() {
 
-	if (!webstartVersionCheck("1.5")) {
+	if (!deployJava.isWebStartInstalled("1.6+")) {
 		show_messages(
-			"Your browser is missing or showing an old version of Java plugin. "
+			"Your browser is missing (or showing an old version of) Java plugin. "
 			+ "Please <a href=\""
 			+ "http://jdl.sun.com/webapps/getjava/BrowserRedirect?locale=en&host=java.com\">"
 			+ "install latest Java</a> to launch Apollo.");
@@ -264,8 +264,9 @@ function launch_apollo() {
 			//debug(response);
 			var r = response.evalJSON();
 			if (r.status == 'success') {
-				var upl = new Element('iframe', {src: r.file, width: '0px', height:'0px'});
-				$('body').insert(upl);
+				//var upl = new Element('iframe', {src: r.file, width: '0px', height:'0px'});
+				//$('body').insert(upl);
+				deployJava.launch(r.file);
 			}
 			else  if (r.status == 'error') {
 				alert("There seems to be an error: " + r.message);

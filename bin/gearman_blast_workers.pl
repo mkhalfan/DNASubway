@@ -80,7 +80,6 @@ my ($is_idle, $last_job_time);
 
 my $stop_if = sub { 
 	($is_idle, $last_job_time) = @_; 
-	print STDERR  "[$script_name] is idle = $is_idle", $/;
 
 	if ($work_exit) { 
 		print STDERR  "*** [$script_name] exiting.. \n", $/;

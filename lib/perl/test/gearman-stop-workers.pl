@@ -32,6 +32,19 @@ my %gearman_functions = map {$_->name => $_->running} $gsession->status();
 my $gearman_config_file = '/etc/sysconfig/gearman';
 #--------------
 
+sub print_stats {
+
+	my @functions = $gsession->status;
+	last unless @functions;
+	print STDERR  "----------------", $/;
+	print STDERR  "name\t# running", $/;
+	for (@functions) {
+		print STDERR  $_->name, "\tR=", $_->running, "\tB=", $_->busy, $/;
+	}
+}
+
+
+print_stats();
 
 my %gearman_config = ();
 my %exit_functions = ();
@@ -72,14 +85,7 @@ for (my $i = 0; $i < scalar @tmp; $i += 2) {
 }
 
 while (1) {
-
-	my @functions = $gsession->status;
-	last unless @functions;
-	print STDERR  "----------------", $/;
-	print STDERR  "name\t# running", $/;
-	for (@functions) {
-		print STDERR  $_->name, "\tR=", $_->running, "\tB=", $_->busy, $/;
-	}
+	print_stats();
 	sleep 5;
 }
 

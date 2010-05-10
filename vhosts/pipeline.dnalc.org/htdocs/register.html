@@ -221,7 +221,7 @@ DNASubway Team";
 
 				# send mail to the applicant
 				my $msg = MIME::Lite->new (
-							From => '"Admin" <dnalcadmin@cshl.edu>',
+							From => '"DNASubway Admin" <dnalcadmin@cshl.edu>',
 							To	=> $s->{email},
 							Subject => "Set your password",
 							Type	=> 'text/plain',
@@ -242,7 +242,10 @@ DNASubway Team";
 				}
 			}			
 
-			$m->comp("/_message_add", "Account created. You will receive an email with further instructions.");
+			$m->comp("/_message_add", "<p>Welcome to DNA Subway! In order to use your new account go to your email"
+						. " and follow the instructions in the message you receive from <u>dnalcadmin\@cshl.edu</u>.</p>"
+						. "<br/><p>Should you not get this message it may have been filtered out by your"
+						. " provider's spam/junk filters.</p>");
 
 			# clear registration session
 			$m->session->{pipeline_reg} = {};
