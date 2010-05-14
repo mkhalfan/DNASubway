@@ -44,7 +44,12 @@
 		return;
 	}
 
-	if (!$s->{logged_in} || $proj->user_id != $s->{user_id}) {
+	if (!$s->{logged_in}) {
+		print "{'status':'error', 'message':'Your session expired. Please <a href=\"/\">log in</a>.'}";
+		return;
+	}
+
+	if ($proj->user_id != $s->{user_id}) {
 		print "{'status':'error', 'message':'Analysis only available to project owner.'}";
 		return;
 	}

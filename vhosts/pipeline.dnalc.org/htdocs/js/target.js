@@ -183,6 +183,15 @@ function launch_tree(nw) {
 	if (!nw)
 		return;
 
+	if (deployJava.versionCheck('1.5+') == false) {
+		show_errors(
+				"<p>You need the latest Java Runtime Environment plug-in installed and enabled.</p>" +
+				"<div><br/>Please <a href=\"#\" onclick=\"javascript:deployJava.installLatestJRE();\">install</a> " +
+				"the latest Java Runtime Environment plug-in.</div>"
+			);
+		return;
+	}
+
 	UI.defaultWM.options.blurredWindowsDontReceiveEvents = true;
 
 	function openWindow(url) {
@@ -200,6 +209,15 @@ function launch_tree(nw) {
 function launch_jalview(fa) {
 	if (!fa)
 		return;
+
+	if (deployJava.versionCheck('1.5+') == false) {
+		show_errors(
+				"<p>You need the latest Java Runtime Environment plug-in installed and enabled.</p>" +
+				"<div><br/>Please <a href=\"#\" onclick=\"javascript:deployJava.installLatestJRE();\">install</a> " +
+				"the latest Java Runtime Environment plug-in.</div>"
+			);
+		return;
+	}
 
 	if ($('jalview_ifr')) {
 		$('jalview_ifr').contentWindow.location.reload();
