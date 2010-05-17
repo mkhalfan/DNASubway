@@ -705,7 +705,7 @@ sub dbh {
 }
 
 sub gmod_conf_file {
-    my ($self, $project_id) = @_;
+    my ($self, $project_id, $dbname_override) = @_;
 
 	unless ($project_id && $project_id =~ /\d+/) {
 		warn "Project ID is missing or invalid\n";
@@ -718,6 +718,7 @@ sub gmod_conf_file {
 	}
 
 	my $username = $self->username;
+	my $dbname  = $username;
     my $confdir = $self->confdir;
 	unless ($confdir && -w $confdir ) {
 		warn "Config dir [$confdir] is not writable.\n\n";
@@ -729,12 +730,15 @@ sub gmod_conf_file {
 		#warn "Configuration file for this user [$username] already exists.";
     }
     else {
+		if ($dbname_override) {
+			$dbname = $dbname_override;
+		}
 		my $in  = IO::File->new( $confdir . '/' . $self->profile . '.conf' );
 		my $out = IO::File->new( "> $conffile" );
 		if (defined $in && $out) {
 			my $organism = $self->common_name;
 			while (my $line = <$in> ) {
-				$line =~ s/DBNAME=chado/DBNAME=$username/;
+				$line =~ s/DBNAME=chado/DBNAME=$dbname/;
 				$line =~ s/DBORGANISM=/DBORGANISM=$organism/;
 				print $out $line;
 			}
@@ -934,7 +938,7 @@ sub create_gbrowse_conf {
 }
 
 sub gbrowse_chado_conf {
-    my ( $self, $project_id ) = @_;
+    my ( $self, $project_id, $dbname_override ) = @_;
 
     unless ($project_id && $project_id =~ /\d+/) {
         warn "Project ID is missing or invalid\n";
@@ -961,12 +965,17 @@ sub gbrowse_chado_conf {
 		my $trimmed_organism = $organism;
 		$trimmed_organism =~ s/\s+/_/g;
 		$trimmed_organism =~ s/-/_/g;
+
+		my $dbname = $username;
+		if ($dbname_override) {
+			$dbname = $dbname_override;
+		}
         while (my $line = <$in> ) {
             $line =~ s/__USER__/$username/;
             $line =~ s/__ORGANISM__/$organism/;
             $line =~ s/__TRIMMED_ORGANISM__/$trimmed_organism/;
             $line =~ s/__PID__/$project_id/;
-            $line =~ s/__DBNAME__/$username/;
+            $line =~ s/__DBNAME__/$dbname/;
             print $out $line;
         }
         undef $in;
@@ -1137,6 +1146,7 @@ sub create_chado_adapter {
 			<program>FGenesH</program>
 			<program>AUGUSTUS</program>
 			<program>SNAP</program>
+			<program>tRNAScan-SE</program>
 		</genePredictionPrograms>
 
 		<oneLevelResultPrograms>
@@ -1145,6 +1155,7 @@ sub create_chado_adapter {
 
 		<searchHitPrograms>
 			<program>BLASTN</program>
+			<program>BLASTN_USER</program>
 			<program>BLASTX</program>
 		</searchHitPrograms>
 
@@ -1185,6 +1196,7 @@ END
 	if (-f $apollo_chado_adapter) {
 		my $fh = new IO::File "> $apollo_conf";
 		if (defined $fh) {
+			#print $fh "NameAdapterInstall \"apollo.config.DefaultNameAdapter\"\n";
 			print $fh "ChadoJdbcAdapterConfigFile \"$apollo_chado_adapter\"\n";
 			$fh->close;
 			return $apollo_conf;
@@ -1219,7 +1231,7 @@ sub write_jnlp {
 	if (defined $fh) {
 		print $fh <<END;
 <?xml version="1.0" encoding="UTF-8"?>
-<jnlp codebase="$hostname/files/apollo/webstart/" href="$hostname$web_jnlp" spec="1.0+">
+<jnlp codebase="$hostname/files/apollo/webstart/" spec="1.0+">
   <information>
     <title>Apollo</title>
     <vendor>$vendor</vendor>
@@ -1232,7 +1244,7 @@ sub write_jnlp {
     <all-permissions/>
   </security>
   <resources>
-    <j2se initial-heap-size="64m" max-heap-size="500m" version="1.5+"/>
+    <j2se initial-heap-size="64m" max-heap-size="500m" version="1.6+"/>
     <jar href="${cdn}apollo-jars/apollo.jar"/>
     <jar href="${cdn}apollo-jars/bbop.jar"/>
     <jar href="${cdn}apollo-jars/biojava.jar"/>

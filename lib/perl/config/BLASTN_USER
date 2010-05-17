@@ -22,6 +22,7 @@
 		'--version', 3,
 		'-m',
 		'--method', 'match_part',
+		'-s', 'BLASTN_USER',
 		'--coverage', '0',
 		'--identity', '0',
 		'--bits', '0',
