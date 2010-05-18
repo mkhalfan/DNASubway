@@ -31,7 +31,7 @@ image widths  = 640 800 1024
 
 # default width of detailed view (pixels)
 default width = 800
-default features = Augustus FGenesH tRNA Snap usergenes Repeats Blastx Blastn
+default features = Augustus FGenesH tRNA Snap usergenes Repeats Blastx Blastn Blastn_user
 
 # max and default segment sizes for detailed view
 max segment     = 100000
