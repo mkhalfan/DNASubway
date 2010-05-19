@@ -120,7 +120,11 @@ fgcolor = #663187
 glyph = segments
 fgcolor = #c48f0e
 bgcolor = #c48f0e
-#bgcolor = rgb(196,143,14)
+
+[match:BLASTN_USER]
+glyph = segments
+fgcolor = #987625
+bgcolor = #987625
 
 [match:BLASTX]
 glyph = segments
