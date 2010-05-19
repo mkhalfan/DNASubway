@@ -248,7 +248,7 @@
 %#-----------------------------------------------------------------
 <%attr>
 	current_section => 'yellow'
-	js => ['target.js', 'prototip/prototip.js']
+	js => ['target.js', 'prototip/prototip.js', 'deployJava.js']
 	css => ['prototip.css']
 	load_window_ui => 1
 	show_glossary => 1
