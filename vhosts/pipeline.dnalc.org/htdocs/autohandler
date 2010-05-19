@@ -119,7 +119,8 @@ new Tip('tt_brick', "Bioinformatics analysis routines in  <i>DNA Subway</i>  wor
 % if ($s->{username}) {
 var re_name_tag = "<% $s->{username} %>";
 % }
-re_("ktaz7-6gmi62748k");
+//re_("ktaz7-6gmi62748k");
+try {reinvigorate.track("ktaz7-6gmi62748k");} catch(err) {}
 </script>
 <script type="text/javascript">
 var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
