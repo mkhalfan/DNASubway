@@ -85,7 +85,13 @@ use Carp;
 	sub set_status {
 		my ($self, $task_name, $status_name, $duration) = @_;
 
+		unless (defined $self->{task_name_to_id}->{ $task_name }) {
+			print STDERR  "__SET_STATUS__: unknown task: ", $task_name, $/;
+			return;
+		}
+
 		unless (defined $status_map{ $status_name }) {
+			print STDERR  "Unknown status: ", $status_name, $/;
 			croak "Unknown status: ", $status_name, $/;
 		}
 
@@ -140,10 +146,14 @@ use Carp;
 	sub get_status {
 		my ($self, $task_name) = @_;
 
+		unless (defined $self->{task_name_to_id}->{ $task_name }) {
+			print STDERR  "__GET_STATUS__: unknown task: ", $task_name, $/;
+			return;
+		}
+
 		my $mc_key = "status-$task_name-" . $self->project->id;
 		my $mc_status = $self->{_mc}->get($mc_key);
 		if ($mc_status) {
-			#print STDERR  " \@\@ 10. MC status for task_id = ", $task_name, ' == ', $mc_status, $/;
 			return DNALC::Pipeline::TaskStatus->retrieve( $status_map{$mc_status} );
 		}
 		
@@ -155,7 +165,6 @@ use Carp;
 		unless ($wf) {
 			return DNALC::Pipeline::TaskStatus->retrieve( $status_map{'not-processed'} );
 		}
-		#print STDERR  "11. getting status for task_id = ", $task_name, ' == ', $wf->status->name, $/;
 		$wf->status;
 	}
 	#-------------------------------------------------------------------------
