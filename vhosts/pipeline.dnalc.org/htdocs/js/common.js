@@ -1,6 +1,7 @@
 // global w to keep track of the popup window
 
 var w;
+var isMSIE = Prototype.Browser.IE;
 
 function gl_hide_definition() {
 	$$('span.con_GlossaryTextbox').each(function(sp) {
@@ -32,7 +33,7 @@ function show_messages(html, isError) {
 	        shadow: false,
 	        draggable: false
 		};
-	if (navigator.userAgent.indexOf('MSIE') != -1) {
+	if (isMSIE) {
 		// IE doen't like this option!!!
 		delete options['resizable'];
 	}
@@ -47,7 +48,7 @@ function show_messages(html, isError) {
 	_w.header.removeClassName('move_handle');
 	_w.setHeader("Message");
 	_w.setContent(html);
-	if (navigator.userAgent.indexOf('MSIE') != -1) {
+	if (isMSIE) {
 		// remove buttons from IE
 		try {
 			var btns = _w.buttons.childElements();
@@ -224,7 +225,8 @@ function update_info() {
 //------------------------
 
 function openWindow(url, title, opts) {
-	UI.defaultWM.options.blurredWindowsDontReceiveEvents = true;
+	//UI.defaultWM.options.blurredWindowsDontReceiveEvents = true;
+	UI.WindowManager.setOptions({zIndex: 20000});
 
 	var options = opts ? opts : {
 		width: 900, 
@@ -235,21 +237,69 @@ function openWindow(url, title, opts) {
 		url: url
 	};
 	
-	if (navigator.userAgent.indexOf('MSIE') != -1) {
+	if (isMSIE) {
 		// IE doen't like this option!!!
 		delete options['resizable'];
 	}
 
-	var w = new UI.URLWindow( options ).center();
+	var w = url && url.indexOf('.gff') > 1 ? new UI.Window( options ) : new UI.URLWindow( options );
+	w.center();
 	if (title) {
 		w.setHeader(title);
+	}
+	
+	if (url && url.indexOf('.gff') > 1) {
+		new Ajax.Request(url, {
+			method:'get',
+			//parameters: params, 
+			onSuccess: function(transport){
+				var response = transport.responseText || "#No data to display.";
+				w.setContent('<pre>' + response + '</pre>');
+			},
+			onFailure: function(){
+				alert("Something went wrong.");
+			}
+		});
 	}
 
 	var p = w.getPosition();
 	w.setPosition(110, p.left);
 	w.show();
 	w.focus();
-	//windows.push(w);
+
+	w.observe('position:changed', function(event) {
+		var pos = this.getPosition();
+		if (pos['top'] < 0) {
+			this.setPosition(0, pos['left']);
+		}
+	});
+
+	/*w.observe('move:started', function(event) {
+		var memow = event.memo.window;
+		var content_el = 1;//memow.element.getElementById('content');
+		//alert(content_el);
+		//memow.sendToBack();
+		//this.setContent("xx");
+		//debug("Window with id " + memow.id + " and elem = " + content_el + " has just started moving.");
+		//debug(memow.x + 'x' + memow.y);
+	});
+	
+	w.observe('move:ended', function(event) {
+		var memow = event.memo.window;
+		debug("Window with id " + memow.id + " and elem = " + memow.element.id + " has just stopped moving.");
+	});
+	
+	if (window.frames[w.element.id + '_frame']) {
+		UI.logger.info('set event for: ' + window.frames[w.element.id + '_frame'].document);
+		Event.observe(window.frames[w.element.id + '_frame'].document, 
+			'mousedown', function(event) {
+				UI.logger.info('mousedown: ' + w.element.id);
+				Event.fire(window.frames[0].window.parent, 'drag:ended');
+				//w.fire('drag:ended');
+			}
+		);
+	}*/
+
 	return w;
 }
 
@@ -258,16 +308,17 @@ function openWindow(url, title, opts) {
 function launch_tour() {
 	var w = openWindow('/files/tour/index.html',
 				'DNA Subway tour', {
-				width: 750, 
-				height: 520,
+				width: 758, 
+				height: 528,
 				shadow: false,
-				draggable: true,
+				draggable: false,
 				resizable: false,
 				url: '/files/tour/index.html'
 			}
 		);
+	w.header.removeClassName('move_handle');
 
-	if (navigator.userAgent.indexOf('MSIE') != -1) {
+	if (isMSIE) {
 		try {
 			var btns = w.buttons.childElements();
 			btns.each(function(btn){
@@ -282,7 +333,7 @@ function launch_tour() {
 
 //------------------------
 
-Event.observe(window, 'load', function() {
+Event.observe(window, isMSIE ? 'load' : 'dom:loaded', function() {
 	// check for errors
 	var err = $("error_list");
 	if (err) {

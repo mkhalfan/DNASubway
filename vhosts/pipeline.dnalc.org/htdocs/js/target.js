@@ -179,33 +179,7 @@ function check_status (tid, h) {
 	});
 }
 
-function launch_tree(nw) {
-	if (!nw)
-		return;
-
-	if (deployJava.versionCheck('1.5+') == false) {
-		show_errors(
-				"<p>You need the latest Java Runtime Environment plug-in installed and enabled.</p>" +
-				"<div><br/>Please <a href=\"#\" onclick=\"javascript:deployJava.installLatestJRE();\">install</a> " +
-				"the latest Java Runtime Environment plug-in.</div>"
-			);
-		return;
-	}
-
-	UI.defaultWM.options.blurredWindowsDontReceiveEvents = true;
-
-	function openWindow(url) {
-		new UI.URLWindow({
-			width: 800, 
-			height: 600,
-			shadow: false,
-			url: url 
-		}).show();  
-	}
-
-	openWindow("/files/phylowidget/bare.html?tree=" +  nw);
-}
-
+/* Launches the Alignment Viewer */
 function launch_jalview(fa) {
 	if (!fa)
 		return;
@@ -238,19 +212,7 @@ function launch_jalview(fa) {
 function launch_viewseq(tid) {
 	if (!tid)
 		return;
-
-	UI.defaultWM.options.blurredWindowsDontReceiveEvents = true;
-
-	function openWindow(url) {
-		new UI.URLWindow({
-			width: 1000, 
-			height: 600,
-			shadow: true,
-			url: url 
-		}).center().show();
-	}
-
-	openWindow("/project/target/view_seq/" +  tid);
+	openWindow("/project/target/view_seq/" +  tid, 'Sequence');
 }
 
 function set_source(s) {
@@ -406,7 +368,7 @@ function updateRunButton(event) {
 
 //-------------
 // keep this at the end
-Event.observe(window, 'load', function() {
+Event.observe(window, isMSIE ? 'load' : 'dom:loaded', function() {
 	
 	// re-check processing routines' status
 	if ($('tid')) {
@@ -414,7 +376,7 @@ Event.observe(window, 'load', function() {
 		var spans = $$('span');
 		var btn = $('launch_btn_ind');
 		if (btn && btn.hasClassName('conIndicator_processing')) {
-			if (navigator.userAgent.indexOf('MSIE') != -1) {
+			if (isMSIE) {
 				var callback = "check_status(" + tid + ", -1)";
 				//if (console) console.info(callback);
 				intervalID = setInterval(callback, 20000);

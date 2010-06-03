@@ -432,7 +432,7 @@ function set_public(np) {
 
 //-------------
 // keep this at the end
-Event.observe(window, 'load', function() {
+Event.observe(window, isMSIE ? 'load' : 'dom:loaded', function() {
 	
 	// re-check processing routines' status
 	if ($('isowner').value != "1") 
@@ -452,7 +452,7 @@ Event.observe(window, 'load', function() {
 				delay = 10;
 			}
 			
-			if (navigator.userAgent.indexOf('MSIE') != -1) {
+			if (isMSIE) {
 				var callback = "check_status(" + pid + ", '" + op + "', -1)";
 				//debug(callback);
 				intervalID[op] = setInterval(callback, 20000);

@@ -1,5 +1,21 @@
 % if ($warn) {
-<html>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<!--
+<script type="text/javascript" src="/js/prototype-1.6.1.js"></script>
+<script type="text/javascript">
+if (window.parent) {
+	document.observe('mousedown', function(e) {
+		console.debug(window.parent.UI.defaultWM.getFocusedWindow());
+		window.parent.UI.defaultWM.getFocusedWindow().fire('drag:ended');
+		window.parent.UI.defaultWM.getFocusedWindow().setDraggable(false);
+		window.parent.UI.defaultWM.getFocusedWindow().setDraggable(true);
+	});
+}
+</script>
+-->
+</head>
 <body>
 	<div>
 	<form id="form2">
@@ -64,10 +80,15 @@
 			gbrowse_confdir  => $pcf->{GBROWSE_CONF_DIR},
 		);
 
-		# 1st create GBrowse conf file & DB dir for this project
-		$cutils->gbrowse_chado_conf($proj->id);
+		# create GBrowse conf file for this project
+		if ($pm->username =~ /^guest_/) {
+			$cutils->gbrowse_chado_conf($proj->id, $pm->chado_user_database);
+		}
+		else {
+			$cutils->gbrowse_chado_conf($proj->id);
+		}
 
-		$m->redirect($pcf->{GBROWSE_URL} . '/' . $pm->username . '_db_' . $proj->id);
+		$m->redirect($pcf->{GBROWSE_URL} . '/' . $pm->username . '_db_' . $proj->id . '?nocache=1');
 	}
 	
 </%init>
