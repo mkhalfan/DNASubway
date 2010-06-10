@@ -58,7 +58,7 @@
 						status => $status{blastn}, rm_status => $rm_status &>
 		</span><!--END of span class conRedline_ConCell-->
 
-		<span class="conRedline_ConCell">
+		<span class="conRedline_ConCellEND">
 			<span class="conIndicator_box"><div id="blastx_st" class="conIndicator_<% $status{blastx} eq "done" ? "done" : $is_owner && $rm_status eq "done" ? $status{blastx} : "disabled" %>"></div></span>
 			<& '.routine', routine => 'blastx', pmanager => $pm, delay => 15, is_owner => $is_owner,
 						status => $status{blastx}, rm_status => $rm_status &>
@@ -68,30 +68,23 @@
 % my $nt_evid = lc $wfm->get_status("upload_evid_nt")->name;
 % my $prot_evid = lc $wfm->get_status("upload_evid_prot")->name;
 % if ( $nt_evid eq "done") {
-		<span class="conRedline_ConCellAdd">
+		<span class="conRedline_ConCellAdd1">
 			<span class="conIndicator_box"><div id="blastn_user_st" class="conIndicator_<% $status{blastn_user} eq "done" ? "done" : $is_owner ? $status{blastn_user} : 'disabled' %>"></div></span>
 			<& '.routine', routine => 'blastn_user', pmanager => $pm, delay => 15, is_owner => $is_owner,
 					status => $status{blastn_user}, rm_status => $rm_status &>
 		</span><!--END of span class conRedline_ConCell-->
-% } else {
-	<span class="conRedline_ConCell"></span>
 % }
-		
-		
-% if ($prot_evid eq "done") {
-		<span class="conRedline_ConCellAdd"> <!-- conRedline_ConCell -->
+
+% if ( $prot_evid eq "done") {
+		<span class="conRedline_ConCellAdd2"> <!-- conRedline_ConCellAdd2 -->
 			<span class="conIndicator_box"><div id="blastx_user_st" class="conIndicator_<% $status{blastx_user} eq "done" ? "done" : $is_owner ? $status{blastx_user} : 'disabled' %>"></div></span>
 			<& '.routine', routine => 'blastx_user', pmanager => $pm, delay => 15, is_owner => $is_owner,
 					status => $status{blastx_user}, rm_status => $rm_status &>
-		</span><!--END of span class conRedline_ConCell-->
-% } else {
-		<span class="conRedline_ConCell"></span>
-% }
-		
+		</span><!--END of span class conRedline_ConCellAdd2-->
+% }		
 
-%# if ( $nt_evid ne "done" || $prot_evid ne "done") 
-% if ( 1 ) {
-		<span class="conRedline_ConCell2">
+% if ( $nt_evid ne "done" || $prot_evid ne "done") {
+		<span class="conRedline_ConCellAdd2">
 			<span class="conIndicator_box"><div id="evidence_ind" class="conIndicator_<% $rm_status eq 'done' && $is_owner ? 'not-processed' : 'disabled' %>"></div></span>
 			<span class="bt_run">
 			

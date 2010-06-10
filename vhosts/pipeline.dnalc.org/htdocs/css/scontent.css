@@ -720,12 +720,35 @@
   position: relative;
   float: left;
 }
+.conRedline_ConCellEND{
+  width: 124px;
+  height: 26px;
+  position: relative;
+  margin: 0px 0px 10px 0px;
+  float: left;
+}
 
 .conRedline_ConCellAdd{
   width: 124px;
   height: 26px;
   margin: 0px 0px 19px 0px;
   background: url("/images/v2/bt_runAdd1.png") bottom left no-repeat;
+  position: relative;
+  float: left;
+}
+.conRedline_ConCellAdd1{
+  width: 124px;
+  height: 26px;
+  padding: 9px 0px 10px 0px;
+  background: url("/images/v2/bg_runAdd1.jpg") bottom left no-repeat;
+  position: relative;
+  float: left;
+}
+.conRedline_ConCellAdd2{
+  width: 124px;
+  height: 26px;
+  padding: 9px 0px 0px 0px;
+  background: url("/images/v2/bg_runUpload.jpg") bottom left no-repeat;
   position: relative;
   float: left;
 }
@@ -1538,7 +1561,7 @@
    display:none;
    position:absolute;
    top:-100px;
-   left:-40px;
+   left:-200px;
    background: url("/images/v2/uploadData_panel.png") no-repeat;
    padding: 24px 20px 0px 20px;
    color: #006699;

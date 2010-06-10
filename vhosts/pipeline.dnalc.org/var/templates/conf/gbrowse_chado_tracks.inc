@@ -134,8 +134,9 @@ key          = BlastX
 [Blastn_user]
 feature      = match:BLASTN_USER
 glyph        = segments
-fgcolor      = rgb(196,143,14)
-bgcolor      = rgb(196,143,14)
+#fgcolor      = rgb(196,143,14)
+fgcolor      = rgb(152,118,37)
+bgcolor      = rgb(152,118,37)
 stranded     = 1
 height       = 8
 description = sub {

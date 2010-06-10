@@ -21,8 +21,12 @@ function gl_show_definition(el) {
 
 //------------------------
 function show_messages(html, isError) {
-	if (!html || !UI) {
-		//alert(html);
+	try {
+		if (!html || !UI) {
+			//alert(html);
+			return;
+		}
+	} catch (e) {
 		return;
 	}
 
@@ -266,39 +270,6 @@ function openWindow(url, title, opts) {
 	w.setPosition(110, p.left);
 	w.show();
 	w.focus();
-
-	w.observe('position:changed', function(event) {
-		var pos = this.getPosition();
-		if (pos['top'] < 0) {
-			this.setPosition(0, pos['left']);
-		}
-	});
-
-	/*w.observe('move:started', function(event) {
-		var memow = event.memo.window;
-		var content_el = 1;//memow.element.getElementById('content');
-		//alert(content_el);
-		//memow.sendToBack();
-		//this.setContent("xx");
-		//debug("Window with id " + memow.id + " and elem = " + content_el + " has just started moving.");
-		//debug(memow.x + 'x' + memow.y);
-	});
-	
-	w.observe('move:ended', function(event) {
-		var memow = event.memo.window;
-		debug("Window with id " + memow.id + " and elem = " + memow.element.id + " has just stopped moving.");
-	});
-	
-	if (window.frames[w.element.id + '_frame']) {
-		UI.logger.info('set event for: ' + window.frames[w.element.id + '_frame'].document);
-		Event.observe(window.frames[w.element.id + '_frame'].document, 
-			'mousedown', function(event) {
-				UI.logger.info('mousedown: ' + w.element.id);
-				Event.fire(window.frames[0].window.parent, 'drag:ended');
-				//w.fire('drag:ended');
-			}
-		);
-	}*/
 
 	return w;
 }

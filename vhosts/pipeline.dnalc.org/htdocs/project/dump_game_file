@@ -48,6 +48,7 @@
 				vendor		=> $config->{APOLLO_VENDOR},
 				apollo_desc => $config->{APOLLO_DESC},
 				pid			=> $pid,
+				cdn			=> $config->{APOLLO_CDN},
 			});
 		my $javacmd = "$apollo -H -w $game_file -o game -l $req_region -i chadoDB -C $conf_file > /dev/null 2>&1";
 		#my $javacmd = "$apollo -H -w $game_file -o game -l $req_region -i chadoDB -C $conf_file";
