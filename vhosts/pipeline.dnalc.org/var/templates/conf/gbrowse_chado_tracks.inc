@@ -134,7 +134,6 @@ key          = BlastX
 [Blastn_user]
 feature      = match:BLASTN_USER
 glyph        = segments
-#fgcolor      = rgb(196,143,14)
 fgcolor      = rgb(152,118,37)
 bgcolor      = rgb(152,118,37)
 stranded     = 1
@@ -146,6 +145,22 @@ description = sub {
   }
 #das category = transcription
 key          = User BlastN
+
+[Blastx_user]
+feature      = match:BLASTX_USER
+glyph        = segments
+fgcolor      = rgb(176,117,80)
+bgcolor      = rgb(176,117,80)
+stranded     = 1
+height       = 8
+description = sub {
+        my $f = shift;
+        my ($desc) = $f->attributes('description');
+        return $desc;
+  }
+#das category = transcription
+key          = User BlastX
+
 
 [usergenes]
 feature     = gene:user

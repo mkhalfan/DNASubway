@@ -1,21 +1,6 @@
 % if ($warn) {
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
-<head>
-<!--
-<script type="text/javascript" src="/js/prototype-1.6.1.js"></script>
-<script type="text/javascript">
-if (window.parent) {
-	document.observe('mousedown', function(e) {
-		console.debug(window.parent.UI.defaultWM.getFocusedWindow());
-		window.parent.UI.defaultWM.getFocusedWindow().fire('drag:ended');
-		window.parent.UI.defaultWM.getFocusedWindow().setDraggable(false);
-		window.parent.UI.defaultWM.getFocusedWindow().setDraggable(true);
-	});
-}
-</script>
--->
-</head>
 <body>
 	<div>
 	<form id="form2">

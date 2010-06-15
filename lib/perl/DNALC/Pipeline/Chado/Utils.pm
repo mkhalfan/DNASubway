@@ -1157,6 +1157,7 @@ sub create_chado_adapter {
 			<program>BLASTN</program>
 			<program>BLASTN_USER</program>
 			<program>BLASTX</program>
+			<program>BLASTX_USER</program>
 		</searchHitPrograms>
 
 		<searchHitsHaveFeatLocs>true</searchHitsHaveFeatLocs>

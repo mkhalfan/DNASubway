@@ -212,18 +212,21 @@ if ($r->method eq "POST") {
 			$u->set_reset_pwd_code($code);
 
 			if ($code) {
-				my $text = "Dear user,\n
-Thank you for creating an account.\n
+				my $text = "Welcome to DNA Subway, Fast Track to Gene Annotation and Genome Analysis.\n
 Your username is: \"$s->{username}\" (without the quotes).\n
-To set your password follow this link:
+To set your password, follow this link or paste it into your browser:
 $cf->{APOLLO_PROJECT_HOME}/resetpass.html?c=$code\n
-DNASubway Team";
+For information on using the site, take advantage of the DNA Subway Tour
+and DNA Subway Manual, linked from the home page and the site footer.\n
+
+Sincerely,
+DNASubway Team\n";
 
 				# send mail to the applicant
 				my $msg = MIME::Lite->new (
 							From => '"DNASubway Admin" <dnalcadmin@cshl.edu>',
 							To	=> $s->{email},
-							Subject => "Set your password",
+							Subject => "Thank you for registering on DNA Subway!",
 							Type	=> 'text/plain',
 							Data	=> $text
 						);
