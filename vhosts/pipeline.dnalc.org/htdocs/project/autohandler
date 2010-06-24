@@ -6,6 +6,8 @@
 <link rel="icon" type="image/png" href="/images/favicon.png" />
 <link type="text/css" rel="stylesheet" href="/css/sgeneral.css" />
 <link type="text/css" rel="stylesheet" href="/css/scontent.css" />
+<link href="/files/window/themes/window/window.css" rel="stylesheet" type="text/css" />
+<link href="/files/window/themes/window/alphacube.css" rel="stylesheet" type="text/css" />
 % if ($m->request_comp->attr_if_exists('css') && @{$m->request_comp->attr('css')}) {
 %	foreach my $css (@{$m->request_comp->attr('css')}) {
 %		next unless $css;
@@ -20,12 +22,8 @@
 <script type="text/javascript" src="/js/<% $js %>"></script>
 %	}
 % }
-% if ($m->request_comp->attr('load_window_ui')) {
-<link href="/files/window/themes/window/window.css" rel="stylesheet" type="text/css" />
-<link href="/files/window/themes/window/alphacube.css" rel="stylesheet" type="text/css" />
 <script src="/files/window/lib/effects.js" type="text/javascript"></script>  
 <script src="/files/window/dist/window.js" type="text/javascript"></script>
-% }
 </head>
 <body id="body">
 <div id="mainContainer">
@@ -78,7 +76,6 @@
 % } else {
 	<span class="bt_Glossary"></span>
 % }
-  <span class="bt_Guide"><a href="/files/pdf/DNA_Subway_Guide.pdf"></a></span>
 </div><!--END of ID container_leftMenu-->
 
 <!-- end header -->
@@ -99,7 +96,6 @@
 % if ($s->{username}) {
 var re_name_tag = "<% $s->{username} %>";
 % }
-//re_("ktaz7-6gmi62748k");
 try {reinvigorate.track("ktaz7-6gmi62748k");} catch(err) {}
 </script>
 <script type="text/javascript">
@@ -155,7 +151,6 @@ pageTracker._trackPageview();
 <%attr>
 	js => []
 	css => []
-	load_window_ui => 0
 	show_glossary => 0
 	current_section => ''
 </%attr>

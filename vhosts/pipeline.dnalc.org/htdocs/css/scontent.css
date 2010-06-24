@@ -922,14 +922,14 @@
 }
 
 #conRunAll_empty{
-	width: 154px;
-	height: 32px;
-	margin: 0px 300px 10px 30px;
+	width: 600px;
+	height: 40px;
+	margin: 0px 0px 10px 30px;
 	display: block;
 	position: relative;
 	float: left;
-	padding: 25px 150px 0px 150px;
-	z-index: 0;
+	padding: 4px 0px 0px 150px;
+	
 }
 
 #conRunAll{

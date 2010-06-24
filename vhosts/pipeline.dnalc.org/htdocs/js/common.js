@@ -246,13 +246,14 @@ function openWindow(url, title, opts) {
 		delete options['resizable'];
 	}
 
-	var w = url && url.indexOf('.gff') > 1 ? new UI.Window( options ) : new UI.URLWindow( options );
+	//var w = url && url.indexOf('.gff') > 1 ? new UI.Window( options ) : new UI.URLWindow( options );
+	var w = new UI.URLWindow( options );
 	w.center();
 	if (title) {
 		w.setHeader(title);
 	}
 	
-	if (url && url.indexOf('.gff') > 1) {
+	/*if (url && url.indexOf('.gff') > 1) {
 		new Ajax.Request(url, {
 			method:'get',
 			//parameters: params, 
@@ -264,7 +265,7 @@ function openWindow(url, title, opts) {
 				alert("Something went wrong.");
 			}
 		});
-	}
+	}*/
 
 	var p = w.getPosition();
 	w.setPosition(110, p.left);

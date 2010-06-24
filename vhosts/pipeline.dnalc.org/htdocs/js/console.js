@@ -52,7 +52,8 @@ function check_status (pid, op, h) {
 					//b.removeClassName('processing');
 					b.removeClassName('disabled');
 					b.addClassName('done');
-					b.onclick = function () { launch(null, file, rnames[op])};
+					//b.onclick = function () { launch(null, file, rnames[op])};
+					b.onclick = function () { launch(null, "/project/gff_to_html?f=" + file, rnames[op])};
 
 					ind.removeClassName(ind.className);
 					ind.addClassName('conIndicator_done');

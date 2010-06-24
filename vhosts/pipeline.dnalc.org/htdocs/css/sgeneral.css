@@ -919,31 +919,64 @@ h5{
 /*---footer START------*/
 
 #footerContainer {
-	width: 920px;
-	height: 26px;
-	background-color: #666666;
-	padding-left: 50px;
-	padding-right: 30px;
+	width: 1000px;
+	height: 28px;
+	/*background-color: #666666;*/
+	background: url("/images/v2/bg_footer.jpg") left no-repeat;
 	vertical-align: bottom;
 	position: relative;
 	
 	}
-#footerCopy {
-	width:300px;
-	height: 20px;
-	font-size: 0.75em;
+#footer_left {
+	width: 200px;
+	height: 26px;
+	padding-left: 30px;
+	position: relative;
+	float: left;
+	padding-top: 2px;
+	
+	}
+#footer_middle {
+	width: 360px;
+	height: 28px;
+	position: relative;
+	font-size: 0.65em;
 	font-family: helvetica, sans-serif;	
-	text-align: right;
-	font-weight: bold;
+	text-align: left;	
 	color: #000;
+	float: left;
+	position: relative;
+	padding:12px 0px 0px 40px;	
+	letter-spacing: 0.1em;
+	
+	}
+	
+#footer_right {
+	width: 340px;
+	height: 28px;
 	float: right;
 	position: relative;
-	padding-top: 6px;	
+	padding-right: 12px;
+	padding-top: 2px;
+	
+	}
+	
+#footerCopy {
+	width:300px;
+	height: 12px;
+	font-size: 0.65em;
+	font-family: helvetica, sans-serif;	
+	text-align: left;	
+	color: #000;
+	float: left;
+	position: relative;
+	padding-left:22px;	
+	letter-spacing: 0.1em;
 
 }
 .footerLink {
 	width:auto;
-	height: 20px;
+	height: 16px;
 	font-size: 0.8em;
 	font-family: helvetica, sans-serif;	
 	text-align: left;
@@ -953,20 +986,52 @@ h5{
 }
 
 
-.footerLink   a {
+.footerLink a {
 	width:auto;
-	height: 20px;
-	color: #000;
+	height: 16px;
+	color: #fff;
 	text-decoration: none;
-	background: url("/images/v2/footer-button.png") left no-repeat;
+	font-weight: bold;
+	background: url("/images/v2/footer-button.png") left bottom no-repeat;
 	display: block;
 	position: relative;
 	float: left;
-	padding: 6px 20px 0px 22px;	
+	padding: 4px 20px 0px 22px;	
 }
 
-.footerLink   a:hover {
-	color:#fff;
+.footerLink a:hover {
+	color:#666;
+
+}
+
+.footerLink_R {
+	width:auto;
+	height: 16px;
+	font-size: 0.8em;
+	font-family: helvetica, sans-serif;	
+	text-align: right;
+	list-style-type: none;
+	position: relative;		
+
+}
+
+
+.footerLink_R a {
+	width:auto;
+	height: 16px;
+	color: #fff;
+	text-decoration: none;
+	font-style: italic;
+	font-weight: bold;
+	background: url("/images/v2/footer-buttonR.png") left no-repeat;
+	display: block;
+	position: relative;
+	float: right;
+	padding: 2px 16px 0px 12px;	
+}
+
+.footerLink_R a:hover {
+	color:#000000;
 
 }
 
@@ -1061,7 +1126,7 @@ float: left;
 	width:140px;
 	height: 40px;
 	position: relative;	
-	float: right;
+	float:left;
 }
 
 .bt_poster a {
@@ -1071,7 +1136,7 @@ float: left;
 	display: block;
 	/*margin-top: 10px;*/
 	position: relative;
-	float: right;
+	float: left;
 }
 
 .bt_poster a:hover {

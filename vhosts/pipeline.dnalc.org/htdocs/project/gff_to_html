@@ -1,0 +1,62 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<style type="text/css">
+body { font-family: Arial, sans-serif;font-size: 80%;}
+table {border-collapse: collapse;}
+table th {text-align: left; }
+table thead, table tfoot {background-color: silver;}
+table td {padding: 2px; border: 1px solid #ccc;}
+table tfoot th {padding: 2px; border: 1px solid #ccc; font-weight: normal};
+table tr.roweven {background-color: #f2f2f2;}
+table tr.rowodd {background-color: #ddd;}
+</style>
+</head>
+<body>
+% if ($in) {
+<table class="">
+<thead>
+<tr>
+<th>Seqid</th><th>Source</th><th>Type</th><th>Start</th><th>End</th><th>Score</th><th>Strand</th><th>Phase</th><th>Attributes</th>
+</tr>
+</thead>
+%	my $chunk = q{};
+%	while (my $line = <$in>) {
+%		next if $line =~ /^#/;
+<tr>
+%		my @tokens = split /\t/, $line;
+%		next if scalar(@tokens) != 9;
+%		$tokens[8] =~ s/\%3D/=/g;
+%		for (@tokens) {
+	<td><% $_ |html%></td>
+%		}
+</tr>
+%    }
+%	undef $in;
+<tfoot><tr>
+<th>Seqid</th><th>Source</th><th>Type</th><th>Start</th><th>End</th><th>Score</th><th>Strand</th><th>Phase</th><th>Attributes</th>
+</tr></tfoot>
+</table>
+% }
+</body>
+</html>
+<%args>
+	$f => ''
+</%args>
+<%init>
+	$r->content_type("text/html; charset=UTF-8");
+	
+	$f =~ s|\.+|.|g;
+	$f =~ s|//|/|g;
+
+	return '' if (!$f || !-f $r->document_root . $f);
+	return if $m->cache_self(key => "gff-" . $f, expires_in => "2 hours");
+
+	$f = $r->document_root . $f;
+	
+	my $in = new IO::File($f);
+</%init>
+
+<%flags>
+	inherit => undef
+</%flags>

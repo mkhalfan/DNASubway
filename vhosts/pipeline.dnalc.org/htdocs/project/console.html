@@ -404,8 +404,8 @@ if ($status eq 'processing') {
 	$title = $label = 'Processing';
 }
 elsif ($status eq 'done') {
-	#my $url = "/project/gff_to_html?f=" . $m->comp('./.comp/filepath_to_web', file => $pmanager->get_gff3_file($routine) || '#', just_return => 1); 
-	my $url = $m->comp('./.comp/filepath_to_web', file => $pmanager->get_gff3_file($routine) || '#', just_return => 1); 
+	my $url = "/project/gff_to_html?f=" . $m->comp('./.comp/filepath_to_web', file => $pmanager->get_gff3_file($routine) || '#', just_return => 1); 
+	#my $url = $m->comp('./.comp/filepath_to_web', file => $pmanager->get_gff3_file($routine) || '#', just_return => 1); 
 	$action = qq{onclick="launch(null, '$url', '$routines{$routine}')"};
 	$target = '';
 	$title  = 'Click to view results';

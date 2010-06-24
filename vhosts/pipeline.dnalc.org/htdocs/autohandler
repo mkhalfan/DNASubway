@@ -10,10 +10,6 @@
 <link rel="stylesheet" type="text/css" href="/files/window/themes/window/window.css" />
 <link rel="stylesheet" type="text/css" href="/files/window/themes/window/alphacube.css" />
 <script type="text/javascript" src="/js/prototype-1.6.1.js"></script>
-<script type="text/javascript" src="/js/prototip/prototip.js"></script>
-<script type="text/javascript" src="/js/common.js"></script>
-<script type="text/javascript" src="/files/window/lib/effects.js"></script>  
-<script type="text/javascript" src="/files/window/dist/window.js"></script>
 % if ($m->request_comp->attr_if_exists('js') && @{$m->request_comp->attr('js')}) {
 %	foreach my $js (@{$m->request_comp->attr('js')}) {
 %		next unless $js;
@@ -21,12 +17,10 @@
 %	}
 % }
 <!--[if lte IE 6]><script src="/files/ie6/warning.js"></script><script>window.onload=function(){e("/files/ie6/")}</script><![endif]-->
-% if ($m->request_comp->attr('load_window_ui')) {
-<script src="/files/window/lib/effects.js" type="text/javascript"></script>  
-<script src="/files/window/dist/window.js" type="text/javascript"></script>
-<link href="/files/window/themes/window/window.css" rel="stylesheet" type="text/css" />
-<link href="/files/window/themes/window/alphacube.css" rel="stylesheet" type="text/css" />
-% }
+<script type="text/javascript" src="/js/prototip/prototip.js"></script>
+<script type="text/javascript" src="/js/common.js"></script>
+<script type="text/javascript" src="/files/window/lib/effects.js"></script>  
+<script type="text/javascript" src="/files/window/dist/window.js"></script>
 </head>
 
 <body>
@@ -119,7 +113,6 @@ new Tip('tt_brick', "Bioinformatics analysis routines in  <i>DNA Subway</i>  wor
 % if ($s->{username}) {
 var re_name_tag = "<% $s->{username} %>";
 % }
-//re_("ktaz7-6gmi62748k");
 try {reinvigorate.track("ktaz7-6gmi62748k");} catch(err) {}
 </script>
 <script type="text/javascript">
