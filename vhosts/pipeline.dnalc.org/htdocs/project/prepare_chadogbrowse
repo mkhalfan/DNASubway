@@ -67,13 +67,14 @@
 
 		# create GBrowse conf file for this project
 		if ($pm->username =~ /^guest_/) {
-			$cutils->gbrowse_chado_conf($proj->id, $pm->chado_user_database);
+			#$cutils->gbrowse_chado_conf($proj->id, $pm->chado_user_database);
+			$cutils->gbrowse_chado_conf($proj->id);
 		}
 		else {
 			$cutils->gbrowse_chado_conf($proj->id);
 		}
 
-		$m->redirect($pcf->{GBROWSE_URL} . '/' . $pm->username . '_db_' . $proj->id . '?nocache=1');
+		$m->redirect($pcf->{GBROWSE_URL} . '/' . $pm->username . '_db_' . $proj->id . '/?nocache=1');
 	}
 	
 </%init>

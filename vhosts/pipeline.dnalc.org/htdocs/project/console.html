@@ -276,6 +276,7 @@
 	use Data::Dumper; 
 	use DNALC::Pipeline::App::ProjectManager ();
 	use DNALC::Pipeline::App::WorkflowManager ();
+	use DNALC::Pipeline::Config ();
 	use DNALC::Pipeline::App::Utils ();
 	use DNALC::Pipeline::MasterProject ();
 	use DNALC::Pipeline::User ();
@@ -319,11 +320,15 @@ my $user = DNALC::Pipeline::User->retrieve($proj->user_id);
 my %status = ();
 my ($history, $rm_status, $trimmed_common_name, $institution);
 
+my $pcf = DNALC::Pipeline::Config->new->cf("PIPELINE");
 my $is_owner = $s->{user_id} == $user->user_id;
 my ($mp) = DNALC::Pipeline::MasterProject->search(user_id => $user->id, project_id => $proj->id);
-my $is_public = $mp->public;
+my $is_public = $mp ? $mp->public : 0;
 
-if (!$is_public && !$is_owner) {
+my $username = $s->{username};
+my $is_admin = grep {/^$username$/} @{$pcf->{ADMINS}};
+
+if (!$is_public && !$is_owner && !$is_admin) {
 	#$m->comp('/_message_add', 'Project is not accessible!', 'error');
 	#print STDERR "Project not accesible...", $/;
 	$m->redirect('/project/browse');

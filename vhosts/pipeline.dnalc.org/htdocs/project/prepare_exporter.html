@@ -41,11 +41,12 @@ if ($proj) {
 
 		my ($redirect_to) = '';
 		for ($sample->links) {
-			if ( $_->link_name =~ /Phytozome/) {
+			if ( $_->link_name =~ /phytozome/i) {
 				$redirect_to = $_->link_url;
 				last;
 			}
 		}
+		#print STDERR $redirect_to . ";eurl=" . $eurl, "\n";
 		$m->redirect($redirect_to . ';eurl=' . $eurl) if $redirect_to;
 	}
 }
