@@ -10,6 +10,8 @@
 </%once>
 <%init>
 	$r->content_type('text/plain');
+	$r->no_cache(1);
+
 	my $err = '';
 	my $status = 'fail';
 	my ($jnlp, $web_game_file) = ('', '');
@@ -36,8 +38,9 @@
 		my $stop  = $pmanager->project->sequence_length;
 
 		my $req_region = $pmanager->cleaned_common_name . ":$start-$stop";
-		my $game_file  = $config->{APOLLO_WRITE_DIR} . "/$req_region.xml";
-		$web_game_file = $config->{APOLLO_WEB_PATH} . "/$req_region.xml";
+		my $xml_file = $pmanager->cleaned_common_name . "-" . random_string(6,8) . ".xml";
+		my $game_file  = $config->{APOLLO_WRITE_DIR} . "/$xml_file";
+		$web_game_file = $config->{APOLLO_WEB_PATH} . "/$xml_file";
 	
 		$jnlp = $config->{APOLLO_WEB_PATH} . "/$req_region.jnlp";
 		$cutil->write_jnlp({
@@ -52,9 +55,11 @@
 			});
 		my $javacmd = "$apollo -H -w $game_file -o game -l $req_region -i chadoDB -C $conf_file > /dev/null 2>&1";
 		#my $javacmd = "$apollo -H -w $game_file -o game -l $req_region -i chadoDB -C $conf_file";
-		print STDERR  $javacmd , $/;
+		#print STDERR  $javacmd , $/;
 		#print STDERR  "\njnlp = $jnlp\n", $/;
 		#print STDERR  "\ngame = $game_file\n", $/;
+
+		$jnlp .= "?r=" . random_string(4, 8);
 
 		my $rc = system($javacmd);
 		if ($rc == 0 && -f $game_file) {
