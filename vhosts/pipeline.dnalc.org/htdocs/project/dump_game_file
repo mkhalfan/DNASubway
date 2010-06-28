@@ -4,6 +4,7 @@
 </%args>
 <%once>
 	use DNALC::Pipeline::Chado::Utils ();
+	use DNALC::Pipeline::Utils qw(random_string);
 	use DNALC::Pipeline::Config ();
 	use DNALC::Pipeline::App::ProjectManager ();
 	use Data::Dumper;
