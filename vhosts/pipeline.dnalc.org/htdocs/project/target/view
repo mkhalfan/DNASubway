@@ -44,20 +44,21 @@
 </div><!--END of ID conYellowlineLeft2-->
 
 <div id="conYellowlineRight2">
-    <div class="con_browserBT ">
+  <div style="margin-left: -26px">
+    <div class="con_browserBT">
 		<span class="conIndicator_boxBrowse"><div id="alignment_ind" class="<% $files{fasta} ? "conIndicator_done" : "conIndicator_Rb_disabled"%>"></div></span>
 		
 %	if (defined $files{fasta}) {
-	<span class="bt_browserYellow" id="alignment_span"><a href="#" onclick="launch_jalview('<% $files{fasta} %>')">Alignment<br/>Viewer</a></span>
+		<span class="bt_browserYellow" id="alignment_span"><a href="#" onclick="launch_jalview('<% $files{fasta} %>')">Alignment<br/>Viewer</a></span>
 %	} else {
-	<span class="bt_browserYellow" id="alignment_span"><a href="#" class="disabled">Alignment<br/>Viewer</a></span>
+		<span class="bt_browserYellow" id="alignment_span"><a href="#" class="disabled">Alignment<br/>Viewer</a></span>
 %	}
 	</div>
     
-<span id="con_browserYellowSpacer"></span>
- <div class="con_browserBT ">
-    <span class="conIndicator_boxBrowse"><div id="tree_ind" class="<% $tree_url ? "conIndicator_done" : "conIndicator_Rb_disabled" %>"></div></span>
-	<span class="bt_browserYellow"><a href="javascript:;" id="tree_btn"\
+	<div id="con_browserYellowSpacer"></div>
+	<div class="con_browserBT">
+		<span class="conIndicator_boxBrowse"><div id="tree_ind" class="<% $tree_url ? "conIndicator_done" : "conIndicator_Rb_disabled" %>"></div></span>
+		<span class="bt_browserYellow"><a href="javascript:;" id="tree_btn"\
 % 	if ( $tree_url) {
 		onclick="window.open('/files/phylowidget/bare.html?tree=<% $tree_url %>', 'target_tree', 'status=0,height=550,width=750')"
 % 	} else {
@@ -66,13 +67,14 @@
 	>Tree<br/>Viewer</a></span>
     
     </div>
+  </div>
 </div><!--END of ID conYellowlineRight2--> 
 
 <br clear="both"/>
 
 % if ($tp) {
 <div id="conRun_yellowline">
-	<div class="con_browserBT ">
+	<div class="con_browserBT">
 % if ($is_owner) {
 		<span class="conIndicator_boxBrowse"><div id="launch_btn_ind" class="<% $tp->status ne "processing" ? "conIndicator_Rb_disabled" : "conIndicator_processing"%>"></div></span>
 		<span class="bt_Runyellowline"><a id="launch_btn" href="javascript:;" onclick="launch_target()"class="<% $tp->status eq "processing" ? "disabled" : ""%>">RUN</a></span>

@@ -1,8 +1,6 @@
 @charset "UTF-8";
 /* CSS Document */
 
-* {margin: 0px auto ;}
-
 #container_pageTitle{
 	width: 620px;
 	height: 24px;
@@ -624,14 +622,14 @@
 
 .conProjectInfo_Row{
 	width: 246px;
-	height: 20px;
+	height: auto;
 	margin: 0px auto; 
 	padding-top: 2px;
 	float: left;
 	}
 .conProjectInfo_Cell1{
 	width: 80px;
-	height: 20px;
+	height: auto;
 	margin: 0px auto; 
 	color: #006699;
 	font-size: 0.8em;
@@ -640,7 +638,7 @@
 	}
 .conProjectInfo_Cell2{
 	width: 156px;
-	height: 20px;
+	height: auto;
 	margin: 0px auto; 
 	color: #996600;
 	font-size: 0.8em;
@@ -649,7 +647,7 @@
 	}
 .conProjectInfo_Cell3{
 	width: 80px;
-	height: 20px;
+	height: auto;
 	margin: 0px auto; 
 	color: #996600;
 	font-size: 0.8em;
@@ -1016,8 +1014,6 @@
 .con_browserBT {
 	width:126px;
 	height: 34px;
-	position: relative;	
-	float: right;
 }
 
 .bt_browserBlueSpacer {
@@ -1280,7 +1276,7 @@
 }
 
 .bt_Runyellowline a.disabled:hover {
-	background: url("/images/v2/bt_browserYellow1.png") top no-repeat;
+	background: url("/images/v2/bt_runYellowline1.png") top no-repeat;
 	cursor: default;
 }
 
@@ -1290,19 +1286,13 @@
 	
 /*---YELLOWLINE Console--right browse---*/
 #con_browserYellowSpacer {
-	width:100px;
 	height: 30px;
-	display: block;
-	position: relative;	
-	display: block;
-	float:left;
 }
 #conYellowlineRight2 {
 	width: 100px;
 	height: 192px;
 	background: url("/images/v2/map-yellowline_R2.jpg") bottom left no-repeat;
 	float: left;
-	position: relative;
 	padding: 137px 16px 0px 174px;
 	}
 
