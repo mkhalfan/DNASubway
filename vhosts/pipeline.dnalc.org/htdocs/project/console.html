@@ -156,7 +156,7 @@
 			onclick="<% $rm_status eq "done" ? "launch('gbrowse', null, 'GBrowse')" : "" %>">Local<br/>Browser</a></span>
     </span>
 
-% 	if ( $proj->sample) {
+% 	if ( $sample && $sample->links) {
 	<div class="bt_browserBlueSpacer">
 		<div id="con_browserBlueAdd">
 			<span class="conIndicator_boxBrowse"><div id="exporter_ind" class="conIndicator_<%$rm_status eq "done" ? 'Rb' : 'Rb_disabled' %>"></div></span>
@@ -279,6 +279,7 @@
 	use DNALC::Pipeline::Config ();
 	use DNALC::Pipeline::App::Utils ();
 	use DNALC::Pipeline::MasterProject ();
+	use DNALC::Pipeline::Sample ();
 	use DNALC::Pipeline::User ();
 	use DNALC::Pipeline::UserProfile ();
 	use DNALC::Pipeline::Utils qw/nicebasepairs/;
@@ -318,7 +319,7 @@ unless ($proj) {
 my $user = DNALC::Pipeline::User->retrieve($proj->user_id);
 
 my %status = ();
-my ($history, $rm_status, $trimmed_common_name, $institution);
+my ($history, $rm_status, $trimmed_common_name, $institution, $sample);
 
 my $pcf = DNALC::Pipeline::Config->new->cf("PIPELINE");
 my $is_owner = $s->{user_id} == $user->user_id;
@@ -366,6 +367,7 @@ if ($r->method eq "POST") {
 }
 else { # most likely is GET
 	$history = $wfm->get_history;
+	$sample = DNALC::Pipeline::Sample->retrieve($proj->sample) if $proj->sample;
 
 	for my $rt ( keys %routines ) {
 		my $status_name = $wfm->get_status($rt)->name;

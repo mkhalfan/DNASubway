@@ -11,6 +11,9 @@ use File::Path;
 use IO::File ();
 use Data::Dumper;
 
+{
+no Apache::DBI;
+
 =head1 NAME
 
 DNALC::Pipeline::Chado::Utils - Do administrative tasks for setting up a new user
@@ -1051,6 +1054,25 @@ sub additional_load_parameters {
 }
 
 
+# sets the ranks for any duplicate transcripts to 0
+#
+sub  fix_apollo_transcripts {
+    my ($self, $trimmed_common_name) = @_;
+
+    my $dbh = $self->dbh;
+
+    #check to see if the organism is already in the db
+    my $query = q{UPDATE featureloc fl SET rank=0 
+					FROM feature f 
+					WHERE f.name = ? AND fl.rank > 0 AND fl.srcfeature_id = f.feature_id};
+    my $sth = $dbh->prepare($query);
+    $sth->execute($trimmed_common_name) or do {
+			print STDERR  "Unable to fix_apollo_transcripts: ", $!, $/;
+		};
+	$sth->finish;
+	$dbh->disconnect;
+}
+
 
 sub create_chado_adapter {
     my ($self, $apollo_conf_dir) = @_;
@@ -1284,4 +1306,5 @@ END
 	}
 }
 
+}
 1;

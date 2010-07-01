@@ -29,11 +29,11 @@
 		$cutil->profile( $pmanager->chado_user_profile );
 		my $conf_file = $cutil->create_chado_adapter($config->{APOLLO_USERCONF_DIR});
 		my $command = "-H -C $conf_file -G user -f '$path' -i game -o chadoDB";
-		print STDERR  "TODO: send other orguments to 'apollo_insert'", $/;
 
 		my $client = Gearman::Client->new;
 		my $sx = $client->job_servers(@{$config->{GEARMAN_SERVERS}});
-		my $h = $client->dispatch_background( apollo_insert => $command );
+		my $h = $client->do_task( apollo_insert => $command );
+		$cutil->fix_apollo_transcripts( $pmanager->cleaned_common_name );
 
 		$msg = 'ok';	   
    }

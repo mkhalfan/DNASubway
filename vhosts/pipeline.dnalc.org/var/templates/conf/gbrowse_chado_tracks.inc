@@ -163,8 +163,11 @@ key          = User BlastX
 
 
 [usergenes]
-feature     = gene:user
+#feature     = gene:user
+#feature     = transcript gene:user
+feature     = transcript
 glyph       = gene
 bgcolor     = rgb(51,102,255)
 das category = transcription
+
 key         = User Annotation
