@@ -805,6 +805,18 @@ sub create_db {
 				return;
 			};
 
+    my $vacuum_cmd = "vacuumdb $q -U ".$self->dbuser
+             . " -h " . $self->host
+             . " -p " . $self->port
+             . " -f -z "
+             . " ". $self->username 
+             . ( $quiet ? ' > /dev/null 2>&1' : '');
+    #print STDERR $vacuum_cmd, $/;
+    system( $vacuum_cmd ) == 0 or do {
+				print STDERR "Unable to VACUUM Chado DB [", $self->username, "].\n";
+				return;
+			};
+
     return 1; # success
 }
 
@@ -1057,18 +1069,19 @@ sub additional_load_parameters {
 # sets the ranks for any duplicate transcripts to 0
 #
 sub  fix_apollo_transcripts {
-    my ($self, $trimmed_common_name) = @_;
+	my ($self, $trimmed_common_name) = @_;
 
-    my $dbh = $self->dbh;
+	my $dbh = $self->dbh;
 
-    #check to see if the organism is already in the db
-    my $query = q{UPDATE featureloc fl SET rank=0 
-					FROM feature f 
-					WHERE f.name = ? AND fl.rank > 0 AND fl.srcfeature_id = f.feature_id};
-    my $sth = $dbh->prepare($query);
-    $sth->execute($trimmed_common_name) or do {
-			print STDERR  "Unable to fix_apollo_transcripts: ", $!, $/;
-		};
+	#check to see if the organism is already in the db
+	my $query = q{UPDATE featureloc SET rank=0 
+			FROM feature
+			WHERE feature.name = ? AND featureloc.rank > 0 AND featureloc.srcfeature_id = feature.feature_id};
+	print STDERR "\n-----------------\n$query\n", $trimmed_common_name, "\n--------------\n";
+	my $sth = $dbh->prepare($query);
+	$sth->execute($trimmed_common_name) or do {
+		print STDERR  "Unable to fix_apollo_transcripts: ", $!, $/;
+	};
 	$sth->finish;
 	$dbh->disconnect;
 }
