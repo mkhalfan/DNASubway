@@ -38,7 +38,7 @@ max segment     = 100000
 default segment = 10000
 
 # zoom levels
-zoom levels    = 100 200 1000 2000 5000 10000 20000 40000 50000
+zoom levels    = 100 200 1000 2000 5000 10000 25000 50000 100000 150000
 
 # colors of the overview, detailed map and key
 overview bgcolor = lightgrey
