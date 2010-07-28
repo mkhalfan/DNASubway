@@ -180,7 +180,7 @@ function check_status (tid, h) {
 }
 
 /* Launches the Alignment Viewer */
-function launch_jalview(fa) {
+function launch_jalview(fa, nw) {
 	if (!fa)
 		return;
 
@@ -197,7 +197,12 @@ function launch_jalview(fa) {
 		$('jalview_ifr').contentWindow.location.reload();
 	}
 	else {
-		var jlv = new Element('iframe', {id: 'jalview_ifr', src: './view_alignment?f=' + fa, width: '0px', height:'0px'});
+		var jlv = new Element('iframe', {
+									id: 'jalview_ifr', 
+									src: './view_alignment?f=' + fa + ';nw=' + nw, 
+									width: '0px', 
+									height:'0px'}
+						);
 		$('body').insert(jlv);
 		$('alignment_ind').removeClassName('conIndicator_done');
 		$('alignment_ind').addClassName('conIndicator_processing');

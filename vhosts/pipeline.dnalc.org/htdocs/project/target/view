@@ -49,7 +49,7 @@
 		<span class="conIndicator_boxBrowse"><div id="alignment_ind" class="<% $files{fasta} ? "conIndicator_done" : "conIndicator_Rb_disabled"%>"></div></span>
 		
 %	if (defined $files{fasta}) {
-		<span class="bt_browserYellow" id="alignment_span"><a href="#" onclick="launch_jalview('<% $files{fasta} %>')">Alignment<br/>Viewer</a></span>
+		<span class="bt_browserYellow" id="alignment_span"><a href="#" onclick="launch_jalview('<% $files{fasta} %>', '<% $files{nw} %>')">Alignment<br/>Viewer</a></span>
 %	} else {
 		<span class="bt_browserYellow" id="alignment_span"><a href="#" class="disabled">Alignment<br/>Viewer</a></span>
 %	}

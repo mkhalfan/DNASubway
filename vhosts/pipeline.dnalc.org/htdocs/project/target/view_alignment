@@ -1,6 +1,7 @@
 %#--------------------------------
 <%args>
 	$f => ''
+	$nw => ''
 </%args>
 %#--------------------------------
 <%once>
@@ -18,6 +19,7 @@
 	codebase="/files/jalview/" 
 	code="jalview.bin.JalviewLite" height="15" width="110">
 	<param name="file" value="<% $f %>">
+	<param name="treeFile" value="<% $nw %>">
 	<param name="showAnnotation" value="true">
 	<param name="wrap" value="false">
 	<param name="nojmol" value="true">
