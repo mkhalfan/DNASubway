@@ -70,5 +70,30 @@ sub count_registered_users {
 	return $class->sql_count_registered_users->select_val;
 }
 
+__PACKAGE__->set_sql( group_by_occupation_institution => q{
+		SELECT count(*) AS num, a_value,
+			CASE WHEN a_question_id = 37 THEN 'Student' WHEN a_question_id = 49 THEN 'Educator' END AS occupation
+		FROM user_profile_answer
+		LEFT JOIN user_profile_question ON a_question_id = q_id
+		WHERE a_question_id IN (
+			SELECT q_id FROM sub_questions(36)
+			WHERE q_type = 'q' AND q_input_type = '' AND lower(q_label) LIKE '%institution%'
+			UNION
+			SELECT q_id FROM sub_questions(48)
+			WHERE q_type = 'q' AND q_input_type = '' AND lower(q_label) LIKE '%institution%'
+		)
+		GROUP BY occupation, a_value
+		ORDER BY num;
+	});
+
+__PACKAGE__->set_sql( group_by_occupation => q{
+		SELECT count(*) AS num, CASE WHEN a_value != '' THEN a_value ELSE '-' END AS value
+		FROM user_profile_answer
+		LEFT JOIN user_profile_question ON a_question_id = q_id
+		WHERE a_question_id IN (12)
+			AND a_value != 'Other'
+		GROUP BY value
+		ORDER BY num DESC
+	});
 1;
 

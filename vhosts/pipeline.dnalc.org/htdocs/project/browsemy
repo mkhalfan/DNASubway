@@ -94,23 +94,10 @@ unless ($page =~ /^\d+$/) {
 	$page = 1;
 }
 
-#my $pager = DNALC::Pipeline::Project->pager;
-#$pager->per_page( $epp );
-#$pager->page( $page );
-#$pager->order_by( $sort );
-#my @projects = $pager->search_where;
+my $pager = DNALC::Pipeline::MasterProject->pager($epp, $page);
 
-my $pager = DNALC::Pipeline::MasterProject->pager;
-$pager->where({user_id => $s->{user_id}});
-$pager->per_page( $epp );
-$pager->page( $page );
-$pager->order_by( 'mp_id desc' );
-
-
-# this should be replaced by a join in DNALC::Pipeline::MasterProject???
-#if (0) {
 my @projects = grep { defined $_ } map {
-				my $pid = $_->project_id;
+				my $pid = $_->{project_id};
 				my $pclass = 'DNALC::Pipeline::Project';
 				if ($_->project_type eq "target") {
 					$pclass = 'DNALC::Pipeline::TargetProject';
@@ -122,10 +109,7 @@ my @projects = grep { defined $_ } map {
 					$p->{public} = $_->public;
 				}
 				$p;
-			} $pager->search_where;
-#}
-#my @projects = $pager->retrieve_all;
-#print STDERR Dumper(\@projects);
+			} $pager->get_mine_sorted({user_id => $s->{user_id}});
 
 my $pages = int($pager->total_entries/$epp) + ($pager->total_entries % $epp > 0 ? 1 : 0);
 

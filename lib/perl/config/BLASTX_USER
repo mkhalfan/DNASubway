@@ -22,6 +22,7 @@
 		'--version', 3,
 		'-m',
 		'--method', 'match_part',
+		'-s', 'BLASTX_USER',
 		'--addid',
 		'--coverage', '0',
 		'--identity', '0',

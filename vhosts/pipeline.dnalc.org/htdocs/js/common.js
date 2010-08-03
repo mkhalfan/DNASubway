@@ -42,13 +42,11 @@ function show_messages(html, isError) {
 		delete options['resizable'];
 	}
 	var _w = new UI.Window(options).center();
-	html = "<div class=\"conNewPro_title\" style=\"vertical-align: middle; padding: 20px\">" + html + "</div>";
-	/*if (isError) {
-		_w.setHeader("Error");
-	}
-	else {
-		_w.setHeader("Notice");
-	}*/
+	html = "<div class=\"messages\">" 
+		+ html
+		+ "<div style=\"text-align: center;margin-top: 20px;\"><input id=\"msg_ok_btn\" class=\" &nbsp; OK &nbsp; \" type=\"button\" value=\"OK\" onclick=\"w.close();\"/></div>"
+		+ "</div>";
+
 	_w.header.removeClassName('move_handle');
 	_w.setHeader("Message");
 	_w.setContent(html);
@@ -67,6 +65,9 @@ function show_messages(html, isError) {
 
 	_w.show(true);
 	_w.activate();
+	var msg_ok_btn = $('msg_ok_btn');
+	if (msg_ok_btn)
+		msg_ok_btn.focus();
 	return w = _w;
 }
 

@@ -11,11 +11,11 @@
   <table class="conProject_table" summary="">
   <tr>
     <th width="32" scope="col">ID</th>
-    <th width="60" scope="col">Date</th>
-    <th width="200" scope="col">Project Title</th>
+    <th width="60" scope="col"><a href="<& /_realurl &>/1/date/<% $sort eq "date" && $dir eq "desc" ? "asc" : "desc" %>">Date</a></th>
+    <th width="200" scope="col"><a href="<& /_realurl &>/1/title/<% $sort eq "title" && $dir eq "asc" ? "desc" : "asc" %>">Project Title</a></th>
 	<th width="250" scope="col">Description</th>
-    <th width="200" scope="col">Organism</th>
-    <th width="120" scope="col">Owner</th>
+    <th width="200" scope="col"><a href="<& /_realurl &>/1/organism/<% $sort eq "organism" && $dir eq "asc" ? "desc" : "asc" %>">Organism</a></th>
+    <th width="120" scope="col"><a href="<& /_realurl &>/1/owner/<% $sort eq "owner" && $dir eq "asc" ? "desc" : "asc" %>">Owner</a></th>
   </tr>
 % for (@projects) {
 %	my $created = DNALC::Pipeline::App::Utils->format_datetime($_->created, undef, "%m/%d/%Y");
@@ -40,7 +40,7 @@
 </table>
 
 <& '/_pager', cur=>$page, pages => $pages, 
-	suffix => '', prefix => '/project/browse/' &>
+	suffix => "/$sort/$dir", prefix => '/project/browse/' &>
 
 </div>
 <div class="clear"> </div>
@@ -49,7 +49,8 @@
 %#--------------------------------------------------------
 <%args>
 	$page => 1
-	$sort => 'created desc'
+	$sort => 'date'
+	$dir => 'desc'
 </%args>
 <%once>
 	use DNALC::Pipeline::MasterProject ();
@@ -71,6 +72,12 @@
 			u => 'Unknown',
 			o => 'Other'
 		);
+	my %sort_map = (
+			date => 'mp.mp_id',
+			title => 'name',
+			organism => 'organism',
+			owner => 'u.name_last',
+	);
 
 	my $epp = 10;
 </%once>
@@ -82,39 +89,42 @@ $r->content_type('text/html');
 $m->session->{pipeline} ||= {};
 my $s = $m->session->{pipeline};
 
-if ($r->uri =~ /\/(\d+)$/) {
+if ($r->uri =~ /\/(\d+)\/?(date|title|organism|owner)?\/?(asc|desc)?$/) {
+#if ($r->uri =~ /\/(\d+)\//) {
 	$page = $1;
+	$sort = $2;
+	$dir  = $3;
 }
 
 unless ($page =~ /^\d+$/) {
 	$page = 1;
 }
 
-my $pager = DNALC::Pipeline::MasterProject->pager;
-$pager->per_page( $epp );
-$pager->page( $page );
-$pager->order_by( 'mp_id desc' );
-$pager->where({ public => 1});
+unless ($dir && $dir =~ /^(?:asc|desc)$/) {
+	$dir = "desc";
+}
 
-# this should be replaced by a join in DNALC::Pipeline::MasterProject???
-#if (0) {
+unless ($sort_map{$sort}) {
+	$sort = "date";
+}
+
+my $order_by = "$sort_map{$sort} $dir";
+
+my $pager = DNALC::Pipeline::MasterProject->pager($epp, $page);
 my @projects = grep { defined $_ } map {
-				my $pid = $_->project_id;
+				my $pid = $_->{project_id};
 				my $pclass = 'DNALC::Pipeline::Project';
 				if ($_->project_type eq "target") {
 					$pclass = 'DNALC::Pipeline::TargetProject';
 				}
-				my $u = DNALC::Pipeline::User->retrieve($_->user_id);
+				#my $u = DNALC::Pipeline::User->retrieve($_->user_id);
 				my $p = $pclass->retrieve($pid);
 				if ($p) {
 					$p->{project_type} = $_->project_type;
-					$p->{full_name} = $u->full_name if $u;
+					$p->{full_name} = $_->{full_name};
 				}
 				$p;
-			} $pager->search_where;
-#}
-#my @projects = $pager->retrieve_all;
-#print STDERR Dumper(\@projects);
+			} $pager->get_public_sorted({order_by => $order_by});
 
 my $pages = int($pager->total_entries/$epp) + ($pager->total_entries % $epp > 0 ? 1 : 0);
 
