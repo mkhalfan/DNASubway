@@ -124,9 +124,16 @@ function check_status (tid, h) {
 							abtn.childElements().each(function(item){
 									if ('A' == item.nodeName) {
 										item.removeClassName('disabled');
-										item.observe('click', function() {
-											launch_jalview(r.files['fasta']);
-										});
+										if (r.files['nw']) {
+											item.observe('click', function() {
+												launch_jalview(r.files['fasta'], r.files['nw']);
+											});
+										}
+										else {
+											item.observe('click', function() {
+												launch_jalview(r.files['fasta']);
+											});
+										}
 									}
 								}
 							);

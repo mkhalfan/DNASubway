@@ -37,7 +37,7 @@
 	$r->no_cache(1);
 	$r->content_type("text/html");
 	
-	my ($tpid, $num, $gid, $tp, $genome);
+	my ($tpid, $num, $gid, $tp, $genome, $gname);
 	my ($file, $header, $seq);
 	my ($ref, $start, $stop);
 
@@ -45,12 +45,18 @@
 	if ($hn && $hn =~ /([a-z0-9_\s]+)-(\d+)-(\d+)$/i) {
 		$tpid = $3;
 		$num = $2;
-		$gid = $1;
+		#$gid = $1;
+		$gname = $1;
 		$tp = DNALC::Pipeline::TargetProject->retrieve($tpid) if $tpid;
 	}
-	if ($tp && $gid) {
-		$gid =~ s/\s/_/g;
-		($genome) = map { $_->genome_id } grep {$_->genome_id eq $gid} $tp->genomes;
+	#if ($tp && $gid) {
+	if ($tp && $gname) {
+		#$gid =~ s/\s/_/g;
+		#($genome) = map { $_->genome_id } grep {$_->genome_id eq $gid} $tp->genomes;
+		$gname =~ s/_+/ /g;
+		($genome) = map { $_->genome_id } grep {$_->genome_id->organism eq $gname} $tp->genomes;
+		$gid = $genome->genome_id if $genome;
+		
 		my $work_dir = $tp->work_dir;
 		($file) = grep { $_ =~ /$gid/} <$work_dir/*>;
 

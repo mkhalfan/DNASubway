@@ -215,7 +215,7 @@ else {
 						user_id => $s->{user_id},
 						project_id => $pm->project ? $pm->project->id : undef,
 						organism => $organism,
-						segment => $common_name,
+						segment => lc $common_name,
 						seq => $seq,
 						type => $type,
 						gp_name => $gp_name || '',

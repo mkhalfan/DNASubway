@@ -123,15 +123,10 @@ sub run_target {
 						my $fh = IO::File->new;
 						if ($fh->open( $file , 'w')) {
 							if ($ext eq 'nw') {
-								#print STDERR  $content, $/, $/;
-								#$content =~ s/([a-z0-9_]+)_AS_/$genomes{$1} . '_AS_'/gei;
-								$content =~ s/(\d+)_([A-Z][a-z0-9_]+):0/$2-$1-$tpid:0/gi;
-								#print STDERR  $content, $/;
+								$content =~ s/(\d+)_([A-Z][a-z0-9_]+):0/$genomes{$2}-$1-$tpid:0/gi;
 							}
 							elsif ($ext eq 'fasta') {
-								#$content =~ s/^>([a-z0-9_]+)_AS_/'>' . $genomes{$1} . '_AS_'/mgei;
-								$content =~ s/^>(\d+)_([A-Z][a-z0-9_]+)/>$2-$1-$tpid/mgi;
-								#print STDERR $content, $/;
+								$content =~ s/^>(\d+)_([A-Z][a-z0-9_]+)/>$genomes{$2}-$1-$tpid/mgi;
 							}
 							else {
 								$fh->binmode if $ext =~ /(?:gz|jpg)/;
@@ -157,8 +152,9 @@ sub run_target {
 						my $filename = basename($_->{name});
 						$filename =~ s/temp_\d+-//;
 						$tar->extract_file( $_->{name}, $filename );
-						print $filename, $/;
+						#print STDERR $filename, $/;
 					}
+					$tar->clear;
 				}
 				$tp->status('done');
 			}
