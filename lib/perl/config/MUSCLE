@@ -1,0 +1,10 @@
+{
+	program => '/usr/local/bin/muscle',
+	options => ['-in'],
+	option_output_files => {
+			'-fastaout' => 'output.fasta',
+			'-htmlout' => 'output.html',
+			'-physout' => 'output.phys',
+		},
+	
+}

@@ -1,6 +1,7 @@
 package DNALC::Pipeline::ProjectLogger;
 
 use base qw(DNALC::Pipeline::DBI);
+use DNALC::Pipeline::Log ();
 use POSIX ();
 use Params::Validate qw(:types);
 use Carp;
@@ -23,7 +24,7 @@ sub log {
 		project_id => { type => SCALAR, default => '0' },
 		type => { type => SCALAR, 
 					default => 'INFO',
-					regex => qr/^(?:NOTE|ERR|WARN|INFO|DEBG)$/,
+					regex => qr/^(?:NOTE|ERR|WARN|INFO|DEBG|EMERG|CRIT|ALRT)$/,
 		},
 		message => { type => SCALAR },
 	}); 
@@ -31,8 +32,20 @@ sub log {
 			user_id => $o{user_id},
 			project_id => $o{project_id},
 			type => $o{type},
-			message => $o{message},
+			message => $o{message} ? substr $o{message}, 0, 1000 : ''
 		});
+
+	my $dlog = DNALC::Pipeline::Log->new;
+	my $msg = "\n[PID:$o{project_id}] [UID:$o{user_id}] " . $o{message};
+	if ($o{type} eq 'INFO') {
+		$dlog->info($msg);
+	}
+	elsif ($o{type} =~ /ERR/i) {
+		$dlog->error($msg);
+	}
+	elsif ($o{type} =~ /EMERG|ALERT|CRIT/i) {
+		$dlog->emergency($msg);
+	}
 }
 
 __PACKAGE__->set_sql(latest => q{

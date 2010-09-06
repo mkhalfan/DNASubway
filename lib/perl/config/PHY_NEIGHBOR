@@ -1,0 +1,19 @@
+{
+	program => '/usr/local/bin/neighbor',
+	menu => {
+		OUTGROUP => "O\n",
+		LOWTRI => "L\n",
+		UPPTRI => "R\n",
+		SUBREP => "S\n",
+		JUMBLE => "J\n",
+		SUBMIT => "Y\n",
+		MULTIPLE => "M\n",
+		QUIET => "2\n",
+	},
+	menu_options => "L\nR\nS\nY\n",
+
+	input_file => 'infile',
+	output_file => 'outfile',
+	tree_file => 'outtree',
+	options => [],
+}
