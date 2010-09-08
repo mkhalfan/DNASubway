@@ -10,7 +10,8 @@
 		MULTIPLE => "M\n",
 		QUIET => "2\n",
 	},
-	menu_options => "L\nR\nS\nY\n",
+	#menu_options => "L\nR\nS\nY\n",
+	menu_options => "L\nY\n",
 
 	input_file => 'infile',
 	output_file => 'outfile',

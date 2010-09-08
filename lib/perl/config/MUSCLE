@@ -1,10 +1,11 @@
 {
 	program => '/usr/local/bin/muscle',
-	options => ['-in'],
+	options => ['-quiet',
+				'-in'],
 	option_output_files => {
 			'-fastaout' => 'output.fasta',
 			'-htmlout' => 'output.html',
-			'-physout' => 'output.phys',
+			'-phyiout' => 'output.phyi',
 		},
 	
 }

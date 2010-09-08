@@ -11,7 +11,7 @@ use File::Spec ();
 
 		for (keys %{$self->{conf}->{option_output_files}}) {
 			unshift @{$self->{work_options}}, 
-				$_, $project_dir . '/'. $self->{conf}->{option_output_files}->{$_}
+				$_, $self->{work_dir} . '/'. $self->{conf}->{option_output_files}->{$_}
 		}
 
 		return $self;
@@ -28,7 +28,7 @@ use File::Spec ();
 		if ($out_type) {
 			$out_file = File::Spec->catfile($self->{work_dir}, $self->{conf}->{option_output_files}->{$out_type});
 		}
-		return $out_file if $out_file;
+		return $out_file if -e $out_file;
 	}
 }
 

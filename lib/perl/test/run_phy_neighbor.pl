@@ -4,10 +4,9 @@ use strict;
 use Data::Dumper;
 
 use DNALC::Pipeline::Config ();
-use DNALC::Pipeline::Process::Phylip ();
+use DNALC::Pipeline::Process::Phylip::Neighbor ();
 
-#my $cf = DNALC::Pipeline::Config->new->cf('PHY_NEIGHBOR');
-my $p = DNALC::Pipeline::Process::Phylip->new('/tmp');
+my $p = DNALC::Pipeline::Process::Phylip::Neighbor->new('/tmp');
 
 $p->run(input => '/tmp/infile', 
 		pretend => 0, 

@@ -1,0 +1,9 @@
+{
+	program => '/usr/local/bin/dnadist',
+	menu => {},
+	menu_options => "L\n2\nY\n",
+
+	input_file => 'infile',
+	output_file => 'outfile',
+	options => [],
+}

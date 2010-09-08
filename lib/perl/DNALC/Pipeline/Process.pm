@@ -100,6 +100,9 @@ use Carp;
 	sub run {
 		my ($self, %params) = @_;
 
+		#remove old exit_status
+		delete $self->{exit_status};
+
 		my $pretend = exists $params{pretend} ? delete $params{pretend} : undef;
 		my $input_file = $params{input} ? delete $params{input} : undef;
 		my $debug = $params{debug} ? delete $params{debug} : $pretend;
