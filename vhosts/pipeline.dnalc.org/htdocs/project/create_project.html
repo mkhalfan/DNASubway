@@ -83,6 +83,12 @@
 						<input class="conRadiobox_align" type="radio" name="group" id="go" value="o" <% $group eq "o" ? "checked=\"checked\"" : ""%>/>&nbsp; Other</span>
 						<span class="conNewPro_smallContainer">
 						<input class="conRadiobox_align" type="radio" name="group" id="gu" value="u" <% $group eq "u" ? "checked=\"checked\"" : ""%>/>&nbsp; I don't know</span>
+%	if (grep $s->{username}, @{$pcf->{ADMINS}}) {
+					</div>
+					<div class="conNewPro_label1">
+						<span class="conNewPro_smallContainer">
+						<input class="conRadiobox_align" type="radio" name="group" id="gh" value="h" <% $group eq "h" ? "checked=\"checked\"" : ""%>/>&nbsp; Human</span>
+%	}
 					</div>
  				 </div>
 				<div style="clear: both;">&nbsp;</div> <div style="clear: both;">&nbsp;</div> 
