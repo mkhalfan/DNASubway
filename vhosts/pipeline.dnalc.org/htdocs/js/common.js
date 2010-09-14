@@ -304,6 +304,32 @@ function launch_tour() {
 	}
 }
 
+function launch_background() {
+	var w = openWindow('/files/dynamic_gene/index.html',
+				'DNA Subway Background Information', {
+				width: 960, 
+				height: 580,
+				shadow: false,
+				draggable: false,
+				resizable: false,
+				url: '/files/dynamic_gene/index.html'
+			}
+		);
+	w.header.removeClassName('move_handle');
+
+	if (isMSIE) {
+		try {
+			var btns = w.buttons.childElements();
+			btns.each(function(btn){
+				if(btn.hasClassName('minimize') || btn.hasClassName('maximize') ) {
+					btn.remove();
+				}
+			});
+			w.setResizable(false);
+		} catch (e) {};
+	}
+}
+
 //------------------------
 
 Event.observe(window, isMSIE ? 'load' : 'dom:loaded', function() {

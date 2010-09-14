@@ -31,11 +31,10 @@
 <div id="home_header_topline">FAST TRACK TO GENE ANNOTATION AND GENOME ANALYSIS</div>
 	<div id="container_InsideH_bg">   
 		<div id="container_H_insideTop">
-			<div id="conMember_name"><% $s->{full_name} |html %></div>
+			<div id="conMember_name"><span class="bt_LogOut_text"><a href="/logout"><b>Log out</b> &nbsp;&nbsp;</a></span><% $s->{full_name} |html %></div>
 		</div>
 		<div id="container_H_insidebottom">
-			<span class="bt_LogOut"><a href="/logout"></a></span>
-			<span class="bt_Map"><a href="/"></a></span>
+			<span class="bt_home"><a href="/"></a></span>
 		</div>
 	</div> <!--END of ID container_InsideH_bgr-->
 </div> <!--END of ID container_InsideHeader-->

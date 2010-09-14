@@ -390,7 +390,7 @@ h5{
 	color:#000;
 
 }
-
+/*
 .bt_LogOut {
 	width:114px;
 	height: 38px;
@@ -413,6 +413,7 @@ h5{
 	background: url("/images/v2/bt_logout2.png") right no-repeat;
 
 }
+*/
 
 .bt_LogIn {
 	width: auto;
@@ -434,6 +435,79 @@ h5{
 
 .bt_LogIn a:hover {
 	background: url("/images/v2/bt_login2.png") right no-repeat;
+
+}
+
+.bt_LogOut_text {
+	width:autopx;
+	height: auto;
+	font-size: .65em;
+	font-weight: normal;
+	padding-left: 12px;
+	text-transform: uppercase; 
+		
+}
+
+.bt_LogOut_text  a {
+	width:autopx;
+	height: auto;
+	position: relative;
+	color: #666666;
+	text-decoration: none;
+	padding-top: 4px;
+	font-style: normal;
+	font-family: helvetica, sans-serif;
+	letter-spacing: 0em;
+	
+}
+
+.bt_LogOut_text  a:hover {
+	color: #FF9933;
+}
+
+.bt_myprojects_home {
+	width:114px;
+	height: 38px;
+	position: relative;	
+	
+
+}
+
+.bt_myprojects_home  a {
+	width:114px;
+	height: 38px;
+	background: url("/images/v2/bt_myprojects_small1.png") right no-repeat;
+	display: block;
+	position: relative;
+	float: left;
+	margin: 0px 0px 0px 26px;
+}
+
+.bt_myprojects_home a:hover {
+	background: url("/images/v2/bt_myprojects_small2.png") right no-repeat;
+
+}
+
+.bt_publicprojects_home {
+	width:114px;
+	height: 38px;
+	position: relative;	
+	
+
+}
+
+.bt_publicprojects_home  a {
+	width:114px;
+	height: 38px;
+	background: url("/images/v2/bt_pubprojects_small1.png") right no-repeat;
+	display: block;
+	position: relative;
+	float: left;
+	margin:15px 0px 0px 26px;
+}
+
+.bt_publicprojects_home a:hover {
+	background: url("/images/v2/bt_pubprojects_small2.png") right no-repeat;
 
 }
 
@@ -928,7 +1002,7 @@ h5{
 	
 	}
 #footer_left {
-	width: 200px;
+	width: 280px;
 	height: 26px;
 	padding-left: 30px;
 	position: relative;
@@ -937,7 +1011,7 @@ h5{
 	
 	}
 #footer_middle {
-	width: 360px;
+	width: 280px;
 	height: 28px;
 	position: relative;
 	font-size: 0.65em;
@@ -974,6 +1048,7 @@ h5{
 	letter-spacing: 0.1em;
 
 }
+/*
 .footerLink {
 	width:auto;
 	height: 16px;
@@ -1003,6 +1078,49 @@ h5{
 	color:#666;
 
 }
+*/
+
+#footerLink {
+   margin: 0;
+   padding: 0;
+   height: 1em; 
+  
+   }
+#footerLink li {
+   list-style: none;
+   font:.8em Arial, Helvetica, sans-serif;
+   font-style: bold;
+   float: left; 
+   background: url("/images/v2/footer-button.png") left no-repeat;
+   }
+#footerLink li a {
+   display: block;
+   padding: 3px 8px;
+   padding-left: 20px;
+   padding-right: 10px;
+   color: #fff;
+   text-decoration: none; }
+#footerLink li a:hover {
+   color: #a4a4a4;
+  }
+#footerLink li ul {
+   display: none; 
+   width: 8em; /* Width to help Opera out */
+   background-color: #69f;}
+#footerLink li:hover ul, #footerLink li.hover ul {
+   display: block;
+   position: absolute;
+   top: -52px;
+   margin: 0;
+   padding: 0; }
+#footerLink li:hover li, #footerLink li.hover li {
+   float: none; }
+#footerLink li:hover li a, #footerLink li.hover li a {
+   background-color: #d8d8d8;
+   border-bottom: 1px solid #fff;
+   color: #000; }
+#footerLink li li a:hover {
+   background-color: #f2f2f2; }
 
 .footerLink_R {
 	width:auto;

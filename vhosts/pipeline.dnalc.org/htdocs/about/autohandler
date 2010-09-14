@@ -26,13 +26,12 @@
 	<div id="container_InsideH_bg">   
 		<div id="container_H_insideTop">
 % if ($s->{logged_in}) {
-			<div id="conMember_name"><% $s->{full_name} |html %></div>
+			<div id="conMember_name"><span class="bt_LogOut_text"><a href="/logout"><b>Log out</b> &nbsp;&nbsp;</a></span><% $s->{full_name} |html %></div>
 % }
 		</div>
 		<div id="container_H_insidebottom">
 % if ($s->{logged_in}) {
-			<span class="bt_LogOut"><a href="/logout" title="[Logout]"></a></span>
-			<span class="bt_Map"><a href="/" title="[Map]"></a></span>
+			<span class="bt_home"><a href="/" title="[Home]"></a></span>
 % } else {
 			<span class="bt_home"><a href="/" title="[Home]"></a></span>
 % }

@@ -66,10 +66,10 @@ new Tip('tt_brick', "Bioinformatics analysis routines in  <i>DNA Subway</i>  wor
     <div id="home_header_BG_member">
 
 		<div id="home_header_left_member">
-			<div id="conMember_name"><% $s->{full_name} %></div> 
+			<div id="conMember_name"><span class="bt_LogOut_text"><a href="/logout"><b>Log out</b> &nbsp;&nbsp;</a></span><% $s->{full_name} %></div> 
 			<div class="container_log"> 
-				<span class="bt_LogOut"><a href="/logout" title="[Logout]"></a></span>
-				<span class="bt_projects"><a href="/project/browse" title="[Browse Projects]"></a></span>
+				<span class="bt_myprojects_home"><a href="/project/browsemy" title="[Browse My Projects]"></a></span>
+				<span class="bt_publicprojects_home"><a href="/project/browse" title="[Browse Projects]"></a></span>
 			</div>
 		</div>
          <span class="bt_plantsticker" id="tt_brick"></span>

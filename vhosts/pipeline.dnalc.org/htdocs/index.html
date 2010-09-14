@@ -140,6 +140,7 @@ Start a project by selecting one of the "subway lines" (red, yellow). Register a
 	use DNALC::Pipeline::UserProfile ();
 	use DNALC::Pipeline::Config ();
 	use Time::Duration qw/duration/;
+	use DNALC::Pipeline::Log ();
 </%once>
 %#-------------------------------------------------------------------
 <%init>
@@ -153,6 +154,7 @@ my @err = ();
 if ($r->method eq "POST") {
 
 	my $user;
+	my $dispatcher = DNALC::Pipeline::Log->new;
 
 	if ($guest) {
 		if ($name && $name =~ /^guest_/) {
@@ -194,6 +196,8 @@ if ($r->method eq "POST") {
 		($user) = DNALC::Pipeline::User->search(username => $name);
 		$s->{username} = $name;
 		unless ($user && $user->password_valid($passw)) {
+			#$dispatcher->info("AUTH: Invalid pwd for user " . $name );
+			$dispatcher->emergency("AUTH: Invalid pwd for user " . $name );
 			$user = undef;
 		}
 		if ($user && !$user->active) {
@@ -210,13 +214,10 @@ if ($r->method eq "POST") {
 		$s->{logged_in} = 1;
 		
 		$user->increment_login_count;
+		$dispatcher->info($user->username . " just logged in");
 
-		if ($user->has_projects) {
-			$m->redirect("/project/browsemy");
-		}
-		else {
+		unless ($user->has_projects) {
 			$s->{new_user} = 1;
-			$m->redirect("/");
 		}
 	}
 	else {
@@ -224,8 +225,8 @@ if ($r->method eq "POST") {
 			$s->{username} = '';
 		}
 		$m->comp("/_message_add", "Unable to log you in. Try again.");
-		$m->redirect("/");
 	}
+	$m->redirect("/project/browsemy");
 }
 else {
 	#print STDERR "GET username = ", $s->{username}, $/;
