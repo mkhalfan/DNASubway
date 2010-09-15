@@ -67,7 +67,7 @@ header =
 # a footer
 footer = <script type="text/javascript">
 	var mf = document.getElementsByName("mainform");
-	if (mf) {
+	if (mf && mf.length > 0) {
 		mf[0].action = mf[0].action.replace(/(\d+)\/.*$/, "$1/");
 	}
 	</script>
