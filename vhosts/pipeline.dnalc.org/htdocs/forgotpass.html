@@ -81,9 +81,10 @@ To set your password follow this link:
 $cf->{PROJECT_HOME}/resetpass.html?c=$code\n
 DNALC Team";
 
+					my $from_email = $cf->{ADMIN_EMAIL} || '"DNASubway Admin" <dnalcadmin@cshl.edu>';
 					# send mail to the applicant
 					my $msg = MIME::Lite->new (
-								From => '"Admin" <dnalcadmin@cshl.edu>',
+								From => $from_email,
 								To	 => $email,
 								Subject => "[DNA Subway]Reset your password",
 								Type	=> 'text/plain',

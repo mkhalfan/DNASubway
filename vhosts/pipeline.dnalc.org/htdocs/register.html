@@ -146,7 +146,7 @@ if ($r->method eq "POST") {
 			push @err, "Email address is invalid!";
 		}
 		my $user = DNALC::Pipeline::User->search( username => $s->{username});
-		if ($user || $s->{username} =~ /^(?:chado|guest|default|postgre|temp|mysql)/i) {
+		if ($user || $s->{username} =~ /^(?:chado|guest|default|postgre|temp|mysql)/i || $s->{username} =~ /^de$/) {
 			push @err, "Username not available!";
 		}
 		else {
@@ -222,9 +222,10 @@ and DNA Subway Manual, linked from the home page and the site footer.\n
 Sincerely,
 DNASubway Team\n";
 
+				my $from_email = $cf->{ADMIN_EMAIL} || '"DNASubway Admin" <dnalcadmin@cshl.edu>';
 				# send mail to the applicant
 				my $msg = MIME::Lite->new (
-							From => '"DNASubway Admin" <dnalcadmin@cshl.edu>',
+							From => $from_email,
 							To	=> $s->{email},
 							Subject => "Thank you for registering on DNA Subway!",
 							Type	=> 'text/plain',
