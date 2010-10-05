@@ -73,15 +73,31 @@
 <h1>Export in other borwsers</h1>
 <p>Links to other GBrowse portals..</p>
 % for (@links) {
-	<div><a href="<% $_->link_url|u%>"><% $_->link_name |html%></a> 
-	<a href="./edit_link?sid=<%$sid%>;lid=<%$_->id%>;op=remove" onclick="return confirm('Really remove this link?');" title="delete link">x</a></div>
+	<div><a href="<% $_->link_url%>" target="_blank"><% $_->link_name |html%></a> (<% $_->link_type %> like)
+	<a href="./edit_link?sid=<%$sid%>;lid=<%$_->id%>;op=remove" onclick="return confirm('Really remove this link?');" title="delete link">x</a>
+	<div style="padding-left: 10px;"><% $_->link_segment%>:<%$_->link_start%>-<% $_->link_stop %></div>
+	</div>
 % }
 <p></p>
-<h1>Add new link</h1>
+<h1>Add new link to an external browser</h1>
 <label>Name</label>
 <input type="text" name="link_name" id="link_name" value="<% $link_name | html %>"/>
 <label>Link<!--<span class="small"></span>--></label>
 <input type="text" name="link_url" id="link_url" value="<% $link_url | html %>"/>
+<label>Segment<!--<span class="small"></span>--></label>
+<input type="text" name="link_segment" id="link_segment" value="<% $link_segment | html %>"/>
+<label>Start</label>
+<input type="text" name="link_start" id="link_start" value="<% $link_start | html %>"/>
+<label>Stop</label>
+<input type="text" name="link_stop" id="link_stop" value="<% $link_stop | html %>"/>
+<label>Browser type</label>
+%#<input type="text" name="link_type" id="link_type" value="<% $link_type | html %>"/>
+<select style="margin: 2px 0 10px 10px" name="link_type" id="link_type">
+<option value="">set browser type</option>
+% for (@browser_types) {
+	<option value="<% $_%>"><%$_%></option>
+% }
+</select>
 <button type="submit">Add link</button>
 
 </form>
@@ -104,6 +120,10 @@
 	
 	$link_url => ''
 	$link_name => ''
+	$link_segment => ''
+	$link_start => ''
+	$link_stop => ''
+	$link_type => ''
 	
 	$active => 0
 	
@@ -118,10 +138,12 @@
 	use DNALC::Pipeline::Sample ();
 	use Regexp::Common qw/URI/;
 	use Data::Dumper;
+	
+	my @browser_types = qw/gbrowse ensemble/;
 </%once>
 %#------------------------------------------------------------------------------
 <%init>
-
+my $s = $m->session->{pipeline};
 my $sample = $sid ? DNALC::Pipeline::Sample->retrieve($sid) : 0;
 unless ($sample) {
 	$m->comp('/_message_add', "No sample was found for sample id = $sid!", 'error');
@@ -148,6 +170,13 @@ if ($r->method eq "GET") {
 	$start = $sample->start;
 	$stop = $sample->stop;
 	$source_url = $sample->source_url;
+	
+	$link_url = $s->{link_url};
+	$link_name = $s->{link_name};
+	$link_segment = $s->{link_segment};
+	$link_start = $s->{link_start};
+	$link_stop = $s->{link_stop};
+	$link_type = $s->{link_type};
 }
 elsif ( $r->method eq "POST") {
 	my $ok = 1;

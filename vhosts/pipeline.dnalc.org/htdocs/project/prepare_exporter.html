@@ -5,7 +5,7 @@
 	use DNALC::Pipeline::App::ProjectManager ();
 	use DNALC::Pipeline::Config ();
 	use DNALC::Pipeline::Sample ();
-	use DNALC::Pipeline::Utils qw/random_string/;
+	#use DNALC::Pipeline::Utils qw/random_string/;
 </%once>
 <%init>
 
@@ -28,26 +28,6 @@ if ($proj) {
 		$start = $sample->start;
 		$stop = $sample->stop;
 		
-		my $pcf = DNALC::Pipeline::Config->new->cf("PIPELINE");
-		my $host = $pcf->{PROJECT_HOME};
-		$host =~ s/:/\%3A/;
-		
-		$eurl = $host =~ /pipeline-dev.dnalc.org/
-					? "http%3A//green.cshl.edu/project/prepare_exporter_file%3Fpid%3D$pid"
-					: $host . "/project/prepare_exporter_file%3Fpid%3D$pid";
-
-
-		$eurl .= '%26rand%3D' . random_string();
-
-		my ($redirect_to) = '';
-		for ($sample->links) {
-			if ( $_->link_name =~ /phytozome/i) {
-				$redirect_to = $_->link_url;
-				last;
-			}
-		}
-		#print STDERR $redirect_to . ";eurl=" . $eurl, "\n";
-		$m->redirect($redirect_to . ';eurl=' . $eurl) if $redirect_to;
 	}
 }
 
@@ -58,8 +38,6 @@ if ($proj) {
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <meta name="author" content="Dolan DNA Learning Center" />
-<meta http-equiv="Content-Language" content="en" />
-%#<link type='text/css' rel='stylesheet' href='/css/device.css' />
 </head>
 <body>
 <div id="">
@@ -69,7 +47,8 @@ if ($proj) {
 	<a href="/project/prepare_exporter_file?pid=<% $pid %>">here</a> and save it to the desktop.</p>
 	<p>Then, open the Genome Browser at the website of:
 % for ($sample->links) {
-	<div><a href="<% $_->link_url . ";eurl=" . $eurl %>"><% $_->link_name %></a></div>
+%	print STDERR $_->remote_link($pid), $/;
+	<div><a href="<% $_->remote_link($pid) %>"><% $_->link_name %></a></div>
 % }
 	<p>To view the annotation results within any of the above browsers use the "Add your own tracks" 
 	facility at the bottom of that page.</p>
