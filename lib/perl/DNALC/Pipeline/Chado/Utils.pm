@@ -435,7 +435,10 @@ sub profile          {
     if ($profile) {
         #if profile is set, we'll want dbuser, host and port later
         my $gmod_conf = Bio::GMOD::Config->new();
-        my $db_conf   = Bio::GMOD::DB::Config->new($gmod_conf, $profile);
+        my $db_conf   = eval {Bio::GMOD::DB::Config->new($gmod_conf, $profile);};
+		if ($@) {
+			return;
+		}
 
         my $confdir = $gmod_conf->confdir;
         my $db_user = $db_conf->user;
@@ -449,6 +452,9 @@ sub profile          {
         $self->dbpassword ($db_pass);
         $self->port ($db_port);
         $self->host ($db_host);
+
+		# we've changed the profile, so the connection is changing also..
+		delete $self->{dbh} if defined $self->{dbh};
     }
 
     return $self->{'profile'} = $profile if defined($profile);
@@ -716,7 +722,7 @@ sub gmod_conf_file {
 	}
 
 	unless ($self->profile) {
-		warn "Profiles was not set!\n";
+		warn "Profile was not specified!\n";
 		return;
 	}
 
@@ -754,6 +760,55 @@ sub gmod_conf_file {
     }
 
     return $conffile if (-f $conffile);
+}
+
+sub get_pool_size {
+	my ($self) = @_;
+
+	my $dbh = $self->dbh;
+	unless ($dbh) {
+		print STDERR "Unable to connect to DB\n";
+		return;
+	}
+
+	my $query = "SELECT count(*) FROM pg_database WHERE datname like 'pool_%'";
+
+	my $sth   = $dbh->prepare($query);
+	$sth->execute or die $dbh->errstr;
+	my ($db_num) = $sth->fetchrow_array;
+	$sth->finish;
+
+	return $db_num;
+}
+
+sub assign_pool_db {
+	my ($self, $username) = @_;
+	my $dbh = $self->dbh;
+	unless ($dbh) {
+		print STDERR "Unable to connect to DB\n";
+		return;
+	}
+
+	#my $query = "SELECT datname FROM pg_database WHERE datname like 'pool_%'";
+	my $query = "SELECT datname FROM pg_database WHERE datname LIKE 'pool_%' ORDER BY RANDOM() LIMIT 1";
+
+	my $sth   = $dbh->prepare($query);
+	$sth->execute or die $dbh->errstr;
+	my ($db_name) = $sth->fetchrow_array;
+	$sth->finish;
+
+	return unless $db_name;
+
+	my $rc = undef;
+	eval {
+		print STDERR  "ALTER DATABASE $db_name RENAME TO $username", $/;
+		$rc = $dbh->do("ALTER DATABASE $db_name RENAME TO $username");
+	};
+	if ($@)  {
+		print STDERR  "assign_pool_db: ", $@, $/;
+	}
+
+	return $rc;
 }
 
 sub check_db_exists {

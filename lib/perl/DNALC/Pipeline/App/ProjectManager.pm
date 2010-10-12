@@ -10,8 +10,10 @@ use DNALC::Pipeline::User ();
 use DNALC::Pipeline::Config ();
 use DNALC::Pipeline::Project ();
 use DNALC::Pipeline::ProjectLogger ();
+use DNALC::Pipeline::Log ();
 use DNALC::Pipeline::Chado::Utils ();
 use Bio::SeqIO ();
+use Gearman::Client ();
 use Data::Dumper; 
 
 #-----------------------------------------------------------------------------
@@ -103,10 +105,14 @@ sub create_project {
 	# create folder
 	if ($self->create_work_dir) {
 		print STDERR "project's work_dir: ", $self->work_dir, $/;
+		$self->log("Created work_dir [". $self->work_dir . "], for project [$proj]");
 	}
 	else {
 		$msg = "Failed to create work_dir for project [$proj]";
 		print STDERR  $msg, $/;
+		$self->log("Failed to create work_dir for project [$proj]", type => 'EMERG');
+		$proj->delete;
+		return {status => 'fail', msg => $msg};
 	}
 
 	# write fasta file
@@ -242,6 +248,16 @@ sub username {
 	$self->{username};
 }
 #-----------------------------------------------------------------------------
+sub chado_user_database {
+	my ($self) = @_;
+	my $dbname = '';
+	if ($self->username =~ /^guest_/) {
+		my $u = DNALC::Pipeline::User->retrieve($self->project->user_id);
+		$dbname = $u->chado_db;
+	}
+	$dbname ? $dbname : $self->username;
+}
+#-----------------------------------------------------------------------------
 
 sub fasta_file {
 	my ($self) = @_;
@@ -291,18 +307,39 @@ sub init_chado {
 					gbrowse_template => $self->config->{GBROWSE_TEMPLATE},
 					gbrowse_confdir  => $self->config->{GBROWSE_CONF_DIR},
 				);
-	eval {
-		$cutils->create_db(1);
-	};
-	if ($@)  {
-		print STDERR  "create_db: ", $@, $/;
+
+	my $dbname = undef;
+
+	unless ($cutils->check_db_exists($self->username)) {
+		if ($cutils->assign_pool_db($self->username)) {
+			print STDERR  "Assigned dbpool for user: ", $self->username, $/;
+		}
+		else {
+			#1st fail over step
+			my $gclient = Gearman::Client->new;
+			$gclient->job_servers(@{$self->config->{GEARMAN_SERVERS}});
+			my $rc = eval { # it may fail if gearman server(s) not available
+						$gclient->do_task('create_chado_db', $self->username, {
+							timeout => 120,
+						});
+					};
+			unless (defined $rc && $$rc eq "OK") {
+				#2nd failover step - direct call
+				eval {
+					$cutils->create_db(1);
+				};
+				if ($@) {
+					print STDERR "create_db: ", $@, $/;
+					return;
+				}
+			}
+		}
+	}
+	else {
+		#print STDERR  "DB ALREADY EXISTS....", $/;
 	}
 
-	#unless ($cutils->check_db_exists( $self->username)) {
-	#	print STDERR  "Unable to create CHADO DB for ", $self->username, $/;
-	#	return;
-	#}
-	my $conffile_ok = $cutils->gmod_conf_file( $project->id );
+	my $conffile_ok = $cutils->gmod_conf_file( $project->id);
 	print STDERR "Created CHADO CONF file = ", $conffile_ok, $/;
 
 	# read data from new file
@@ -426,6 +463,7 @@ sub all_log_entries {
 sub remove_project {
 	my ($self) = @_;
 	my $p = $self->project;
+	my $user_id = $p->user_id;
 	my $organism_str = join('_', split /\s+/, $p->organism) . '_' . $p->common_name;
 
 	my $cutils = eval {
@@ -438,23 +476,26 @@ sub remove_project {
 				);
 			};
 	if ($@) {
-		print STDERR  "Unable to process project $p: ", $@, $/;
+		print STDERR  "Unable to remove project $p: ", $@, $/;
 	}
 	else {
 		my $gmod_conf_file = $cutils->gmod_conf_file($p->id);
 		#print STDERR  "p.$p ->", $gmod_conf_file, $/;
 
 		my $gbrowse_file = $cutils->gbrowse_chado_conf($p->id);
-		#print STDERR  "p.$p =>", $gbrowse_file , $/;
 
 		unlink $gmod_conf_file, $gbrowse_file;
 	}
 
 	# project dir
 	my $dir = $self->work_dir;
-	#print STDERR  "p.$p DIR => ", $dir, $/;
 	DNALC::Pipeline::App::Utils->remove_dir($dir);
-	$p->delete;
+	my $pid = $p->id;
+	my $rc = $p->delete;
+	unless ($rc) {
+		$self->log("Unable to remove project $pid", type => 'ERR', user_id => $user_id);
+	}
+	$rc;
 }
 #-----------------------------------------------------------------------------
 1;
