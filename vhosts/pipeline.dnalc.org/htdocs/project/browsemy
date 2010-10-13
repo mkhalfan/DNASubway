@@ -50,6 +50,14 @@
 <p>&nbsp;</p>
 	</div>
 <div class="clear"> </div>
+% if ($s->{warn_guest}) {
+<div id="message_list" style="display:none;">
+	<p>Guest accounts are temporary.</p>
+	<p>&nbsp;</p>
+	<p>Guest users cannot use the Red Line's FGenesH gene predictor on uploaded sequences.</p>
+</div>
+% 	delete $s->{warn_guest};
+%}
 </div><!--END of ID container_rightContent-->  
 
 %#--------------------------------------------------------
