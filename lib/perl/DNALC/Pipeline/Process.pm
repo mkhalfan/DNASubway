@@ -105,10 +105,13 @@ use Carp;
 
 		my $pretend = exists $params{pretend} ? delete $params{pretend} : undef;
 		my $input_file = $params{input} ? delete $params{input} : undef;
+		my $input_files = $params{input_files} && 'ARRAY' eq ref $params{input_files}
+						? delete $params{input_files} 
+						: undef;
 		my $debug = $params{debug} ? delete $params{debug} : $pretend;
 
-		unless ($input_file) {
-			print STDERR 'Input file is missing...', $/;
+		unless ($input_file || @$input_files) {
+			print STDERR 'Input file(s) is/are missing...', $/;
 			return -1;
 		}
 
@@ -130,7 +133,8 @@ use Carp;
 				}
 			}
 		}
-		push @opts, $input_file;
+		push @opts, $input_file if $input_file;
+		push @opts, @$input_files if $input_files && @$input_files;
 
 		$self->{cmd} = join ' ', @opts;
 		if ($debug) {
