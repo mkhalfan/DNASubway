@@ -17,7 +17,7 @@ table tr.rowodd {background-color: #ddd;}
 <table class="">
 <thead>
 <tr>
-<th>Seqid</th><th>Source</th><th>Type</th><th>Start</th><th>End</th><th>Score</th><th>Strand</th><th>Phase</th><th>Attributes</th>
+<th>Seqid</th><th>Source</th><th>Type</th><th>Length</th><th>Start</th><th>End</th><th>Score</th><th>Strand</th><th>Phase</th><th>Attributes</th>
 </tr>
 </thead>
 %	my $chunk = q{};
@@ -27,6 +27,7 @@ table tr.rowodd {background-color: #ddd;}
 %		my @tokens = split /\t/, $line;
 %		next if scalar(@tokens) != 9;
 %		$tokens[8] =~ s/\%3D/=/g;
+%		splice @tokens, 3, 0, $tokens[4] - $tokens[3] + 1;
 %		for (@tokens) {
 	<td><% $_ |html%></td>
 %		}
@@ -34,7 +35,7 @@ table tr.rowodd {background-color: #ddd;}
 %    }
 %	undef $in;
 <tfoot><tr>
-<th>Seqid</th><th>Source</th><th>Type</th><th>Start</th><th>End</th><th>Score</th><th>Strand</th><th>Phase</th><th>Attributes</th>
+<th>Seqid</th><th>Source</th><th>Type</th><th>Length</th><th>Start</th><th>End</th><th>Score</th><th>Strand</th><th>Phase</th><th>Attributes</th>
 </tr></tfoot>
 </table>
 % }
