@@ -362,6 +362,31 @@
 	overflow-x: hidden;*/
 	
 }
+
+.conStylized_box6 {
+	float:left;
+	border: .1em; border-style: solid; border-color: #669900; color: #996600;
+	width:280px;
+
+	margin:2px 0px 0px 0px;
+	padding: 2px;
+	font-size:.95em; 
+	/*overflow-y: scroll;
+	overflow-x: hidden;*/
+}
+
+.conStylized_box7 {
+	float:left;
+	font-size:.95em;
+	border: .1em;
+	border-style: solid;
+	border-color: #669900;
+	color: #666666;
+	width:360px;
+	margin:2px 10px 0px 20px;
+	padding: 4px;
+}
+
 .conNewPro_smallContainer{
 	width: 146px;
 	height: auto;
@@ -1300,7 +1325,6 @@
 #conBluelineLeft1 {
 	width: 470px;
 	height: auto;
-	min-height: 320px;
 	background: url("/images/v2/map-blueline_L1.jpg") top left no-repeat;
 	float: left;
 	position: relative;
@@ -1319,60 +1343,150 @@
 	
 	}
 
+.conNewPro_smallContainer_blue{
+	width: 95px;
+	height: auto;
+	margin: 0px auto; 
+	padding-bottom: 4px;
+	padding-top: 4px;
+	color: #006699;
+	font-size: 0.9em;
+	text-align: left;
+	position: relative;
+	float: left;
+	}
 /*---BLUE Console--left RUN----*/
 
 #conBluelineLeft2 {
-	width: 519px;
-	height: 250px;
+	width: 482px;
+	height: 290px;
 	background: url("/images/v2/map-blueline_L2.jpg") top left no-repeat;
 	float: left;
 	position: relative;
-	padding-top: 114px;
-	padding-left: 38px;
-	
+	padding-top: 76px;
+	padding-left: 18px;
+		
 	}
+
+.conBlueline_ConColumn1{
+  width:160px;
+  height: 246px;
+  position: relative;
+  float:left;
+  }
+#conBlueline_ConColumn1_1{
+  width:148px;
+  height: auto;
+  padding-left: 6px;
+  position: relative;
+  float:left;
+  }
+ .conBlueline_ConColumn2{
+  width:148px;
+  height: 150px;
+  padding-left: 10px;
+  padding-top: 50px;
+  position: relative;
+  float:left;
+  }
+  
+  .conBlueline_ConColumn3{
+  width:148px;
+  height: 130px;
+  padding-left: 14px;
+  padding-top: 48px;
+  position: relative;
+  float:left;
+  }
+  
+  .conBlueline_ConColumn4{
+  width:148px;
+  height: 110px;
+ 
+  padding-top: 83px;
+  position: relative;
+  float:left;
+  }
+  
+ .conBlueline_ConColumn5{
+  width:126px;
+  height: 110px;
+  padding-left: 46px;
+  padding-top: 80px;
+  position: relative;
+  float:left;
+  }
+
+.conBlueline_keys{
+  width: 92px;
+  height: 136px;
+  margin: 0px 0px 0px 20px;
+  background: url("/images/v2/keys_blue.jpg") bottom left no-repeat;
+  position: relative;
+  float: left;
+}
+
+.conBlueline_ConCell{
+  width: 148px;
+  height: 26px;
+  margin: 0px 0px 19px 0px;
+  position: relative;
+  float: left;
+}
+.conBleline_ConCell1{
+  width: 148px;
+  height: 47px;
+  position: relative;
+  float: left;
+ 
+}
 
 
 .bt_Runblueline {
-  width: 163px;
-  height: 27px;
+  width: 122px;
+  height: 26px;
   position: relative;
   float: left;
 }
 
 .bt_Runblueline a{
-  width: 163px;
-  height: 23px;
-  padding: 4px 0px 0px 0px;
-  display: block;
-  position: relative;
-  background: url("/images/v2/bt_blueRun1.png") top no-repeat;
-  float: left;
-  color: #000;
-  font-size: 0.7em;
-  text-align: center; text-decoration: none; 
-  margin-left:10px;
+	width: 122px;
+	height: 26px;
+	background: url("/images/v2/bt_blueRun1.png") top no-repeat;
+	display: block;
+	position: relative;
+	float: right;
+	padding-top: 6px;
+	color: #555;
+	font-size: 0.75em;
+	text-align: center;
+	text-decoration: none;
 }
 
+.bt_Runbluelinea.disabled:hover {
+	background: url("/images/v2/bt_blueRun.png") top no-repeat;
+	cursor: default;
+}
 .bt_Runblueline a:hover{
   background: url("/images/v2/bt_blueRun2.png") top no-repeat;
 }
 
 
 #conBluelineRight2 {
-	width: 100px;
+	width: 326px;
 	height: 208px;
 	background: url("/images/v2/map-blueline_R2.jpg") bottom left no-repeat;
 	float: left;
 	position: relative;
-	padding: 121px 16px 0px 174px;
+	padding: 121px 2px 0px 14px;
 	
 	}
 	
 #spacer_Runblueline {
-  width: 100px;
-  height: 16px;
+  width: 126px;
+  height: 39px;
   position: relative;
+  display: block;
   float: left;
 }
 

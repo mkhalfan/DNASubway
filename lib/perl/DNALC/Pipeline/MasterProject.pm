@@ -24,29 +24,65 @@ __PACKAGE__->set_sql(get_sorted => q{
 		CASE mp.project_type 
 			WHEN 'annotation' THEN p.name
 			WHEN 'target' THEN tp.name
+			WHEN 'phylogenetics' THEN pp.name
 		END AS name,
 		CASE mp.project_type
 			WHEN 'annotation' THEN p.organism
 			WHEN 'target' THEN tp.organism
+			WHEN 'phylogenetics' THEN pp.name
 		END AS organism
 	FROM master_project mp
 	LEFT JOIN project p ON mp.project_id = p.project_id
 	LEFT JOIN target_project tp ON mp.project_id = tp.tpid
+	LEFT JOIN phy_project pp ON mp.project_id = pp.id
 	LEFT JOIN users u ON mp.user_id = u.user_id
 	WHERE CASE mp.project_type 
 		WHEN 'annotation' THEN p.project_id 
-		WHEN 'target' THEN tp.tpid END IS NOT NULL 
+		WHEN 'target' THEN tp.tpid 
+		WHEN 'phylogenetics' THEN pp.id
+	END IS NOT NULL 
 		%s
 	ORDER BY %s
 	});
 
 sub get_public_sorted {
 	my ($class, $args) = @_;
+
 	my $order_by = $args->{order_by} || 'mp.mp_id DESC';
-	my $sth = $class->sql_get_sorted('AND mp.public = true', $order_by);
-	$sth->execute;
+	my $where_str = 'AND mp.public = true ';
+	my @params = ();
+	
+	if ($args->{where} && $args->{where}) {
+		if (defined $args->{where}->{user_name}) {
+			my $name = lc $args->{where}->{user_name};
+			$where_str .= "AND (lower(u.name_first) like ? OR lower(u.name_last) like ?) ";
+			push @params, ('%' . $name . '%', '%' . $name . '%');
+		}
+
+		if (defined $args->{where}->{organism}) {
+			$where_str .= "AND CASE mp.project_type "
+						. "  WHEN 'annotation' THEN lower(p.organism) "
+						. "  WHEN 'target' THEN lower(tp.organism) "
+						. "END like ? ";
+			push @params,  '%' . $args->{where}->{organism} . '%';
+		}
+
+		if (defined $args->{where}->{title}) {
+			$where_str .= "AND CASE mp.project_type "
+						. "  WHEN 'annotation' THEN lower(p.name) "
+						. "  WHEN 'target' THEN lower(tp.name) "
+						. "END like ? ";
+			push @params,  '%' . $args->{where}->{title} . '%';
+		}
+
+	}
+	#print STDERR  $where_str, $/;
+
+	my $sth = $class->sql_get_sorted($where_str, $order_by);
+	$sth->execute(@params);
 	return $class->sth_to_objects($sth);
 }
+
 sub get_mine_sorted {
 	my ($class, $args) = @_;
 	my $order_by = $args->{order_by} || 'mp.mp_id DESC';

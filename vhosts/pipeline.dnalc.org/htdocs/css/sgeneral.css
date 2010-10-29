@@ -656,10 +656,13 @@ h5{
 	margin: 0px 0px 0px 0px;
 }
 
-/*
 .bt_blueStart_home a:hover {
+	background: url("/images/v2/bt_blueStart2.jpg") left no-repeat;
+}
+
+.bt_blueStart_home a.nohover {
 	background: url("/images/v2/bt_blueStart1.jpg") left no-repeat;
-}*/
+}
 
 .bt_redStart {
 	width:150px;
@@ -734,15 +737,14 @@ h5{
 	margin: 0px 0px 0px 0px;
 }
 
-/*- inactive -*/
-/*
+
 .bt_blueStart a:hover {
 	background: url("/images/v2/bt_blueStart2.jpg") left no-repeat;
 }
 
 .bt_blueStart a.current {
 	background: url("/images/v2/bt_blueStart3.jpg") left no-repeat;
-}*/
+}
 
 /*-----Home Map rollover info-----*/
 

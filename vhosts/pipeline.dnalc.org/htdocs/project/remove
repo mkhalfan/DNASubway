@@ -6,13 +6,10 @@
 <%once>
 	use DNALC::Pipeline::MasterProject ();
 	use DNALC::Pipeline::App::ProjectManager ();
+	use DNALC::Pipeline::App::Phylogenetics::ProjectManager ();
 	use DNALC::Pipeline::TargetProject ();
 	use DNALC::Pipeline::Config ();
-	use DNALC::Pipeline::Utils qw(random_string);
 	use DNALC::Pipeline::App::Utils ();
-
-	use Data::Dumper;
-
 </%once>
 %#--------------------------------------------------------
 <%init>
@@ -50,6 +47,14 @@ elsif ($mp->project_type eq "annotation") {
 	}
 	else {
 		print STDERR "Nothing to remove...", $/;
+	}
+}
+elsif ($mp->project_type eq "phylogenetics") {
+	my $pm = DNALC::Pipeline::App::Phylogenetics::ProjectManager->new($mp->project_id);
+	if ($pm->project) {
+		print STDERR "TODO: remove project's files...", $/;
+		$pm->project->delete;
+		$m->comp('/_message_add', 'Project removed!', 'error');
 	}
 }
 

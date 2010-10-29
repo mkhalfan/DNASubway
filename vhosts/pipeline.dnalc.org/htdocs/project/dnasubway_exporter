@@ -45,9 +45,14 @@
 		print STDERR "Target $target is not in the [export_browsers] list\n";
 		return;
 	}
-	
-	#my $sample = DNALC::Pipeline::Sample->new($proj->sample);
+
 	my ($sample_link) = DNALC::Pipeline::SampleLink->search(link_id => $lid, sample_id => $proj->sample);
+	
+	unless ($sample_link) {
+		print "# ERROR: Something went wrong.";
+		print STDERR "Sample link not found: lid = ", $lid, $/;;
+		return;
+	}
 
 	my $gff_file = $pm->work_dir . "/gff3_$target.gff";
 	

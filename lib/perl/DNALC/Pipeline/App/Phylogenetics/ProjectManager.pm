@@ -21,6 +21,10 @@ use aliased 'DNALC::Pipeline::Phylogenetics::DataFile';
 use aliased 'DNALC::Pipeline::Phylogenetics::DataSequence';
 use aliased 'DNALC::Pipeline::Phylogenetics::Pair';
 use aliased 'DNALC::Pipeline::Phylogenetics::PairSequence';
+use aliased 'DNALC::Pipeline::Phylogenetics::Tree';
+
+use DNALC::Pipeline::Process::Phylip::DNADist ();
+use DNALC::Pipeline::Process::Phylip::Neighbor ();
 use DNALC::Pipeline::Process::Merger ();
 use DNALC::Pipeline::Process::Muscle();
 
@@ -72,6 +76,10 @@ sub create_project {
 	$proj = eval { Project->create({
 				user_id => $user_id,
 				name => $name,
+				type => $params->{type},
+				has_tools => $params->{has_tools},
+				sample => $params->{sample} || 0,
+				description => substr($params->{description} || '', 0, 140),
 			});
 		};
 	if ($@) {
@@ -79,7 +87,7 @@ sub create_project {
 		print STDERR  $msg, $/;
 		return {status => 'fail', msg => $msg};
 	}
-	print STDERR  "NEW PID = ", $proj, $/;
+	#print STDERR  "NEW PID = ", $proj, $/;
 	
 	$self->project($proj);
 	
@@ -102,13 +110,18 @@ sub project {
 sub add_data {
 	my ($self, $params) = @_;
 
+	my @errors = ();
+	my $seq_count = 0;
+
+	my $bail_out = sub { return {seq_count => $seq_count, errors => \@errors}};
+
 	my $data_src = $self->project->add_to_datasources({
 			name => $params->{source},
 		});
-	return unless $data_src;
+	return $bail_out->() unless $data_src;
 
-	print STDERR "TODO: add more checks\n";
-	
+	my @files = @{$params->{files}};
+
 	unless (-e $self->work_dir) {
 		$self->create_work_dir;
 	}
@@ -116,27 +129,24 @@ sub add_data {
 	my $fasta = $self->fasta_file;
 	open (my $fasta_fh, ">> $fasta");
 	#print STDERR "fh1 = ", $fasta_fh, $/;
-	lock $fasta_fh, LOCK_EX or print STDERR "Unable to lock fasta file!!!\n$!\n";
+	flock $fasta_fh, LOCK_EX or print STDERR "Unable to lock fasta file!!!\n$!\n";
 	#my $out_io  = Bio::SeqIO->new(-file => ">> $fasta", -format => 'Fasta', -flush  => 0);
 	my $out_io  = Bio::SeqIO->new(-fh => $fasta_fh, -format => 'Fasta', -flush  => 0);
 
-	#print STDERR "fh2 = ", $out_io->fh, $/;
-	
 	my $ab = Bio::Trace::ABIF->new if $params->{type} =~ /trace/i;
 
-	my @files = @{$params->{files}};
-	for my $f (@files) {
-		#print "\tadding file: $f\n";
-
+	for my $fhash (@files) {
 		# store files
 		# this will return the path of the stored file, if any
 		#my $stored_file = $self->store_file(src => $f, target => 'x', type => 'yy');
-		my $stored_file = $f;
+		my $stored_file = $fhash->{path};
+		my $filename = $fhash->{filename};
+		my $f = $fhash->{path};
 
 		my $data_file = DataFile->create({
 					project_id => $self->project,
 					source_id => $data_src,
-					file_name => basename ($f),
+					file_name => $filename,
 					file_path => $stored_file,
 					file_type => $params->{type},
 				});
@@ -146,7 +156,12 @@ sub add_data {
 		# store sequences
 		# FASTA files
 		if ($params->{type} =~ /fasta/i) {
-			my $seqio = Bio::SeqIO->new(-file => $f);
+			# make sure we have a text file
+			unless (-T $f) {
+				push @errors, sprintf("File %s is not an FASTA file!", $filename);
+				next;
+			}
+			my $seqio = Bio::SeqIO->new(-file => $f, -format => 'fasta');
 			while (my $seq_obj = $seqio->next_seq) {
 				#print ">", $seq_obj->display_id, $/;
 				#print $seq_obj->seq, $/;
@@ -160,13 +175,29 @@ sub add_data {
 					});
 				$out_io->write_seq($seq_obj);
 			}
+
+			$seq_count++;
 		}
 		# AB1 files
 		elsif ($params->{type} =~ /trace/i) {
-			my $rc = $ab->open_abif($f);
+			my $rc = eval {
+					$ab->open_abif($f);
+				};
+
+			unless ($rc && $ab->is_abif_format) {
+				$ab->close_abif;
+				push @errors, sprintf("File %s is not an AB1 file", $filename);
+				next;
+			}
+
 			my $sequence = $ab->sequence;
-			my $display_id = basename($f);
+			my $display_id = $filename;
+
+			# remove file extension (if any)
 			$display_id =~ s/\..*?$//;
+			#remove any spaces
+			$display_id =~ s/\s+/_/g;
+
 			#print $rc, $/;
 			my $seq_obj = Bio::Seq->new(
 					-seq => $sequence,
@@ -181,10 +212,14 @@ sub add_data {
 					});
 			#print ">", $seq_obj->display_id, $/;
 			$out_io->write_seq($seq_obj);
+
+			$seq_count++;
 		}
 	}
-	$ab->close_abif if $ab;
+	$ab->close_abif if $ab && $ab->is_abif_open;
 	close $fasta_fh;
+
+	return $bail_out->();
 }
 
 #-----------------------------------------------------------------------------
@@ -348,20 +383,29 @@ sub build_concensus {
 
 #-----------------------------------------------------------------------------
 sub build_alignment {
-	my ($self) = @_;
-
-	my $seq_fasta = $self->alignable_sequences;
-	return unless $seq_fasta;
+	my ($self, $realign) = @_;
 
 	my $pwd = $self->work_dir;
 	return unless $pwd && -d $pwd;
 
-	#my $wd = File::Temp->newdir( 
-	#			'algnXXXXX',
-	#			DIR => $pwd,
-	#			CLEANUP => 0,
-	#		);
-	#my $fasta_file = File::Spec->catfile($wd->dirname, 'fasta.fas');
+	my $seq_fasta = '';
+	if ($realign) {
+		my $alignment_file = $self->get_alignment;
+		my $fh = IO::File->new;
+		if ($fh->open($alignment_file)) {
+			flock $fh, LOCK_SH;
+			while(<$fh>) {
+				$seq_fasta .= $_;
+			}
+			flock $fh, LOCK_UN;
+		}
+	}
+	else {
+		
+		$seq_fasta = $self->alignable_sequences;
+	}
+	return unless $seq_fasta;
+
 	my $fasta_file = File::Spec->catfile($pwd, 'to_align.fas');
 	my $fh = IO::File->new;
 	if ($fh->open($fasta_file, 'w')) {
@@ -383,46 +427,163 @@ sub build_alignment {
 	return $m->get_output;
 }
 #-----------------------------------------------------------------------------
+# returns the path to the alignment file (default format is fasta)
+#	or undef if the file doesn't exist
+#
 sub get_alignment {
-	my ($self) = @_;
+	my ($self, $format) = @_;
+
+	$format ||= 'fasta';
 
 	my $pwd = $self->work_dir;
 	return unless -d $pwd;
 	my $mcf = DNALC::Pipeline::Config->new->cf('MUSCLE');
-	my $f = File::Spec->catfile($pwd, 'MUSCLE', $mcf->{option_output_files}->{"-fastaout"});
-	return $f if -f $f;
+
+	my $out_file;
+	my ($out_type) = grep (/$format/i, keys %{$mcf->{option_output_files}});
+	if ($out_type) {
+		$out_file = File::Spec->catfile($pwd, 'MUSCLE', $mcf->{option_output_files}->{$out_type});
+	}
+
+	return $out_file if ($out_file && -f $out_file);
 }
 #-----------------------------------------------------------------------------
+# trims the last alignment
+#
 sub trim_alignment {
 	my ($self, $params) = @_;
 
-	my $alignment = $self->get_alignment;
-	return unless $alignment;
-	return unless ($params->{left} || $params->{rigth});
+	my $alignment_file = $self->get_alignment;
+	return unless $alignment_file;
+	return unless ($params->{left} || $params->{right});
 
 	my ($l_trim, $r_trim) = ($params->{left} || 0, $params->{right} || 0);
 
-	my $aio = Bio::AlignIO->new('-file' => $alignment);
+	my $aio; #Bio::AlignIO object
+	open (my $afh, $alignment_file) || 
+		confess "Can't read alignment: ", $/;
+
+	flock $afh, LOCK_SH or print STDERR "Unable to lock fasta file!!!\n$!\n";
+	$aio = Bio::AlignIO->new(-fh => $afh, -format => 'fasta');
 
 	my $trimmed_fasta = '';
 	while (my $aln = $aio->next_aln) {
 		for my $seq ($aln->each_seq) {
-
 			my $s = $seq->seq;
 			$s = substr $s, 0, length($s) - $r_trim if $r_trim;
 			$s = substr $s, $l_trim;
-			#$s = substr $seq->seq, $l_trim, length($s) - $r_trim;
-			#print "x", $s =~ s/^.{$l_trim}// if $l_trim;
-			#print "x", $s =~ s/.{$r_trim}$// if $r_trim;
 
 			$trimmed_fasta .= '>' . $seq->display_id . "\n";
 			$trimmed_fasta .= $s . "\n";
 		}
 	}
+
+	flock $afh, LOCK_UN;
+	$afh->close;
+	
+	print STDERR  "size 1: ", -s $alignment_file, $/;
+
+	# now write the trimmed alignment
+	$afh = IO::File->new;
+	if ($afh->open($alignment_file, 'w')) {
+		flock $afh, LOCK_EX;
+		print $afh $trimmed_fasta;
+		flock $afh, LOCK_UN;
+		$afh->close;
+	}
+	else {
+		print STDERR  "Unable to write trimmed alignment..", $/;
+	}
+	print STDERR  "size 2: ", -s $alignment_file, $/;
 	return $trimmed_fasta;
 }
-#-----------------------------------------------------------------------------
 
+#-----------------------------------------------------------------------------
+#
+sub compute_dist_matrix {
+	my ($self) = @_;
+
+	my $pwd = $self->work_dir;
+	return unless -d $pwd;
+
+	my $dnadist_input = $self->get_alignment('phyi');
+	return unless $dnadist_input;
+
+	my $d = DNALC::Pipeline::Process::Phylip::DNADist->new($pwd);
+
+	my $rc = $d->run(input => $dnadist_input, debug => 0);
+
+	if ($rc == 0) {
+		my $dist_file = $d->get_output;
+		return $dist_file;
+	}
+	return;
+}
+#-----------------------------------------------------------------------------
+# params: 
+#	$dist_tree => the path to the tree created by neighbor
+# returns {tree => $tree_object, tree_file => $stored_tree_file}
+#
+sub compute_tree {
+	my ($self, $dist_file) = @_;
+
+	my $pwd = $self->work_dir;
+	return unless -d $pwd;
+
+	my $p = DNALC::Pipeline::Process::Phylip::Neighbor->new($pwd);
+
+	my $rc = $p->run( input => $dist_file, debug => 1 );
+	if ($rc == 0) {
+		#print STDERR  "exit_status: ", $p->{exit_status}, $/;
+		print STDERR  "elapsed: ", $p->{elapsed}, $/;
+
+		my $stored_tree = $self->_store_tree($p->get_tree);
+		return $stored_tree if ($stored_tree && $stored_tree->{tree});
+	}
+
+	return;
+}
+
+#-----------------------------------------------------------------------------
+#
+sub _store_tree {
+	my ($self, $file) = @_;
+
+	return unless ($file && -f $file);
+
+	my $pwd = $self->work_dir;
+	return unless -d $pwd;
+
+	my $project = $self->project;
+	return unless $project;
+
+	my $tree = eval {
+		Tree->create({
+			project_id => $project,
+		});
+	};
+	if ($@) {
+		print STDERR "Error storing tree: $@", $/;	
+		return;
+	}
+
+	my $tree_dir = File::Spec->catfile($pwd, 'trees');
+	unless (-e $tree_dir) {
+		unless (mkdir $tree_dir) {
+			print STDERR  "Unable to create tree dir for project: ", $project, $/;
+			return;
+		}
+	}
+	my $tree_file = File::Spec->catfile($tree_dir, sprintf("%d.nw", $tree->id) );
+	unless (move $file, $tree_file) {
+		return;
+	}
+
+	return {tree => $tree, tree_file => $tree_file};
+}
+
+
+#-----------------------------------------------------------------------------
 sub store_file {
 	my ($self, $params) = @_;
 	

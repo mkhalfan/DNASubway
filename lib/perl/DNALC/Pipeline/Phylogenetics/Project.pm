@@ -1,25 +1,18 @@
 package DNALC::Pipeline::Phylogenetics::Project;
 
-use strict;
-use warnings;
-
 use POSIX ();
-#use File::Path;
 
-#use DNALC::Pipeline::User ();
 use DNALC::Pipeline::Config ();
 
 use base qw(DNALC::Pipeline::DBI);
 
-#use Class::DBI::Plugin::AbstractCount;
-#use Class::DBI::Plugin::Pager;
-
 use DNALC::Pipeline::MasterProject ();
-use Data::Dumper;
 
 __PACKAGE__->table('phy_project');
 __PACKAGE__->columns(Primary => qw/id/);
-__PACKAGE__->columns(Essential => qw/name user_id created/);
+__PACKAGE__->columns(Essential => qw/user_id name type  sample created/);
+__PACKAGE__->columns(Other => qw/has_tools description/);
+
 __PACKAGE__->sequence('phy_project_id_seq');
 
 
@@ -57,5 +50,10 @@ __PACKAGE__->add_trigger(before_delete => sub {
 	}
 });
 
+
+sub master_project {
+	my ($mp) = DNALC::Pipeline::MasterProject->search(project_id => $_[0]);
+	return $mp;
+}
 
 1;

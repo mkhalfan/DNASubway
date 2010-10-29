@@ -52,11 +52,11 @@ use strict;
 		};
 
 		print STDERR "Sent parameters:\n", $instring if $debug;
-		my $treefile = File::Spec->catfile($self->{work_dir}, $self->{conf}->{tree_file});
-		if (-e $treefile) {
+		my $outfile = File::Spec->catfile($self->{work_dir}, $self->{conf}->{output_file});
+		if (-f $outfile) {
 			$self->{elapsed} = tv_interval($t0, [gettimeofday]);
 			$self->{exit_status} = 0;
-			print STDERR  "Tree file: ", $treefile, $/ if $debug;
+			print STDERR  "Dist file: ", $outfile, $/ if $debug;
 		}
 		else {
 			$self->{exit_status} = 1;
@@ -80,8 +80,8 @@ use strict;
 	sub get_output {
 		my ($self) = @_;
 		if ($self->{exit_status} == 0) {
-			my $tree = File::Spec->catfile($self->{work_dir}, $self->{conf}->{output_file});
-			return $tree if -e $tree;
+			my $f = File::Spec->catfile($self->{work_dir}, $self->{conf}->{output_file});
+			return $f if -e $f;
 		}
 		return;
 	}

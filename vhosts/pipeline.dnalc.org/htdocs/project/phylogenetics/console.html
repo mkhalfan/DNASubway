@@ -1,0 +1,251 @@
+<div id="container_rightContent">
+<input type="hidden" id="pid" value="<% $pid %>"/>
+<input type="hidden" id="isowner" value="<% $is_owner %>"/>
+%	if (exists $m->session->{messages}) {
+<div style="display:none" id="error_list">	
+	<& "/_messages" &>
+</div>
+% 	}
+<!--Left Content Start--------------> 
+<div id="conBluelineLeft2">
+    
+    
+       <span class="conBlueline_ConColumn1">
+     <span id="conBlueline_ConColumn1_1">
+        <span class="conBlueline_ConCell">
+			<span class="conIndicator_box">
+		<div class="conIndicator_Rb"></div> </span>
+       	<span class="bt_Runblueline"><a href="javascript:;" onclick="phy.launch('viewer')">Trace viewer</a></span>
+        </span>
+        
+        <span class="conBlueline_ConCell">
+			<span class="conIndicator_box">
+		<div class="conIndicator_Rb"></div> </span>
+       	<span class="bt_Runblueline"><a href="javascript:;" onclick="phy.launch('pair')">Pair</a></span> 
+            
+        </span>
+        <span class="conBlueline_ConCell">
+        <span class="conIndicator_box">
+   		<div class="conIndicator_Rb"></div> </span>
+        <span class="bt_Runblueline"><a href="javascript:;" onclick="phy.launch('x')">Concensus editor</a></span> 
+        
+        </span>
+			
+        </span>  
+       <span class="conBlueline_keys"></span>     
+     
+     </span><!--END of span conBlueline_ConColumn1-->
+       
+       
+       
+     <span class="conBlueline_ConColumn2">
+     
+     <span class="conBlueline_ConCell">
+     
+
+			<span class="conIndicator_box">
+   		<div class="conIndicator_Rb"></div> </span>
+        <span class="bt_Runblueline"><a href="#">BLAST</a></span> </span> 
+  
+     
+     <span class="conBlueline_ConCell">
+     
+
+			<span class="conIndicator_box">
+   		<div class="conIndicator_Rb"></div> </span>
+        <span class="bt_Runblueline"><a href="#">Upload data</a></span> </span>  
+          
+           
+<span class="conBlueline_ConCell">
+			<span class="conIndicator_box">
+   		<div class="conIndicator_Rb"></div> </span>
+        <span class="bt_Runblueline"><a href="#">Reference data</a></span> </span>  
+        
+        <span class="conBlueline_ConCell">
+			<span class="conIndicator_box">
+   		<div class="conIndicator_Rb"></div> </span>
+        <span class="bt_Runblueline"><a href="">Manage data</a></span> </span>     
+            
+            
+            </span><!--END of span conBlueline_ConColumn2-->
+            
+     <span class="conBlueline_ConColumn3">
+     
+     
+<span class="conBlueline_ConCell">
+			<span class="conIndicator_box">
+   		<div class="conIndicator_Rb"></div> </span>
+        <span class="bt_Runblueline"><a href="">MUSCLE</a></span> </span>
+     </span><!--END of span conBlueline_ConColumn3-->
+    
+     
+</div><!--END of ID conBluelineLeft2-->
+
+ <!--right Content Start--------------> 
+<div id="conBluelineRight2">
+	<!--<div style="clear: both;">&nbsp;</div>-->
+    <span class="conBlueline_ConColumn4">
+     
+     
+<span class="conBlueline_ConCell">
+			<span class="conIndicator_box">
+   		<div class="conIndicator_Rb"></div> </span>
+        <span class="bt_Runblueline"><a href="#">PHYLIP</a></span> </span>
+        
+    
+     
+     </span>
+	
+
+    
+<span class="conBlueline_ConColumn5">
+<div class="con_browserBT ">
+    <span class="conIndicator_boxBrowse"><div class="conIndicator_Rb"></div> </span>
+	<span class="bt_browserBlue"><a href="#">Export to<br/>BOLD</a></span>	</div>
+    
+  <div id="spacer_Runblueline">&nbsp;</div> 
+    
+	<div class="con_browserBT ">
+    <span class="conIndicator_boxBrowse"><div class="conIndicator_Rb"></div> </span>
+	<span class="bt_browserBlue"><a href="#">Export to<br/>Genbank</a></span>	</div>
+    
+    </span>
+    
+</div>
+<!--END of ID conBluelineRight2--> 
+
+
+%#<div id="conRunAll_empty"></div>
+
+<!--  Project Information Panel START----------------------------------------------------------------  -->
+
+<div id="conProjectInfo"> 
+	<div id="conProjectInfo_header">
+		<div id="conProjectInfo_title">Project Information</div>
+		<div id="conProjectInfo_edit">
+			<div class="bt_projectInfo_edit"><a href="javascript:;" onclick="javascript:show_edit();"></a></div>
+		</div>
+		<div id="conProjectInfo_projecttitle" origtitle=""><% $proj->name |html%></div>
+		<div id="conProjectInfo_projectlog">Description</div>
+	</div>
+
+	<span class="conProjectInfo_column1"><!--Start of CLASS conProjectInfo_column1-->
+	<div class="conProjectInfo_Row">
+			<span class="conProjectInfo_Cell1">Project ID</span>
+		<span class="conProjectInfo_Cell2">:</span>
+	</div>
+		<div class="conProjectInfo_Row">
+			<span class="conProjectInfo_Cell1">User</span>
+			<span class="conProjectInfo_Cell2">:</span>
+		</div>
+		<div class="conProjectInfo_Row">
+			<span class="conProjectInfo_Cell1">Affiliation</span>
+			<span class="conProjectInfo_Cell2">:</span>
+		</div>
+
+        <div class="conProjectInfo_Row">
+			<div class="conProjectInfo_Cell1">Status</div>
+			<div class="conProjectInfo_Cell3">: &nbsp;<input type="radio" name="public" id="public_no" <% $is_public ? "" : "checked=\"checked\"" %> onclick="set_public(0);" /> &nbsp; Private</div>
+			<div class="conProjectInfo_Cell3"><input type="radio" name="public" id="public_yes" <% $is_public ? "checked=\"checked\"" : "" %> onclick="set_public(1);"/> &nbsp; Public</div>
+		</div>
+
+        <div class="conProjectInfo_Row">
+			<div class="conProjectInfo_Cell1">Seqs tools</div>
+			<div class="conProjectInfo_Cell3">: &nbsp;<input type="radio" > &nbsp; On</span></div>
+			<div class="conProjectInfo_Cell3"><input type="radio" > &nbsp; Off</span></div>
+		</div>
+
+	</span><!--END of span conProjectInfo_column1-->
+
+	<span class="conProjectInfo_column2"><!--Start of CLASS conProjectInfo_column2-->
+		<div class="conProjectInfo_Row">
+			<span class="conProjectInfo_Cell1">Project type</span>
+			<span class="conProjectInfo_Cell2">: <% $proj->type %></span>
+		</div>
+		<div class="conProjectInfo_Row">
+			<span class="conProjectInfo_Cell1">Input seqs</span>
+			<span class="conProjectInfo_Cell2">: </span>
+		</div>
+%#		<div></div>
+		<div class="conProjectInfo_Row">
+			<span class="conProjectInfo_Cell1">Ref seqs</span>
+			<span class="conProjectInfo_Cell2">: </span>
+		</div>
+        <div class="conProjectInfo_Row">
+			<span class="conProjectInfo_Cell1">Parameters</span>
+			<span class="conProjectInfo_Cell2">: </span>
+		</div>
+	</span><!--END of span conProjectInfo_column2-->
+
+	 <span class="conProjectInfo_column3"><!--Start of CLASS conProjectInfo_column3-->
+<!--
+		 <div class="conHistorylist">
+			<ul>
+				<li ><strong>messages</strong></li>
+			</ul>
+			<span class="bt_more"><a href="#">more »</a></span>
+		</div>
+-->
+
+		<div id="desc_limit_label" class="conNewPro_label" style="display: none;">Total characters (max.140): &nbsp;<span id="desc_len">0</span></div>
+		<div id="description_container" origdesc="" class="conProjectInfo_description"><% $proj->description |html%></div>
+	</span> <!--END of span conProjectInfo_column3-->
+    
+</div><!--END of ID conProjectInfo-->
+
+
+</div><!--END of ID container_rightContent-->  
+
+<%args>
+	$pid => 0
+	$debug => 0
+</%args>
+%#-------------------------------------------------
+
+<%once>
+	use Data::Dumper; 
+	use DNALC::Pipeline::App::Phylogenetics::ProjectManager ();
+	use DNALC::Pipeline::User ();
+</%once>
+%#-------------------------------------------------
+<%init>
+
+$m->session->{pipeline} ||= {};
+my $s = $m->session->{pipeline};
+
+my $pm = DNALC::Pipeline::App::Phylogenetics::ProjectManager->new($pid);
+my $proj = $pm->project;
+unless ($proj) {
+	$m->comp('/_message_add', 'Project not found!', 'error');
+	$m->redirect('/project/');
+}
+
+# project's owner
+my $user = DNALC::Pipeline::User->retrieve($proj->user_id);
+
+#my %status = ();
+#my ($history, $rm_status, $trimmed_common_name, $institution, $sample);
+
+my $pcf = DNALC::Pipeline::Config->new->cf("PIPELINE");
+my $is_owner = $s->{user_id} == $user->user_id;
+my ($mp) = $proj->master_project;
+my $is_public = $mp ? $mp->public : 0;
+
+my $username = $s->{username};
+my $is_admin = grep {/^$username$/} @{$pcf->{ADMINS}};
+
+if (!$is_public && !$is_owner && !$is_admin) {
+	#$m->comp('/_message_add', 'Project is not accessible!', 'error');
+	#print STDERR "Project not accesible...", $/;
+	$m->redirect('/project/browse');
+}
+
+</%init>
+%#-------------------------------------------------
+<%attr>
+	js => ['phylogenetics.js']
+	css => []
+	load_window_ui => 1
+	current_section => 'blue'
+	show_glossary => 1
+</%attr>

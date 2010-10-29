@@ -9,13 +9,12 @@
 <%once>
 	use DNALC::Pipeline::MasterProject ();
 	use DNALC::Pipeline::Project ();
-	#use DNALC::Pipeline::App::ProjectManager ();
+	use DNALC::Pipeline::Phylogenetics::Project ();
 	use DNALC::Pipeline::TargetProject ();
 	use DNALC::Pipeline::Config ();
 	use DNALC::Pipeline::Utils qw(random_string);
-	#use DNALC::Pipeline::App::Utils ();
 
-	use Data::Dumper;
+	#use Data::Dumper;
 
 </%once>
 %#--------------------------------------------------------
@@ -54,6 +53,9 @@ unless ($s->{logged_in}) {
 		}
 		elsif ($type eq 'target') {
 			$proj = DNALC::Pipeline::TargetProject->retrieve($pid);
+		}
+		elsif ($type eq 'phylogenetics') {
+			$proj = DNALC::Pipeline::Phylogenetics::Project->retrieve($pid);
 		}
 
 		if ($proj && (defined $title || defined $description)) {

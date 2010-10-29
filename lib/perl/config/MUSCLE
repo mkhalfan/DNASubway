@@ -6,6 +6,7 @@
 			'-fastaout' => 'output.fasta',
 			'-htmlout' => 'output.html',
 			'-phyiout' => 'output.phyi',
+			'-physout' => 'output.phys',
 		},
 	
 }

@@ -5,12 +5,15 @@ use warnings;
 
 use Apache2::Upload;
 use Bio::SeqIO ();
+#use Bio::Trace::ABIF ();
+use File::Basename;
 use IO::File ();
 use Text::FixEOL ();
 use DNALC::Pipeline::Config ();
 use DNALC::Pipeline::Utils qw(random_string);
 use Digest::MD5 ();
 use Time::Piece ();
+use Carp;
 
 use Data::Dumper;
 
@@ -88,6 +91,96 @@ sub save_upload {
 			path => $path, 
 			converted_to_dna => $converted_to_dna,
 			sequence_id => $sequence_id
+		};
+}
+
+sub save_upload_files {
+	my ($class, $args) = @_;
+	my ($status, $msg);
+	$status = 'fail';
+
+	unless ( defined ($args->{u}) && ref ($args->{u}) eq 'ARRAY') {
+		return { status => 'fail', message => 'Invalid parameters passed!'};
+	}
+
+	my $config = DNALC::Pipeline::Config->new;
+	my $upl_dir = $config->cf('PIPELINE')->{upload_dir};
+	my @files = ();
+	my @excluded_files = ();
+
+	for my $u (@{$args->{u}}) {
+		my $filename = basename($u);
+		$filename =~ s/.*[\\\/]+//;
+
+		my $path = $upl_dir . '/' . random_string();
+		print STDERR  "UPLOAD saved to: ", $path, $/;
+
+		my $fh = $u->fh;
+		print STDERR  "text: ", -T $fh, $/;
+		print STDERR  "binary: ", -B $fh, $/;
+
+		if (-B $fh) {
+			binmode($fh);
+			my $buffer = '';
+			unless (seek($fh, 0, 0)) {
+				carp "Error on reading file";
+				return 0;
+			}
+			read($fh, $buffer, 4) or return do {
+					$msg = "Can't read data from uploaded file!";
+					push @excluded_files, { filename => $filename, msg => $msg};
+					next;
+				};
+			$buffer = unpack('A4', $buffer);
+			if ($buffer eq 'ABIF') {
+				seek($fh, 0, 0);
+
+				my $out = IO::File->new;
+				if ($out->open($path, 'w')) {
+					binmode $out;
+					while(read($fh, $buffer, 8192)) {
+						print $out $buffer;
+					}
+					$out->close;
+				}
+				push @files, { filename => $filename, type => 'trace', path => $path };
+			}
+			else {
+				push @excluded_files, {filename => $filename, msg => 'Not a AB1 file!'};
+			}
+
+		}
+		else {
+			# text file
+			my $seq_data = '';
+			while (my $line = <$fh>) {
+				$seq_data .= $line;
+			}
+
+			my $fixer = Text::FixEOL->new;
+			$seq_data = $fixer->fix_eol($seq_data);
+
+			unless ($msg) {
+				my $out = IO::File->new;
+				if ($out->open($path, 'w')) {
+					print $out $seq_data;
+					undef $out;
+					push @files, { filename => $filename, type => 'fasta', path => $path };
+				}
+				else {
+					$msg = 'Unable to save uploaded file!';
+					push @excluded_files, {filename => $filename, msg => $msg};
+				}
+			}
+		}
+	}
+
+	$status = @files ? 'success' : 'fail';
+	return { status => $status, 
+			message => $msg, 
+			files => \@files,
+			excluded_files => \@excluded_files,
+			converted_to_dna => 0,
 		};
 }
 
@@ -201,7 +294,7 @@ sub _is_upload_ok {
 	my $config = DNALC::Pipeline::Config->new;
 	my $mimes = $config->cf('PIPELINE')->{upload_mime_types};
 	my $mt = $u->type;
-	#print STDERR  "Upload MIME = $mt", $/;
+	print STDERR  "Upload MIME = $mt", $/;
 	my $ok = 0;
 
 	for my $t (@{ $mimes }) {
@@ -210,7 +303,11 @@ sub _is_upload_ok {
 			last;
 		}
 	}
+	unless ($ok) {
+		# read file
+	}
 
+	print STDERR "is binary: ? ", -B $u->fh, $/;
 	# TODO - check content & size
 	return $ok;
 }

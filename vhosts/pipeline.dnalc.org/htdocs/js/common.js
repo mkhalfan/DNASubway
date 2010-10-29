@@ -198,8 +198,16 @@ function update_info() {
 		show_errors("Description should have 140 characters or less.");
 		return;
 	}
+	var ptype = 'annotation';
+	{
+		var path = window.location.pathname;
+		var m = path.match(/\project\/(target|phylogenetics)/);
+		if (m && m.length == 2) {
+			ptype = m[1];
+		}
+	}
 	var params = { pid : $('pid') ? $('pid').value : $('tid').value, 
-					type: $('tid') ? 'target' : 'annotation',
+					type: ptype,
 					title : ttl.value, description: desc.value
 				};
 	//sent = params;
@@ -331,6 +339,63 @@ function launch_background() {
 }
 
 //------------------------
+function set_public(np) {
+	if ($('public_yes').disabled)
+		return;
+
+	if (np) {
+		$('public_yes').checked = true;
+		$('public_no').checked = false;
+	}
+	else {
+		$('public_yes').checked = false;
+		$('public_no').checked = true;
+	}
+	
+	$('public_yes').disabled = true;
+	$('public_no').disabled = true;
+	
+	// stop hammering the db
+	new PeriodicalExecuter(function(p){
+				$('public_yes').disabled = false;
+				$('public_no').disabled = false;
+				p.stop();
+		}, 5);
+	var ptype = 'annotation';
+	{
+		var path = window.location.pathname;
+		var m = path.match(/\project\/(target|phylogenetics)/);
+		if (m && m.length == 2) {
+			ptype = m[1];
+		}
+	}
+	var params = { 'pid' : $('pid') ? $('pid').value : $('tid').value, 
+				'public' : np, 
+				'type': ptype 
+			};
+	sent = params;
+	new Ajax.Request('/project/update',{
+		method:'post',
+		parameters: params, 
+		onSuccess: function(transport){
+			var response = transport.responseText || "{'status':'error', 'message':'No response'}";
+			//debug(response);
+			var r = response.evalJSON();
+			if (r.status == 'success') {
+				show_messages("Project updated successfully.");
+			}
+			else  if (r.status == 'error') {
+				show_errors("There seems to be an error: " + r.message);
+			}
+			else {
+			}
+		},
+		onFailure: function(){
+				alert("Something went wrong.");
+			}
+	});
+}
+//------------------------
 
 Event.observe(window, isMSIE ? 'load' : 'dom:loaded', function() {
 	// check for errors
@@ -339,6 +404,7 @@ Event.observe(window, isMSIE ? 'load' : 'dom:loaded', function() {
 		var html = err.innerHTML;
 		if (html) {
 			w = show_errors(html);
+			return;
 		}
 	}
 	

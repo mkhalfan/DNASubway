@@ -46,7 +46,7 @@
 	<span class="bt_PublicProjects"><a href="/project/browse" title="Browse public projects"></a></span>
 	<span class="bt_redStart"><a href="/project/create_project.html" class="<% $class_r %>"></a></span>
 	<span class="bt_yellowStart"><a href="/project/target/create" class="<% $class_y %>"></a></span>
-	<span class="bt_blueStart">&nbsp;<!--<a href="#" style="cursor: default;"></a>--></span>
+	<span class="bt_blueStart"><a href="/project/phylogenetics/create_project.html" class="<% $class_b %>"></a></span>
     <span class="spacer_btGlossary"></span> 
     <span class="spacer_btGlossary"></span>
      

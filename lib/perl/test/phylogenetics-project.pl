@@ -7,6 +7,7 @@ use lib "$FindBin::Bin/..";
 use DNALC::Pipeline::Phylogenetics::Project ();
 use DNALC::Pipeline::App::Phylogenetics::ProjectManager ();
 use Getopt::Long;
+use File::Basename;
 
 use Data::Dumper;
 
@@ -24,6 +25,7 @@ my %actions = (
 		display => 1,
 		merge_pairs => 1,
 		align => 1,
+		tree => 1,
 	);
 
 my $action = $ACTION && defined $actions{$ACTION} ? $ACTION : 'display';
@@ -44,6 +46,9 @@ if ($action eq 'add') {
 	my $st = $pm->create_project({
 			name => $proj_name,
 			user_id => 90,
+			has_tools => 1,
+			type => 'rbcl',
+			description => 'my desc',
 		});
 	print STDERR "new p = ", Dumper($st), $/;
 	$proj = $pm->project;
@@ -66,26 +71,35 @@ print STDERR "project dir = ", $pm->work_dir, $/;
 # 3. data files
 if ($action eq 'add') {
 	if (1) {
-		my @files = </home/cornel/tmp/paiwisealignment/fasta/*>;
+		my @files = map {{
+				path => $_,
+				filename => basename($_),
+			}} </home/cornel/tmp/paiwisealignment/fasta/*>;
 		#print STDERR "files to add = ", scalar (@files), $/;
-		$pm->add_data({
+		my $st = $pm->add_data({
 			source => "upload",
 			files => \@files,
 			type => "fasta",
 		});
+		print STDERR Dumper( $st ), $/;
 	}
 	if (1) {
-		my @files = </home/cornel/tmp/paiwisealignment/sequences/*.ab1>;
+		my @files = map {{
+				path => $_,
+				filename => basename($_),
+			}} </home/cornel/tmp/paiwisealignment/sequences/*.ab1>;
 		#print STDERR "files to add = ", scalar (@files), $/;
 		#print STDERR "files = ", Dumper(\@files), $/;
 		#exit;
-		$pm->add_data({
+		my $st = $pm->add_data({
 				source => "upload",
 				files => \@files,
 				type => "trace",
 		});
+		print STDERR Dumper( $st ), $/;
 	}
 }
+
 
 #------------------------------------
 # 4. pair sequences
@@ -169,9 +183,26 @@ if ($action =~ /add|display/) {
 if ($action eq 'align') {
 
 	$pm->build_alignment;
+	
+	print "alignment = ", $pm->get_alignment, $/;
 
 	# trim
-	print $pm->trim_alignment({left => 30, right => 20});
+	$pm->trim_alignment({left => 30, right => 20});
 
 	# realign
+	$pm->build_alignment(1);
+}
+
+if ($action eq 'tree') {
+	print "------------------------------------\n";
+	my $phyi_file = $pm->get_alignment('phyi');
+
+	print "Alignment file: $phyi_file\n";
+
+	my $dist_file = $pm->compute_dist_matrix;
+	if (-f $dist_file) {
+		my $stree = $pm->compute_tree($dist_file);
+		print STDERR  "Tree = ", $stree->{tree}, "\t", $stree->{tree_file}, $/;
+	}
+	
 }

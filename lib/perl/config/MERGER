@@ -1,0 +1,13 @@
+{
+	program => '/usr/local/bin/merger',
+	options => [
+		'--auto',
+		'-gapopen', '10.0',
+		'-gapextend', '0.5',
+	],
+	'outfile' => '-outfile',
+	'outseq' => '-outseq',
+	'sreverse1' => '-sreverse1',
+	'sreverse2' => '-sreverse2',
+	'redirect' => 1,
+}

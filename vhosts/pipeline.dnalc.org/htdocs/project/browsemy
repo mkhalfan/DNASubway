@@ -25,15 +25,18 @@
 %	my $uri = "/project/console.html?pid=" . $_->id;
 %	if ($_->{project_type} eq "target") {
 %		$uri = "/project/target/view?tid=" . $_->id;
-%		$color = "#fdba3e"; #blue = "#3953A4"
-% 	}
+%		$color = "#fdba3e";
+%	} elsif ($_->{project_type} eq "phylogenetics") {
+%		$uri = "/project/phylogenetics/console.html?pid=" . $_->id;
+%		$color = "#3953A4"
+%	}
 %	my $description = break_long_text($_->description, 35);
 <tr>
 	<td style="background-color: <% $color %>;"><% $_->id %></td>
 	<td><% $created %></td>
 	<td><a href="<% $uri %>"><%$_->name |html%></a></td>
 	<td><% $description |html %></td>
-	<td><% $_->organism %>, <% $_->common_name %></td>
+	<td><% $_->{organism} %>, <% $_->{common_name} %></td>
 %#	<td><% $_->can("clade") ? $clades{$_->clade} : $_->type eq "d" ? "DNA" : "Protein" %></td>
 	<td><% $_->{public} ? "public" : "private" %></td>
 	<td><a href="/project/remove?id=<% $_->{master_project_id} %>" onclick="return confirm('Remove this project?')"><img src="/images/v2/Trash_Can.png" style="border: none;" alt="[remove project]"/></a></td>
@@ -69,6 +72,7 @@
 	use DNALC::Pipeline::MasterProject ();
 	use DNALC::Pipeline::Project ();
 	use DNALC::Pipeline::TargetProject ();
+	use DNALC::Pipeline::Phylogenetics::Project ();
 	use DNALC::Pipeline::User ();
 	use DNALC::Pipeline::Config ();
 	use DNALC::Pipeline::Utils qw(random_string);
@@ -109,6 +113,9 @@ my @projects = grep { defined $_ } map {
 				my $pclass = 'DNALC::Pipeline::Project';
 				if ($_->project_type eq "target") {
 					$pclass = 'DNALC::Pipeline::TargetProject';
+				}
+				elsif ($_->project_type eq 'phylogenetics') {
+					$pclass = 'DNALC::Pipeline::Phylogenetics::Project';
 				}
 				my $p = $pclass->retrieve($pid);
 				if ($p) {

@@ -17,7 +17,6 @@ use strict;
 		return $self;
 	}
 
-	#~/downloads/BioPerl-run-1.6.0-7pu4fn/Bio/Tools/Run/Phylo/Phylip/Neighbor.pm
 	sub run {
 	
 		my ($self, %params) = @_;

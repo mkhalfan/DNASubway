@@ -1,0 +1,88 @@
+sequences..
+<div id="container_rightContent">
+<style type="text/css">
+input[type="checkbox"] {
+	border: none;
+}
+span.bold {
+	font-weight: bolder;
+}
+
+.paired-light {
+	background-color:yellow;
+}
+.paired-dark {
+	background-color:silver;
+}
+</style>
+	<div style="margin-top: 20px;"></div>
+	<div id="seqids" style="float:left; width: 60px;font-family:courier; line-height: 1.2em;padding-left:10px">
+		<pre>
+% for (@sequences) {
+<span id="x<% $_->display_id |html %>"><% $_->display_id |html%></span>
+% }
+		</pre>
+	</div>
+
+	<div id="seqs" style="float:left;width:700px;margin-left:60px;overflow-y:hidden;font-family:courier;line-height: 1.2em;">
+		<pre>
+% for (@sequences) {
+<span id="<%$_%>" ><% $_->seq|html %></span>
+% }
+</pre>
+	</div>
+
+	<div id="seqops" style="float:left; padding-left:4px; width: 20px;line-height: 1.2em;line-height: 1.2em">
+		<pre>
+% for (@files) {
+<span><input type="checkbox" id="op<% $_ %>" /></span>
+% }
+		</pre>
+	</div>
+	<br clear="both"/>
+% if (0) {
+	<div style="text-align: center">
+		<input type="button" id="consensus" value="Build consensus" onclick="javascript:build_consensus();"/>
+		<input type="button" id="align" value="Align" />
+	</div>
+	<form method="post" id="forma1">
+		<input type="hidden" id="step" value="0" />
+		<input type="hidden" id="op" name="op" />
+		<input type="hidden" id="data" name="data" />
+	</form>
+% }
+</div>
+<%args>
+	$op => ''
+	$data => ''
+	$pid => 0
+</%args>
+<%once>
+	use File::Slurp qw/read_file/;
+	use DNALC::Pipeline::App::Phylogenetics::ProjectManager ();
+	use DNALC::Pipeline::Config ();
+	#use JSON::XS ();
+	use Data::Dumper;
+</%once>
+<%init>
+	$r->content_type("text/html");
+	my $gcf = DNALC::Pipeline::Config->new->cf("GREENLINE");
+	#my $dir = $gcf->{PROJECTS_DIR} . '/fasta';
+	my $pairs = undef;
+	my @files = ();
+
+	my $pm = DNALC::Pipeline::App::Phylogenetics::ProjectManager->new($pid);
+	my $proj = $pm->project;
+	unless ($proj) {
+		#$m->comp('/_message_add', 'Project not found!', 'error');
+		#$m->redirect('/project/');
+		print "Project not found!";
+		return;
+	}
+	
+	my @sequences = $pm->sequences;
+</%init>
+<%attr>
+	#js => ['greenline.js']
+</%attr>
+
