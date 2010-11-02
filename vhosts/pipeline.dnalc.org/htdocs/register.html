@@ -79,6 +79,9 @@
 			{ id => "name_last", label => "Last name", re => qr/.+/, maxlength => 64},
 			{ id => "username", label => "Username", re => qr/^[a-z0-9_-]+$/i, maxlength => 16},
 			{ id => "email", type => "email", label => "Email", re => qr/\@/, maxlength => 120},
+			{ id => "pwd", type => "password", label => "Password", re => qr/.{5,}/, maxlength => 20, 
+						msg => "Password is missing or is shorter then 5 chars."},
+			{ id => "repwd", type => "password", label => "Re-type password", re => qr/.+/, maxlength => 20},
 		];
 	my @titles = qw/Ms Mr Miss PhD MBA MD Prof/;
 	my %question_map = (
@@ -126,12 +129,16 @@ if ($r->method eq "POST") {
 		my $f = $_->{id};
 		$s->{$f} = substr $ARGS{$f}, 0, $_->{maxlength} if defined $ARGS{$f};
 		unless (defined $s->{$f} && $s->{$f} =~ $_->{re}) {
-			push @err, "$_->{label} is missing or invalid!";
+			push @err, $_->{msg} || "$_->{label} is missing or invalid!";
 		}
 	}
 	
 	if ($s->{username} && length($s->{username}) < 3) {
 		push @err, "Username is too short. Use at least 3 chars.";
+	}
+	
+	if ($s->{pwd} && $s->{pwd} ne $s->{repwd}) {
+		push @err, "Passwords to not match.";
 	}
 	
 	if (! defined $s->{country}  || $s->{country} eq '') {
@@ -163,13 +170,13 @@ if ($r->method eq "POST") {
 	
 	unless (@err ) {
 		# create passwd
-		my $pwd = random_string(4, 15);
+		#my $pwd = random_string(4, 15);
 
 		# create account		
 		my $u = eval {
 				DNALC::Pipeline::User->create({
 					username => $s->{username},
-					password => $pwd,
+					password => $s->{pwd},
 					email => $s->{email},
 					title => $s->{title},
 					name_first => $s->{name_first},
@@ -214,8 +221,6 @@ if ($r->method eq "POST") {
 			if ($code) {
 				my $text = "Welcome to DNA Subway, Fast Track to Gene Annotation and Genome Analysis.\n
 Your username is: \"$s->{username}\" (without the quotes).\n
-To set your password, follow this link or paste it into your browser:
-$cf->{APOLLO_PROJECT_HOME}/resetpass.html?c=$code\n
 For information on using the site, take advantage of the DNA Subway Tour
 and DNA Subway Manual, linked from the home page and the site footer.\n
 
@@ -228,7 +233,7 @@ DNASubway Team\n";
 							From => $from_email,
 							To	=> $s->{email},
 							Subject => "Thank you for registering on DNA Subway!",
-							Type	=> 'text/plain',
+							Type	=> "text/plain",
 							Data	=> $text
 						);
 				eval {
@@ -238,7 +243,6 @@ DNASubway Team\n";
 					else {
 						$msg->send;
 					}
-					
 				};
 				if ($@) {
 					print STDERR "Error: " . $@ . "\n";
@@ -246,13 +250,25 @@ DNASubway Team\n";
 				}
 			}			
 
-			$m->comp("/_message_add", "<p>Welcome to DNA Subway! In order to use your new account go to your email"
-						. " and follow the instructions in the message you receive from <u>dnalcadmin\@cshl.edu</u>.</p>"
-						. "<br/><p>Should you not get this message it may have been filtered out by your"
-						. " provider's spam/junk filters.</p>");
+			$m->comp("/_message_add", "<p>Welcome to DNA Subway!</p>");
+			#				"In order to use your new account go to your email"
+			#			. " and follow the instructions in the message you receive from <u>dnalcadmin\@cshl.edu</u>.</p>";
+			#			. "<br/><p>Should you not get this message it may have been filtered out by your"
+			#			. " provider's spam/junk filters.</p>");
 
 			# clear registration session
 			$m->session->{pipeline_reg} = {};
+			
+			# log them in
+			$s = $m->session->{pipeline};
+
+			$s->{username} = $u->username;
+			$s->{full_name} = $u->full_name;
+			$s->{user_id} = $u->id;
+			$s->{institution} = DNALC::Pipeline::UserProfile->get_user_institution($u->id);
+			$s->{logged_in} = 1;
+			$s->{new_user} = 1;
+			
 			$m->redirect("/");
 		}
 	}
