@@ -802,7 +802,7 @@ sub assign_pool_db {
 	my $rc = undef;
 	eval {
 		print STDERR  "ALTER DATABASE $db_name RENAME TO $username", $/;
-		$rc = $dbh->do("ALTER DATABASE $db_name RENAME TO $username");
+		$rc = $dbh->do(qq{ALTER DATABASE $db_name RENAME TO "$username"});
 	};
 	if ($@)  {
 		print STDERR  "assign_pool_db: ", $@, $/;
