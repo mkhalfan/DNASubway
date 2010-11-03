@@ -14,21 +14,24 @@
      <span id="conBlueline_ConColumn1_1">
         <span class="conBlueline_ConCell">
 			<span class="conIndicator_box">
-		<div class="conIndicator_Rb"></div> </span>
+		<div class="conIndicator_done"></div></span>
        	<span class="bt_Runblueline"><a href="javascript:;" onclick="phy.launch('viewer')">Trace viewer</a></span>
         </span>
         
         <span class="conBlueline_ConCell">
 			<span class="conIndicator_box">
-		<div class="conIndicator_Rb"></div> </span>
-       	<span class="bt_Runblueline"><a href="javascript:;" onclick="phy.launch('pair')">Pair</a></span> 
-            
+		<div id="phy_pair_st" class="conIndicator_<% $status{phy_pair} eq "done" ? "done" : $status{phy_pair} %>"></div></span>
+       	<span class="bt_Runblueline"><a href="javascript:;" onclick="phy.launch('pair')">Pair</a></span>
+%#				<& '.routine', routine => 'phy_pair', pmanager => $pm, is_owner => $is_owner,
+%#					status => $status{phy_pair}, delay => 20, pid => $pid &>
         </span>
         <span class="conBlueline_ConCell">
-        <span class="conIndicator_box">
-   		<div class="conIndicator_Rb"></div> </span>
-        <span class="bt_Runblueline"><a href="javascript:;" onclick="phy.launch('x')">Concensus editor</a></span> 
-        
+			<span class="conIndicator_box">
+				<div id="phy_concensus_st" class="conIndicator_<% $status{phy_concensus} eq "done" ? "done" : $status{phy_concensus} %>"></div>
+			</span>
+%#			<span class="bt_Runblueline"><a href="javascript:;" onclick="phy.launch('concensus')">Concensus editor</a></span>
+				<& '.routine', routine => 'phy_concensus', pmanager => $pm, is_owner => $is_owner,
+					status => $status{phy_concensus}, delay => 20, pid => $pid &>
         </span>
 			
         </span>  
@@ -59,7 +62,7 @@
 <span class="conBlueline_ConCell">
 			<span class="conIndicator_box">
    		<div class="conIndicator_Rb"></div> </span>
-        <span class="bt_Runblueline"><a href="#">Reference data</a></span> </span>  
+        <span class="bt_Runblueline"><a href="#" onclick="phy.launch('add_ref');">Reference data</a></span> </span>  
         
         <span class="conBlueline_ConCell">
 			<span class="conIndicator_box">
@@ -70,12 +73,14 @@
             </span><!--END of span conBlueline_ConColumn2-->
             
      <span class="conBlueline_ConColumn3">
-     
-     
-<span class="conBlueline_ConCell">
+		<span class="conBlueline_ConCell">
 			<span class="conIndicator_box">
-   		<div class="conIndicator_Rb"></div> </span>
-        <span class="bt_Runblueline"><a href="">MUSCLE</a></span> </span>
+				<div id="phy_alignment_st" class="conIndicator_<% $status{phy_alignment} eq "done" ? "done" : $status{phy_alignment} %>"></div>
+			</span>
+%#			<span class="bt_Runblueline"><a href="#">MUSCLE</a></span>
+				<& '.routine', routine => 'phy_alignment', pmanager => $pm, is_owner => $is_owner,
+					status => $status{phy_alignment}, delay => 20, pid => $pid &>
+		</span>
      </span><!--END of span conBlueline_ConColumn3-->
     
      
@@ -84,17 +89,19 @@
  <!--right Content Start--------------> 
 <div id="conBluelineRight2">
 	<!--<div style="clear: both;">&nbsp;</div>-->
-    <span class="conBlueline_ConColumn4">
-     
-     
-<span class="conBlueline_ConCell">
+    <span class="conBlueline_ConColumn4"> 
+		<span class="conBlueline_ConCell">
 			<span class="conIndicator_box">
-   		<div class="conIndicator_Rb"></div> </span>
-        <span class="bt_Runblueline"><a href="#">PHYLIP</a></span> </span>
-        
-    
-     
-     </span>
+				<div id="phy_tree_st" class="conIndicator_<% $status{phy_alignment} eq "done" ? $status{phy_tree} eq "done" ? "done" : $status{phy_tree} : "disabled" %>"></div>
+			</span>
+%	if ($status{phy_alignment} ne "done") {
+			<span class="bt_Runblueline"><a href="#">PHYLIP</a></span>
+%	} else {
+				<& '.routine', routine => 'phy_tree', pmanager => $pm, is_owner => $is_owner,
+					status => $status{phy_tree}, delay => 20, pid => $pid &>
+%	}
+		</span>
+	</span>
 	
 
     
@@ -132,15 +139,15 @@
 	<span class="conProjectInfo_column1"><!--Start of CLASS conProjectInfo_column1-->
 	<div class="conProjectInfo_Row">
 			<span class="conProjectInfo_Cell1">Project ID</span>
-		<span class="conProjectInfo_Cell2">:</span>
+		<span class="conProjectInfo_Cell2">: <% $proj->id%></span>
 	</div>
 		<div class="conProjectInfo_Row">
 			<span class="conProjectInfo_Cell1">User</span>
-			<span class="conProjectInfo_Cell2">:</span>
+			<span class="conProjectInfo_Cell2">: <% $user->full_name |html%></span>
 		</div>
 		<div class="conProjectInfo_Row">
 			<span class="conProjectInfo_Cell1">Affiliation</span>
-			<span class="conProjectInfo_Cell2">:</span>
+			<span class="conProjectInfo_Cell2">: <% $institution |html%></span>
 		</div>
 
         <div class="conProjectInfo_Row">
@@ -206,6 +213,14 @@
 	use Data::Dumper; 
 	use DNALC::Pipeline::App::Phylogenetics::ProjectManager ();
 	use DNALC::Pipeline::User ();
+	
+	my %routines = (
+			phy_pair => "Pair",
+			phy_concensus => "Consensus editor",
+			phy_alignment => "MUSCLE",
+			phy_tree => "Tree",
+
+		);
 </%once>
 %#-------------------------------------------------
 <%init>
@@ -223,7 +238,8 @@ unless ($proj) {
 # project's owner
 my $user = DNALC::Pipeline::User->retrieve($proj->user_id);
 
-#my %status = ();
+my %status = ();
+my ($institution);
 #my ($history, $rm_status, $trimmed_common_name, $institution, $sample);
 
 my $pcf = DNALC::Pipeline::Config->new->cf("PIPELINE");
@@ -240,7 +256,69 @@ if (!$is_public && !$is_owner && !$is_admin) {
 	$m->redirect('/project/browse');
 }
 
+$institution = $is_owner ? $s->{institution} : DNALC::Pipeline::UserProfile->get_user_institution($user->id);
+$institution ||= "-";
+
+for my $rt ( keys %routines ) {
+	my $status_name = $pm->get_task_status($rt)->name;
+	$status{$rt} = $status_name;
+}
+
 </%init>
+%#-------------------------------------------------
+<%def .routine>
+<%args>
+	$routine => ""
+	$status => 'disabled'
+	$pmanager => undef
+	$is_owner => 0
+	$delay => 5
+	$pid => 0
+</%args>
+<%init>
+my $link   = 'javascript:;';
+my $target = 'target="_blank"';
+my $action = $is_owner ? qq{onclick="phy.run('$routine')"} : '';
+my $title  = '';
+##my $label  = '';
+my $class = "disabled";
+
+if ($status eq 'processing') {
+	$action = "";
+	$target = "";
+	#$title = $label = 'Processing';
+}
+elsif ($status eq 'done') {
+	my $url = "/project/phylogenetics/tools/view_$routine?pid=$pid";
+	$url =~ s/phy_//;
+	$action = qq{onclick="phy.launch(null, '$url', '$routines{$routine}')"};
+	$target = '';
+	#$title  = 'Click to view results';
+	#$label  = 'View';
+	$class = '';
+} 
+else {
+		if ($status eq 'error') {
+			#$label = 'Failed/Run';
+			$class = "";
+		}
+		else {
+			#$label = 'Run';
+			if ($is_owner) {
+				$class = '';
+			}
+		}
+		#$title = 'Click to process';
+	$target = "";
+}
+
+</%init>
+<span class="bt_Runblueline"><a id="<% $routine %>_btn" href="<% $link %>" class="<% $class %>" <% $target %> \
+% if ($is_owner) {
+status="<% $status %>" \
+% }
+<% $action %> delay="<% $delay %>"><% $routines{$routine} %></a></span>
+</%def>
 %#-------------------------------------------------
 <%attr>
 	js => ['phylogenetics.js']

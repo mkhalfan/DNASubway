@@ -15,19 +15,27 @@ span.bold {
 	background-color:silver;
 }
 </style>
+% if ($ok == 1) {
+<script type="text/javascript">
+	top.phy.close_window('pair');
+</script>
+% }
+%#pairs: <% Dumper(\@pairs) %>
 	<div style="margin-top: 20px;"></div>
 	<div id="seqids" style="float:left; width: 60px;font-family:courier; line-height: 1.2em;padding-left:10px">
 		<pre>
 % for (@sequences) {
-<span id="x<% $_->display_id |html %>"><% $_->display_id |html%></span>
+<span id="x<% $_->{s}->display_id |html %>"><% $_->{s}->display_id |html%></span>
 % }
 		</pre>
 	</div>
 
 	<div id="seqs" style="float:left;width:600px;margin-left:60px;overflow-y:hidden;font-family:courier;line-height: 1.2em;">
 		<pre>
+%# my $last_pair_id = @sequences ? $sequences[0]->{pair_id} : "";
+% my $class = '';
 % for (@sequences) {
-<span id="<%$_%>" ><% $_->seq|html %></span>
+<span class="<% $class %>" id="<%$_->{s}%>"><% $_->{s}->seq|html %></span>
 % }
 		</pre>
 	</div>
@@ -35,22 +43,24 @@ span.bold {
 	<div id="seqops" style="float:left; padding-left:10px; width: 30px;font-family:courier;line-height: 1.2em;">
 		<pre>
 % for (@sequences) {
-%	my $dir = "F";
-<span><a href="javascript:;" id="rc<% $_->id %>" onclick="phy.toggle_strand(this);"><% $dir %></a> \
-<input type="checkbox" id="op<% $_ %>" /></span>
+%	my $dir = $_->{type} eq "s" ? "F" : $_->{strand};
+<span><a href="javascript:;" id="rc<% $_->{s}->id %>" onclick="phy.toggle_strand(this);"><% $dir %></a> \
+<input type="checkbox" id="op<% $_->{s} %>" <%$_->{type} eq "p" ? "checked=\"checked\"" : ""%>/></span>
 % }
 </pre>
 	</div>
 	<br clear="both"/>
 % if (1) {
+%	if (!@pairs) {
 	<div style="text-align: center">
-		<input type="button" id="consensus" value="Save" onclick="javascript:phy.do_pair();"/>
-		<input type="button" id="consensus" value="test" onclick="javascript:parent.show_messages(1);"/>
+		<input type="button" id="do_pair" value="Save" onclick="javascript:phy.do_pair();"/>
+%#		<input type="button" id="x" value="Test" onclick="javascript:top.phy.close_window('pair');"/>
 	</div>
+% 	}
 	<form method="post" id="forma1">
 		<input type="hidden" id="step" value="1" />
 %#		<input type="hidden" id="op" name="op" />
-		<input type="hidden" id="data" name="data" />
+		<input type="hidden" id="data" name="data" value='<% $json->encode(\@paired_seqids) %>' />
 	</form>
 % }
 </div>
@@ -58,8 +68,10 @@ span.bold {
 	$op => ''
 	$data => ''
 	$pid => 0
+	$ok => 0
 </%args>
 <%once>
+	#use diagnostics;
 	use File::Slurp qw/read_file/;
 	use DNALC::Pipeline::App::Phylogenetics::ProjectManager ();
 	use DNALC::Pipeline::Config ();
@@ -68,9 +80,10 @@ span.bold {
 </%once>
 <%init>
 	$r->content_type("text/html");
-	my $gcf = DNALC::Pipeline::Config->new->cf("GREENLINE");
+	#my $gcf = DNALC::Pipeline::Config->new->cf("GREENLINE");
 	#my $dir = $gcf->{PROJECTS_DIR} . '/fasta';
-	my $pairs = undef;
+	my $json = JSON::XS->new->utf8;
+	my $new_pairs = undef;
 	my @files = ();
 
 	my $pm = DNALC::Pipeline::App::Phylogenetics::ProjectManager->new($pid);
@@ -82,13 +95,24 @@ span.bold {
 		return;
 	}
 	
-	my @sequences = $pm->sequences;
+	my @sequences = ();
+	my @pairs = $pm->pairs;
+	my @paired_seqids = map {[ map {$_->seq->id} $_->paired_sequences]} @pairs;
+	for my $pair (@pairs) {
+		push @sequences, map {
+					{s => $_->seq, type => "p", strand => $_->strand, pair_id => $pair}
+				} $pair->paired_sequences;
+	}
+	
+	push @sequences, map {{s => $_, type => "s"}} $pm->non_paired_sequences;
+	#$pm->sequences;
 	
 	if ($data) {
-		my $json = JSON::XS->new->utf8;
+		
 		my $decoded_data = $json->decode($data);
-		$pairs = ref $decoded_data eq "ARRAY" ? $decoded_data : [];
-		for my $p (@$pairs) {
+		$new_pairs = ref $decoded_data eq "ARRAY" ? $decoded_data : [];
+		my @added_pairs = ();
+		for my $p (@$new_pairs) {
 			my $pair = $pm->add_pair(
 				{seq_id => $p->[0]->[0],
 				 strand => $p->[0]->[1] ? "R" : "F",
@@ -97,9 +121,12 @@ span.bold {
 				 strand => $p->[1]->[1] ? "R" : "F",
 				},
 			);
+			push @added_pairs, $p;
 			print "added pair ", $pair, $/;
 		}
-		$m->redirect("./pair?pid=" . $pid);
+		$pm->set_task_status("phy_pair", "done")
+			if @added_pairs;
+		$m->redirect("./pair?pid=" . $pid . ';ok=1');
 	}
 	
 </%init>

@@ -1,0 +1,49 @@
+<div id="conbodyx">
+% unless ($proj) {
+	Error: can't open project "<% $pid|html%>".
+% } else {
+	<div>
+<applet archive="/files/jalview/jalviewApplet.jar" name="Jalview" 
+	codebase="/files/jalview/" 
+	code="jalview.bin.JalviewLite" height="450" width="100%">
+	<param name="file" value="<% $m->comp('../../.comp/filepath_to_web', file => $pm->get_alignment ) %>">
+%#	<param name="treeFile" value="<% $nw %>">
+	<param name="embedded" value="true"> 
+	<param name="showAnnotation" value="true">
+	<param name="wrap" value="false">
+	<param name="nojmol" value="true">
+	<param name="windowHeight" value="500">
+	<param name="windowWidth" value="750">
+	<param name="showFullId" value="false">
+	<param name="defaultColour" value="Clustal">
+%#	<param name="linkLabel_1" value="Details" />
+%#	<param name="linkUrl_1" value="<% $pcf->{PROJECT_HOME} %>/project/target/details?hn=$SEQUENCE_ID$" />
+	<param name="showbutton" value="false" />
+	<param name="debug" value="true" />
+%#	<p id="java_install"><a href="http://java.sun.com/webapps/getjava/BrowserRedirect?host=java.com">Install Java</a>.</p>
+</applet>
+
+	<% $m->comp('../../.comp/filepath_to_web', file => $pm->get_alignment ) %>
+	</div>
+% }
+</div>
+%#----------------------------------------------------------------------------
+<%args>
+	$pid => 0
+	$pair_id => 0
+</%args>
+%#----------------------------------------------------------------------------
+<%once>
+	use DNALC::Pipeline::App::Phylogenetics::ProjectManager ();
+	use DNALC::Pipeline::Utils qw(random_string);
+</%once>
+%#----------------------------------------------------------------------------
+<%init>
+	$r->content_type("text/html");
+	my $pcf = DNALC::Pipeline::Config->new->cf('PIPELINE');
+	$pid =~ s/\D+//g;
+	my $pm = DNALC::Pipeline::App::Phylogenetics::ProjectManager->new($pid);
+	my $proj = $pm->project;
+	my $x = random_string();
+</%init>
+%#----------------------------------------------------------------------------

@@ -22,6 +22,7 @@ my ($proj, $pm, $data_src);
 
 my %actions = (
 		add => 1,
+		add_ref => 1,
 		display => 1,
 		merge_pairs => 1,
 		align => 1,
@@ -128,23 +129,40 @@ if ($action eq 'merge_pairs') {
 	for my $p ($pm->pairs) {
 		print "PS= ", $p, ": ", join(',', $p->paired_sequences), $/;
 		my $rc = $pm->build_concensus($p);
-		print "build_concensus = ", $rc, $/;
-		print STDERR  $p->concensus, $/;
-		print STDERR  "---------------", $/;
+		#print "build_concensus = ", $rc, $/;
+		#print STDERR  $p->concensus, $/;
+		#print STDERR  "---------------", $/;
 
-	}	
+	}
+	$pm->set_task_status('phy_concensus', 'done');
+}
+
+if ($action =~ /^add_ref/) {
+	print STDERR  "Adding ref...", $/;
+	my $ref_cf = DNALC::Pipeline::Config->new->cf('PHYLOGENETICS_REF');
+	my $type = $pm->project->type;
+	my $refs = defined $ref_cf->{$type} ? $ref_cf->{$type} : [];
+	print STDERR Dumper( $refs->[0] ), $/;
+	$pm->add_reference($refs->[0]->{id}) 
+		if @$refs;
 }
 
 #------------------------------------
 
-if ($action =~ /add|display/) {
+if ($action =~ /^(?:add|display)$/) {
 
+	print STDERR  "project type = ", $proj->type, $/;
 	if ($pm->has_fasta_file) {
 		print STDERR "fasta = ", $pm->fasta_file, $/;
 	}
 	else {
 		print STDERR "No fasta file for this project\n";
 	}
+
+	for (qw/phy_concensus phy_alignment phy_tree/) {
+		print STDERR  "$_:\t", $pm->get_task_status($_)->name, $/;
+	}
+	print "------------------------------------\n";
 
 	for (qw/fasta trace/) {
 		my @files = $pm->files($_);
@@ -153,6 +171,7 @@ if ($action =~ /add|display/) {
 			#print "files[0] seq = \n", $files[0]->seq, $/;
 			if ($_ =~ /^trace$/i) {
 				my @q = $files[0]->quality_values;
+				#print STDERR Dumper( $files[0]), $/;
 				print "qualities: ", scalar @q, $/;
 			}
 		}

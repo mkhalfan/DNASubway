@@ -83,7 +83,7 @@ use Data::Dumper;
 		}
 
 		my $algn_length = length $data->{(keys %$data)[0]};
-		if (length($merged_seq) != $algn_length) {
+		if (0 && length($merged_seq) != $algn_length) {
 			#print STDERR  "Not equal...", $/;
 			my @strings = map {lc $data->{$_}} keys %$data;
 			#print STDERR Dumper( \@strings), $/;

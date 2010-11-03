@@ -1,0 +1,24 @@
+{status:'<% $status|js%>', message:'<% $msg |js%>'}
+<%args>
+	$pid => 0
+</%args>
+<%once>
+	use DNALC::Pipeline::App::Phylogenetics::ProjectManager ();
+	#use DNALC::Pipeline::Phylogenetics::Pair ();
+</%once>
+<%init>
+	my ($status, $msg) = ("error", "");
+	my $pm = DNALC::Pipeline::App::Phylogenetics::ProjectManager->new($pid);
+	my $proj = $pm->project;
+	unless ($proj) {
+		$msg = "Project not found."
+	}
+	else {
+		$pm->build_alignment;
+		$status = "success";
+	}
+</%init>
+
+<%flags>
+	inherit => undef
+</%flags>

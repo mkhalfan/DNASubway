@@ -1,0 +1,14 @@
+{
+	dna => [
+		{
+			id => 'Adh',
+			file => '/var/www/vhosts/pipeline.dnalc.org/var/phy_samples/adh.fasta',
+		},
+	],
+	rbcL => [
+		{
+			id => 'rbcL ref',
+			file => '/var/www/vhosts/pipeline.dnalc.org/var/phy_samples/rbcl_ref.fasta'
+		},
+	],
+}

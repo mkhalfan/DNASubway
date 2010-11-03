@@ -150,7 +150,7 @@ use Carp;
 			my $t0 = [gettimeofday];
 			if ($self->{conf}->{redirect}) {
 				my $cmd = join " ", @opts;
-				print STDERR  "CMD = ", $cmd, $/;
+				print STDERR  "CMD = ", $cmd, $/ if $debug;
 
 				system($cmd . ' > ' . $stdout_file);
 				$self->{exit_status} = $?;

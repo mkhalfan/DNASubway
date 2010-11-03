@@ -1,0 +1,72 @@
+<div id="" style="min-height: 300px">
+% if ($ok == 1) {
+<script type="text/javascript">
+	top.phy.close_window('add_ref');
+</script>
+% } elsif ($error) {
+	<div><% $error |html%></div>
+% }
+% if ($proj) {
+	<h3><% $type %> reference data</h3>
+%#	<pre><% Dumper $ref_cf->{$type} %></pre>
+% 	for my $ref (@$refs) {
+	<div><input type="radio" name="refid" id="refid" value="<% $ref->{id} |html%>" /> <label for="<% $ref->{id}%>"><% $ref->{id} %></label></div>
+% 	}
+	<p>
+		<input type="button" id="buttonas" value="Add ref data" onclick="phy.do_add_ref()"/>
+	</p>
+	<form method="post" id="forma1">
+		<input type="hidden" id="pid" value="<% $pid %>"/>
+%#		<input type="hidden" id="step" value="1" />
+%#		<input type="hidden" id="op" name="op" />
+		<input type="hidden" id="ref_id" name="ref_id" value="" />
+	</form>
+% } else {
+	Uable to locate project <% $pid |html %>
+% }
+</div>
+%#----------------------------------------------------------------------------
+<%args>
+	$pid => 0
+	$ref_id => 0
+	$ok => 0
+</%args>
+%#----------------------------------------------------------------------------
+<%once>
+	use DNALC::Pipeline::App::Phylogenetics::ProjectManager ();
+	#use DNALC::Pipeline::Utils qw(random_string);
+	use Data::Dumper;
+</%once>
+%#----------------------------------------------------------------------------
+<%init>
+	$r->content_type("text/html");
+	$pid =~ s/\D+//g;
+	my $pm = DNALC::Pipeline::App::Phylogenetics::ProjectManager->new($pid);
+	my $proj = $pm->project;
+	my $error = '';
+	my ($type, $refs);
+	if ($proj) {
+		$type = $proj->type;
+		my $ref_cf = DNALC::Pipeline::Config->new->cf('PHYLOGENETICS_REF');
+		$refs = defined $ref_cf->{$type} ? $ref_cf->{$type} : [];
+		if ($r->method eq "POST") {
+			print STDERR "POST", $/;
+			
+			if (@$refs && $ref_id) {
+				my ($ref) = grep {$_->{id} eq $ref_id} @$refs;
+				if ($ref) {
+					print STDERR Dumper( $ref ), $/;
+					$pm->add_reference($ref->{id});
+					$m->redirect("./add_ref?pid=" . $pid . ';ok=1');
+				}
+				else {
+					$error = "Can't find reference with id=[$ref_id]";
+				}
+			}
+		}
+	}
+</%init>
+%#----------------------------------------------------------------------------
+<%attr>
+	js => ['prototype-1.6.1.js', 'phylogenetics.js']
+</%attr>
