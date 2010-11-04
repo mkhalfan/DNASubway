@@ -128,7 +128,7 @@ if ($action eq 'merge_pairs') {
 	print "\nSeq pairs:\n";
 	for my $p ($pm->pairs) {
 		print "PS= ", $p, ": ", join(',', $p->paired_sequences), $/;
-		my $rc = $pm->build_concensus($p);
+		my $rc = $pm->build_consensus($p);
 		#print "build_concensus = ", $rc, $/;
 		#print STDERR  $p->concensus, $/;
 		#print STDERR  "---------------", $/;

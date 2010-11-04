@@ -3,6 +3,7 @@
 input[type="checkbox"] {
 	border: none;
 	background-color:red;
+	margin: 0;
 }
 span.bold {
 	font-weight: bolder;
@@ -17,7 +18,9 @@ span.bold {
 </style>
 % if ($ok == 1) {
 <script type="text/javascript">
-	top.phy.close_window('pair');
+	top.phy.set_status("phy_pair", "done");
+	top.phy.set_status("phy_concensus", "not-processed")
+	top.phy.close_window("pair");
 </script>
 % }
 %#pairs: <% Dumper(\@pairs) %>
@@ -44,8 +47,8 @@ span.bold {
 		<pre>
 % for (@sequences) {
 %	my $dir = $_->{type} eq "s" ? "F" : $_->{strand};
-<span><a href="javascript:;" id="rc<% $_->{s}->id %>" onclick="phy.toggle_strand(this);"><% $dir %></a> \
-<input type="checkbox" id="op<% $_->{s} %>" <%$_->{type} eq "p" ? "checked=\"checked\"" : ""%>/></span>
+<a style="text-decoration:none" href="javascript:;" id="rc<% $_->{s}->id %>" onclick="phy.toggle_strand(this);"><% $dir %></a> \
+<input type="checkbox" id="op<% $_->{s} %>" <%$_->{type} eq "p" ? "checked=\"checked\"" : ""%>/>
 % }
 </pre>
 	</div>
@@ -104,7 +107,7 @@ span.bold {
 				} $pair->paired_sequences;
 	}
 	
-	push @sequences, map {{s => $_, type => "s"}} $pm->non_paired_sequences;
+	push @sequences, map {{s => $_, type => "s"}} sort {$a->display_id cmp $b->display_id} $pm->non_paired_sequences;
 	#$pm->sequences;
 	
 	if ($data) {

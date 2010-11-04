@@ -23,6 +23,7 @@
 		if (-f $dist_file) {
 			my $stree = $pm->compute_tree($dist_file);
 			print STDERR  "Tree = ", $stree->{tree}, "\t", $stree->{tree_file}, $/;
+			$pm->set_task_status("phy_tree", "done");
 			$status = "success";
 		}
 	}

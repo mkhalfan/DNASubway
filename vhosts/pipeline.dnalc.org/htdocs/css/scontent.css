@@ -238,10 +238,10 @@
 	}
 	
 #conProject_newLeft {
-	width: 410px;
+	width: 418px;
 	height:auto;
 	min-height: 320px;
-	padding: 115px 0px 20px 50px;
+	padding: 85px 0px 12px 50px;
 	float: left;
 	position: relative;
 	}
@@ -267,7 +267,7 @@
 	}
 	
 .conNewPro_label{
-	width: 360px;
+	width: 418px;
 	height: auto;
 	margin: 0px auto; 
 	padding-bottom: 4px;
@@ -290,10 +290,10 @@
 	float: left;
 	}
 .conNewPro_label2{
-	width: 400px;
+	width: 160px;
 	height: auto;
 	margin: 0px auto; 
-	padding-bottom: 4px;
+	padding: 0px 20px 4px 25px;
 	color: #006699;
 	font-size: 0.9em;
 	text-align: left;
@@ -837,6 +837,49 @@
 	background: url("/images/v2/indicatorX.png") bottom left no-repeat;
 }
 
+.conIndicatorBL_not-processed{
+	width: 18px;
+	height: 18px;
+	display: block;
+	position: relative;
+	background: url("/images/v2/indicatorBL_R.png") bottom left no-repeat;
+
+}
+
+.conIndicatorBL_processing{
+	width: 18px;
+	height: 18px;
+	display: block;
+	position: relative;
+	background: url("/images/v2/indicatorBL_running.gif") bottom left no-repeat;
+
+}
+
+.conIndicatorBL_done{
+	width: 18px;
+	height: 18px;
+	display: block;
+	position: relative;
+	background: url("/images/v2/indicatorBL_V.png") bottom left no-repeat;
+}
+
+.conIndicatorBL_error{
+	width: 18px;
+	height: 18px;
+	display: block;
+	position: relative;
+	background: url("/images/v2/indicatorBL_E.png") bottom left no-repeat;
+}
+
+.conIndicatorBL_disabled {
+	width: 18px;
+	height: 18px;
+	display: block;
+	display: block;
+	position: relative;
+	background: url("/images/v2/indicatorBL_X.png") bottom left no-repeat;
+}
+
 .conIndicator_Rb {
 	width: 18px;
 	height: 18px;
@@ -1344,7 +1387,7 @@
 	}
 
 .conNewPro_smallContainer_blue{
-	width: 95px;
+	width: 110px;
 	height: auto;
 	margin: 0px auto; 
 	padding-bottom: 4px;

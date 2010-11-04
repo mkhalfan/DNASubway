@@ -10,30 +10,29 @@
 <form id="forma1" enctype="multipart/form-data" method="post">
 <div id="conBluelineLeft1"> 
 	<div id="conProject_newLeft">
-	<div class="conNewPro_title">Select Project Type*</div>
-	<div class="conNewPro_label">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Phylogenetics:
-		<div class="conNewPro_label1">
-			<span class="conNewPro_smallContainer_blue">
-			<input class="conRadiobox_align" type="radio" name="type" id="gd" value="dna" <% $type eq "dna" ? "checked=\"checked\"" : ""%>/>&nbsp; DNA</span>
-			<span class="conNewPro_smallContainer_blue">
-			<input class="conRadiobox_align" type="radio" name="type" id="gp" value="protein" <% $type eq "protein" ? "checked=\"checked\"" : ""%>/>&nbsp; Protein</span>
-			<span class="conNewPro_smallContainer_blue">
-			<input class="conRadiobox_align" type="radio" name="type" id="gm" value="mtdna" <% $type eq "mtdna" ? "checked=\"checked\"" : ""%>/>&nbsp; mtDNA</span>
-		</div>
-	</div>
-	<div class="conNewPro_label">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Barcoding:
-		<div class="conNewPro_label1">
-			<span class="conNewPro_smallContainer_blue">
-			<input class="conRadiobox_align" type="radio" name="type" id="gr" value="rbcL" <% $type eq "rbcL" ? "checked=\"checked\"" : ""%>/>&nbsp; rbcL</span>
-			<span class="conNewPro_smallContainer_blue">
-			<input class="conRadiobox_align" type="radio" name="type" id="gc" value="COI" <% $type eq "COI" ? "checked=\"checked\"" : ""%>/>&nbsp; COI</span>
-		</div> 
-	</div>  
+		<div class="conNewPro_title">Select Project Type*</div>
+
+		<div class="conNewPro_label">
+			<div class="conNewPro_label2">&nbsp;Phylogenetics:
+			<div class="conNewPro_smallContainer_blue">
+				&nbsp;<input class="conRadiobox_align" type="radio" name="type" id="gd" value="dna" <% $type eq "dna" ? "checked=\"checked\"" : ""%>/>&nbsp; DNA</div>
+			<div class="conNewPro_smallContainer_blue">
+				&nbsp;<input class="conRadiobox_align" type="radio" name="type" id="gp" value="protein" <% $type eq "protein" ? "checked=\"checked\"" : ""%>/>&nbsp; Protein</div>
+			<div class="conNewPro_smallContainer_blue">
+				&nbsp;<input class="conRadiobox_align" type="radio" name="type" id="gm" value="mtdna" <% $type eq "mtdna" ? "checked=\"checked\"" : ""%>/>&nbsp; mtDNA</div>
+			</div>
+			<div class="conNewPro_label2">&nbsp;Barcoding:
+				<div class="conNewPro_smallContainer_blue">
+					&nbsp;<input class="conRadiobox_align" type="radio" name="type" id="gr" value="rbcL" <% $type eq "rbcL" ? "checked=\"checked\"" : ""%>/>&nbsp; rbcL</div>
+				<div class="conNewPro_smallContainer_blue">
+					&nbsp;<input class="conRadiobox_align" type="radio" name="type" id="gc" value="COI" <% $type eq "COI" ? "checked=\"checked\"" : ""%>/>&nbsp; COI</div>
+			</div> 
+		</div>  
 	<div class="conNewPro_title">Select Sequence Source *</div> 
 	<div class="conNewPro_label">
 		<input class="conRadiobox_align" type="radio" name="seq_src" id="seq_src_upload" 
 			value="upload" onclick="phy.select_source(this)" <% $seq_src eq "upload" ? "checked=\"checked\"" : ""%>/>&nbsp;
-			Upload sequence in <a href="#">AB1</a> or <a href="http://en.wikipedia.org/wiki/FASTA_format#Format">FASTA format</a> <small>(max <% $seq_max_len %>kb)</small>:
+			Upload sequence(s) in <a href="#">AB1</a> or <a href="http://en.wikipedia.org/wiki/FASTA_format#Format">FASTA format</a> <small>(max <% $seq_max_len %>kb)</small>:
 			<input class="conStylized_box1" type="file" type=file multiple id="seq_file" name="seq_file"  onchange="phy.set_source('upload')" onclick="phy.set_source('upload')"  />
 		</div>
 
@@ -201,7 +200,7 @@ if ($r->method eq 'POST') {
 	}
 	
 	print STDERR "Errors: ", Dumper(\@err), $/ if @err;
-	print STDERR "all files:", Dumper(\@files2process), $/;
+	#print STDERR "all files:", Dumper(\@files2process), $/;
 
 	my $pm = DNALC::Pipeline::App::Phylogenetics::ProjectManager->new;
 	
@@ -231,10 +230,10 @@ if ($r->method eq 'POST') {
 			#if (@files2process) 
 			for my $ftype (qw/fasta trace/) {
 				my @_files = grep {$_->{type} =~ /^$ftype$/i} @files2process;
-				print STDERR "** $ftype files: ", Dumper(\@_files), $/;
+				#print STDERR "** $ftype files: ", Dumper(\@_files), $/;
 				next unless @_files;
 				my $st = $pm->add_data({
-						source => "upload",
+						source => "init",
 						files => \@_files,
 						type => $ftype,
 					});

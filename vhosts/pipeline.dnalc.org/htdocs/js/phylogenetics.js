@@ -6,11 +6,11 @@
 	// keep open windows
 
 	var step = 0;
-
+	var windows = {};
 	
 	phy = function() {
 		this.task_states = {};
-		this.windows = {};
+		
 	};
 	
 	phy.create_project = function () {
@@ -23,7 +23,7 @@
 		});
 
 		if (ptype == '') {
-			show_messages("Please provide a type for this projec!");
+			show_messages("Please provide a type for this project!");
 			return;
 		}
 
@@ -95,7 +95,6 @@
 	};
 	
 	phy.select_source = function (el) {
-		//console.info(el.value);
 		if (el && (el.value == 'upload' || el.value == 'paste')) {
 			//$('specie').selectedIndex = -1;
 		}
@@ -118,6 +117,7 @@
 				viewer: ['/project/phylogenetics/tools/view_sequences.html?pid=', 'View Sequences'],
 				pair: ['/project/phylogenetics/tools/pair?pid=', 'Pair sequences'],
 				data: ['/project/phylogenetics/tools/add_data?pid=', 'Phytozome Browser'],
+				add_ref: ['/project/phylogenetics/tools/add_ref?pid=', 'Add Reference'],
 				manage: ['/project/prepare_chadogbrowse?warn=1;pid=', 'Phylogenetic Tree']
 			};
 
@@ -125,24 +125,21 @@
 			//$('add_evidence').hide();
 			//$('add_evidence_link').show();
 		}
-		catch (e) {
-			//
-		}
+		catch (e) {}
 
 		if (what && !urls[what]) {
 			alert('Nothing to load!!');
 			return;
 		}
-		if (what && what == 'apollo') {
-			launch_apollo();
-			return;
-		}
+
 		var host = window.location.host;
 		var uri = what 
 						? 'http://' + host + urls[what][0] + $('pid').value
 						: where;
 		var window_title = title ? title : urls[what] ? urls[what][1] : null;
-		openWindow( uri, window_title);
+		windows[what] = openWindow( uri, window_title);
+		
+		debug(what + ': ' + windows[what]);
 		
 		/*try {
 			pageTracker._trackEvent(title, "view");
@@ -160,20 +157,18 @@
 			phy.add_pair(current_pair);
 			current_pair = [];
 		}
-		//console.info("push " + id);
 	};
 
 	phy.add_pair = function(pair) {
-		//console.info("Adding " + pair);
 		pair.each(function(el) {
-			console.info('to add BG ' + el);
+			//console.info('to add BG ' + el);
 			$(el).addClassName(pairs.length % 2 ? 'paired-light' : 'paired-dark');
 			//seq2pairs[el] = pairs.length;
 		});
 
 		pairs.push(pair);
-		if ($('consensus').disabled) {
-			$('consensus').disabled = false;
+		if ($('do_pair') != null && $('do_pair').disabled) {
+			$('do_pair').disabled = false;
 		}
 	};
 	
@@ -186,7 +181,6 @@
 		else {
 			//alert('pop ' + pairs.length);
 			for(var i = 0; i < pairs.length; i++) {
-				//console.debug(pairs[i][0] == id + " " + pairs[i][1] == id);
 				if (pairs[i][0] == id || pairs[i][1] == id) {
 					//console.info('removed pair ' + pairs[i]);
 					[0,1].each(function(k) {
@@ -203,14 +197,21 @@
 				}
 			}
 		}
+		if ($('do_pair') != null && $('do_pair').disabled) {
+			$('do_pair').disabled = false;
+		}
 	};
 	
-	phy.toggle_strand = function(el) {
+	phy.toggle_strand = function(el, norclbl) {
+		debug(el);
 		var id = el.id.replace(/^rc/, '');
-		if (el.innerHTML == "R")
-			el.innerHTML = "F";
-		else if (el.innerHTML == "F")
-			el.innerHTML = "R";
+		
+		if (norclbl == undefined) {
+			if (el.innerHTML == "R")
+				el.innerHTML = "F";
+			else if (el.innerHTML == "F")
+				el.innerHTML = "R";
+		}
 
 		if (el.hasAttribute("rc")) {
 			el.setAttribute("rc", el.getAttribute("rc") == "1" ? "0" : "1");
@@ -247,7 +248,6 @@
 	};
 	
 	phy.do_pair = function() {
-
 		var lpairs = [];
 		/*$('seqops').descendants().each(function(el){
 			if (el.nodeName == "A") {		
@@ -267,7 +267,7 @@
 			//console.info(el);
 		});*/
 		pairs.each(function(p,index){
-			console.info(p + " " + index);
+			//console.info(p + " " + index);
 			var lpair = [];
 			p.each(function(id) {
 				var a = $('rc' + id);
@@ -276,12 +276,142 @@
 			lpairs.push(lpair);
 		});
 
-		console.info(lpairs.toJSON());
+		debug(lpairs.toJSON());
 
 		$('data').value = lpairs.toJSON();
 		var form = $('forma1');
 		form.submit();
-	}
+		if (null != windows['pair']) {
+			windows['pair'].close();
+		}
+	};
+	
+	phy.set_status = function(op, status) {
+		var p = $('pid').value;
+		var b = $(op + '_btn');
+		var ind = $(op + '_st');
+		
+		if (status == 'processing') {
+			b.onclick = null;
+			ind.removeClassName(ind.className);
+			ind.addClassName('conIndicatorBL_processing');
+		}
+		else if (status == 'done') {
+			ind.removeClassName(ind.className);
+			ind.addClassName('conIndicatorBL_done');
+			if (op == 'phy_pair')
+				return;
+			var uri = op;
+			uri = uri.replace(/phy_/, "view_");
+			b.onclick = function(){
+					phy.launch(null, '/project/phylogenetics/tools/' + uri + '?pid=' + p, '');
+				};
+		}
+		else if (status == 'not-processed') {
+			ind.removeClassName(ind.className);
+			ind.addClassName('conIndicatorBL_not-processed');
+			b.onclick = function(){ phy.run(op); };
+		}
+	};
+	
+	phy.run = function(op) {
+		debug("op = " + op);
+		//var s = $(op);
+		var b = $(op + '_btn');
+		var p = $('pid').value;
+		var ind = $(op + '_st');
+
+		phy.set_status(op, "processing");
+		/*
+		if (b) {
+			b.onclick = null;
+			//b.removeClassName(b.className);
+			//b.addClassName('disabled');
+		}
+		if (ind) {
+			ind.removeClassName(ind.className);
+			ind.addClassName('conIndicatorBL_processing');
+			//ind.title = 'Processing';
+		}
+		*/
+		
+		/*
+			var delay = b ? parseFloat(b.getAttribute('delay')) : 10;
+			delay = !isNaN(delay) ? (delay * 1000) : 10000;
+		*/
+
+		var uri = op;
+		uri = uri.replace(/phy_/, "build_");
+		new Ajax.Request('/project/phylogenetics/tools/' + uri,{
+			method:'get',
+			parameters: { 't' : op, pid : p}, 
+			onSuccess: function(transport){
+				var response = transport.responseText || "{'status':'error', 'message':'No response'}";
+				debug(response);
+				var r = response.evalJSON();
+				//debug(r);
+		
+				if (r.status == 'success') {
+					/*ind.removeClassName(ind.className);
+					ind.addClassName('conIndicatorBL_done');
+					var uri = op;
+					uri = uri.replace(/phy_/, "view_");
+					b.onclick = function(){
+							phy.launch(null, '/project/phylogenetics/tools/' + uri + '?pid=' + p, '');
+						};
+					*/
+					phy.set_status(op, "done");
+					if (op == "phy_alignment") {
+						phy.set_status("phy_tree", "not-processed");
+						debug("set Tree to not-processed");
+					}
+				}
+				else  if (r.status == 'error') {
+					b.removeClassName(b.className);
+					b.addClassName('error');
+					
+					ind.removeClassName(ind.className);
+					ind.addClassName('conIndicatorBL_error');
+					//ind.title = 'Error';
+					b.onclick = function(){phy.run(op);};
+					
+					show_errors(r.message);
+				}
+				else {
+					//s.update('Unknown status!');
+					//alert('Unknown status!');
+				}
+			},
+			onFailure: function(){
+					alert('Something went wrong!\nAborting...');
+				}
+		});
+		
+		/*try {
+			pageTracker._trackEvent(rnames[op] || op, "run");
+		} catch (e) {
+			debug(e.toString());
+		};*/
+	};
+	
+	phy.do_add_ref = function() {
+		var pid = $('pid').value;
+		var refid = $('refid').value;
+		//alert(pid + ' ' + refid);
+		if (refid && pid) {
+			$('buttonas').disabled = true;
+			var f = $('forma1');
+			$('ref_id').value = refid;
+			f.submit();
+		}
+	};
+	
+	phy.close_window = function(id) {
+		if (null != windows[id]) {
+			windows[id].close();
+			debug("change stauts if it's the case....");
+		}
+	};
 
 })();
 
@@ -296,7 +426,7 @@ function debug(msg) {
 
 Event.observe(window, Prototype.Browser.IE ? 'load' : 'dom:loaded', function() {
 	step = $('step') ? parseInt($('step').value, 10) : 0;
-	console.info("step = " + step);
+	//console.info("step = " + step);
 
 	if (step == 1) {
 		$('seqops').down().descendants().each(function(sp){
@@ -305,8 +435,8 @@ Event.observe(window, Prototype.Browser.IE ? 'load' : 'dom:loaded', function() {
 				var el = Event.element(ev);
 				//el.checked = false;
 				var id = el.id.replace(/^op/,'');
-				console.info(id + " " + el.id);
-				console.info(el.checked);
+				//console.info(id + " " + el.id);
+				//console.info(el.checked);
 				if (el.checked) {
 					$(id).addClassName('bold');
 					phy.push_to_pair(id);
@@ -318,7 +448,19 @@ Event.observe(window, Prototype.Browser.IE ? 'load' : 'dom:loaded', function() {
 			});
 		  }
 		});
-		$('consensus').disabled = true;
+		// init pairs
+		pairs = $('data').value.evalJSON();
+		pairs.each(function(pair, cnt) {
+			pair.each(function(el){
+				var a_rc = $('rc' + el);
+				//console.info(el + ' ' + a_rc.innerHTML);
+				if (a_rc && a_rc.innerHTML == "R") {
+					phy.toggle_strand(a_rc, 1);
+				}
+			});
+		});
+		if ($('do_pair') != null)
+			$('do_pair').disabled = true;
 	}
 	else if (step == 2) {
 		

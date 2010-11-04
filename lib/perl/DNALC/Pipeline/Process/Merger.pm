@@ -97,11 +97,12 @@ use Data::Dumper;
 						: 'x';
 			}
 			print STDERR $/;
-		}
 			print STDERR  'len merged: ', length($merged_seq), $/;
 			for (keys %$data) {
 				print STDERR  "len     $_: ", length($data->{$_}), $/;
+				print STDERR  $_, ':', substr($data->{$_}, 0, 50), $/;
 			}
+		}
 
 		my $out_fh = IO::File->new;
 		if ($out_fh->open("> $consensus")) {
@@ -111,10 +112,11 @@ use Data::Dumper;
 			#print $out_fh $ids[1], "\t", $data->{$ids[1]}, $/;
 			#print $out_fh "C\t", $merged_seq, $/;
 
-			print $out_fh $data->{$ids[0]}, $/;
-			print $out_fh $markup, "", $/;
-			print $out_fh $data->{$ids[1]}, $/;
-			print $out_fh $merged_seq, $/;
+			print $out_fh sprintf("%-15s", substr($ids[0], 0, 15)), ': ', uc $data->{$ids[0]}, $/;
+			#print $out_fh $markup, "", $/;
+			print $out_fh sprintf("%-15s", substr($ids[1], 0, 15)), ': ', uc $data->{$ids[1]}, $/;
+			print $out_fh "Consensus      : ", uc $merged_seq, $/;
+
 			$out_fh->close;
 			#print length $data->{$ids[0]},  " ", length $data->{$ids[1]}, " ", length $markup, " ", length $merged_seq, $/;
 		}

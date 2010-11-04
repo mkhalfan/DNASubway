@@ -334,11 +334,11 @@ use Bio::Trace::ABIF ();
 
 		my @data = ();
 		for my $pair ($self->pairs) {
-			next unless $pair->concensus;
+			next unless $pair->consensus;
 			my @pair_sequences = $pair->paired_sequences;
 			my $name = join '_', map {$_->seq->display_id} @pair_sequences;
 			push @data, ">pair_" . $name;
-			push @data, $pair->concensus;
+			push @data, $pair->consensus;
 		}
 		for my $s ($self->non_paired_sequences) {
 			push @data, ('>' . $s->display_id, $s->seq);
@@ -346,7 +346,7 @@ use Bio::Trace::ABIF ();
 		join "\n", @data;
 	}
 	#-----------------------------------------------------------------------------
-	sub build_concensus {
+	sub build_consensus {
 		my ($self, $pair) = @_;
 		
 		return unless ref $self && $self->project;
@@ -373,7 +373,7 @@ use Bio::Trace::ABIF ();
 
 		my $outfile = File::Spec->catfile($wd->dirname, 'outfile.txt');
 		my $outseq  = File::Spec->catfile($wd->dirname, 'outseq.txt');
-		my $dbgfile = File::Spec->catfile($wd->dirname, 'debug.txt');
+		#my $dbgfile = File::Spec->catfile($wd->dirname, 'debug.txt');
 
 		my %merger_args = (
 				input_files => [],
@@ -398,18 +398,25 @@ use Bio::Trace::ABIF ();
 		#print STDERR Dumper( \%merger_args), $/;
 		my $merger = DNALC::Pipeline::Process::Merger->new($wd->dirname);
 		$merger->run(%merger_args);
-		#print STDERR "\nexit code = ", $merger->{exit_status}, $/;
+		print STDERR "\nexit code = ", $merger->{exit_status}, $/;
 
 		if ($merger->{exit_status} == 0) { # success
-			my $alignment = slurp($outfile);
-			$alignment =~ s/#{3,}.*Report_file.*#{3,}\n*//ms;
 
-			my $concensus = uc slurp($outseq);
-			$concensus =~ s/>.*//;
-			$concensus =~ s/\n//g;
+			my $pdir = File::Spec->catfile($pwd, "pairs");
+			mkdir $pdir;
+			my $formatted_alignment = File::Spec->catfile($pdir, "pair-$pair.txt");
+			$merger->build_consensus($outfile, $outseq, $formatted_alignment);
+
+			my $alignment = slurp($formatted_alignment);
+			#my $alignment = slurp($outfile);
+			#$alignment =~ s/#{3,}.*Report_file.*#{3,}\n*//ms;
+
+			my $consensus = uc slurp($outseq);
+			$consensus =~ s/>.*//;
+			$consensus =~ s/\n//g;
 
 			$pair->alignment($alignment);
-			$pair->concensus($concensus);
+			$pair->consensus($consensus);
 			$pair->update;
 		}
 		#print STDERR Dumper( $merger ), $/;
