@@ -33,7 +33,7 @@
 	my $time  = time();
 	my $mtime = (stat($gff_file))[9];
 	$use_cache = 0 if $!; # drop cached data if error stat-ing file!
-	if ($use_cache && $time - 120 > $mtime) {
+	if ($use_cache && $time - 60 > $mtime) {
 		$use_cache = 0;
 	}
 	

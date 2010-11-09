@@ -30,7 +30,8 @@ sub remote_link {
 	my $local_link = $host =~ /-dev\.dnalc/
 				? "http://green.cshl.edu/project/dnasubway_exporter"
 				: $host . "/project/dnasubway_exporter";
-	$local_link .= "/$project_id/$self/" . $self->link_type . '/' . random_string();
+	$local_link .= "/$project_id/$self/" . $self->link_type 
+				. '/' . random_string() . '/dnasubway';
 
 	my $params = $cf->{export_browsers}->{ $self->link_type };
 
