@@ -1,0 +1,55 @@
+{'status':'<% $status %>', 'message':'<% $msg |js%>'\
+% if ($blast) {
+,'bid':'<% $blast->id %>'\
+% }
+}
+<%args>
+	$pid => 0
+	$sid => 0
+</%args>
+<%once>
+	use DNALC::Pipeline::App::Phylogenetics::ProjectManager ();
+	use DNALC::Pipeline::Phylogenetics::DataSequence ();
+	use DNALC::Pipeline::Phylogenetics::Blast ();
+	use DNALC::Pipeline::Config ();
+	
+	use File::Spec ();
+	#use JSON::XS ();
+	use Data::Dumper;
+</%once>
+<%init>
+	my $s = $m->session->{pipeline};
+
+	my ($status, $msg, $seq, $blast) = ("error", "");
+	my $pm = DNALC::Pipeline::App::Phylogenetics::ProjectManager->new($pid);
+	my $proj = $pm->project;
+	unless ($proj && $proj->user_id == $s->{user_id}) {
+		$msg = "Project not found."
+	}
+	else {
+		$sid =~ s/^\D+//;
+		($seq) = DNALC::Pipeline::Phylogenetics::DataSequence->search(
+					project_id => $pid,
+					id => $sid,
+				);
+	}
+	
+	unless ($seq) {
+		$msg = "Sequence not found.";
+	}
+	else {
+	
+		my $st = $pm->do_blast_sequence($seq);
+		if ($st->{status} eq "success") {
+			$blast = $st->{blast};
+			$status = 'success';
+		}
+		else {
+			$msg = $st->{message};
+		}
+		#print STDERR Dumper($st), $/;
+	}
+</%init>
+<%flags>
+	inherit => undef
+</%flags>

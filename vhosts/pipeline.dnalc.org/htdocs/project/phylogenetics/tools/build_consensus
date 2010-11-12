@@ -1,0 +1,36 @@
+{status:'<% $status|js%>', message:'<% $msg |js%>'}
+<%args>
+	$pid => 0
+</%args>
+<%once>
+	use DNALC::Pipeline::App::Phylogenetics::ProjectManager ();
+	#use DNALC::Pipeline::Phylogenetics::Pair ();
+</%once>
+<%init>
+	my ($status, $msg) = ("error", "");
+	my $pm = DNALC::Pipeline::App::Phylogenetics::ProjectManager->new($pid);
+	my $proj = $pm->project;
+	unless ($proj) {
+		$msg = "Project not found."
+	}
+	else {
+		my @pairs = $pm->pairs;
+		if (@pairs) {
+			if ($pm->get_task_status("phy_concensus")->name ne "done") {
+				for my $p (@pairs) {
+					$pm->build_consensus($p);
+				}
+				$pm->set_task_status("phy_concensus", "done");
+				$status = "success";
+			}
+			$msg = $pm->get_task_status('phy_concensus')->name;
+		}
+		else {
+			$msg = "This project has no pairs!";
+		}
+	}
+</%init>
+
+<%flags>
+	inherit => undef
+</%flags>

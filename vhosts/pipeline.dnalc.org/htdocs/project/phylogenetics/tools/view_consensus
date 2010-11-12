@@ -1,0 +1,68 @@
+<div id="conbodyx">
+% unless ($proj) {
+	Error: can't open project "<% $pid|html%>".
+% } else {
+	<div style="width: 15%;float:left;overflow: none;">
+	<ul style="list-style-type:none; margin:0; padding: 5px;">
+%	my $cnt = 1;
+%	for my $p (@pairs) {
+		<li>
+			<div><a href="./view_concensus?pid=<%$pid |html%>;pair_id=<% $p->id %>">Pair <% $cnt++%></a></div>
+			<small>·<% join "+", map{$_->seq->display_id} $p->paired_sequences |html%></small>
+		</li>
+%	}
+	</ul>
+	</div>
+	<div style="width: 85%;float:left;background:pink;">
+%	if ($pair) {
+		<div>Pair <% join "+", map{$_->seq->display_id} $pair->paired_sequences |html%></div>
+		<div style="overflow: auto;padding-left: 10px;"><pre>\
+%	if (0) {
+%	  for ($pair->paired_sequences) {
+<% sprintf("%-15s", substr($_->seq->display_id, 0, 15)) |html %>: \
+%		if ($_->strand eq 'R') {
+%			my $seq = Bio::Seq->new(-seq => $_->seq->seq);
+<% $seq->revcom->seq %>
+%		} else {
+<% $_->seq->seq %>
+%		}
+%	  }
+% 	}
+<% $pair->alignment |html %>
+%#Consensus      : <% $pair->consensus |html %>
+		</pre></div>
+%#		<hr/>
+%#		<pre><% read_file("/tmp/pair-$pair.txt")%></pre>
+%	}
+	</div>
+% }
+</div>
+%#----------------------------------------------------------------------------
+<%args>
+	$pid => 0
+	$pair_id => 0
+</%args>
+%#----------------------------------------------------------------------------
+<%once>
+	use DNALC::Pipeline::App::Phylogenetics::ProjectManager ();
+	#use DNALC::Pipeline::Phylogenetics::Pair ();
+	use File::Slurp qw(read_file);
+</%once>
+%#----------------------------------------------------------------------------
+<%init>
+	$r->content_type("text/html");
+	my ($status, $msg) = ("error", "");
+	$pid =~ s/\D+//g;
+	my $pm = DNALC::Pipeline::App::Phylogenetics::ProjectManager->new($pid);
+	my $proj = $pm->project;
+	my @pairs = ();
+	my $pair = undef;
+	unless ($proj) {
+		$msg = "Project not found."
+	}
+	else {
+		@pairs = $pm->pairs;
+		($pair) = grep {$_->id == $pair_id} @pairs;
+	}
+</%init>
+%#----------------------------------------------------------------------------

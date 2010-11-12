@@ -1,0 +1,81 @@
+%# key = caf45f111ac3f8424b780d385b1e893c
+%# http://entrezajax.appspot.com/
+<div id="container_rightContentx">
+<style type="text/css">
+input[type="checkbox"] {
+	border: none;
+	background-color:red;
+	margin: 0;
+}
+
+span.bold {
+	font-weight: bolder;
+}
+
+.paired-light {
+	background-color:yellow;
+}
+.paired-dark {
+	background-color:silver;
+}
+</style>
+	<div style="margin-top: 20px;"></div>
+	<div id="seqids" style="float:left; width: 100px;font-family:courier; line-height: 1.2em;padding-left:5px; overflow-x:auto;">
+		<pre>
+% for (@sequences) {
+<span id="x<% $_ |html %>"><% $_->display_id |html%></span>
+% }
+</pre>
+	</div>
+	<div id="seqs" style="float:left;width:700px;margin-left:10px;overflow-x:auto;font-family:courier;line-height: 1.2em;">
+		<pre>
+% for (@sequences) {
+<span id="<%$_%>" ><% $_->seq|html %></span>
+% }
+</pre>
+	</div>
+
+%#	<div id="seqops" style="float:left; padding-left:4px; width: 20px;line-height: 1.2em;line-height: 1.2em">
+	<div id="seqops" style="float:left; padding-left:10px; width: 30px;font-family:courier;line-height: 1.2em;">
+		<pre>
+% for (@sequences) {
+<span id="bls<% $_->id %>"><a href="#" onclick="phy.do_blast('s<%$_->id%>');">blast</a></span>
+% }
+</pre>
+<input type="hidden" id="pid" value="<% $proj->id %>" />
+</div>
+<%args>
+	$op => ''
+	$data => ''
+	$pid => 0
+	$fid => 0
+</%args>
+<%once>
+	use File::Slurp qw/read_file/;
+	use DNALC::Pipeline::App::Phylogenetics::ProjectManager ();
+	use DNALC::Pipeline::Phylogenetics::DataSequence ();
+	use DNALC::Pipeline::Config ();
+	#use JSON::XS ();
+	use Data::Dumper;
+</%once>
+<%init>
+	$r->content_type("text/html");
+	my $pairs = undef;
+	
+	my @sequences = ();
+	my $file;
+
+	my $pm = DNALC::Pipeline::App::Phylogenetics::ProjectManager->new($pid);
+	my $proj = $pm->project;
+	unless ($proj) {
+		#$m->comp('/_message_add', 'Project not found!', 'error');
+		#$m->redirect('/project/');
+		print "Project not found!";
+		return;
+	}
+	@sequences = $pm->initial_sequences;
+
+</%init>
+<%attr>
+	js => ['prototype-1.6.1.js', 'phylogenetics.js']
+</%attr>

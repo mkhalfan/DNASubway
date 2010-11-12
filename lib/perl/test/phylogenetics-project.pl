@@ -27,6 +27,7 @@ my %actions = (
 		merge_pairs => 1,
 		align => 1,
 		tree => 1,
+		blast => 1,
 	);
 
 my $action = $ACTION && defined $actions{$ACTION} ? $ACTION : 'display';
@@ -224,4 +225,30 @@ if ($action eq 'tree') {
 		print STDERR  "Tree = ", $stree->{tree}, "\t", $stree->{tree_file}, $/;
 	}
 	
+}
+
+if ($action eq 'blast') {
+	print "------------------------------------\n";
+	
+	print STDERR  "BLAST\n", $/;
+	my $seq_id = shift;
+	my $seq;
+	unless ($seq_id && $seq_id =~ /^\d+$/) {
+		print STDERR  "Sequence id (integer) is missging (last argument)", $/;
+		exit 1;
+	}
+	else {
+		($seq) = DNALC::Pipeline::Phylogenetics::DataSequence->search(
+				project_id => $proj_id,
+				id => $seq_id,
+			);	
+	}
+
+	unless ($seq) {
+		print STDERR  "Error: Sequence <$seq_id> not found!\n";
+		exit 1;
+	}
+
+	my $st = $pm->do_blast_sequence($seq);
+	print STDERR Dumper( $st ), $/;
 }

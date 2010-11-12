@@ -11,6 +11,7 @@ use File::Spec;
 use File::Copy qw/move/;
 use File::Slurp qw/slurp/;
 use Carp;
+use Digest::MD5();
 use Data::Dumper;
 
 #use DNALC::Pipeline::ProjectLogger ();
@@ -23,6 +24,7 @@ use aliased 'DNALC::Pipeline::Phylogenetics::Pair';
 use aliased 'DNALC::Pipeline::Phylogenetics::PairSequence';
 use aliased 'DNALC::Pipeline::Phylogenetics::Tree';
 use aliased 'DNALC::Pipeline::Phylogenetics::Workflow';
+use aliased 'DNALC::Pipeline::Phylogenetics::Blast';
 
 use DNALC::Pipeline::Process::Phylip::DNADist ();
 use DNALC::Pipeline::Process::Phylip::Neighbor ();
@@ -258,6 +260,23 @@ use Bio::Trace::ABIF ();
 	
 	}
 	#-----------------------------------------------------------------------------
+	# returns a list of the used references in the project
+	sub references {
+		my ($self) = @_;
+
+		return unless $self->project;
+	
+		my @sources = DataSource->search_like( 
+				project_id => $self->project,
+				name => 'ref:%'
+			);
+		my @refs = map { 
+				my $r = $_->name; $r =~ s/^ref://; $r
+			} @sources;
+
+		wantarray ? @refs : \@refs;
+	}
+	#-----------------------------------------------------------------------------
 
 	sub files {
 		my ($self, $type) = @_;
@@ -327,7 +346,29 @@ use Bio::Trace::ABIF ();
 		wantarray ? @sequences : \@sequences;
 	}
 	#-----------------------------------------------------------------------------
-	# returns the sequencesin FASTA format
+	# returns a list of sequences that were used initially at project conception
+	#
+	sub initial_sequences {
+		my ($self) = @_;
+		return unless $self->project;
+
+		my @sequences = ();
+		#for my $pair ($self->pairs) {
+		#	next unless $pair->consensus;
+		#	my @pair_sequences = $pair->paired_sequences;
+		#	my $name = join '_', map {$_->seq->display_id} @pair_sequences;
+		#	push @data, ">pair_" . $name;
+		#	push @data, $pair->consensus;
+		#}
+		for my $s ( DataSequence->search_initial_non_paired_sequences($self->project) ) {
+			push @sequences, $s;
+		}
+
+		wantarray ? @sequences : \@sequences;
+	}
+
+	#-----------------------------------------------------------------------------
+	# returns the sequences in FASTA format
 	#
 	sub alignable_sequences {
 		my ($self) = @_;
@@ -670,6 +711,82 @@ use Bio::Trace::ABIF ();
 		
 	}
 
+	#-----------------------------------------------------------------------------
+	sub do_blast_sequence {
+		my ($self, $seq) = @_;
+
+		my $bail_out = sub { return {status => 'error', 'message' => shift } };
+
+		my $blast;
+		my $status = 'success';
+
+		unless ( ref ($seq) =~ /DataSequence/) {
+			($seq) = DNALC::Pipeline::Phylogenetics::DataSequence->search(
+					project_id => $self->project->id,
+					id => $seq,
+				);
+		}
+
+		my $ctx = Digest::MD5->new;
+		$ctx->add($seq->seq);
+		my $crc = $ctx->hexdigest;
+
+		# see if we already have cached such sequence
+		($blast) = Blast->search( crc => $crc );
+		if ($blast) {
+			return {status => 'success', blast => $blast};
+		}
+		
+		my $pwd = $self->work_dir;
+		my $tdir = File::Temp->newdir(
+                    'blast_XXXXX',
+                    DIR => $pwd,
+                    CLEANUP => 1,
+                );
+		my $in_file = File::Spec->catfile($tdir->dirname, 'input.txt');
+		my $out_file = File::Spec->catfile($tdir->dirname, 'output.txt');
+
+		my $fh = IO::File->new;
+		if ($fh->open($in_file, 'w')) {
+			print $fh $seq->seq;
+			$fh->close;
+		}
+		else {
+			print STDERR "Can't write file $in_file", $/;
+			return $bail_out->('Error: Cannot process sequence.');
+		}
+		
+		my @args = (
+				'-p', 'blastn',
+				'-d', 'nr',
+				'-i', $in_file,
+				'-o', $out_file,
+			);
+		my $rc = system('/var/www/bin/web_blast.pl', @args);
+		print STDERR "blast rc = $rc\n";
+
+		# 0 == success
+		# 2 == success, no results
+		if ((0 == $rc || 2 == $rc) && -f $out_file) {
+			my $alignment = '';
+			if ($fh->open($out_file)) {
+				while (<$fh>) {
+					$alignment .= $_;
+				}
+				$fh->close;			
+			}
+			$blast = DNALC::Pipeline::Phylogenetics::Blast->create({
+					project_id => $self->project->id,
+					sequence_id => $seq,
+					crc => $crc,
+					output => $alignment || 'No results!',
+				});
+			$status = 'success';
+		}
+
+		return {status => $status, blast => $blast};
+
+	}
 	#-----------------------------------------------------------------------------
 
 	sub create_work_dir {

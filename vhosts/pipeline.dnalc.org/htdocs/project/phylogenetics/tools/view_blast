@@ -1,0 +1,85 @@
+%#sid=<% $sid |html%>
+%#bid=<% $bid |html%>
+<h2><% $seq ? ">" . $seq->display_id : "" %></h2>
+
+% if ($blast) {
+% 	while( my $res = $in->next_result ) {
+%		while( my $hit = $res->next_hit ) {
+%			#print STDERR  $hit->description, $/;
+	<div><% $hit->description |html%></div>
+%		}
+% 	}
+%	$in_fh->close;
+% }
+
+<%args>
+	$sid => 0
+	$bid => 0
+</%args>
+<%once>
+	use File::Slurp qw/read_file/;
+	use DNALC::Pipeline::App::Phylogenetics::ProjectManager ();
+	use DNALC::Pipeline::Phylogenetics::DataSequence ();
+	use DNALC::Pipeline::Phylogenetics::Blast ();
+	use DNALC::Pipeline::Config ();
+	use Bio::SearchIO ();
+	#use JSON::XS ();
+	use IO::Scalar ();
+	use Data::Dumper;
+</%once>
+<%init>
+	$r->content_type("text/html");
+	
+	$sid =~ s/\D//g;
+	$bid =~ s/\D//g;
+	my $seq = DNALC::Pipeline::Phylogenetics::DataSequence->retrieve($sid);
+	
+	my $blast = DNALC::Pipeline::Phylogenetics::Blast->retrieve($bid);
+	my $in_fh;
+	
+	if ($blast) {
+		$in_fh = IO::Scalar->new;
+		print $in_fh $blast->output;
+		$in_fh->seek(0,0);
+	}
+	
+	my $in = Bio::SearchIO->new(-format => 'blast', -fh => $in_fh);
+	my $out = '';
+	
+if (0) {
+	while( my $res = $in->next_result ) {
+	  while( my $hit = $res->next_hit ) {
+		#print STDERR Dumper( $hit ), $/;
+		#last;
+		print STDERR  $hit->description, $/;
+		$out .= $hit->description . $/;
+		next;
+		while( my $hsp = $hit->next_hsp ) {
+			my $mismatchcount = $hsp->length('total') - ($hsp->num_conserved + $hsp->gaps('total'));
+			$out .= join("\t", ( $res->query_name,
+						$hit->name,
+						sprintf("%.2f",$hsp->percent_identity),
+						$hsp->length('total'),
+						$mismatchcount,
+						$hsp->gaps('total'),
+						# flip start/end on rev strand
+						$hsp->query->strand < 0
+							? ( $hsp->query->end, $hsp->query->start )
+							: ( $hsp->query->start, $hsp->query->end ),
+						$hsp->hit->strand < 0
+							? ( $hsp->hit->end, $hsp->hit->start )
+							: ( $hsp->hit->start, $hsp->hit->end ),
+
+						$hsp->evalue,
+						# chance this to $hsp->sw_score
+						# if you would rather have that
+						# it will only work for FASTA parsing though!
+						$hsp->bits
+				)). "\n";
+		}
+	  }
+	}
+}
+	
+	
+</%init>

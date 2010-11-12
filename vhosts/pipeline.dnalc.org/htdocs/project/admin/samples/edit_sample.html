@@ -70,7 +70,7 @@
 <form id="form" name="form" method="post" action="./edit_link">
 <input type="hidden" id="op" name="op" value="add" />
 <input type="hidden" id="sid" name="sid" value="<% $sample->id %>" />
-<h1>Export in other borwsers</h1>
+<h1>Export in other browsers</h1>
 <p>Links to other GBrowse portals..</p>
 % for (@links) {
 	<div><a href="<% $_->link_url%>" target="_blank"><% $_->link_name |html%></a> (<% $_->link_type %> like)

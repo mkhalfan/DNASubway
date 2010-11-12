@@ -8,17 +8,23 @@
 % }
 % if ($proj) {
 	<h3><% $type %> reference data</h3>
+	<form method="post" id="forma1">
 %#	<pre><% Dumper $ref_cf->{$type} %></pre>
 % 	for my $ref (@$refs) {
-	<div><input type="radio" name="refid" id="refid" value="<% $ref->{id} |html%>" /> <label for="<% $ref->{id}%>"><% $ref->{id} %></label></div>
+%		my $disabled = $in_use_refs{$ref->{id}} ? "disabled=\"disabled\"" : "";
+	<div>
+		<input type="radio" name="refid" id="r<% $ref->{id}%>" value="<% $ref->{id} |html%>" <% $disabled %>/> 
+		<label for="r<% $ref->{id}%>"><% $ref->{id} %></label> \
+%		if ($in_use_refs{$ref->{id}}) {
+		<small>(Added already)</small>
+%		}
+	</div>
 % 	}
 	<p>
 		<input type="button" id="buttonas" value="Add ref data" onclick="phy.do_add_ref()"/>
 	</p>
-	<form method="post" id="forma1">
+	
 		<input type="hidden" id="pid" value="<% $pid %>"/>
-%#		<input type="hidden" id="step" value="1" />
-%#		<input type="hidden" id="op" name="op" />
 		<input type="hidden" id="ref_id" name="ref_id" value="" />
 	</form>
 % } else {
@@ -45,17 +51,23 @@
 	my $proj = $pm->project;
 	my $error = '';
 	my ($type, $refs);
+	my %in_use_refs = ();
 	if ($proj) {
 		$type = $proj->type;
 		my $ref_cf = DNALC::Pipeline::Config->new->cf('PHYLOGENETICS_REF');
 		$refs = defined $ref_cf->{$type} ? $ref_cf->{$type} : [];
+
+		%in_use_refs = map {$_ => 1} $pm->references;
+		#print STDERR "z: ", Dumper (\%in_use_refs), $/;
+
 		if ($r->method eq "POST") {
 			print STDERR "POST", $/;
 			
+			#my @in_use_refs = $pm->references;
 			if (@$refs && $ref_id) {
 				my ($ref) = grep {$_->{id} eq $ref_id} @$refs;
 				if ($ref) {
-					print STDERR Dumper( $ref ), $/;
+					#print STDERR Dumper( $ref ), $/;
 					$pm->add_reference($ref->{id});
 					$m->redirect("./add_ref?pid=" . $pid . ';ok=1');
 				}

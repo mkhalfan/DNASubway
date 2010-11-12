@@ -16,22 +16,39 @@ span.bold {
 }
 </style>
 	<div style="margin-top: 20px;"></div>
-	<div id="seqids" style="float:left; width: 60px;font-family:courier; line-height: 1.2em;padding-left:10px">
+	<div id="seqids" style="float:left; width: 100px;font-family:courier; line-height: 1.2em;padding-left:5px; overflow-x:auto;">
 		<pre>
+% for (@files) {
+<span id="x<% $_ |html %>"><a href="./view_sequences.html?pid=<% $pid |html%>;fid=<% $_->id %>"><% $_->file_name |html%></a></span>
+% }
 % for (@sequences) {
 <span id="x<% $_->display_id |html %>"><% $_->display_id |html%></span>
 % }
-		</pre>
+</pre>
 	</div>
-
-	<div id="seqs" style="float:left;width:700px;margin-left:60px;overflow-y:hidden;font-family:courier;line-height: 1.2em;">
+	<div id="seqs" style="float:left;width:700px;margin-left:10px;overflow-x:auto;font-family:courier;line-height: 1.2em;">
+% if ($file) {
+	<input type="hidden" id="step" value="2" />
+	<input type="hidden" id="seq_data" value="<% $file->seq |html%>" />
+	<input type="hidden" id="qvalues" value="<% join ",", $file->quality_values %>" />
+	<div>
+		<canvas id="canvas1" width="400" height="100">
+			Your browser isn't supporting canvas objects.
+		</canvas>  
+	</div>
+%#	<pre><% Dumper($file)%></pre>
+% } else {
 		<pre>
+% for (@files) {
+<span id="<%$_%>" ><% $_->seq|html %></span>
+% }
 % for (@sequences) {
 <span id="<%$_%>" ><% $_->seq|html %></span>
 % }
 </pre>
+% }
 	</div>
-
+% if (0) {
 	<div id="seqops" style="float:left; padding-left:4px; width: 20px;line-height: 1.2em;line-height: 1.2em">
 		<pre>
 % for (@files) {
@@ -40,13 +57,13 @@ span.bold {
 		</pre>
 	</div>
 	<br clear="both"/>
-% if (0) {
+
 	<div style="text-align: center">
 		<input type="button" id="consensus" value="Build consensus" onclick="javascript:build_consensus();"/>
 		<input type="button" id="align" value="Align" />
 	</div>
 	<form method="post" id="forma1">
-		<input type="hidden" id="step" value="0" />
+		
 		<input type="hidden" id="op" name="op" />
 		<input type="hidden" id="data" name="data" />
 	</form>
@@ -56,20 +73,22 @@ span.bold {
 	$op => ''
 	$data => ''
 	$pid => 0
+	$fid => 0
 </%args>
 <%once>
 	use File::Slurp qw/read_file/;
 	use DNALC::Pipeline::App::Phylogenetics::ProjectManager ();
+	use DNALC::Pipeline::Phylogenetics::DataSequence ();
 	use DNALC::Pipeline::Config ();
 	#use JSON::XS ();
 	use Data::Dumper;
 </%once>
 <%init>
 	$r->content_type("text/html");
-	my $gcf = DNALC::Pipeline::Config->new->cf("GREENLINE");
-	#my $dir = $gcf->{PROJECTS_DIR} . '/fasta';
 	my $pairs = undef;
-	my @files = ();
+	
+	my @sequences = ();
+	my $file;
 
 	my $pm = DNALC::Pipeline::App::Phylogenetics::ProjectManager->new($pid);
 	my $proj = $pm->project;
@@ -80,9 +99,22 @@ span.bold {
 		return;
 	}
 	
-	my @sequences = $pm->sequences;
+	my @files = $pm->files("trace");
+	if (@files) {
+		#@sequences = DNALC::Pipeline::Phylogenetics::DataSequence->search_trace_sequences($pid);
+		#print STDERR "trace seq\n";
+		if ($fid && $fid =~ /^\d+$/) {
+			($file) = grep {$_->id == $fid } @files;
+			unless (-f $file->file_path) {
+				$file = undef;
+			}
+		}
+	}
+	else {
+		@sequences = $pm->sequences;
+	}
 </%init>
 <%attr>
-	#js => ['greenline.js']
+	js => ['prototype-1.6.1.js', 'phylogenetics.js']
 </%attr>
 

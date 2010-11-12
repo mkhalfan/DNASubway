@@ -1,6 +1,6 @@
 	var pairs = [];
 	var current_pair = [];
-	//var seq2pairs = {};
+	var intervalID = {};
 	
 (function() {
 	// keep open windows
@@ -202,8 +202,45 @@
 		}
 	};
 	
+	phy.run = function(op, params) {
+		//var s = $(op);
+		var b = $(op + '_btn');
+		var p = $('pid').value;
+		var ind = $(op + '_st');
+
+		var delay = b ? parseFloat(b.getAttribute('delay')) : 10;
+		delay = !isNaN(delay) ? (delay * 1000) : 10000;
+
+		new Ajax.Request('/project/phylogenetics/launch_job',{
+			method:'get',
+			parameters: { 't' : op, pid : p, params: params}, 
+			onSuccess: function(transport){
+				var response = transport.responseText || "{'status':'error', 'message':'No response'}";
+				debug(response);
+				var r = response.evalJSON();
+				//dbg = r;
+				//alert('after launch job:\n' + response + ' ' + r.h);
+				if (r.status == 'success') {
+					var h = r.h || '';
+					//intervalID[op] = setInterval(function (){ phy.check_status(p, op, h)}, delay);
+					
+				}
+				else  if (r.status == 'error') {
+					show_errors(r.message);
+				}
+				else {
+					//s.update('Unknown status!');
+					//alert('Unknown status!');
+				}
+			},
+			onFailure: function(){
+					alert('Something went wrong!\nAborting...');
+				}
+		});
+	};
+	
 	phy.toggle_strand = function(el, norclbl) {
-		debug(el);
+		//debug(el);
 		var id = el.id.replace(/^rc/, '');
 		
 		if (norclbl == undefined) {
@@ -276,7 +313,7 @@
 			lpairs.push(lpair);
 		});
 
-		debug(lpairs.toJSON());
+		//debug(lpairs.toJSON());
 
 		$('data').value = lpairs.toJSON();
 		var form = $('forma1');
@@ -315,7 +352,7 @@
 	};
 	
 	phy.run = function(op) {
-		debug("op = " + op);
+		//debug("op = " + op);
 		//var s = $(op);
 		var b = $(op + '_btn');
 		var p = $('pid').value;
@@ -347,19 +384,11 @@
 			parameters: { 't' : op, pid : p}, 
 			onSuccess: function(transport){
 				var response = transport.responseText || "{'status':'error', 'message':'No response'}";
-				debug(response);
+				//debug(response);
 				var r = response.evalJSON();
 				//debug(r);
 		
 				if (r.status == 'success') {
-					/*ind.removeClassName(ind.className);
-					ind.addClassName('conIndicatorBL_done');
-					var uri = op;
-					uri = uri.replace(/phy_/, "view_");
-					b.onclick = function(){
-							phy.launch(null, '/project/phylogenetics/tools/' + uri + '?pid=' + p, '');
-						};
-					*/
 					phy.set_status(op, "done");
 					if (op == "phy_alignment") {
 						phy.set_status("phy_tree", "not-processed");
@@ -396,11 +425,16 @@
 	
 	phy.do_add_ref = function() {
 		var pid = $('pid').value;
-		var refid = $('refid').value;
-		//alert(pid + ' ' + refid);
+		var refid;
+		var f = $('forma1');
+		f.getInputs().each(function(el) {
+			if (el.type == 'radio' && el.name == 'refid' && el.checked) {
+				refid = el.value;
+			}
+		});
+
 		if (refid && pid) {
 			$('buttonas').disabled = true;
-			var f = $('forma1');
 			$('ref_id').value = refid;
 			f.submit();
 		}
@@ -409,8 +443,102 @@
 	phy.close_window = function(id) {
 		if (null != windows[id]) {
 			windows[id].close();
-			debug("change stauts if it's the case....");
+			delete windows[id];
+			debug("change status if it's the case....");
 		}
+	};
+	
+	phy.draw_qvalues = function() {
+		var canvas = document.getElementById('canvas1');
+		if (canvas.getContext){
+			var padding = 10;
+			var font = "16px Courier";
+			
+			var colors = ['#00299c', '#0884ce', '#c6ffff'];
+			var ctx = canvas.getContext('2d');
+
+			// data
+			//var str = "NNNNNNNTGNATCAGCTGGTGTTAAGATTACAAATTGACTTATTATACTCCTGAGTATGACCCCGCGGATACTGATATCTTGGCAGCATTCCGAGTAACTCCTCAACCTGGAGTTCCGCCGGAAGAAGCAGGGGCCGCGGTAGCTGCCGAATCTTCTACTGG";
+			// var qual = [3,2,4,3,3,4,4,6,6,4,5,11,7,8,7,9,30,19,33,15,37,33,11,13,13,12,12,10,31,30,34,21,41,47,52,53,53,31,32,57,53,52,40,47,61,50,53,61,61,61,50,61,61,47,47,61,35,38,61,55,55,61,61,61,61,61,61,61,38,38,49,49,61,61,47,61,55,49,61,61,61,36,18,14,12,19,19,61,61,61,61,61,61,61,61,59,61,61,61,61,59,55,55,59,61,61,61,61,61,61,55,59,61,61,61,59,61,61,61,61,61,61,59,61,59,61,59,59,59,59,59,55,59,61,61,55,61,61,61,61,61,61,61,61,61,61,61,61,61,61,61,61,61,61,55,59,59,61,61,61,61,61];
+			var qual = [];
+			var str  = $('seq_data').value;
+			var qval = $('qvalues').value;
+			debug(str.length);
+			qval.split(',').each(function(q){
+					//debug(q);
+					qual.push(parseInt(q, 10));
+				});
+			debug(str.length + " " + qual.length);
+			
+			// get text's size and resize the canvas
+			ctx.font = font;
+			ctx.fillStyle = "Black";
+			var metrics = ctx.measureText(str);
+			var text_width = metrics.width;
+			canvas.width = text_width + 2*padding;
+
+			var char_width = text_width/str.length;
+			debug(text_width + " " + char_width);
+			
+			
+			// draw the text
+			ctx.font = font;
+			ctx.fillText(str, padding, 30);
+			//return;
+			// draw quality scores
+			var qual_str = '';
+			for (var q in qual) {
+				var aq = parseInt(qual[q]/10);
+				qual_str = qual_str.concat(aq);
+				var h = 3 * aq;
+				var qcol = qual[q] > 30
+						? colors[2]
+						: qual[q] > 20
+							? colors[1]
+							: colors[0];
+				var x = padding + q*char_width + 2;
+				ctx.fillStyle = qcol;
+				ctx.fillRect(x, 55 - h + 1, 6, h + 1);
+			}
+			//console.info(qual_str);
+			//console.info(str.length + " " + qual_str.length);
+			//ctx.fillText(qual_str, padding, 42);
+			
+			/*
+			// draw line
+			ctx.beginPath();
+			ctx.moveTo(padding,50.5);
+			ctx.lineTo(text_width + padding,50.5);
+			ctx.closePath();
+			ctx.stroke();
+			*/
+		}
+	};
+	
+	phy.do_blast = function (sid) {
+		var params = { sid : sid, pid: $('pid').value};
+		new Ajax.Request('/project/phylogenetics/tools/do_blast',{
+			method:'post',
+			parameters: params, 
+			onSuccess: function(transport){
+				var response = transport.responseText || "{'status':'error', 'message':'No response'}";
+				var r = response.evalJSON();
+				
+				alert(r.status);
+				if (r && r.status == 'success') {
+					
+					document.location.href = '/project/phylogenetics/tools/view_blast'
+							+ '?bid=' + r.bid 
+							+ ';sid=' + sid;
+				}
+				else {
+					alert("Error: " + r.message);
+				}
+			},
+			onFailure: function(){
+				alert('Something went wrong!\nAborting...');
+			}
+		});
 	};
 
 })();
@@ -426,7 +554,7 @@ function debug(msg) {
 
 Event.observe(window, Prototype.Browser.IE ? 'load' : 'dom:loaded', function() {
 	step = $('step') ? parseInt($('step').value, 10) : 0;
-	//console.info("step = " + step);
+	debug("step = " + step);
 
 	if (step == 1) {
 		$('seqops').down().descendants().each(function(sp){
@@ -448,6 +576,7 @@ Event.observe(window, Prototype.Browser.IE ? 'load' : 'dom:loaded', function() {
 			});
 		  }
 		});
+
 		// init pairs
 		pairs = $('data').value.evalJSON();
 		pairs.each(function(pair, cnt) {
@@ -463,6 +592,7 @@ Event.observe(window, Prototype.Browser.IE ? 'load' : 'dom:loaded', function() {
 			$('do_pair').disabled = true;
 	}
 	else if (step == 2) {
-		
+		//alert(step);
+		phy.draw_qvalues();
 	}
 });

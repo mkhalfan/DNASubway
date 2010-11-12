@@ -116,8 +116,8 @@ sub save_upload_files {
 		print STDERR  "UPLOAD saved to: ", $path, $/;
 
 		my $fh = $u->fh;
-		print STDERR  "text: ", -T $fh, $/;
-		print STDERR  "binary: ", -B $fh, $/;
+		#print STDERR  "text: ", -T $fh, $/;
+		#print STDERR  "binary: ", -B $fh, $/;
 
 		if (-B $fh) {
 			binmode($fh);
