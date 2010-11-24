@@ -107,11 +107,12 @@ span.bold {
 				} $pair->paired_sequences;
 	}
 	
-	push @sequences, map {{s => $_, type => "s"}} sort {$a->display_id cmp $b->display_id} $pm->non_paired_sequences;
+	push @sequences, map {
+				{s => $_, type => "s"}
+			}  sort {$a->display_id cmp $b->display_id} $pm->initial_sequences;
 	#$pm->sequences;
 	
 	if ($data) {
-		
 		my $decoded_data = $json->decode($data);
 		$new_pairs = ref $decoded_data eq "ARRAY" ? $decoded_data : [];
 		my @added_pairs = ();

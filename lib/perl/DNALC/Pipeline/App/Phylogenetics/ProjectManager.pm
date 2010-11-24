@@ -5,6 +5,7 @@ use common::sense;
 
 use Fcntl qw/:flock/;
 use IO::File ();
+use IO::Scalar ();
 use File::Basename;
 use File::Path;
 use File::Spec;
@@ -30,10 +31,11 @@ use DNALC::Pipeline::Process::Phylip::DNADist ();
 use DNALC::Pipeline::Process::Phylip::Neighbor ();
 use DNALC::Pipeline::Process::Merger ();
 use DNALC::Pipeline::Process::Muscle();
-
+use DNALC::Pipeline::CacheMemcached ();
 use DNALC::Pipeline::Task ();
 use DNALC::Pipeline::TaskStatus ();
 
+use Bio::SearchIO ();
 use Bio::SeqIO ();
 use Bio::AlignIO ();
 use Bio::Trace::ABIF ();
@@ -257,8 +259,8 @@ use Bio::Trace::ABIF ();
 					files => [{ path => $ref->{file}, filename => basename($ref->{file})}],
 					type => "reference",
 				});
-	
 	}
+
 	#-----------------------------------------------------------------------------
 	# returns a list of the used references in the project
 	sub references {
@@ -275,6 +277,71 @@ use Bio::Trace::ABIF ();
 			} @sources;
 
 		wantarray ? @refs : \@refs;
+	}
+	#-----------------------------------------------------------------------------
+	sub add_blast_data {
+		my ($self, $blast_id) = @_;
+
+		my @errors = ();
+		my $seq_count = 0;
+
+		my $bail_out = sub { return {seq_count => $seq_count, errors => \@errors}};
+
+		my $blast = Blast->retrieve($blast_id);
+		unless ($blast) {
+			push @errors, "Blast results not found.";
+			return $bail_out->();
+		}
+
+		my $data_src = $self->project->add_to_datasources({
+				name => "blast:$blast_id",
+			});
+		return $bail_out->() unless $data_src;
+
+		my $fasta = $self->fasta_file;
+		open (my $fasta_fh, ">> $fasta") or do {
+				print STDERR  "Unable to open fasta file: $fasta\n$!", $/;
+			};
+		#print STDERR "fh1 = ", $fasta_fh, $/;
+		flock $fasta_fh, LOCK_EX or print STDERR "Unable to lock fasta file!!!\n$!\n";
+		my $out_io  = Bio::SeqIO->new(-fh => $fasta_fh, -format => 'Fasta', -flush  => 0);
+
+		my $in_fh = IO::Scalar->new;
+		print $in_fh $blast->output;
+		$in_fh->seek(0,0);
+		my $in = Bio::SearchIO->new(-format => 'blast', -fh => $in_fh);
+		
+		my $out = '';
+
+		while( my $res = $in->next_result ) {
+			while( my $hit = $res->next_hit ) {
+				while( my $hsp = $hit->next_hsp ) {
+					my @tmp = split /\s+/, $hit->description;
+					my $seq_obj = $hsp->seq("hit");
+				
+					my $display_id = $seq_obj->display_id . '|' . join '_', map {lc $_} splice @tmp, 0, 2;
+					$display_id =~ s/\|+/\|/g;
+
+					#print ">", $display_id, $/;
+					$seq_obj->display_id($display_id);
+				
+					my $seq = DataSequence->create({
+						project_id => $self->project,
+						source_id => $data_src,
+						file_id => undef,
+						display_id => $display_id,
+						seq => $seq_obj->seq,
+					});
+					$out_io->write_seq($seq_obj);
+
+					$seq_count++;
+				}
+			}
+		}
+		close $fasta_fh;
+		close $in_fh;
+
+		return $bail_out->();
 	}
 	#-----------------------------------------------------------------------------
 
@@ -373,8 +440,21 @@ use Bio::Trace::ABIF ();
 	sub alignable_sequences {
 		my ($self) = @_;
 
+		my %selected_sequences = ();
+		my $memcached = DNALC::Pipeline::CacheMemcached->new;
+		if ($memcached) {
+			my $mc_key = "selected-seq-" . $self->project->id;
+			my $sel = $memcached->get($mc_key);
+			if ($sel && @$sel) {
+				%selected_sequences = map {$_ => 1} @$sel;
+			}
+		}
+
+		my $has_selected_sequences = keys %selected_sequences;
+
 		my @data = ();
 		for my $pair ($self->pairs) {
+			next if ($has_selected_sequences && !defined $selected_sequences{"p$pair"});
 			next unless $pair->consensus;
 			my @pair_sequences = $pair->paired_sequences;
 			my $name = join '_', map {$_->seq->display_id} @pair_sequences;
@@ -382,6 +462,7 @@ use Bio::Trace::ABIF ();
 			push @data, $pair->consensus;
 		}
 		for my $s ($self->non_paired_sequences) {
+			next if ($has_selected_sequences && !defined $selected_sequences{$s->id});
 			push @data, ('>' . $s->display_id, $s->seq);
 		}
 		join "\n", @data;
@@ -502,8 +583,15 @@ use Bio::Trace::ABIF ();
 		my $m = DNALC::Pipeline::Process::Muscle->new($pwd);
 
 		my $st = $m->run(pretend=>0, debug => 1, input => $fasta_file);
-		#print STDERR Dumper( $m ), $/;
+
+		my ($output, $phy_out);
+
 		if (defined $m->{exit_status} && $m->{exit_status} == 0) { # success
+			$output = $m->get_output;
+		}
+		
+		if ($output && -f $output) {
+			$phy_out = $m->convert_fasta_to_phylip;
 			$self->set_task_status("phy_alignment", "done", $m->{elapsed});
 		}
 		else {
@@ -513,9 +601,9 @@ use Bio::Trace::ABIF ();
 		#print STDERR  "exit_status: ", $m->{exit_status}, $/;
 		#print STDERR  "elapsed: ", $m->{elapsed}, $/;
 
-		print STDERR "Fasta out: ", $m->get_output, $/;
-		print STDERR "html out: ", $m->get_output('html'), $/;
-		return $m->get_output;
+		print STDERR "Fasta out: ", $output, $/;
+		print STDERR "phylip out: ", $phy_out, $/;
+		return $output;
 	}
 	#-----------------------------------------------------------------------------
 	# returns the path to the alignment file (default format is fasta)
@@ -649,15 +737,15 @@ use Bio::Trace::ABIF ();
 		my ($tree, $tree_file);
 
 		my $tree_dir = File::Spec->catfile($pwd, 'trees');
-		print STDERR "Trees are in ", $tree_dir, $/;
+		#print STDERR "Trees are in ", $tree_dir, $/;
 		unless (-e $tree_dir) {
 			unless (mkdir $tree_dir) {
 				print STDERR  "Unable to create tree dir for project: ", $project, $/;
 				return;
 			}
 		}
-		my $trees = Tree->search(project_id => $project->id);
-		print STDERR "Trees= ", $trees, $/;
+		my $trees = Tree->search(project_id => $project->id,  {order_by => 'id DESC' });
+		#print STDERR "Trees= ", $trees, $/;
 		if ($trees) {
 			$tree = $trees->next;
 			$tree_file = File::Spec->catfile($tree_dir, sprintf("%d.nw", $tree->id) );
@@ -713,22 +801,45 @@ use Bio::Trace::ABIF ();
 
 	#-----------------------------------------------------------------------------
 	sub do_blast_sequence {
-		my ($self, $seq) = @_;
+		my ($self, %args) = @_;
 
 		my $bail_out = sub { return {status => 'error', 'message' => shift } };
 
+		my $seq_str;
 		my $blast;
 		my $status = 'success';
 
-		unless ( ref ($seq) =~ /DataSequence/) {
-			($seq) = DNALC::Pipeline::Phylogenetics::DataSequence->search(
-					project_id => $self->project->id,
-					id => $seq,
-				);
+		my $seq = $args{seq};
+		my $pair = $args{pair};
+		my $type = $args{type};
+
+		unless ($type && $type =~ /sequence|consensus/) {
+			return $bail_out->("Blast: Missing or invalid type specified.");
 		}
 
+		if ($type eq 'sequence') {
+			unless ( ref ($seq) =~ /DataSequence/) {
+				($seq) = DataSequence->search(
+						project_id => $self->project->id,
+						id => $seq,
+					);
+			}
+			$seq_str = $seq->seq if $seq;
+		}
+		else {
+			unless ( ref ($pair) =~ /Pair$/) {
+				($pair) = Pair->search(
+						project_id => $self->project->id,
+						pair_id => $pair,
+					);
+			}
+			$seq_str = $pair->consensus if $pair;
+		}
+
+		#print STDERR  'seq = ', $seq_str, $/;
+
 		my $ctx = Digest::MD5->new;
-		$ctx->add($seq->seq);
+		$ctx->add($seq_str);
 		my $crc = $ctx->hexdigest;
 
 		# see if we already have cached such sequence
@@ -748,7 +859,7 @@ use Bio::Trace::ABIF ();
 
 		my $fh = IO::File->new;
 		if ($fh->open($in_file, 'w')) {
-			print $fh $seq->seq;
+			print $fh $seq_str;
 			$fh->close;
 		}
 		else {
@@ -762,6 +873,7 @@ use Bio::Trace::ABIF ();
 				'-i', $in_file,
 				'-o', $out_file,
 			);
+		#print STDERR 'blast args: ', Dumper( \@args ), $/;
 		my $rc = system('/var/www/bin/web_blast.pl', @args);
 		print STDERR "blast rc = $rc\n";
 
@@ -782,6 +894,7 @@ use Bio::Trace::ABIF ();
 					output => $alignment || 'No results!',
 				});
 			$status = 'success';
+
 		}
 
 		return {status => $status, blast => $blast};

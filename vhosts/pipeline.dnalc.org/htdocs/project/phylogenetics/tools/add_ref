@@ -1,6 +1,7 @@
 <div id="" style="min-height: 300px">
 % if ($ok == 1) {
 <script type="text/javascript">
+	top.phy.set_status('phy_alignment', 'not-processed');
 	top.phy.close_window('add_ref');
 </script>
 % } elsif ($error) {
@@ -69,6 +70,9 @@
 				if ($ref) {
 					#print STDERR Dumper( $ref ), $/;
 					$pm->add_reference($ref->{id});
+					if ($pm->get_task_status('phy_alignment')->name eq 'done') {
+						$pm->set_task_status('phy_alignment', 'not-processed');
+					}
 					$m->redirect("./add_ref?pid=" . $pid . ';ok=1');
 				}
 				else {

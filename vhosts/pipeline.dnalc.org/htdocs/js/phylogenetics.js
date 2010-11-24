@@ -116,9 +116,10 @@
 		var urls = {
 				viewer: ['/project/phylogenetics/tools/view_sequences.html?pid=', 'View Sequences'],
 				pair: ['/project/phylogenetics/tools/pair?pid=', 'Pair sequences'],
+				blast: ['/project/phylogenetics/tools/blast.html?pid=', 'BLAST'],
 				data: ['/project/phylogenetics/tools/add_data?pid=', 'Phytozome Browser'],
 				add_ref: ['/project/phylogenetics/tools/add_ref?pid=', 'Add Reference'],
-				manage: ['/project/prepare_chadogbrowse?warn=1;pid=', 'Phylogenetic Tree']
+				manage_sequences: ['/project/phylogenetics/tools/manage_sequences?pid=', 'Manage Data']
 			};
 
 		try {
@@ -314,6 +315,9 @@
 		});
 
 		//debug(lpairs.toJSON());
+		
+		if (lpairs.length == 0)
+			return;
 
 		$('data').value = lpairs.toJSON();
 		var form = $('forma1');
@@ -517,6 +521,8 @@
 	
 	phy.do_blast = function (sid) {
 		var params = { sid : sid, pid: $('pid').value};
+		$$("#seqops pre")[0].hide();
+		$("seqops").addClassName('blast_processing');
 		new Ajax.Request('/project/phylogenetics/tools/do_blast',{
 			method:'post',
 			parameters: params, 
@@ -524,12 +530,54 @@
 				var response = transport.responseText || "{'status':'error', 'message':'No response'}";
 				var r = response.evalJSON();
 				
-				alert(r.status);
+				//alert(r.status);
 				if (r && r.status == 'success') {
 					
-					document.location.href = '/project/phylogenetics/tools/view_blast'
-							+ '?bid=' + r.bid 
+					if (r.bid) {
+						document.location.href = '/project/phylogenetics/tools/view_blast'
+							+ '?bid=' + r.bid
+							+ ';pid=' + $('pid').value
 							+ ';sid=' + sid;
+					}
+					else {
+						$$("#seqops pre")[0].show();
+						$("seqops").removeClassName('blast_processing');
+						alert("Some error occured " + r.message);	
+					}
+				}
+				else {
+					//debug(show_messages);
+					$$("#seqops pre")[0].show();
+					$("seqops").removeClassName('blast_processing');
+					alert("Error: " + r.message);
+					/*if (show_messages) {
+						show_messages(r.message);
+					}
+					else {
+						alert("Error: " + r.message);
+					}*/
+				}
+			},
+			onFailure: function(){
+				alert('Something went wrong!\nAborting...');
+				$$("#seqops pre")[0].show();
+				$("seqops").removeClassName('blast_processing');
+			}
+		});
+	};
+	
+	phy.add_blast_data = function (bid) {
+		//top.phy.close_window('blast');
+		//return;
+		new Ajax.Request('/project/phylogenetics/tools/add_blast_data',{
+			method:'post',
+			parameters: { bid : bid, pid: $('pid').value},
+			onSuccess: function(transport){
+				var response = transport.responseText || "{'status':'error', 'message':'No response'}";
+				var r = response.evalJSON();
+				if (r && r.status == 'success') {
+					top.phy.set_status('phy_alignment', 'not-processed');
+					top.phy.close_window('blast');
 				}
 				else {
 					alert("Error: " + r.message);
@@ -540,7 +588,72 @@
 			}
 		});
 	};
+	
+    _searchComplete = function(searcher, el) {
+      // Check that we got results
+      if (searcher.results && searcher.results.length > 0) {
+        // Grab our content div, clear it.
 
+        //var contentDiv = document.getElementById('content');
+        //contentDiv.innerHTML = '';
+		var contentDiv = new Element('div', 'tipcontent');
+    
+        // Loop through our results, printing them to the page.
+        var results = searcher.results;
+		debug(results.length);
+		var imgContainer = new Element('div');
+        for (var i = 0; i < results.length; i++) {
+          // For each result write it's title and image to the screen
+          var result = results[i];
+    
+          /*var title = document.createElement('h2');
+          // We use titleNoFormatting so that no HTML tags are left in the title
+          title.innerHTML = result.titleNoFormatting;
+		  imgContainer.appendChild(title);
+		  */
+    
+          var newImg = new Element('img', {style: "padding: 2px;"});
+          // There is also a result.url property which has the escaped version
+          newImg.src = result.tbUrl;
+
+          imgContainer.appendChild(newImg);
+    
+          // Put our title + image in the content
+          contentDiv.appendChild(imgContainer);
+        }
+		var t = new Tip(el.id, contentDiv, {
+				title : el.innerHTML,
+				style: 'blue',
+				hideOn: false,
+				//hideAfter: 3,
+				hideOthers: true
+				//delay: 0.3
+			});
+		  debug(t);
+		  //t.build();
+		  //t.prototip.show();
+		  el.prototip.show();
+      }
+    };
+	
+	phy.get_ggl_image = function(el) {
+		if (!el)
+			return;
+		var query = el.innerHTML;
+		if (!query)
+			return;
+		debug(query);
+		var imageSearch = new google.search.ImageSearch();
+		// Restrict to extra large images only
+		//imageSearch.setRestriction(google.search.ImageSearch.RESTRICT_IMAGESIZE,
+        //                         google.search.ImageSearch.IMAGESIZE_MEDIUM);
+		imageSearch.setSearchCompleteCallback(this, _searchComplete, [imageSearch, el]);
+		imageSearch.execute(query);
+	};
+	
+	phy.show_tips = function () {
+		
+	};
 })();
 
 function debug(msg) {
@@ -594,5 +707,57 @@ Event.observe(window, Prototype.Browser.IE ? 'load' : 'dom:loaded', function() {
 	else if (step == 2) {
 		//alert(step);
 		phy.draw_qvalues();
+	}
+	else if (step == 3) {
+		/*
+		$$('div[id^=tip]').each(function(el){
+			new Tip(el.id, 
+				el.getAttribute('desc'),
+			{
+				title : el.innerHTML,
+				style: 'blue'
+			});
+			$(el.id).observe('prototip:shown', function(event) {
+				//this.pulsate({ pulses: 1, duration: 0.3 });
+				//event.inner
+				phy.get_ggl_image(el);
+			});
+		});
+		*/
+	}
+	else if (step == 4) {
+		var pre = pre=$('alignment').down();
+		debug(pre.down());
+
+		var sz = parseInt($('alignment_length').value, 0);
+		debug(sz);
+		var pre=$('alignment').down();
+		var spn = new Element('span');
+		$R(0, sz, true).each(function(val) {
+			if (val % 10 == 0) {
+				spn.insert(new Element('span', {class:'rot'}).update(val));
+				debug(val);
+			}
+			else
+				spn.insert(new Element('span').update(' '));
+		});
+
+		pre.insert({top:spn});
+		/*
+		//insert(element, { position: content }) -> HTMLElement
+// insert(element, content) -> HTMLElement
+sz = parseInt($('alignment_length').value, 0);
+pre=$('alignment').down();
+spn = new Element('span');
+$R(0, sz, true).each(function(val) {
+  if (val % 10 == 0)
+    spn.insert(new Element('span', {class:'rot'}).update(val));
+  else
+    spn.insert(new Element('span').update(' '));
+});
+
+pre.insert({top:spn});
+
+		*/
 	}
 });

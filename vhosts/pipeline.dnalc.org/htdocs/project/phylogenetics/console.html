@@ -43,9 +43,9 @@
 	<span class="conBlueline_ConColumn2">
 		<span class="conBlueline_ConCell">
 			<span class="conIndicator_box">
-				<div class="conIndicatorBL_disabled"></div>
+				<div class="conIndicatorBL_not-processed"></div>
 			</span>
-			<span class="bt_Runblueline"><a href="#">BLAST</a></span>
+			<span class="bt_Runblueline"><a href="javascript:;" onclick="phy.launch('blast')">BLAST</a></span>
 		</span>
 		<span class="conBlueline_ConCell">
 			<span class="conIndicator_box">
@@ -63,13 +63,13 @@
         
         <span class="conBlueline_ConCell">
 			<span class="conIndicator_box">
-   		<div class="conIndicatorBL_disabled"></div> </span>
-        <span class="bt_Runblueline"><a href="#">Manage data</a></span> </span>     
-            
-            
-            </span><!--END of span conBlueline_ConColumn2-->
-            
-     <span class="conBlueline_ConColumn3">
+				<div class="conIndicatorBL_not-processed"></div>
+			</span>
+			<span class="bt_Runblueline"><a href="javascript:;" onclick="phy.launch('manage_sequences')">Manage data</a></span>
+		</span>
+	</span><!--END of span conBlueline_ConColumn2-->
+
+	<span class="conBlueline_ConColumn3">
 		<span class="conBlueline_ConCell">
 			<span class="conIndicator_box">
 				<div id="phy_alignment_st" class="conIndicatorBL_<% $status{phy_alignment} eq "done" ? "done" : $status{phy_alignment} %>"></div>

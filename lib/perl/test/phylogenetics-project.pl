@@ -79,7 +79,7 @@ if ($action eq 'add') {
 			}} </home/cornel/tmp/paiwisealignment/fasta/*>;
 		#print STDERR "files to add = ", scalar (@files), $/;
 		my $st = $pm->add_data({
-			source => "upload",
+			source => "init",
 			files => \@files,
 			type => "fasta",
 		});
@@ -94,7 +94,7 @@ if ($action eq 'add') {
 		#print STDERR "files = ", Dumper(\@files), $/;
 		#exit;
 		my $st = $pm->add_data({
-				source => "upload",
+				source => "init",
 				files => \@files,
 				type => "trace",
 		});
@@ -249,6 +249,10 @@ if ($action eq 'blast') {
 		exit 1;
 	}
 
-	my $st = $pm->do_blast_sequence($seq);
+	my $st = $pm->do_blast_sequence(type => 'sequence', seq => $seq);
+	if ($st->{status} eq 'success') {
+		my $blast = $st->{blast};
+		$st = $pm->add_blast_data($st->{blast}->id);
+	}	
 	print STDERR Dumper( $st ), $/;
 }

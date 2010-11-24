@@ -4,27 +4,27 @@
 % } else {
 	<div>
 <applet archive="/files/jalview/jalviewApplet.jar" name="Jalview" 
-	codebase="/files/jalview/" 
+	codebase="/" 
 	code="jalview.bin.JalviewLite" height="450" width="100%">
-	<param name="file" value="<% $m->comp('../../.comp/filepath_to_web', file => $pm->get_alignment ) %>">
-	<param name="treeFile" value="<% $m->comp('../../.comp/filepath_to_web', file => $tinfo->{tree_file} ) %>">
-	<param name="embedded" value="true"> 
-	<param name="showAnnotation" value="true">
-	<param name="wrap" value="false">
-	<param name="nojmol" value="true">
-	<param name="windowHeight" value="500">
-	<param name="windowWidth" value="750">
-	<param name="showFullId" value="false">
-	<param name="defaultColour" value="Clustal">
+	<param name="cache_option" value="No" />
+	<param name="file" value="<% $m->comp('../../.comp/filepath_to_web', file => $pm->get_alignment ) %>" />
+	<param name="treeFile" value="<% $m->comp('../../.comp/filepath_to_web', file => $tinfo->{tree_file} ) %>" />
+	<param name="embedded" value="true" />
+	<param name="showAnnotation" value="true" />
+	<param name="wrap" value="false" />
+	<param name="nojmol" value="true" />
+	<param name="windowHeight" value="500" />
+	<param name="windowWidth" value="750" />
+	<param name="showFullId" value="false" />
+	<param name="defaultColour" value="Clustal" />
 %#	<param name="linkLabel_1" value="Details" />
 %#	<param name="linkUrl_1" value="<% $pcf->{PROJECT_HOME} %>/project/target/details?hn=$SEQUENCE_ID$" />
 	<param name="showbutton" value="false" />
 	<param name="debug" value="true" />
-%#	<p id="java_install"><a href="http://java.sun.com/webapps/getjava/BrowserRedirect?host=java.com">Install Java</a>.</p>
 </applet>
 
 	<pre>
-	1: <% $m->comp('../../.comp/filepath_to_web', file => $pm->get_alignment ) %>
+	1: <% $m->comp('../../.comp/filepath_to_web', file => $pm->get_alignment )%>
 	2: <% $m->comp('../../.comp/filepath_to_web', file => $tinfo->{tree_file} ) %>
 	</pre>
 	</div>
@@ -49,6 +49,6 @@
 	my $pm = DNALC::Pipeline::App::Phylogenetics::ProjectManager->new($pid);
 	my $tinfo = $pm->get_tree;
 	my $proj = $pm->project;
-	print STDEER Dumper $tinfo, $/;
+	#print STDEER Dumper $tinfo, $/;
 </%init>
 %#----------------------------------------------------------------------------

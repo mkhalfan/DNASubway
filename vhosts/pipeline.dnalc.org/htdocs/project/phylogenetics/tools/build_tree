@@ -21,6 +21,8 @@
 		my $dist_file = $pm->compute_dist_matrix;
 		print STDERR "Dist matrix file to use: $dist_file\n";
 		if (-f $dist_file) {
+			print STDERR  "Dist = ", $dist_file, "\tsize = ", -s $dist_file, $/;
+
 			my $stree = $pm->compute_tree($dist_file);
 			print STDERR  "Tree = ", $stree->{tree}, "\t", $stree->{tree_file}, $/;
 			$pm->set_task_status("phy_tree", "done");

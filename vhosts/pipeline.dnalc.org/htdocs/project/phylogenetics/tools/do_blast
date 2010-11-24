@@ -10,7 +10,7 @@
 <%once>
 	use DNALC::Pipeline::App::Phylogenetics::ProjectManager ();
 	use DNALC::Pipeline::Phylogenetics::DataSequence ();
-	use DNALC::Pipeline::Phylogenetics::Blast ();
+	use DNALC::Pipeline::Phylogenetics::Pair ();
 	use DNALC::Pipeline::Config ();
 	
 	use File::Spec ();
@@ -20,26 +20,42 @@
 <%init>
 	my $s = $m->session->{pipeline};
 
-	my ($status, $msg, $seq, $blast) = ("error", "");
+	my ($status, $msg, $seq, $pair, $type, $blast) = ("error", "");
 	my $pm = DNALC::Pipeline::App::Phylogenetics::ProjectManager->new($pid);
 	my $proj = $pm->project;
+
 	unless ($proj && $proj->user_id == $s->{user_id}) {
-		$msg = "Project not found."
+		$msg = "Project not found.\n";
 	}
 	else {
-		$sid =~ s/^\D+//;
-		($seq) = DNALC::Pipeline::Phylogenetics::DataSequence->search(
-					project_id => $pid,
-					id => $sid,
-				);
+		if ($sid =~ /^s\d+/) {
+			$type = 'sequence';
+			$sid =~ s/^\D+//;
+			($seq) = DNALC::Pipeline::Phylogenetics::DataSequence->search(
+						project_id => $pid,
+						id => $sid,
+					);
+		}
+		elsif ($sid =~ /^p\d+/) {
+			$type = 'consensus';
+			$sid =~ s/^\D+//;
+			($pair) = DNALC::Pipeline::Phylogenetics::Pair->search(
+						project_id => $pid,
+						pair_id => $sid,
+					);
+		}
 	}
 	
-	unless ($seq) {
-		$msg = "Sequence not found.";
+	if (!$seq && !$pair) {
+		$msg .= "Nothing to blast! Invalid data received: [$sid]/type=$type";
 	}
 	else {
 	
-		my $st = $pm->do_blast_sequence($seq);
+		my $st = eval {$pm->do_blast_sequence(
+					type => $type, 
+					seq => $seq, 
+					pair => $pair);
+				} || {};
 		if ($st->{status} eq "success") {
 			$blast = $st->{blast};
 			$status = 'success';

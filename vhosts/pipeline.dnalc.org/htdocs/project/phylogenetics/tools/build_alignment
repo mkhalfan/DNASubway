@@ -1,6 +1,7 @@
 {status:'<% $status|js%>', message:'<% $msg |js%>'}
 <%args>
 	$pid => 0
+	$aln => ''
 </%args>
 <%once>
 	use DNALC::Pipeline::App::Phylogenetics::ProjectManager ();
@@ -14,8 +15,17 @@
 		$msg = "Project not found."
 	}
 	else {
-		$pm->build_alignment;
-		$status = "success";
+		if ($aln) {
+			#//document.applets.Jalview.getSelectedSequencesAsAlignment("fasta", false)
+			# parse $aln, extract the seq_ids and make sure they belong to this project
+			
+		}
+		else {
+			if ($pm->build_alignment) {
+				$status = "success";
+			}
+		}
+		#$status = "success";
 	}
 </%init>
 
