@@ -290,7 +290,7 @@ if ($status eq 'processing') {
 elsif ($status eq 'done') {
 	my $url = "/project/phylogenetics/tools/view_$routine?pid=$pid";
 	$url =~ s/phy_//;
-	$action = qq{onclick="phy.launch(null, '$url', '$routines{$routine}')"};
+	$action = qq{onclick="phy.launch('$routine', '$url', '$routines{$routine}')"};
 	$target = '';
 	#$title  = 'Click to view results';
 	#$label  = 'View';

@@ -47,7 +47,7 @@
 			<input class="conRadiobox_align" type="radio"/>&nbsp; Enter sequence tracking number:
 			<input class="conStylized_box7" type="text" />
 		</div>
-
+% }
 		<div class="conNewPro_label">
 			<input class="conRadiobox_align" type="radio" name="seq_src" id="seq_src_sample" value="sample" <% $seq_src eq "sample" ? "checked=\"checked\"" : ""%>/>&nbsp; 
 		Select a sample sequence:  
@@ -58,7 +58,6 @@
 % }
 			</select>
 		</div>
-% }
         <div style="clear: both;">&nbsp;</div>
 	</div>
 <!--END of ID conProject_newLeft-->
@@ -111,6 +110,7 @@
 	use DNALC::Pipeline::Phylogenetics::Sample ();
 	use Carp;
 	use IO::File ();
+	use File::Basename qw(basename);
 	use Data::Dumper;
 </%once>
 
@@ -165,7 +165,7 @@ if ($r->method eq "POST") {
 			} 
 			else {
 				#my $file2process = $phy_sample->sample_dir . "/fasta.fa";
-				push @files2process, map {{path => $_, type => "trace"}} $phy_sample->files;
+				push @files2process, map {{path => $_, type => "trace", filename => basename($_)}} $phy_sample->files;
 			}
 		}
 		elsif ($seq_src eq "paste") {

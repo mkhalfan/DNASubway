@@ -15,13 +15,13 @@
 % }
 	</div>
 	<input type="submit" id="save_selection" value="Save selection" />
-	<input type="button" id="close" value="Close" />
+	<input type="button" id="close" value="Close" onclick="top.phy.close_window('manage_sequences');"/>
 	<input type="hidden" id="pid" value="<% $proj->id %>" />
 </form>
 % if ($ok == 1) {
 <script type="text/javascript">
 	top.phy.set_status("phy_alignment", "not-processed");
-	//top.phy.close_window("pair");
+	top.phy.close_window("manage_sequences");
 </script>
 % }
 </div>

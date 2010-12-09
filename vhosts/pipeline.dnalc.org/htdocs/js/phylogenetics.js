@@ -131,13 +131,13 @@
 		}
 		catch (e) {}
 
-		if (what && !urls[what]) {
+		/*if (what && !urls[what]) {
 			alert('Nothing to load!!');
 			return;
-		}
+		}*/
 
 		var host = window.location.host;
-		var uri = what 
+		var uri = what && urls[what]
 						? 'http://' + host + urls[what][0] + $('pid').value
 						: where;
 		var window_title = title ? title : urls[what] ? urls[what][1] : null;
@@ -348,7 +348,7 @@
 			var uri = op;
 			uri = uri.replace(/phy_/, "view_");
 			b.onclick = function(){
-					phy.launch(null, '/project/phylogenetics/tools/' + uri + '?pid=' + p, '');
+					phy.launch(op, '/project/phylogenetics/tools/' + uri + '?pid=' + p, '');
 				};
 		}
 		else if (status == 'not-processed') {
