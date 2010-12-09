@@ -1,0 +1,68 @@
+
+<div id="conbody">
+<input type="hidden" id="step" value="6" />
+<!--<div id="title">Upload / Import Sequence</div>-->
+	<div class="con_BL_infoText">Please select one for upload or import a sequence</div>
+
+	<!-- UPLOAD -->
+	<div class="con_BL_subTitle">Upload sequence</div>
+	<div class="con_BL_menu_box"> 
+		<div class="con_BL_menu_box1">
+			<input class="conRadiobox_align" type="radio" name="seq_src" id="seq_src_upload" value="upload" onclick="phy.select_source(this.value)" />
+			Upload sequence(s) in <a href="#">AB1</a> or <a href="http://en.wikipedia.org/wiki/FASTA_format#Format">FASTA format</a>
+		</div>                     
+	</div>
+	<div class="con_BL_menu_box" id="upload_inputs">
+		<input class="conStylized_input1" type="file" id="seq_file" name="seq_file" />
+		<input class="" type="button" id="upload_data" name="upload_data" value="Upload" onclick="phy.do_upload_data()" />
+	</div>
+
+	<!-- PASTE -->
+	<div class="con_BL_subTitle">Enter sequence</div>
+	<div class="con_BL_menu_box"> 
+		<div class="con_BL_menu_box1">
+			<input class="conRadiobox_align" type="radio" name="seq_src" id="seq_src_paste" value="paste" onclick="phy.select_source(this.value)" />
+			&nbsp; Enter a new sequence in FASTA format
+		</div>                     
+	</div>
+	<div class="con_BL_menu_box" id="paste_inputs">
+		<div class="con_BL_menu_box2">Please type or copy &amp; paste sequence:</div>
+		<textarea class="conStylized_input2" name="sequence" id="sequence" rows="4" cols="30"></textarea>
+		<div align="left"><input type="button" value="Add data"></div>
+	</div>
+
+	<!-- IMPORT -->
+	<div class="con_BL_subTitle">Import sequence</div>
+	<div class="con_BL_menu_box"> 
+		<div class="con_BL_menu_box1">
+			<input class="conRadiobox_align" type="radio" name="seq_src" id="seq_src_genbank" value="genbank" onclick="phy.select_source('import')" />
+				&nbsp; Import sequence from GenBank
+		</div>                     
+		<div class="con_BL_menu_box1">
+			<input class="conRadiobox_align" type="radio" name="seq_src" id="seq_src_bold" value="bold" onclick="phy.select_source('import')" />
+				&nbsp; Import sequence from BOLD
+		</div>
+		<div class="con_BL_menu_box1">
+			<input class="conRadiobox_align" type="radio" name="seq_src" id="seq_src_dnalc" value="dnalc" onclick="phy.select_source('import')" />
+				&nbsp; Import sequence/trace from DNALC
+		</div>                     
+	</div>
+	<div class="con_BL_menu_box" id="import_inputs">
+		<div class="con_BL_menu_box2">Please enter accession/sequence ID:</div>
+			<input class="conStylized_input3"  name="accession" id="accession" value="" />
+		<div align="left"><input type="button" value="Import" /></div>
+	</div>
+</div>
+%#------------------------------------------------------------
+<%args>
+	$pid => 0
+</%args>
+%#------------------------------------------------------------
+%#------------------------------------------------------------
+<%init>
+	$r->content_type("text/html");
+</%init>
+%#------------------------------------------------------------
+<%attr>
+	js => ['prototype-1.6.1.js', 'phylogenetics.js']
+</%attr>

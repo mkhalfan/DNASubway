@@ -19,7 +19,7 @@ span.bold {
 % if ($ok == 1) {
 <script type="text/javascript">
 	top.phy.set_status("phy_pair", "done");
-	top.phy.set_status("phy_concensus", "not-processed")
+	top.phy.set_status("phy_consensus", "not-processed")
 	top.phy.close_window("pair");
 </script>
 % }

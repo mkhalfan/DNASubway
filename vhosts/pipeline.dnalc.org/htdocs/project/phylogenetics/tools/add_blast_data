@@ -1,0 +1,54 @@
+{status:'<% $status %>','message':'<% $msg |js %>'}
+%#----------------------------------------------------------------------------
+<%args>
+	$pid => 0
+	$bid => 0
+</%args>
+%#----------------------------------------------------------------------------
+<%once>
+	use DNALC::Pipeline::App::Phylogenetics::ProjectManager ();
+	use DNALC::Pipeline::Phylogenetics::DataSource ();
+	use DNALC::Pipeline::Phylogenetics::Blast ();
+	use Bio::SearchIO ();
+	use IO::Scalar ();
+	use Data::Dumper;
+</%once>
+%#----------------------------------------------------------------------------
+<%init>
+	$r->content_type("text/javascript");
+	
+	my ($status, $msg) = ("error", "");
+	
+	$pid =~ s/\D//g;
+	$bid =~ s/\D//g;
+
+	my $pm = DNALC::Pipeline::App::Phylogenetics::ProjectManager->new($pid);
+	my $blast = DNALC::Pipeline::Phylogenetics::Blast->retrieve($bid);
+
+	if ($blast && $pm) {
+		my $dsource = DNALC::Pipeline::Phylogenetics::DataSource
+						->search( project_id => $pid, name => "blast:$bid");
+		print STDERR Dumper($dsource), $/;
+		unless ($dsource) {
+			my $st = $pm->add_blast_data($blast->id);
+			#print STDERR "XXXXXXXXXXXXX\n", Dumper($st), $/;
+			if ($st->{seq_count} > 0) {
+				$status = 'success';
+				if ($pm->get_task_status('phy_alignment')->name eq 'done') {
+					$pm->set_task_status('phy_alignment', 'not-processed');
+				}
+			}
+			else {
+				$msg = join ' ', @{$st->{errors}};
+			}
+		}
+		else {
+			$msg = "This data set is already in your sequence list.";
+		}
+	}
+	
+</%init>
+%#----------------------------------------------------------------------------
+<%flags>
+	inherit => undef
+</%flags>

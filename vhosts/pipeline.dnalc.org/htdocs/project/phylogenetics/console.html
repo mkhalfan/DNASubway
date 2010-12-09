@@ -25,15 +25,15 @@
         </span>
         <span class="conBlueline_ConCell">
 			<span class="conIndicator_box">
-				<div id="phy_concensus_st" class="conIndicatorBL_<% $status{phy_pair} eq "done" ? $status{phy_concensus} eq "done" ? "done" : $status{phy_concensus} : "disabled" %>"></div>
+				<div id="phy_consensus_st" class="conIndicatorBL_<% $status{phy_pair} eq "done" ? $status{phy_consensus} eq "done" ? "done" : $status{phy_consensus} : "disabled" %>"></div>
 			</span>
-%	if ($status{phy_concensus} ne "done") {
+%	if ($status{phy_pair} ne "done") {
 			<span class="bt_Runblueline">
-				<a id="phy_concensus_btn" class="conIndicatorBL_disabled" status="disabled" href="javascript:;">Concensus editor</a>
+				<a id="phy_consensus_btn" class="conIndicatorBL_disabled" status="disabled" href="javascript:;">Consensus editor</a>
 			</span>
 %	} else {
-				<& '.routine', routine => 'phy_concensus', pmanager => $pm, is_owner => $is_owner,
-					status => $status{phy_concensus}, delay => 20, pid => $pid &>
+				<& '.routine', routine => 'phy_consensus', pmanager => $pm, is_owner => $is_owner,
+					status => $status{phy_consensus}, delay => 20, pid => $pid &>
 %	}
         </span>
 	</span>  
@@ -49,16 +49,16 @@
 		</span>
 		<span class="conBlueline_ConCell">
 			<span class="conIndicator_box">
-				<div class="conIndicatorBL_disabled"></div>
+				<div class="conIndicatorBL_not-processed"></div>
 			</span>
-			<span class="bt_Runblueline"><a href="#">Upload data</a></span>
+			<span class="bt_Runblueline"><a href="#" onclick="phy.launch('data');">Upload data</a></span>
 		</span>
 
 		<span class="conBlueline_ConCell">
 			<span class="conIndicator_box">
 				<div class="conIndicatorBL_not-processed"></div>
 			</span>
-			<span class="bt_Runblueline"><a href="#" onclick="phy.launch('add_ref');">Reference data</a></span> 
+			<span class="bt_Runblueline"><a href="#" onclick="phy.launch('ref');">Reference data</a></span>
 		</span>
         
         <span class="conBlueline_ConCell">
@@ -215,7 +215,7 @@
 	
 	my %routines = (
 			phy_pair => "Pair",
-			phy_concensus => "Consensus editor",
+			phy_consensus => "Consensus editor",
 			phy_alignment => "MUSCLE",
 			phy_tree => "PHYLIP",
 

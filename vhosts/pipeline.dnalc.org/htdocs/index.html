@@ -168,15 +168,14 @@ if ($r->method eq "POST") {
 			my $rand = lc random_string(6, 8);
 
 			$name = "guest_$rand";
-			my $chado_db = $name;
-			
-			my $pcf = DNALC::Pipeline::Config->new->cf("PIPELINE");
-			my $guest_chado_instanced = $pcf->{CHADO_GUEST_INSTANCES};
-			if ($guest_chado_instanced && $guest_chado_instanced =~ /^\d+$/) {
-				$chado_db = "guest_" . int(rand $guest_chado_instanced);
-			}
+			#my $chado_db = $name;
+			#my $pcf = DNALC::Pipeline::Config->new->cf("PIPELINE");
+			#my $guest_chado_instanced = $pcf->{CHADO_GUEST_INSTANCES};
+			#if ($guest_chado_instanced && $guest_chado_instanced =~ /^\d+$/) {
+			#	$chado_db = "guest_" . int(rand $guest_chado_instanced);
+			#}
 
-			print STDERR "Generated user: ", $name, "; db = ", $chado_db, $/;
+			#print STDERR "Generated user: ", $name, "; db = ", $chado_db, $/;
 			$user = eval {
 					DNALC::Pipeline::User->create({
 						username => $name,

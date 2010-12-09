@@ -1,40 +1,50 @@
 <div id="conbodyx">
+% if ($ok == 100) {
+<script type="text/javascript">
+	top.phy.set_status("phy_alignment", "not-processed")
+</script>
+% } else {
 % unless ($proj) {
 	Error: can't open project "<% $pid|html%>".
 % } else {
 	<div>
 <applet archive="/files/jalview/jalviewApplet.jar" name="Jalview" 
-	codebase="/" code="jalview.bin.JalviewLite" height="450" width="100%">
+	codebase="/" code="jalview.bin.JalviewLite" height="400" width="100%">
 	<param name="cache_option" value="No" />
-	<param name="file" value="<% $m->comp('../../.comp/filepath_to_web', file => $pm->get_alignment ) %>?<% rand(1000) %>" />
-%#	<param name="treeFile" value="<% $nw %>" />
+	<param name="file" value="<% $m->comp('../../.comp/filepath_to_web', file => $algn_file ) %>" />
 	<param name="embedded" value="true" />
 	<param name="showAnnotation" value="true" />
 	<param name="wrap" value="false" />
 	<param name="nojmol" value="true" />
-	<param name="windowHeight" value="500" />
+	<param name="windowHeight" value="800" />
 	<param name="windowWidth" value="750" />
 	<param name="showFullId" value="false" />
 	<param name="defaultColour" value="Clustal" />
-%#	<param name="linkLabel_1" value="Details" />
-%#	<param name="linkUrl_1" value="<% $pcf->{PROJECT_HOME} %>/project/target/details?hn=$SEQUENCE_ID$" />
+	<param name="linkLabel_1" value="Details" />
+	<param name="linkUrl_1" value="null" />
 	<param name="showbutton" value="false" />
 	<param name="debug" value="true" />
-%#	<p id="java_install"><a href="http://java.sun.com/webapps/getjava/BrowserRedirect?host=java.com">Install Java</a>.</p>
 </applet>
 
-	<div>
-%# 		//document.applets.Jalview.getSelectedSequencesAsAlignment("fasta", false)
-%#		<input type="button" value="Save selection" onclick="phy.fix_alignment();" />
-		<a href="./trim_alignment?pid=<% $pid |html %>">Trim alignment</a>
+<form id="forma1" method="post">
+	<div style="text-align:center">
+		<input type="hidden" id="data" name="data" value="" />
+		<input type="hidden" id="aln_length" value="<% $aln_length %>" />
+		<input type="hidden" id="pid" value="<% $proj->id %>" />
+		<input type="button" id="submit_trimmed" value="Submit trimmed alignment" onclick="phy.submit_trimmed_alignment();" />
+%#		<a href="./trim_alignment?pid=<% $pid |html %>">Trim alignment</a>
 	</div>
-	<% $m->comp('../../.comp/filepath_to_web', file => $pm->get_alignment ) %>
+</form>
+%#	<% $m->comp('../../.comp/filepath_to_web', file => $algn_file ) %>?<% rand(1000) %>
+%#	<% $algn_file %>
 	</div>
 % }
+% } # end if_else $ok
 </div>
 %#----------------------------------------------------------------------------
 <%args>
 	$pid => 0
+	$data => undef
 </%args>
 %#----------------------------------------------------------------------------
 <%once>
@@ -44,10 +54,45 @@
 %#----------------------------------------------------------------------------
 <%init>
 	$r->content_type("text/html");
+	$r->no_cache(1);
 	my $pcf = DNALC::Pipeline::Config->new->cf('PIPELINE');
 	$pid =~ s/\D+//g;
 	my $pm = DNALC::Pipeline::App::Phylogenetics::ProjectManager->new($pid);
 	my $proj = $pm->project;
-	#my $x = random_string();
+	my $algn_file = $pm->get_alignment;
+
+	my $aln_length = undef;
+	my $fn = IO::File->new;
+	
+	my $ok = 0;
+	
+	if ($r->method eq 'POST') {
+		
+		if (-f $algn_file && $fn->open(">$algn_file")) {
+			print $fn $data;
+			$fn->close;
+			
+			#$ok = 1;
+		}
+	}
+	
+	if (-f $algn_file && $fn->open($algn_file)) {
+		my $first_seq = 0;
+		$aln_length = 0;
+		while(my $txt = <$fn>) {
+			if ($txt =~ /^>/) {
+				last if $first_seq;
+				 $first_seq = 1;
+				 next;
+			}
+			$txt =~ s/[\n\r]//g;
+			$aln_length += length $txt;
+		}
+		$fn->close;
+	}
+	
 </%init>
 %#----------------------------------------------------------------------------
+<%attr>
+	js => ['prototype-1.6.1.js', 'phylogenetics.js']
+</%attr>

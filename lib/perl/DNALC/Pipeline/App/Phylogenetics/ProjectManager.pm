@@ -995,7 +995,9 @@ use Bio::Trace::ABIF ();
 	sub get_task_status {
 		my ($self, $task_name) = @_;
 
+		#print STDERR  "TASK NAME = $task_name", $/;
 		my ($task) = DNALC::Pipeline::Task->search(name => $task_name );
+		#print STDERR  "TASK = $task", $/;
 		unless ($task) {
 			print STDERR  "Unknown task: ", $task_name, $/;
 			croak "Unknown task: ", $task_name, $/;

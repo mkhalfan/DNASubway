@@ -8,5 +8,6 @@
 			'-phyiout' => 'output.phyi',
 			'-physout' => 'output.phys',
 		},
+	phylip_id_length => 30,
 	
 }

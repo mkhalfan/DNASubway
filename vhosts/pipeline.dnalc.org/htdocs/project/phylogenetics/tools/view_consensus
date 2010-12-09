@@ -7,13 +7,13 @@
 %	my $cnt = 1;
 %	for my $p (@pairs) {
 		<li>
-			<div><a href="./view_concensus?pid=<%$pid |html%>;pair_id=<% $p->id %>">Pair <% $cnt++%></a></div>
+			<div><a href="./view_consensus?pid=<%$pid |html%>;pair_id=<% $p->id %>">Pair <% $cnt++%></a></div>
 			<small>·<% join "+", map{$_->seq->display_id} $p->paired_sequences |html%></small>
 		</li>
 %	}
 	</ul>
 	</div>
-	<div style="width: 85%;float:left;background:pink;">
+	<div style="width: 85%;float:left;background:silver;">
 %	if ($pair) {
 		<div>Pair <% join "+", map{$_->seq->display_id} $pair->paired_sequences |html%></div>
 		<div style="overflow: auto;padding-left: 10px;"><pre>\

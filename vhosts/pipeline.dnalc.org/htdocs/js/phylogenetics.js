@@ -1,11 +1,11 @@
 	var pairs = [];
 	var current_pair = [];
 	var intervalID = {};
+	//var step = 0;
 	
 (function() {
 	// keep open windows
 
-	var step = 0;
 	var windows = {};
 	
 	phy = function() {
@@ -27,7 +27,7 @@
 			return;
 		}
 
-		if (! $('seq_src_upload').checked && !$('seq_src_paste').checked) {
+		if (! $('seq_src_upload').checked && !$('seq_src_paste').checked && !$('seq_src_sample').checked) {
 			//alert("Source not selected!");
 			show_messages("Sequence source not selected!");
 			return;
@@ -36,6 +36,7 @@
 		var has_file = $('seq_src_upload').checked && ( $('seq_file').value != '' );
 		//var has_sample = $('seq_src_sample').checked && $('specie').selectedIndex != -1;
 		var has_actg = false;
+		var has_sample = $('seq_src_sample').checked && $('sample').selectedIndex >= 0;
 
 		if ($('seq_src_paste').checked) {
 			var pasted_data_ok = function() {
@@ -56,7 +57,7 @@
 			}
 		}
 
-		if (!has_file && !has_actg) {
+		if (!has_file && !has_actg && !has_sample) {
 			show_messages("You must select a file to upload!");
 			return;
 		}
@@ -95,10 +96,12 @@
 	};
 	
 	phy.select_source = function (el) {
-		if (el && (el.value == 'upload' || el.value == 'paste')) {
+		debug(el);
+		debug($$('#' + el + '_inputs, #' + el + '_inputs textarea'));
+		if (el && (el == 'upload' || el == 'paste')) {
 			//$('specie').selectedIndex = -1;
 		}
-		else if (el && el.value == 'sample') {
+		else if (el && el == 'sample') {
 			//$('organism_info').hide();
 		}
 		//populate_fields(el.value);
@@ -117,8 +120,8 @@
 				viewer: ['/project/phylogenetics/tools/view_sequences.html?pid=', 'View Sequences'],
 				pair: ['/project/phylogenetics/tools/pair?pid=', 'Pair sequences'],
 				blast: ['/project/phylogenetics/tools/blast.html?pid=', 'BLAST'],
-				data: ['/project/phylogenetics/tools/add_data?pid=', 'Phytozome Browser'],
-				add_ref: ['/project/phylogenetics/tools/add_ref?pid=', 'Add Reference'],
+				data: ['/project/phylogenetics/tools/add_data?pid=', 'Add data'],
+				ref: ['/project/phylogenetics/tools/add_ref?pid=', 'Add Reference'],
 				manage_sequences: ['/project/phylogenetics/tools/manage_sequences?pid=', 'Manage Data']
 			};
 
@@ -231,7 +234,7 @@
 				}
 				else {
 					//s.update('Unknown status!');
-					//alert('Unknown status!');
+					alert('Unknown status!');
 				}
 			},
 			onFailure: function(){
@@ -651,9 +654,71 @@
 		imageSearch.execute(query);
 	};
 	
+	phy.submit_trimmed_alignment = function () {
+		if (!document.applets.Jalview) {
+			alert("Unable to obtain the trimmed alignment!");
+			return;
+		}
+		var aln_length = $('aln_length') ? parseInt($('aln_length').value,10) : NaN;
+		if (!isNaN(aln_length)) {
+			var algn = document.applets.Jalview.getAlignment("fasta");
+			algn = document.applets.Jalview.getAlignment("fasta");
+			algn = algn.replace(/>.+\n/g,'>\n')
+			algn = algn.replace(/\n/g,'')
+			var tmp_arr = algn.split('>');
+			//tmp_arr.pop(); // we don't need the 1st empty value
+			var trimmed = false;
+			tmp_arr.each(function(str, index) {
+				//debug(str.length + ' ' + aln_length);
+				if (str.length > 0 && str.length != aln_length) {
+					trimmed = true;
+					//return;
+				}
+			});
+			//debug('trimmed: ' + trimmed);
+			if (!trimmed) {
+				alert('No trimming has been detected!');
+				return;
+			}
+			
+			var f = $('forma1');
+			$('data').value = document.applets.Jalview.getAlignment("fasta");
+			f.submit();
+		}
+	};
+
 	phy.show_tips = function () {
 		
 	};
+	
+	phy.get_samples = function(type) {
+		// remove current samples
+		var ssamples = $('sample').options;
+		while(ssamples.length) {
+			ssamples[0].remove();
+		}
+		
+		new Ajax.Request('/project/phylogenetics/get_samples',{
+			method:'get',
+			parameters: { 't': type}, 
+			onSuccess: function(transport){
+				var response = transport.responseText || "{'status':'error', 'message':'No response'}";
+				//debug(response);
+				var samples = response.evalJSON();
+				samples.each (function(s) {
+					if (s) {
+						debug(s);
+						$('sample').insert(new Element('option', {id:'o' + s['id'], value:s['id']}).update(s['name']));
+					}
+				});
+
+			},
+			onFailure: function(){
+					alert('Something went wrong!\nAborting...');
+				}
+		});
+	};
+	
 })();
 
 function debug(msg) {
@@ -666,10 +731,18 @@ function debug(msg) {
 }
 
 Event.observe(window, Prototype.Browser.IE ? 'load' : 'dom:loaded', function() {
-	step = $('step') ? parseInt($('step').value, 10) : 0;
+	var step = $('step') != null ? parseInt($('step').value, 10) : 0;
 	debug("step = " + step);
 
-	if (step == 1) {
+	if (step == -1) {
+		$$('#project_types input[type=radio]').each(function(el) {
+			Event.observe(el, 'click', function(ev){
+				//debug('clicked ' + el.value);
+				phy.get_samples(el.value);
+			});
+		});
+	}
+	else if (step == 1) {
 		$('seqops').down().descendants().each(function(sp){
 		  if (sp.type && sp.type == "checkbox") {
 			Event.observe(sp, 'click', function(ev){
@@ -735,8 +808,9 @@ Event.observe(window, Prototype.Browser.IE ? 'load' : 'dom:loaded', function() {
 		var spn = new Element('span');
 		$R(0, sz, true).each(function(val) {
 			if (val % 10 == 0) {
-				spn.insert(new Element('span', {class:'rot'}).update(val));
-				debug(val);
+				spn.insert(new Element('span').update(val));
+				spn.addClassName('rot');
+				//debug(val);
 			}
 			else
 				spn.insert(new Element('span').update(' '));

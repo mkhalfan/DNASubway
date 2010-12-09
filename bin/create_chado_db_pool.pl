@@ -45,9 +45,9 @@ poplulated with ontology terms but no features.
 
 =head1 AUTHOR
 
-Scott Cain E<lt>cain.cshl@gmail.orgE<gt>
+Cornel Ghiban E<lt>ghiban@cshl.eduE<gt>
 
-Copyright (c) 2009
+Copyright (c) 2010
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

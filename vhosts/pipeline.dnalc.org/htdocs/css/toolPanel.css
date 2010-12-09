@@ -4,7 +4,7 @@
 #conbody {
 	width: 650px;
 	height:450px;
-	background:url("/images/v2/bg_upload_import.jpg") no-repeat;
+	/*background:url("/images/v2/bg_upload_import.jpg") no-repeat;*/
 	font-family: arial, hervetica, san-serif;
 }
 
@@ -184,3 +184,20 @@ clear: both;
 height: 30px;
 width: 300px;
 }
+
+.blast_processing{
+	width: 18px;
+	/*height: 18px;*/
+	padding-top: 20px;
+	background: url("/images/v2/indicatorBL_running.gif") top left no-repeat;
+}
+
+/*.tbl {border:solid thin red; width: 100%}*/
+.tbl {width: 100%}
+.tbl {display:table;}
+.trow {display:table-row;}
+.theader {display:table-row;border-bottom: solid thin red; font-weight: bold;}
+.trownum {text-align: right;}
+.tcell, .tcell1, .tcell2 {display:table-cell; padding: 2px 3px 2px 5px;}
+
+span.rot { -moz-transform:rotate(90deg); font-size: smaller;}

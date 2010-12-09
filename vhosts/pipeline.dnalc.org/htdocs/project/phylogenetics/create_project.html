@@ -8,18 +8,19 @@
 % }
 
 <form id="forma1" enctype="multipart/form-data" method="post">
+<input type="hidden" id="step" value="-1" />
 <div id="conBluelineLeft1"> 
 	<div id="conProject_newLeft">
 		<div class="conNewPro_title">Select Project Type*</div>
 
-		<div class="conNewPro_label">
+		<div class="conNewPro_label" id="project_types">
 			<div class="conNewPro_label2">&nbsp;Phylogenetics:
 			<div class="conNewPro_smallContainer_blue">
-				&nbsp;<input class="conRadiobox_align" type="radio" name="type" id="gd" value="dna" <% $type eq "dna" ? "checked=\"checked\"" : ""%>/>&nbsp; DNA</div>
+				&nbsp;<input class="conRadiobox_align" type="radio" name="type" id="gd" value="DNA" <% $type eq "DNA" ? "checked=\"checked\"" : ""%>/>&nbsp; DNA</div>
 			<div class="conNewPro_smallContainer_blue">
 				&nbsp;<input class="conRadiobox_align" type="radio" name="type" id="gp" value="protein" <% $type eq "protein" ? "checked=\"checked\"" : ""%>/>&nbsp; Protein</div>
 			<div class="conNewPro_smallContainer_blue">
-				&nbsp;<input class="conRadiobox_align" type="radio" name="type" id="gm" value="mtdna" <% $type eq "mtdna" ? "checked=\"checked\"" : ""%>/>&nbsp; mtDNA</div>
+				&nbsp;<input class="conRadiobox_align" type="radio" name="type" id="gm" value="mtDNA" <% $type eq "mtDNA" ? "checked=\"checked\"" : ""%>/>&nbsp; mtDNA</div>
 			</div>
 			<div class="conNewPro_label2">&nbsp;Barcoding:
 				<div class="conNewPro_smallContainer_blue">
@@ -31,13 +32,13 @@
 	<div class="conNewPro_title">Select Sequence Source *</div> 
 	<div class="conNewPro_label">
 		<input class="conRadiobox_align" type="radio" name="seq_src" id="seq_src_upload" 
-			value="upload" onclick="phy.select_source(this)" <% $seq_src eq "upload" ? "checked=\"checked\"" : ""%>/>&nbsp;
+			value="upload" <% $seq_src eq "upload" ? "checked=\"checked\"" : ""%>/>&nbsp;
 			Upload sequence(s) in <a href="#">AB1</a> or <a href="http://en.wikipedia.org/wiki/FASTA_format#Format">FASTA format</a> <small>(max <% $seq_max_len %>kb)</small>:
 			<input class="conStylized_box1" type="file" type=file multiple id="seq_file" name="seq_file"  onchange="phy.set_source('upload')" onclick="phy.set_source('upload')"  />
 		</div>
 
 		<div class="conNewPro_label">
-			<input class="conRadiobox_align" type="radio" name="seq_src" id="seq_src_paste" value="paste" onclick="phy.select_source(this)" <% $seq_src eq "paste" ? "checked=\"checked\"" : ""%> />&nbsp; 
+			<input class="conRadiobox_align" type="radio" name="seq_src" id="seq_src_paste" value="paste" <% $seq_src eq "paste" ? "checked=\"checked\"" : ""%> />&nbsp; 
 			Enter a sequence in <a href="http://en.wikipedia.org/wiki/FASTA_format#Format">FASTA format</a> <small>(max <%$seq_max_len%>kb)</small>:
 			<textarea class="conStylized_box2" name="seq_paste" id="seq_paste" rows="5" cols="30" onfocus="phy.set_source('paste');"><% $seq_paste |html %></textarea>
 		</div>
@@ -46,14 +47,14 @@
 			<input class="conRadiobox_align" type="radio"/>&nbsp; Enter sequence tracking number:
 			<input class="conStylized_box7" type="text" />
 		</div>
+
 		<div class="conNewPro_label">
-			<input class="conRadiobox_align" type="radio" name="seq_src" id="seq_src_sample" value="sample" onclick="phy.select_source(this)" <% $seq_src eq "sample" ? "checked=\"checked\"" : ""%>/>&nbsp; 
+			<input class="conRadiobox_align" type="radio" name="seq_src" id="seq_src_sample" value="sample" <% $seq_src eq "sample" ? "checked=\"checked\"" : ""%>/>&nbsp; 
 		Select a sample sequence:  
-			<select class="conStylized_box3" id="specie" name="species" size="4" style="width: 370px;" onchange="phy.set_source('sample');">
+			<select class="conStylized_box3" id="sample" name="sample" size="4" style="width: 370px;" onchange="phy.set_source('sample');">
 % for my $ss (@samples) {
-%	my $sel = '';#$seq_src eq "sample" && $ss->id == $species ? "selected=\"selected\"" : "";
-			<option id="o<%$ss->id%>" value="<% $ss->id %>" extra="" clade="<% $ss->{clade} ? $ss->{clade} : "o" %>"\
-			<% $sel %>><% $ss->organism %> (<% $ss->common_name %>) <% $ss->segment %>, <% nicebasepairs($ss->sequence_length) %></option>
+%	my $sel = $seq_src eq "sample" && $ss->id == $sample ? "selected=\"selected\"" : "";
+			<option id="o<%$ss->id%>" value="<% $ss->id %>" <% $sel %>><% $ss->name %></option>
 % }
 			</select>
 		</div>
@@ -100,14 +101,14 @@
 	$sequence => ''
 	$seq_paste => ''
 	$description => ''
+	$sample => ''
 </%args>
 <%once>
 	use DNALC::Pipeline::Utils qw/nicebasepairs random_string/;
 	use DNALC::Pipeline::Config ();
-	#use DNALC::Pipeline::Sample ();
 	use DNALC::Pipeline::App::Utils ();
 	use DNALC::Pipeline::App::Phylogenetics::ProjectManager ();
-	#use DNALC::Pipeline::App::WorkflowManager ();
+	use DNALC::Pipeline::Phylogenetics::Sample ();
 	use Carp;
 	use IO::File ();
 	use Data::Dumper;
@@ -121,12 +122,14 @@ my $cf = DNALC::Pipeline::Config->new;
 my $pcf = $cf->cf('PIPELINE');
 my $seq_max_len = int(($pcf->{sequence_length} || 50_000) / 1_000);
 
-my @samples = ();
+my @samples = $type 
+		? DNALC::Pipeline::Phylogenetics::Sample->search(type => $type, active => 1)
+		: ();
 
 my @err = ();
 my @messages = ();
 
-if ($r->method eq 'POST') {
+if ($r->method eq "POST") {
 
 	my @files2process = ();
 	my $converted_to_dna = 0;
@@ -156,13 +159,13 @@ if ($r->method eq 'POST') {
 	unless (@err) {
 
 		if ($seq_src eq "sample") {
-			my $sample = undef; #DNALC::Pipeline::Sample->new($species);
-			if (!$sample) {
-				push @err, "Sample organism wasn't found!";
+			my $phy_sample = DNALC::Pipeline::Phylogenetics::Sample->retrieve($sample);
+			if (!$phy_sample) {
+				push @err, "Sample data wasn't found!";
 			} 
 			else {
-				my $file2process = $sample->sample_dir . "/fasta.fa";
-				push @files2process, {path => $file2process, type => "fasta"};
+				#my $file2process = $phy_sample->sample_dir . "/fasta.fa";
+				push @files2process, map {{path => $_, type => "trace"}} $phy_sample->files;
 			}
 		}
 		elsif ($seq_src eq "paste") {
@@ -222,6 +225,7 @@ if ($r->method eq 'POST') {
 					has_tools => 1,
 					type => $type,
 					description => $description,
+					sample => $sample ? $sample : 0,
 				});
 		if ($st->{status} eq "success") {
 			print STDERR  "New PID = ", $pm->project, $/;
@@ -230,7 +234,7 @@ if ($r->method eq 'POST') {
 			#if (@files2process) 
 			for my $ftype (qw/fasta trace/) {
 				my @_files = grep {$_->{type} =~ /^$ftype$/i} @files2process;
-				#print STDERR "** $ftype files: ", Dumper(\@_files), $/;
+				print STDERR "** $ftype files: ", Dumper(\@_files), $/;
 				next unless @_files;
 				my $st = $pm->add_data({
 						source => "init",

@@ -4,10 +4,27 @@
 </%args>
 <%once>
 	use DNALC::Pipeline::App::Phylogenetics::ProjectManager ();
-	#use DNALC::Pipeline::Phylogenetics::Pair ();
+	use DNALC::Pipeline::Config();
+	use Gearman::Client ();
+	use Storable qw/thaw nfreeze/;
 </%once>
 <%init>
 	my ($status, $msg) = ("error", "");
+	$pid =~ s/\D+//g;
+
+	my $pcf = DNALC::Pipeline::Config->new->cf('PIPELINE');
+	my $client = Gearman::Client->new;
+	my $sx = $client->job_servers(@{$pcf->{GEARMAN_SERVERS}});
+	
+	my $params = nfreeze( {pid => $pid});
+	my $rc = $client->do_task( 'phy_tree' =>  $params);
+	$rc = thaw($$rc);
+	if ($rc && defined $rc->{status}) {
+		$status = $rc->{status};
+		$msg = $rc->{status};
+	}
+
+if (0) {
 	my $pm = DNALC::Pipeline::App::Phylogenetics::ProjectManager->new($pid);
 	my $proj = $pm->project;
 	unless ($proj) {
@@ -29,6 +46,7 @@
 			$status = "success";
 		}
 	}
+}
 </%init>
 
 <%flags>
