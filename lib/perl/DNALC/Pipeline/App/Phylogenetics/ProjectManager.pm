@@ -280,7 +280,7 @@ use Bio::Trace::ABIF ();
 	}
 	#-----------------------------------------------------------------------------
 	sub add_blast_data {
-		my ($self, $blast_id) = @_;
+		my ($self, $blast_id, $selected_results) = @_;
 
 		my @errors = ();
 		my $seq_count = 0;
@@ -316,11 +316,17 @@ use Bio::Trace::ABIF ();
 		while( my $res = $in->next_result ) {
 			while( my $hit = $res->next_hit ) {
 				while( my $hsp = $hit->next_hsp ) {
-					my @tmp = split /\s+/, $hit->description;
 					my $seq_obj = $hsp->seq("hit");
+					my $name = $seq_obj->display_id;
+					$name =~ s/(\.1)?\|$//;
 				
-					my $display_id = $seq_obj->display_id . '|' . join '_', map {lc $_} splice @tmp, 0, 2;
-					$display_id =~ s/\|+/\|/g;
+					# chack if $name is in the selected names
+					#
+					#
+
+					my @tmp = split /\s+/, $hit->description;
+					my $display_id = $name . '|' . join '_', map {lc $_} splice @tmp, 0, 2;
+					#$display_id =~ s/\|+/\|/g;
 
 					#print ">", $display_id, $/;
 					$seq_obj->display_id($display_id);
@@ -499,6 +505,7 @@ use Bio::Trace::ABIF ();
 
 		my %merger_args = (
 				input_files => [],
+				_names => {},
 				outfile => $outfile,
 				outseq => $outseq,
 				debug => 0,
@@ -514,13 +521,15 @@ use Bio::Trace::ABIF ();
 				print $fh $seq->seq;
 				push @{$merger_args{input_files}}, $seq_file;
 				$merger_args{"sreverse$cnt"} = 1 if $s->strand ne 'F';
+				$merger_args{"sid$cnt"} = "seq_$seq";
+				$merger_args{_names}->{"seq_$seq"} = $seq->display_id;
 			}
 			$cnt++;
 		}
-		#print STDERR Dumper( \%merger_args), $/;
 		my $merger = DNALC::Pipeline::Process::Merger->new($wd->dirname);
 		$merger->run(%merger_args);
-		print STDERR "\nexit code = ", $merger->{exit_status}, $/;
+		#print STDERR Dumper( $merger ), $/;
+		print STDERR "\nconsensus exit code = ", $merger->{exit_status}, $/;
 
 		if ($merger->{exit_status} == 0) { # success
 
@@ -874,7 +883,10 @@ use Bio::Trace::ABIF ();
 				'-o', $out_file,
 			);
 		#print STDERR 'blast args: ', Dumper( \@args ), $/;
-		my $rc = system('/var/www/bin/web_blast.pl', @args);
+
+		my $pcf = DNALC::Pipeline::Config->new->cf('PIPELINE');
+		my $blast_script = File::Spec->catfile($pcf->{EXE_PATH}, 'web_blast.pl');
+		my $rc = system($blast_script, @args);
 		print STDERR "blast rc = $rc\n";
 
 		# 0 == success
