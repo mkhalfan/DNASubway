@@ -2,6 +2,7 @@ package DNALC::Pipeline::Phylogenetics::DataFile;
 
 use base qw(DNALC::Pipeline::DBI);
 use POSIX ();
+use List::Util qw/max/;
 
 __PACKAGE__->table('phy_data_file');
 __PACKAGE__->columns(Primary => qw/id/);
@@ -45,16 +46,25 @@ sub seq {
 
 sub trace {
 	my ($self) = @_;
-	my %trace = ();
+	my $trace = ();
 	return unless ref($self) eq __PACKAGE__ || $self->file_type !~ /^trace$/i;
 	
+	my $max = 0;
 	my $ab = Bio::Trace::ABIF->new;
 	if ($ab->open_abif($self->file_path)) {
+		my $max = 0;
 		for (qw(A G T C)) {
-			print "$_: ", scalar ($ab->trace($_)), $/;
+			my @t = $ab->trace($_);
+			$trace->{$_} = \@t;
+			my $local_max = max(@t);
+			$max = $local_max > $max ? $local_max : $max;
 		}
 		$ab->close_abif;
+		for (keys %$trace) {
+			$trace->{$_} = [ map { sprintf("%d", 100 * $_/$max) } @{$trace->{$_}}];
+		}
 	}
+	$trace;
 }
 
 sub quality_values {
@@ -68,6 +78,20 @@ sub quality_values {
 		$ab->close_abif;
 	}
 	wantarray ? @q : \@q;
+}
+
+
+sub base_locations {
+	my ($self) = @_;
+	my @bl = ();
+	return unless ref($self) eq __PACKAGE__ || $self->file_type !~ /^trace$/i;
+	
+	my $ab = Bio::Trace::ABIF->new;
+	if ($ab->open_abif($self->file_path)) {
+		@bl = $ab->base_locations;
+		$ab->close_abif;
+	}
+	wantarray ? @bl : \@bl;
 }
 
 1;

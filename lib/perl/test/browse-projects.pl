@@ -37,6 +37,8 @@ for (@mp) {
 	print $_->id, " ", $_->{full_name}, $/;
 }
 print STDERR  "-------------", $/;
+
+# filter by user_id
 @mp = $pager->get_mine_sorted({
 	   user_id => 90,
 	   order_by => 'u.name_last ASC'
@@ -44,3 +46,17 @@ print STDERR  "-------------", $/;
 for (@mp) {
 	print $_->id, " ", $_->{full_name}, $/;
 }
+print STDERR  "-------------", $/;
+
+
+#filter by user's name
+@mp = $pager->get_public_sorted({
+	   order_by => 'u.name_last ASC',
+	   where => { title => 'auto', user_name => 'Gbzdpy'},
+	});
+for (@mp) {
+	print $_->id, " ", $_->{full_name}, "\t", $_->{organism},$/;
+}
+print STDERR  "-------------", $/;
+
+

@@ -9,14 +9,16 @@ use Data::Dumper;
 	sub new {
 		my ($class, $project_dir, %params) = @_;
 
-		my $self = __PACKAGE__->SUPER::new('MERGER', $project_dir);
+		__PACKAGE__->SUPER::new('MERGER', $project_dir);
+	}
 
-		#for (keys %{$self->{conf}->{option_output_files}}) {
-		#	unshift @{$self->{work_options}}, 
-		#		$_, $self->{work_dir} . '/'. $self->{conf}->{option_output_files}->{$_}
-		#}
-		
-		return $self;
+	sub run {
+		my ($self, %params) = @_;
+		if (defined $params{_names}) {
+			$self->{_names} = delete $params{_names};
+		}
+
+		$self->SUPER::run(%params);
 	}
 
 # 	sub get_output {
@@ -56,6 +58,9 @@ use Data::Dumper;
 						#print STDERR "SEQ_LEN = ", length $align_seq, $/;
 					}
 					#print $id, "\t", $align_seq, $/;
+					if (defined $self->{_names} && defined $self->{_names}->{$id}) {
+						$id = $self->{_names}->{$id};
+					}
 					$data->{$id} .= $align_seq;
 				}
 				else {
@@ -107,15 +112,17 @@ use Data::Dumper;
 		my $out_fh = IO::File->new;
 		if ($out_fh->open("> $consensus")) {
 			my @ids = keys %$data;
+			my $max_len = length $ids[0] > length $ids[1] ? length $ids[0] : length $ids[1];
+			$max_len = $max_len > 15 ? $max_len : 15;
 			#print $out_fh $ids[0], "\t", $data->{$ids[0]}, $/;
 			#print $out_fh "M\t", $markup, "", $/;
 			#print $out_fh $ids[1], "\t", $data->{$ids[1]}, $/;
 			#print $out_fh "C\t", $merged_seq, $/;
 
-			print $out_fh sprintf("%-15s", substr($ids[0], 0, 15)), ': ', uc $data->{$ids[0]}, $/;
+			print $out_fh sprintf("%-${max_len}s", substr($ids[0], 0, $max_len)), ': ', uc $data->{$ids[0]}, $/;
 			#print $out_fh $markup, "", $/;
-			print $out_fh sprintf("%-15s", substr($ids[1], 0, 15)), ': ', uc $data->{$ids[1]}, $/;
-			print $out_fh "Consensus      : ", uc $merged_seq, $/;
+			print $out_fh sprintf("%-${max_len}s", substr($ids[1], 0, $max_len)), ': ', uc $data->{$ids[1]}, $/;
+			print $out_fh sprintf("%-${max_len}s", "Consensus"), ': ', uc $merged_seq, $/;
 
 			$out_fh->close;
 			#print length $data->{$ids[0]},  " ", length $data->{$ids[1]}, " ", length $markup, " ", length $merged_seq, $/;

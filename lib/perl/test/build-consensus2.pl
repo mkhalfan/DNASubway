@@ -10,24 +10,25 @@ use Data::Dumper;
 
 my $data = [{
             'pair' => '0',
-            'ch' => 1,
-            'id' => '01.fasta'
+            'ch' => 0,
+            'id' => 'jm_f.txt'
           },{
             'pair' => '0',
-            'ch' => 0,
-            'id' => '02.fasta'
+            'ch' => 1,
+            'id' => 'jm_r.txt'
           },{
             'pair' => '1',
             'ch' => 0,
-            'id' => '03.fasta'
+            'id' => 'dc_f.txt'
           },{
             'pair' => '1',
             'ch' => 1,
-            'id' => '04.fasta'
+            'id' => 'dc_r.txt'
           }];
 
-my $gcf = DNALC::Pipeline::Config->new->cf("GREENLINE");
-my $dir = $gcf->{PROJECTS_DIR} . '/fasta';
+#my $gcf = DNALC::Pipeline::Config->new->cf("GREENLINE");
+#my $dir = $gcf->{PROJECTS_DIR} . '/fasta';
+my $dir = '/home/cornel/tmp/paiwisealignment/samples';
 
 my $merger = DNALC::Pipeline::Process::Merger->new($dir);
 
@@ -50,9 +51,9 @@ for my $item (@$data) {
 	}
 }
 
-print STDERR Dumper( \@pairs ), $/;
+#print STDERR Dumper( \@pairs ), $/;
 #DNALC::Pipeline::App::Utils->remove_dir($work_dir);
-#mkdir $work_dir;
+mkdir $work_dir;
 
 my $pair_cnt = 1;
 for my $pair (@pairs) {
@@ -74,6 +75,9 @@ for my $pair (@pairs) {
 			pretend => 0,
 			debug => 0,
 			input_files => \@args,
+			sid1 => 'A',
+			sid2 => 'B',
+			_names => {A => 'A_Long_long_name_' . $pair_cnt, B => 'B_Long_name_' . $pair_cnt},
 			outfile => $work_dir . "/outfile_$pair_cnt.txt",
 			outseq => $work_dir . "/merged_seq_$pair_cnt.txt",
 		);
@@ -82,7 +86,7 @@ for my $pair (@pairs) {
 	}
 	#print STDERR Dumper( \%options), $/;
 	$merger->run( %options );
-	#print STDERR  $merger->{exit_status}, $/;
+	print STDERR  'exit code: ', $merger->{exit_status}, $/;
 	#last;
 
 	$merger->build_consensus(
@@ -93,6 +97,7 @@ for my $pair (@pairs) {
 
 	print STDERR $work_dir . "/processed_consensus_$pair_cnt.txt", $/;
 	$pair_cnt++;
+	last;
 }
 
 
