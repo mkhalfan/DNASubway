@@ -824,6 +824,14 @@ h5{
 	position: relative;
 	float: left;
 	}
+	
+.conConsole_info_blue{
+	width: 110px;
+	height:50px;
+	display: block;	
+	position: relative;
+	float: left;
+	}
 
 .conConsole_info a{
 	width: 130px;
