@@ -55,8 +55,12 @@
 					type => $type, 
 					seq => $seq, 
 					pair => $pair);
-				} || {};
-		if ($st->{status} eq "success") {
+				};
+		if ($@) {
+			print STDERR "ERROR blasting: ", $@, $/;
+		}
+
+		if ($st && $st->{status} eq "success") {
 			$blast = $st->{blast};
 			$status = 'success';
 		}
@@ -69,3 +73,4 @@
 <%flags>
 	inherit => undef
 </%flags>
+
