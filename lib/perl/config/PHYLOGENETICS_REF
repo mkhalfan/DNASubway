@@ -2,13 +2,27 @@
 	dna => [
 		{
 			id => 'Adh',
-			file => '/var/www/vhosts/pipeline.dnalc.org/var/phy_samples/adh.fasta',
+			file => '/var/www/vhosts/pipeline.dnalc.org/var/phy_samples/reference/adh.fasta',
 		},
 	],
 	rbcL => [
 		{
-			id => 'rbcL ref',
-			file => '/var/www/vhosts/pipeline.dnalc.org/var/phy_samples/rbcl_ref.fasta'
+			id => 'Assorted plants',
+			file => '/var/www/vhosts/pipeline.dnalc.org/var/phy_samples/reference/plant_subset.fas'
+		},
+	],
+	COI => [
+		{
+			id => 'Assorted mammals',
+			file => '/var/www/vhosts/pipeline.dnalc.org/var/phy_samples/reference/assorted_mammals.fasta'
+		},
+		{
+			id => 'Insect subset',
+			file => '/var/www/vhosts/pipeline.dnalc.org/var/phy_samples/reference/insect_subset.fas'
+		},
+		{
+			id => 'Fish subset',
+			file => '/var/www/vhosts/pipeline.dnalc.org/var/phy_samples/reference/fish_subset.fas'
 		},
 	],
 }
