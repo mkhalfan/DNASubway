@@ -7,21 +7,21 @@
 	],
 	rbcL => [
 		{
-			id => 'Assorted plants',
+			id => 'Common plants',
 			file => '/var/www/vhosts/pipeline.dnalc.org/var/phy_samples/reference/plant_subset.fas'
 		},
 	],
 	COI => [
 		{
-			id => 'Assorted mammals',
+			id => 'Common mammals',
 			file => '/var/www/vhosts/pipeline.dnalc.org/var/phy_samples/reference/assorted_mammals.fasta'
 		},
 		{
-			id => 'Insect subset',
+			id => 'Common insects',
 			file => '/var/www/vhosts/pipeline.dnalc.org/var/phy_samples/reference/insect_subset.fas'
 		},
 		{
-			id => 'Fish subset',
+			id => 'Common fish',
 			file => '/var/www/vhosts/pipeline.dnalc.org/var/phy_samples/reference/fish_subset.fas'
 		},
 	],
