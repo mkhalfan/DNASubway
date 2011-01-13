@@ -14,14 +14,14 @@
 			<span class="conIndicator_box">
 				<div class="conIndicatorBL_done"></div>
 			</span>
-			<span class="bt_Runblueline"><a href="javascript:;" onclick="phy.launch('viewer')">Trace viewer</a></span>
+			<span class="bt_Runblueline"><a href="javascript:;" onclick="phy.launch('viewer')">Trace Viewer</a></span>
         </span>
 
         <span class="conBlueline_ConCell">
 			<span class="conIndicator_box">
 				<div id="phy_pair_st" class="conIndicatorBL_<% $status{phy_pair} eq "done" ? "done" : $status{phy_pair} %>"></div>
 			</span>
-			<span class="bt_Runblueline"><a id="phy_pair_btn" href="javascript:;" onclick="phy.launch('pair')">Pair</a></span>
+			<span class="bt_Runblueline"><a id="phy_pair_btn" href="javascript:;" onclick="phy.launch('pair')">Pair Builder</a></span>
         </span>
         <span class="conBlueline_ConCell">
 			<span class="conIndicator_box">
@@ -29,7 +29,7 @@
 			</span>
 %	if ($status{phy_pair} ne "done") {
 			<span class="bt_Runblueline">
-				<a id="phy_consensus_btn" class="conIndicatorBL_disabled" status="disabled" href="javascript:;">Consensus editor</a>
+				<a id="phy_consensus_btn" class="conIndicatorBL_disabled" status="disabled" href="javascript:;">Consensus Editor</a>
 			</span>
 %	} else {
 				<& '.routine', routine => 'phy_consensus', pmanager => $pm, is_owner => $is_owner,
@@ -45,28 +45,23 @@
 			<span class="conIndicator_box">
 				<div class="conIndicatorBL_not-processed"></div>
 			</span>
-			<span class="bt_Runblueline"><a href="javascript:;" onclick="phy.launch('blast')">BLAST</a></span>
+			<span class="bt_Runblueline"><a href="javascript:;" onclick="phy.launch('blast')">BLASTN</a></span>
 		</span>
 		<span class="conBlueline_ConCell">
 			<span class="conIndicator_box">
 				<div class="conIndicatorBL_disabled"></div>
 			</span>
-			<span class="bt_Runblueline"><a href="javascript:;" onclick="//phy.launch('data');">Upload data</a></span>
+			<span class="bt_Runblueline"><a href="#" onclick="phy.launch('data');">Upload Data</a></span>
 		</span>
 
 		<span class="conBlueline_ConCell">
 			<span class="conIndicator_box">
 				<div class="conIndicatorBL_not-processed"></div>
 			</span>
-			<span class="bt_Runblueline"><a href="#" onclick="phy.launch('ref');">Reference data</a></span>
+			<span class="bt_Runblueline"><a href="#" onclick="phy.launch('ref');">Reference Data</a></span>
 		</span>
         
-        <span class="conBlueline_ConCell">
-			<span class="conIndicator_box">
-				<div class="conIndicatorBL_not-processed"></div>
-			</span>
-			<span class="bt_Runblueline"><a href="javascript:;" onclick="phy.launch('manage_sequences')">Manage data</a></span>
-		</span>
+        
 	</span><!--END of span conBlueline_ConColumn2-->
 
 	<span class="conBlueline_ConColumn3">
@@ -78,6 +73,14 @@
 				<& '.routine', routine => 'phy_alignment', pmanager => $pm, is_owner => $is_owner,
 					status => $status{phy_alignment}, delay => 20, pid => $pid &>
 		</span>
+        
+        <span class="conBlueline_ConCell">
+			<span class="conIndicator_box">
+				<div class="conIndicatorBL_not-processed"></div>
+			</span>
+			<span class="bt_Runblueline"><a href="javascript:;" onclick="phy.launch('manage_sequences')">Select Data</a></span>
+		</span>
+        
      </span><!--END of span conBlueline_ConColumn3-->
     
      
@@ -156,7 +159,7 @@
 		</div>
 
         <div class="conProjectInfo_Row">
-			<div class="conProjectInfo_Cell1">Seqs tools</div>
+			<div class="conProjectInfo_Cell1">Processing</div>
 			<div class="conProjectInfo_Cell3">: &nbsp;<input type="radio" > &nbsp; On</span></div>
 			<div class="conProjectInfo_Cell3"><input type="radio" > &nbsp; Off</span></div>
 		</div>
@@ -290,7 +293,7 @@ if ($status eq 'processing') {
 elsif ($status eq 'done') {
 	my $url = "/project/phylogenetics/tools/view_$routine?pid=$pid";
 	$url =~ s/phy_//;
-	$action = qq{onclick="phy.launch('$routine', '$url', '$routines{$routine}')"};
+	$action = qq{onclick="phy.launch(null, '$url', '$routines{$routine}')"};
 	$target = '';
 	#$title  = 'Click to view results';
 	#$label  = 'View';
