@@ -165,14 +165,14 @@ if ($r->method eq "POST") {
 			} 
 			else {
 				#my $file2process = $phy_sample->sample_dir . "/fasta.fa";
-				push @files2process, map {{path => $_, type => "trace", filename => basename($_)}} $phy_sample->files;
+				push @files2process, map {{path => $_, type => -B $_ ? "trace" : "fasta", filename => basename($_)}} $phy_sample->files;
 			}
 		}
 		elsif ($seq_src eq "paste") {
 
 			my $seq = $seq_paste;
 			$seq_paste =~ s/^\s+//;
-			my $file2process = $pcf->{upload_dir} . '/' . random_string(7,7);
+			my $file2process = $pcf->{upload_dir} . "/" . random_string(7,7);
 			my $out = IO::File->new;
 			if ($out->open($file2process, "w")) {
 				print $out $seq;
