@@ -1,20 +1,5 @@
 
 <div class="container_data1">
-<style type="text/css">
-input[type="checkbox"] {
-	border: none;
-}
-span.bold {
-	font-weight: bolder;
-}
-
-.paired-light {
-	background-color:yellow;
-}
-.paired-dark {
-	background-color:silver;
-}
-</style>
 	<div id="container_data_line">&nbsp;</div>
 	<div id="seqids" class="seqids">
 		<pre>
@@ -41,10 +26,6 @@ span.bold {
 			Your browser isn't supporting canvas objects.
 		</canvas>  
 	</div>
-	<div sytle="float:rigth">
-		<input type="button" id="y_zoom_in" value="Y ZoomIn" onclick="phy.zoomIn()"/>
-		<input type="button" id="y_zoom_out" value="Y ZoomOut" onclick="phy.zoomOut()"/>
-	</div>
 %#	<pre><% Dumper($file)%></pre>
 % } else {
 		<pre>
@@ -57,12 +38,21 @@ span.bold {
 </pre>
 % }
 	 </div>
-     
-   
-     <div style="clear: both;">&nbsp;</div>
+%#     <div style="clear: both;">&nbsp;</div>
+% if ($file) {
+	 <div class="seqs">
+		<div style="float:left; width: 100px;"><input type="button" id="zoom_reset" value=" Reset " onclick="phy.zoomReset()"/></div>
+		<div style="float:left; width: 200px; text-align: center;">
+			X:<input type="button" id="x_zoom_in" value="  +  " onclick="phy.zoomIn('x')"/><input type="button" id="x_zoom_out" value="  -  " onclick="phy.zoomOut('x')"/>
+		</div>
+		<div style="float:left; width: 200px; text-align: right;">
+			Y:<input type="button" id="y_zoom_in" value="  +  " onclick="phy.zoomIn('y')"/><input type="button" id="y_zoom_out" value="  -  " onclick="phy.zoomOut('y')"/>
+		</div>
+	</div>
+% }
      <div id="container_data_lineBottom">&nbsp;</div>
-
 </div> <!-- END of container_rightContent-->
+
 <%args>
 	$op => ''
 	$data => ''

@@ -1,16 +1,16 @@
 <div class="container_data3">
 <div id="container_data_line">&nbsp;</div>
 <form method="post">
-	
+	<input type="hidden" id="selection_changed" value="" />
 	<div class="con_BL_subTitle">
-		<input type="checkbox" id="" title="Select all" \
+		<input type="checkbox" id="" title="Select all" onchange="$('selection_changed').value='1'" \
 		onclick="var chk=this.checked;$$('#seqs input[type=checkbox]').each(function(el) { el.checked = chk});"/> Select all
 	</div>
 	<div id="seqs" class="seqs">
 % for (@sequences) {
 	<div>
 		<input type="checkbox" name="seqids" value="<% $_->{id} %>" id="seq<% $_->{s} %>" \
-		<% $selected_sequences{$_->{id}} ? "checked=\"checked\"" : "" %> />
+		<% $selected_sequences{$_->{id}} ? "checked=\"checked\"" : "" %> onchange="$('selection_changed').value='1';"/>
 		<span id="seq<% $_->{id} |html %>"><% $_->{name} |html%></span>
 	</div>
 % }

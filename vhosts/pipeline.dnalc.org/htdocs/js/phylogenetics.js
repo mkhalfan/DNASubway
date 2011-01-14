@@ -1,6 +1,7 @@
 	var pairs = [];
 	var current_pair = [];
 	var intervalID = {};
+	var xZoom = 1;
 	var yZoom = 1;
 	var yLimit = 80; // max y a trace can have, so the graph stays in the canvas
 	
@@ -142,7 +143,32 @@
 						? 'http://' + host + urls[what][0] + $('pid').value
 						: where;
 		var window_title = title ? title : urls[what] ? urls[what][1] : null;
-		windows[what] = openWindow( uri, window_title);
+		
+		
+		var options = null;
+		if (what == 'manage_sequences') {
+			options = {
+				width: 900, 
+				height: 496,
+				shadow: false,
+				draggable: true,
+				resizable: true,
+				url: uri, 
+				close : function() {
+					if (what && windows[what]) {
+						if ($(windows[what].content.down().contentWindow.document).getElementById('selection_changed').value != "") {
+							if (!confirm("You haven't saved your selection.\nDo you really want to close this window?")) {
+								return false;
+							}
+						}
+						windows[what].destroy(); 
+						return true;
+					}
+				}
+			};
+		}
+		
+		windows[what] = openWindow( uri, window_title, options);
 		
 		debug(what + ': ' + windows[what]);
 		
@@ -508,18 +534,6 @@
 				ctx.fillStyle = qcol;
 				ctx.fillRect(x, 55 - h + 1, 6, h + 1);
 			}
-			//console.info(qual_str);
-			//console.info(str.length + " " + qual_str.length);
-			//ctx.fillText(qual_str, padding, 42);
-			
-			/*
-			// draw line
-			ctx.beginPath();
-			ctx.moveTo(padding,50.5);
-			ctx.lineTo(text_width + padding,50.5);
-			ctx.closePath();
-			ctx.stroke();
-			*/
 		}
 	};
 	
@@ -527,25 +541,31 @@
 	//---------------------------------------------------------
 	//
 	//---------------------------------------------------------
-	
-	phy.zoomIn = function() {
-		document.getElementById('y_zoom_in').disabled = true;
-		yZoom *= 1.3;
+	 phy.zoomReset = function() {
+		$('zoom_reset').disabled = true;
+		yZoom = xZoom = 1;
 		phy.draw();
-		document.getElementById('y_zoom_in').disabled = false;
+		$('zoom_reset').disabled = false;
+	}
+	phy.zoomIn = function(axis) {
+		$(axis + '_zoom_in').disabled = true;
+		var zVar = axis + 'Zoom';
+		eval(zVar + " *= 1.3");
+		phy.draw();
+		$(axis + '_zoom_in').disabled = false;
 	}
 
-	phy.zoomOut = function() {
-		document.getElementById('y_zoom_out').disabled = true;
-		yZoom /= 1.3;
+	phy.zoomOut = function(axis) {
+		$(axis + '_zoom_out').disabled = true;
+		var zVar = axis + 'Zoom';
+		eval(zVar + " /= 1.3");
 		phy.draw();
-		document.getElementById('y_zoom_out').disabled = false;
+		$(axis + '_zoom_out').disabled = false;
 	}
 	//---------------------------------------------------------
 	phy.draw = function() {
-		//function draw() {
 
-		var canvas = document.getElementById('canvas1');       
+		var canvas = $('canvas1');       
 
 		if (!canvas.getContext)
 			return;
@@ -572,17 +592,15 @@
 		var padding = 5;
 		var height = 200;
 		//var width = 6000;
-		var baseCallYPos = 20;
+		var baseCallYPos = 30;
 		var qualScoreSectionHeight = 30;
 		var qualScoreYPos = baseCallYPos + qualScoreSectionHeight;
-		var baseLocationYPos = 60;
+		var baseLocationYPos = 70;
 		var lastBase = Math.max.apply(Math, baseLocations);
-		canvas.width = lastBase + 15;
+		canvas.width = lastBase * xZoom + 15;
 		var width = canvas.width;
 
-
 		var ctx = canvas.getContext('2d');
-		//ctx.fillText("Trace", 10, 10);
 		
 		function drawTrace(n, color){
 			ctx.strokeStyle = color;
@@ -600,7 +618,7 @@
 				if (y < yLimit) {
 					y = yLimit;
 				}
-				ctx.lineTo(padding + i, y);
+				ctx.lineTo(padding + i * xZoom, y);
 			});
 			ctx.stroke();
 			ctx.closePath();
@@ -608,8 +626,7 @@
 
 		//a = a.splice(0, 1000);
 		// Draw The Traces
-		
-		
+
 		var colors = ["green", "red", "blue", "black"];
 		['a', 't', 'c', 'g'].each(function(base, i) {
 			var a = [];
@@ -618,12 +635,17 @@
 			});
 			drawTrace(a, colors[i]);
 		});
-		
-		/*drawTrace(a, "green");
-		drawTrace(t, "red");
-		drawTrace(c, "blue");
-		drawTrace(g, "black");*/
 
+		// Draw The Labels
+		ctx.fillStyle = "black";
+		ctx.fillText("Sequence", padding, 15);
+		ctx.fillText("Quality", padding, 45); 
+		ctx.fillText("Traces", padding, 80);
+		ctx.fillStyle = "rgba(0, 0, 0, 0.1)";
+		ctx.fillRect(padding - 2, 4, 60, 14);
+		ctx.fillRect(padding - 2, 34, 44, 14);
+		ctx.fillRect(padding - 2, 69, 40, 14);
+		
 		// Draw the 'Quality Score = 20' line (99% accuracy line)
 		// Setting line to 5 instead of 20 since I will divide all 
 		// the QS's by 4 (so they fit in the designated height of 50px)
@@ -664,7 +686,7 @@
 			// Drawing every 10th base location
 			if (i%10 == 0){
 				ctx.fillStyle = "black";
-				ctx.fillText(i, padding + bl - 3, baseLocationYPos);
+				ctx.fillText(i, padding + bl * xZoom - 3, baseLocationYPos);
 			}
 		});
 						
@@ -680,7 +702,7 @@
 		var i = 0;
 		//for (var x in baseLocations){
 		baseLocations.each(function(bl, i) {
-			ctx.fillRect(padding + bl, qualScoreYPos - qualityScores[i]/4, qualScoreBarWidth, qualityScores[i]/4);
+			ctx.fillRect(padding + bl * xZoom, qualScoreYPos - qualityScores[i]/4, qualScoreBarWidth, qualityScores[i]/4);
 			i++;
 		});
 	};
