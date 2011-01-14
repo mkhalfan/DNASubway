@@ -10,6 +10,26 @@
 			id => 'Common plants',
 			file => '/var/www/vhosts/pipeline.dnalc.org/var/phy_samples/reference/plant_subset.fas'
 		},
+		{
+			id => 'Eudicots',
+			file => '/var/www/vhosts/pipeline.dnalc.org/var/phy_samples/reference/eudicots.fasta'
+		},
+		{
+			id => 'Ferns and allies',
+			file => '/var/www/vhosts/pipeline.dnalc.org/var/phy_samples/reference/ferns_and_allies.fasta'
+		},
+		{
+			id => 'Gymnosperms',
+			file => '/var/www/vhosts/pipeline.dnalc.org/var/phy_samples/reference/gymnosperms.fasta'
+		},
+		{
+			id => 'Monocots',
+			file => '/var/www/vhosts/pipeline.dnalc.org/var/phy_samples/reference/monocots.fasta'
+		},
+		{
+			id => 'Mosses and allies',
+			file => '/var/www/vhosts/pipeline.dnalc.org/var/phy_samples/reference/mosses_and_allies.fasta'
+		},
 	],
 	COI => [
 		{
