@@ -1,8 +1,8 @@
 %# key = caf45f111ac3f8424b780d385b1e893c
 %# http://entrezajax.appspot.com/
-<div id="container_rightContentx">
-	<div style="margin-top: 20px;"></div>
-	<div id="seqids" style="float:left; width: 100px;font-family:courier; line-height: 1.2em;padding-left:5px; overflow-x:auto;">
+<div class="container_data2">
+	<div id="container_data_line">&nbsp;</div>
+	<div id="seqids" class="seqids">
 		<pre>
 % for (@pairs) {
 %	my $name = join " + ", map {$_->seq->display_id} $_->paired_sequences;
@@ -13,7 +13,7 @@
 % }
 </pre>
 	</div>
-	<div id="seqs" style="float:left;width:700px;margin-left:10px;overflow-x:auto;font-family:courier;line-height: 1.2em;">
+	<div id="seqs" class="seqs">
 		<pre>
 % for (@pairs) {
 %	my $consensus = $_->consensus;
@@ -29,8 +29,7 @@
 </pre>
 	</div>
 
-%#	<div id="seqops" style="float:left; padding-left:4px; width: 20px;line-height: 1.2em;line-height: 1.2em">
-	<div id="seqops" style="float:left; padding-left:10px; width: 30px;font-family:courier;line-height: 1.2em;">
+	<div id="seqops" class="seqops">
 		<pre>
 % for (@pairs) {
 %	if ($_->consensus) {
@@ -43,6 +42,15 @@
 </pre>
 <input type="hidden" id="pid" value="<% $proj->id %>" />
 </div>
+
+<div style="clear: both;">&nbsp;</div>
+     <div id="container_data_lineBottom">&nbsp;</div>
+     
+
+</div> <!-- END of container_data2-->
+
+
+
 <%args>
 	$op => ''
 	$data => ''

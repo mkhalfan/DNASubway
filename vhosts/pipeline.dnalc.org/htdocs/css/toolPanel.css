@@ -22,7 +22,7 @@
 .con_BL_infoText{
 	width: 590px;
 	height: auto; 
-	padding: 4px 30px 10px 30px;
+	padding: 10px 30px 10px 30px;
 	color: #006699;
 	font-size: 0.8em;
 	text-align: left;
@@ -85,20 +85,20 @@
 	padding: 2px;
 	border: .1em;
 	border-style: solid;
-	border-color: #006699;
-	width: 220px;
+	
+	width: 260px;
 	margin-bottom: 4px;
-	font-size:.8em; font-family:  monaco;
+	font-size:.8em; font-family: courier, monaco, monospace;
 }
 
 .conStylized_input2{
 	float:left;
 	border: .1em; 
 	border-style: solid; 
-	border-color: #00669;
+	
 	color: #00669;  
 	width:260px;
-	font-size:.7em; font-family:  monaco;
+	font-size:.7em; font-family: courier, monaco, monospace;
 	text-transform: uppercase;
 	letter-spacing: .1em;
 	overflow-y: scroll;
@@ -110,11 +110,11 @@
 	float:left;
 	border: .1em;
 	border-style: solid;
-	border-color: #006699;
+	
 	width: 260px;
 	height: 20px;
 	margin-bottom: 4px;
-	font-size:.8em; font-family:  monaco;
+	font-size:.8em; font-family: courier, monaco, monospace;
 	
 }
 	
@@ -201,3 +201,305 @@ width: 300px;
 .tcell, .tcell1, .tcell2 {display:table-cell; padding: 2px 3px 2px 5px;}
 
 span.rot { -moz-transform:rotate(90deg); font-size: smaller;}
+
+/* //--------START View Trace MENU ---ADD-as it is ------------------ */
+
+
+.container_data1 {
+	width: 840px;
+	height: auto;
+	padding-top: 8px;
+	float: left;
+	position: relative;
+	padding-left: 20px;
+	font-family:  arial, monospace;
+	 
+	
+	}
+.container_data1 .seqids {
+	float:left; width: 140px; font-family:arial; line-height: 1.2em; overflow-x:auto; color:#996600; 
+	}
+.container_data1 .seqs {
+	float:left; width:680px; margin-left:20px; overflow-x:auto; font-family:courier, monospace; line-height: 1.2em; text-transform: uppercase; 
+	}
+
+
+.container_data2 {
+	width: 840px;
+	height: auto;
+	padding-top: 8px;
+	float: left;
+	position: relative;
+	padding-left: 20px;
+	font-family:  arial, monospace;
+	}
+
+.container_data2 .seqids {
+	float:left; width: 120px;font-family:arial, monospace; line-height: 1.2em;overflow-x:auto; color: #996600; 
+	}
+.container_data2 .seqs {
+	float:left;width:630px;margin-left:15px;overflow-x:auto;font-family:courier;line-height: 1.2em;text-transform: uppercase;
+	}
+.container_data2 .seqops {
+	float:left; padding-left:15px; width: 50px;font-family:arial;line-height: 1.2em; color: #996600;
+	}
+	
+.container_data3 {
+	width: 840px;
+	height: auto;
+	padding: 8px 0px 0px 20px;
+	float: left;
+	position: relative;
+	font-family:  arial, monospace;
+	
+	}
+.container_data3 .seqs {
+	float:left; width: 740px; padding-left: 74px; line-height: 1.2em;overflow-x:auto; color: #996600; clear: right; margin-bottom:2px; font-size: 0.8em;
+	}
+	
+.container_data4 {
+	padding: 8px 0px 0px 20px;
+	float: left;
+	position: relative;
+	font-family:  arial, monospace;
+	
+	}
+	
+#container_data_line {
+	height: 8px;
+	margin-top: 14px;
+	position: relative;
+	border-top: 4px solid #C2DBF3;
+
+	}
+#container_data_lineBottom {
+	height: 3px;
+	position: relative;
+	border-bottom: 1px solid #C2DBF3;
+
+	}
+
+.seqids a{
+ 	
+	text-align: left;
+	color: #006699;
+	text-decoration:none;
+	font-weight:bold;
+	
+	}
+.seqids a:hover{
+	color: #669966;
+	
+	}
+	
+.seqops a{
+ 	
+	text-align: left;
+	color: #006699;
+	text-decoration:none;
+	font-weight:bold;
+	text-transform:uppercase;
+	
+	}
+.seqops a:hover{
+	color: #669966;
+	
+	}	
+
+.list_refdata{
+    width: 400px;
+	height: 22px;
+	padding: 10px 0px 0px 65px;
+	position: relative;
+	float:left;
+	color: #006699;
+	font-size: 0.8em;
+	text-align: left;
+  
+}
+
+/* //--------START View BLAST table ---PAGE----MENU ------------------ */
+.theader .tcell	{
+	font-size: .9em;
+	font-weight: bold;
+	padding: 10px 4px 6px 10px;
+	background:#CADEEF;
+	border-top: 1px solid #999999;
+	border-bottom: 4px solid #666666;
+	color: #000000;
+	height: 30px;
+	font-family:  arial, monospace;
+}
+
+.trow	{
+	background-color: #FFF; 
+}
+
+.trow_1	{
+	background-color: #EEF3F7; 
+}
+
+.trow .tcell	{
+	height: 16px;
+	font-size: .9em;
+	border-top: 1px solid #ccc;
+	color: #333333;
+	padding: 6px 4px 6px 10px;
+	font-family:  arial, monospace;
+}
+
+.trow .tcell a{
+	color: #006699;
+	text-decoration: none; 
+	text-align: left;
+}
+
+.trow .tcell a:hover{
+	color: #C2DBF3;
+
+}
+
+.trow .tcell_1	{
+	height: 16px;
+	font-size: .9em;
+	border-top: 1px solid #ccc;
+	color: #996600;
+	padding: 6px 4px 6px 10px;
+	font-family:  arial, monospace;
+}
+
+.con_BLAST_subTitle{
+	width: 565px;
+	height: auto; 
+	padding: 4px 30px 10px 20px;
+	color: #3399CC;
+	font-size: 1em;
+	text-align: left;
+	font-weight: bold;
+	position: relative;
+	float: left;
+}
+/* //--------START Pair table ---PAGE----MENU ------------------ */
+span.bold {
+	font-weight: bolder;
+}
+
+.paired-light {
+	background-color:#E2F0DC;
+}
+.paired-dark {
+	background-color:#E0E9F6;
+}
+
+/* //--------KILL -----START  MENU ---PAGE----MENU---KILL ------------------ */
+
+#conBL_menu_holder {
+	width: 878px;
+	height:auto;
+	position: relative;
+
+}
+
+.conBL_menu_table{
+	margin: 12px 14px 20px 14px;
+	width: 850px;
+	text-align: left;
+	border-collapse: collapse;
+	border-bottom: 2px solid #666666;
+}
+.conBL_menu_table th{
+	font-size: .9em;
+	font-weight: normal;
+	padding: 4px;
+	background:#CADEEF;
+	border-top: 1px solid #999999;
+	border-bottom: 4px solid #666666;
+	color: #000000;
+}
+.conBL_menu_table td{
+	height: 16px;
+	font-size: .8em;
+	border-bottom: 1px solid #ccc;
+	color: #333333;
+	padding: 6px 4px 6px 4px;
+}
+
+.conBL_menu_table td.seqs{
+	height: 16px;
+	font-size: .8em;
+	border-bottom: 1px solid #ccc;
+	color: #333333;
+	padding: 6px 4px 6px 4px;
+	text-transform: uppercase;
+	letter-spacing: .1em;
+}
+.conBL_menu_table td.tools{
+	height: 16px;
+	font-size: .8em;
+	text-align:left;
+	border-bottom: none;
+	padding-left:  10px;
+	position: relative;
+	vertical-align: top;
+	
+}
+.conBL_menu_table tr.rowOne {
+	background-color: none; 
+}
+.conBL_menu_table tr.rowTwo {
+	background-color: #EEF3F7; 
+}
+
+.conBL_menu_table tr.rowThree {
+	background-color: #D7CABA;
+	font-weight: bold; 
+	
+	border-bottom: 2px solid #876A53;
+	
+}
+
+.conBL_menu_table td.link{
+	color: #0080FF;	
+	display: block;
+	text-decoration: none; text-align: left;
+	
+}
+
+.conBL_menu_table td.link a{
+	color: #0080FF;
+	display: block;
+	text-decoration: none; text-align: left;
+	
+}
+.conBL_menu_tabletd.link a:hover{
+	color: #CC9900;
+	
+}
+.con_BLUEscores {
+	height: 10px;
+	width: 682px;
+	position: relative;
+	float: left;
+	display: block;
+	text-align:left;
+	padding: 5px 0px 5px 0px;
+	color: red;
+	font-size: .6em;
+	font-weight: bold;
+	/*word-spacing: .1em;*/
+	font-family: courier new, courier, monospace;
+}
+
+.con_BLUEseqs {
+	height: 16px;
+	width: 682px;
+	position: relative;
+	float: left;
+	display: block;
+	text-align:left;
+	font-size: 1.2em;
+	text-transform: uppercase;
+	letter-spacing: .2em;
+	font-family: courier new, courier, monospace;
+
+}

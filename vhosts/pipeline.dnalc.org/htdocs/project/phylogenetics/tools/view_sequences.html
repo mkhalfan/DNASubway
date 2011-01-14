@@ -1,5 +1,5 @@
-sequences..
-<div id="container_rightContent">
+
+<div class="container_data1">
 <style type="text/css">
 input[type="checkbox"] {
 	border: none;
@@ -15,8 +15,8 @@ span.bold {
 	background-color:silver;
 }
 </style>
-	<div style="margin-top: 20px;"></div>
-	<div id="seqids" style="float:left; width: 100px;font-family:courier; line-height: 1.2em;padding-left:5px; overflow-x:auto;">
+	<div id="container_data_line">&nbsp;</div>
+	<div id="seqids" class="seqids">
 		<pre>
 % for (@files) {
 <span id="x<% $_ |html %>"><a href="./view_sequences.html?pid=<% $pid |html%>;fid=<% $_->id %>"><% $_->file_name |html%></a></span>
@@ -26,15 +26,24 @@ span.bold {
 % }
 </pre>
 	</div>
-	<div id="seqs" style="float:left;width:700px;margin-left:10px;overflow-x:auto;font-family:courier;line-height: 1.2em;">
+	<div id="seqs" class="seqs">
 % if ($file) {
 	<input type="hidden" id="step" value="2" />
 	<input type="hidden" id="seq_data" value="<% $file->seq |html%>" />
+	<input type="hidden" id="seq_a" value="<% join ",", @{$traces->{A}} %>" />
+	<input type="hidden" id="seq_t" value="<% join ",", @{$traces->{T}} %>" />
+	<input type="hidden" id="seq_c" value="<% join ",", @{$traces->{C}} %>" />
+	<input type="hidden" id="seq_g" value="<% join ",", @{$traces->{G}} %>" />
 	<input type="hidden" id="qvalues" value="<% join ",", $file->quality_values %>" />
+	<input type="hidden" id="b_locations" value="<% join ",", $file->base_locations %>" />
 	<div>
-		<canvas id="canvas1" width="400" height="100">
+		<canvas id="canvas1" height="200">
 			Your browser isn't supporting canvas objects.
 		</canvas>  
+	</div>
+	<div sytle="float:rigth">
+		<input type="button" id="y_zoom_in" value="Y ZoomIn" onclick="phy.zoomIn()"/>
+		<input type="button" id="y_zoom_out" value="Y ZoomOut" onclick="phy.zoomOut()"/>
 	</div>
 %#	<pre><% Dumper($file)%></pre>
 % } else {
@@ -47,28 +56,13 @@ span.bold {
 % }
 </pre>
 % }
-	</div>
-% if (0) {
-	<div id="seqops" style="float:left; padding-left:4px; width: 20px;line-height: 1.2em;line-height: 1.2em">
-		<pre>
-% for (@files) {
-<span><input type="checkbox" id="op<% $_ %>" /></span>
-% }
-		</pre>
-	</div>
-	<br clear="both"/>
+	 </div>
+     
+   
+     <div style="clear: both;">&nbsp;</div>
+     <div id="container_data_lineBottom">&nbsp;</div>
 
-	<div style="text-align: center">
-		<input type="button" id="consensus" value="Build consensus" onclick="javascript:build_consensus();"/>
-		<input type="button" id="align" value="Align" />
-	</div>
-	<form method="post" id="forma1">
-		
-		<input type="hidden" id="op" name="op" />
-		<input type="hidden" id="data" name="data" />
-	</form>
-% }
-</div>
+</div> <!-- END of container_rightContent-->
 <%args>
 	$op => ''
 	$data => ''
@@ -88,7 +82,7 @@ span.bold {
 	my $pairs = undef;
 	
 	my @sequences = ();
-	my $file;
+	my ($file, $traces);
 
 	my $pm = DNALC::Pipeline::App::Phylogenetics::ProjectManager->new($pid);
 	my $proj = $pm->project;
@@ -108,6 +102,7 @@ span.bold {
 			unless (-f $file->file_path) {
 				$file = undef;
 			}
+			$traces = $file->trace if $file;
 		}
 	}
 	else {
@@ -116,5 +111,6 @@ span.bold {
 </%init>
 <%attr>
 	js => ['prototype-1.6.1.js', 'phylogenetics.js']
+	load_ie_canvas => 1
 </%attr>
 

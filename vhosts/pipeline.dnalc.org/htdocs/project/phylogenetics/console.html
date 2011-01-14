@@ -14,7 +14,7 @@
 			<span class="conIndicator_box">
 				<div class="conIndicatorBL_done"></div>
 			</span>
-			<span class="bt_Runblueline"><a href="javascript:;" onclick="phy.launch('viewer')">Trace Viewer</a></span>
+			<span class="bt_Runblueline"><a href="javascript:;" onclick="phy.launch('viewer')">Sequence Viewer</a></span>
         </span>
 
         <span class="conBlueline_ConCell">
@@ -65,20 +65,19 @@
 	</span><!--END of span conBlueline_ConColumn2-->
 
 	<span class="conBlueline_ConColumn3">
-		<span class="conBlueline_ConCell">
-			<span class="conIndicator_box">
-				<div id="phy_alignment_st" class="conIndicatorBL_<% $status{phy_alignment} eq "done" ? "done" : $status{phy_alignment} %>"></div>
-			</span>
-%#			<span class="bt_Runblueline"><a href="#">MUSCLE</a></span>
-				<& '.routine', routine => 'phy_alignment', pmanager => $pm, is_owner => $is_owner,
-					status => $status{phy_alignment}, delay => 20, pid => $pid &>
-		</span>
-        
         <span class="conBlueline_ConCell">
 			<span class="conIndicator_box">
 				<div class="conIndicatorBL_not-processed"></div>
 			</span>
 			<span class="bt_Runblueline"><a href="javascript:;" onclick="phy.launch('manage_sequences')">Select Data</a></span>
+		</span>
+
+		<span class="conBlueline_ConCell">
+			<span class="conIndicator_box">
+				<div id="phy_alignment_st" class="conIndicatorBL_<% $status{phy_alignment} eq "done" ? "done" : $status{phy_alignment} %>"></div>
+			</span>
+				<& '.routine', routine => 'phy_alignment', pmanager => $pm, is_owner => $is_owner,
+					status => $status{phy_alignment}, delay => 20, pid => $pid &>
 		</span>
         
      </span><!--END of span conBlueline_ConColumn3-->

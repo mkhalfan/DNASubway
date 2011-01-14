@@ -1,7 +1,8 @@
 	var pairs = [];
 	var current_pair = [];
 	var intervalID = {};
-	//var step = 0;
+	var yZoom = 1;
+	var yLimit = 80; // max y a trace can have, so the graph stays in the canvas
 	
 (function() {
 	// keep open windows
@@ -117,12 +118,12 @@
 	phy.launch = function (what, where, title) {
 		
 		var urls = {
-				viewer: ['/project/phylogenetics/tools/view_sequences.html?pid=', 'View Sequences'],
-				pair: ['/project/phylogenetics/tools/pair?pid=', 'Pair sequences'],
-				blast: ['/project/phylogenetics/tools/blast.html?pid=', 'BLAST'],
+				viewer: ['/project/phylogenetics/tools/view_sequences.html?pid=', 'Sequence Viewer'],
+				pair: ['/project/phylogenetics/tools/pair?pid=', 'Pair Builder'],
+				blast: ['/project/phylogenetics/tools/blast.html?pid=', 'BLASTN'],
 				data: ['/project/phylogenetics/tools/add_data?pid=', 'Add data'],
-				ref: ['/project/phylogenetics/tools/add_ref?pid=', 'Add Reference'],
-				manage_sequences: ['/project/phylogenetics/tools/manage_sequences?pid=', 'Manage Data']
+				ref: ['/project/phylogenetics/tools/add_ref?pid=', 'Reference Data'],
+				manage_sequences: ['/project/phylogenetics/tools/manage_sequences?pid=', 'Select Data']
 			};
 
 		try {
@@ -456,7 +457,7 @@
 	};
 	
 	phy.draw_qvalues = function() {
-		var canvas = document.getElementById('canvas1');
+		var canvas = $('canvas1');
 		if (canvas.getContext){
 			var padding = 10;
 			var font = "16px Courier";
@@ -520,6 +521,168 @@
 			ctx.stroke();
 			*/
 		}
+	};
+	
+	
+	//---------------------------------------------------------
+	//
+	//---------------------------------------------------------
+	
+	phy.zoomIn = function() {
+		document.getElementById('y_zoom_in').disabled = true;
+		yZoom *= 1.3;
+		phy.draw();
+		document.getElementById('y_zoom_in').disabled = false;
+	}
+
+	phy.zoomOut = function() {
+		document.getElementById('y_zoom_out').disabled = true;
+		yZoom /= 1.3;
+		phy.draw();
+		document.getElementById('y_zoom_out').disabled = false;
+	}
+	//---------------------------------------------------------
+	phy.draw = function() {
+		//function draw() {
+
+		var canvas = document.getElementById('canvas1');       
+
+		if (!canvas.getContext)
+			return;
+			
+		var sequence = $('seq_data').value;
+		var baseLocations = [];
+		var qualityScores = [];
+		
+		var qual = [];
+		//var str  = $('seq_data').value;
+		var qval = $('qvalues').value;
+		//debug(str.length);
+		qval.split(',').each(function(q){
+				qualityScores.push(parseInt(q, 10));
+			});
+			
+		
+		$('b_locations').value.split(',').each(function(q){
+				baseLocations.push(parseInt(q, 10));
+			});
+
+		//console.info(qualityScores);
+		//	return 0;
+		var padding = 5;
+		var height = 200;
+		//var width = 6000;
+		var baseCallYPos = 20;
+		var qualScoreSectionHeight = 30;
+		var qualScoreYPos = baseCallYPos + qualScoreSectionHeight;
+		var baseLocationYPos = 60;
+		var lastBase = Math.max.apply(Math, baseLocations);
+		canvas.width = lastBase + 15;
+		var width = canvas.width;
+
+
+		var ctx = canvas.getContext('2d');
+		//ctx.fillText("Trace", 10, 10);
+		
+		function drawTrace(n, color){
+			ctx.strokeStyle = color;
+			ctx.beginPath();		
+			ctx.moveTo(padding, height - padding);
+			var i = 1;
+			//for (var x in n) {
+			n.each(function(x, i) {
+				/*
+				if (x % 2) {
+					return;
+				}*/
+				var y = height - padding - x*yZoom;
+				//console.info(y);
+				if (y < yLimit) {
+					y = yLimit;
+				}
+				ctx.lineTo(padding + i, y);
+			});
+			ctx.stroke();
+			ctx.closePath();
+		}
+
+		//a = a.splice(0, 1000);
+		// Draw The Traces
+		
+		
+		var colors = ["green", "red", "blue", "black"];
+		['a', 't', 'c', 'g'].each(function(base, i) {
+			var a = [];
+			$('seq_' + base).value.split(',').each(function(b){
+				a.push(parseInt(b, 10));
+			});
+			drawTrace(a, colors[i]);
+		});
+		
+		/*drawTrace(a, "green");
+		drawTrace(t, "red");
+		drawTrace(c, "blue");
+		drawTrace(g, "black");*/
+
+		// Draw the 'Quality Score = 20' line (99% accuracy line)
+		// Setting line to 5 instead of 20 since I will divide all 
+		// the QS's by 4 (so they fit in the designated height of 50px)
+		ctx.strokeStyle = "#33CCFF";
+		ctx.beginPath();
+		ctx.moveTo(padding, qualScoreYPos - 5);
+		ctx.lineTo(width - padding, qualScoreYPos - 5);
+		ctx.stroke();
+		ctx.closePath();
+		
+
+		// Draw The Base Calls at the appropriate base locations
+		//ctx.fillStyle = "black";
+		var i = 0;
+		//for (var x in baseLocations){
+		baseLocations.each(function(bl, i) {
+			var base = sequence.charAt(i);
+			switch (base){
+				case 'A':
+				ctx.fillStyle = "green";
+  				break;
+				case 'T':
+		  		ctx.fillStyle = "red";
+  				break;
+				case 'C':
+  				ctx.fillStyle = "blue";
+  				break;
+				case 'G':
+  				ctx.fillStyle = "black";
+  				break;
+				case 'N':
+  				ctx.fillStyle = "black";
+  				break;
+			}
+			//console.info(base, ' - ', padding + bl , ' - ', baseCallYPos);
+			ctx.fillText(base, padding + bl, baseCallYPos);
+			//i++;
+			// Drawing every 10th base location
+			if (i%10 == 0){
+				ctx.fillStyle = "black";
+				ctx.fillText(i, padding + bl - 3, baseLocationYPos);
+			}
+		});
+						
+		// Draw The Quality Score Bars
+		// The width of the Quality Score bar is calculated in this way so 
+		// that it matches the width of a single nucleotide base call no			
+		// matter what font or size it is. 
+		// Note: I'm dividing the quality score values by 4 so eveything fits
+		// in the designated 50px area
+		var nucleotideWidth = ctx.measureText(sequence).width / sequence.length;
+		var qualScoreBarWidth = nucleotideWidth; 
+		ctx.fillStyle = "rgba(0, 0, 200, 0.5)";
+		var i = 0;
+		//for (var x in baseLocations){
+		baseLocations.each(function(bl, i) {
+			ctx.fillRect(padding + bl, qualScoreYPos - qualityScores[i]/4, qualScoreBarWidth, qualityScores[i]/4);
+			i++;
+		});
 	};
 	
 	phy.do_blast = function (sid) {
@@ -703,7 +866,7 @@
 			parameters: { 't': type}, 
 			onSuccess: function(transport){
 				var response = transport.responseText || "{'status':'error', 'message':'No response'}";
-				//debug(response);
+				debug(response);
 				var samples = response.evalJSON();
 				samples.each (function(s) {
 					if (s) {
@@ -731,7 +894,7 @@ function debug(msg) {
 }
 
 Event.observe(window, Prototype.Browser.IE ? 'load' : 'dom:loaded', function() {
-	var step = $('step') != null ? parseInt($('step').value, 10) : 0;
+	var step = document.getElementById('step') != null ? parseInt(document.getElementById('step').value, 10) : 0;
 	debug("step = " + step);
 
 	if (step == -1) {
@@ -779,7 +942,8 @@ Event.observe(window, Prototype.Browser.IE ? 'load' : 'dom:loaded', function() {
 	}
 	else if (step == 2) {
 		//alert(step);
-		phy.draw_qvalues();
+		//phy.draw_qvalues();
+		phy.draw();
 	}
 	else if (step == 3) {
 		/*

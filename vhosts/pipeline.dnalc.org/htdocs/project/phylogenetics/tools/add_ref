@@ -1,3 +1,4 @@
+
 <div id="" style="min-height: 300px">
 % if ($ok == 1) {
 <script type="text/javascript">
@@ -7,13 +8,16 @@
 % } elsif ($error) {
 	<div><% $error |html%></div>
 % }
+<div class="container_data1">
+<div id="container_data_line">&nbsp;</div>
+
 % if ($proj) {
-	<h3><% $type %> reference data</h3>
+	<div class="con_BL_subTitle"><% $type %> reference data</div>
 	<form method="post" id="forma1">
-%#	<pre><% Dumper $ref_cf->{$type} %></pre>
+
 % 	for my $ref (@$refs) {
 %		my $disabled = $in_use_refs{$ref->{id}} ? "disabled=\"disabled\"" : "";
-	<div>
+	<div class="list_refdata">
 		<input type="radio" name="refid" id="r<% $ref->{id}%>" value="<% $ref->{id} |html%>" <% $disabled %>/> 
 		<label for="r<% $ref->{id}%>"><% $ref->{id} %></label> \
 %		if ($in_use_refs{$ref->{id}}) {
@@ -21,8 +25,9 @@
 %		}
 	</div>
 % 	}
+
 	<p>
-		<input type="button" id="buttonas" value="Add ref data" onclick="phy.do_add_ref()"/>
+		<div class="list_refdata"><input type="button" id="buttonas" value="Add ref data" onclick="phy.do_add_ref()"/></div>
 	</p>
 	
 		<input type="hidden" id="pid" value="<% $pid %>"/>
@@ -31,6 +36,11 @@
 % } else {
 	Uable to locate project <% $pid |html %>
 % }
+
+
+<div style="clear: both;">&nbsp;</div>
+     <div id="container_data_lineBottom">&nbsp;</div>
+</div>
 </div>
 %#----------------------------------------------------------------------------
 <%args>

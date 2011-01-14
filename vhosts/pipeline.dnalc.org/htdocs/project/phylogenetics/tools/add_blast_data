@@ -3,6 +3,7 @@
 <%args>
 	$pid => 0
 	$bid => 0
+	@selected_results => ()
 </%args>
 %#----------------------------------------------------------------------------
 <%once>
@@ -25,6 +26,7 @@
 	my $pm = DNALC::Pipeline::App::Phylogenetics::ProjectManager->new($pid);
 	my $blast = DNALC::Pipeline::Phylogenetics::Blast->retrieve($bid);
 
+	#$msg = join ' ', @selected_results;
 	if ($blast && $pm) {
 		my $dsource = DNALC::Pipeline::Phylogenetics::DataSource
 						->search( project_id => $pid, name => "blast:$bid");

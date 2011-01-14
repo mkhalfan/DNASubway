@@ -1,11 +1,12 @@
-<div id="container_rightContentx">
+<div class="container_data3">
+<div id="container_data_line">&nbsp;</div>
 <form method="post">
-	<div style="margin-top: 20px;"></div>
-	<div style="">
+	
+	<div class="con_BL_subTitle">
 		<input type="checkbox" id="" title="Select all" \
-		onclick="var chk=this.checked;$$('#seqs input[type=checkbox]').each(function(el) { el.checked = chk});"/>
+		onclick="var chk=this.checked;$$('#seqs input[type=checkbox]').each(function(el) { el.checked = chk});"/> Select all
 	</div>
-	<div id="seqs">
+	<div id="seqs" class="seqs">
 % for (@sequences) {
 	<div>
 		<input type="checkbox" name="seqids" value="<% $_->{id} %>" id="seq<% $_->{s} %>" \
@@ -14,16 +15,25 @@
 	</div>
 % }
 	</div>
+
+    
+<div class="list_refdata">
 	<input type="submit" id="save_selection" value="Save selection" />
 	<input type="button" id="close" value="Close" onclick="top.phy.close_window('manage_sequences');"/>
 	<input type="hidden" id="pid" value="<% $proj->id %>" />
-</form>
+    </div>
+    
+    </form>
 % if ($ok == 1) {
 <script type="text/javascript">
 	top.phy.set_status("phy_alignment", "not-processed");
 	top.phy.close_window("manage_sequences");
 </script>
 % }
+
+<div style="clear: both;">&nbsp;</div>
+     <div id="container_data_lineBottom">&nbsp;</div>
+</div>
 </div>
 <%args>
 	$pid => 0

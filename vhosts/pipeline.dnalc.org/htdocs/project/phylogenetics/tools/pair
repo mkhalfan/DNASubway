@@ -1,10 +1,10 @@
-<div id="container_rightContent">
+<div id="container_data2" class="container_data2">
 <style type="text/css">
 input[type="checkbox"] {
 	border: none;
-	background-color:red;
 	margin: 0;
 }
+/*
 span.bold {
 	font-weight: bolder;
 }
@@ -14,7 +14,7 @@ span.bold {
 }
 .paired-dark {
 	background-color:silver;
-}
+}*/
 </style>
 % if ($ok == 1) {
 <script type="text/javascript">
@@ -24,8 +24,8 @@ span.bold {
 </script>
 % }
 %#pairs: <% Dumper(\@pairs) %>
-	<div style="margin-top: 20px;"></div>
-	<div id="seqids" style="float:left; width: 60px;font-family:courier; line-height: 1.2em;padding-left:10px">
+	<div id="container_data_line">&nbsp;</div>
+	<div id="seqids" class="seqids">
 		<pre>
 % for (@sequences) {
 <span id="x<% $_->{s}->display_id |html %>"><% $_->{s}->display_id |html%></span>
@@ -33,7 +33,7 @@ span.bold {
 		</pre>
 	</div>
 
-	<div id="seqs" style="float:left;width:600px;margin-left:60px;overflow-y:hidden;font-family:courier;line-height: 1.2em;">
+	<div id="seqs" class="seqs">
 		<pre>
 %# my $last_pair_id = @sequences ? $sequences[0]->{pair_id} : "";
 % my $class = '';
@@ -43,7 +43,7 @@ span.bold {
 		</pre>
 	</div>
 
-	<div id="seqops" style="float:left; padding-left:10px; width: 30px;font-family:courier;line-height: 1.2em;">
+	<div id="seqops" class="seqops">
 		<pre>
 % for (@sequences) {
 %	my $dir = $_->{type} eq "s" ? "F" : $_->{strand};
@@ -52,10 +52,10 @@ span.bold {
 % }
 </pre>
 	</div>
-	<br clear="both"/>
+	<div style="clear: both;">&nbsp;</div>
 % if (1) {
 %	if (!@pairs) {
-	<div style="text-align: center">
+	<div style="text-align: center;">
 		<input type="button" id="do_pair" value="Save" onclick="javascript:phy.do_pair();"/>
 %#		<input type="button" id="x" value="Test" onclick="javascript:top.phy.close_window('pair');"/>
 	</div>
@@ -66,7 +66,11 @@ span.bold {
 		<input type="hidden" id="data" name="data" value='<% $json->encode(\@paired_seqids) %>' />
 	</form>
 % }
-</div>
+
+	<div style="clear: both;">&nbsp;</div>
+	<div id="container_data_lineBottom">&nbsp;</div>
+</div><!-- END of container_data2-->
+
 <%args>
 	$op => ''
 	$data => ''
