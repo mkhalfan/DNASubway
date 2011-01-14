@@ -28,7 +28,7 @@ new Tip('tt_yellow1', "Input a gene or protein of up to 10,000 nucleotides/amino
 		<span class="bt_blueStart_home" id="tt_blue1"><a href="<% $s->{logged_in} ? "/project/phylogenetics/create_project.html" : "#" %>" 
 				style="cursor: <% $s->{logged_in} ? "pointer" : "default"%>;"<% $s->{logged_in} ? "" : " class=\"nohover\"" %>></a></span>
 <script type="text/javascript" language="javascript">
-new Tip('tt_blue1', "Input up to 100 DNA sequences to build a phylogenetic tree; Analyze DNA barcodes, and prepare DNA sequences for database submissions.", {
+new Tip('tt_blue1', "Input up to 100 DNA sequences to build a phylogenetic tree, analyze DNA barcodes, and prepare DNA sequences for database submissions.", {
 		title: "Phylogenetic Analysis",
 		style: 'blue'
 	});
@@ -110,14 +110,14 @@ new Tip('tt_black1', "View analysis results and annotations in a genome browser.
 	<span class="spacer2"></span>
 	<span class="conConsole_info_blue" id="tt_blue2"></span>
 <script type="text/javascript" language="javascript">
-new Tip('tt_blue2', "View trace files, pair sequences and determine consensus sequences.", {
+new Tip('tt_blue2', "View traces and sequences, pair forward and reverse strands, and build consensus.", {
 		title: "Process Sequences",
 		style: 'blue'
 	});
 </script>
 <span class="conConsole_info_blue" id="tt_blue3"></span>
 <script type="text/javascript" language="javascript">
-new Tip('tt_blue3', "Find related sequences using BLAST, upload additional sequences and add reference sequences to be used in phylogenetic analyses.", {
+new Tip('tt_blue3', "Find and upload additional sequences to be included in your analysis. ", {
 		title: "Add Sequences",
 		style: 'blue'
 	});
@@ -132,7 +132,7 @@ new Tip('tt_blue4', "Perform multiple sequence alignment using MUSCLE.", {
 	<span class="spacer1"></span>
 	<span class="conConsole_info_blue" id="tt_blue5"></span>
 <script type="text/javascript" language="javascript">
-new Tip('tt_blue5', "Create a phylogenetic tree and view sequence relationships.", {
+new Tip('tt_blue5', "Create a phylogenetic tree using PHYLIP and view sequence relationships.", {
 		title: "Generate Tree",
 		style: 'blue'
 	});
