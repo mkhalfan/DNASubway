@@ -846,8 +846,9 @@
 		}
 		var aln_length = $('aln_length') ? parseInt($('aln_length').value,10) : NaN;
 		if (!isNaN(aln_length)) {
-			var algn = document.applets.Jalview.getAlignment("fasta");
-			algn = document.applets.Jalview.getAlignment("fasta");
+			var algn = document.applets.Jalview.getAlignment("fasta", false);
+			algn += ""; // fix mac weird stuff
+			//algn = document.applets.Jalview.getAlignment("fasta");
 			algn = algn.replace(/>.+\n/g,'>\n')
 			algn = algn.replace(/\n/g,'')
 			var tmp_arr = algn.split('>');
@@ -867,7 +868,7 @@
 			}
 			
 			var f = $('forma1');
-			$('data').value = document.applets.Jalview.getAlignment("fasta");
+			$('data').value = document.applets.Jalview.getAlignment("fasta", 'false');
 			f.submit();
 		}
 	};

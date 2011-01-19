@@ -9,8 +9,8 @@
 	Error: can't open project "<% $pid|html%>".
 % } else {
 	<div>
-<applet archive="/files/jalview/jalviewApplet.jar" name="Jalview" 
-	codebase="/" code="jalview.bin.JalviewLite" height="400" width="100%">
+<applet archive="/files/jalview/jalviewApplet.jar" name="Jalview" mayscript
+	code="jalview.bin.JalviewLite" height="400" width="100%">
 	<param name="cache_option" value="No" />
 	<param name="file" value="<% $m->comp('../../.comp/filepath_to_web', file => $algn_file ) %>" />
 	<param name="embedded" value="true" />
