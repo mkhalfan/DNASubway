@@ -19,15 +19,15 @@
 
         <span class="conBlueline_ConCell">
 			<span class="conIndicator_box">
-				<div id="phy_pair_st" class="conIndicatorBL_<% $status{phy_pair} eq "done" ? "done" : $status{phy_pair} %>"></div>
+				<div id="phy_pair_st" class="conIndicatorBL_<% $status{phy_pair} eq "done" ? "done" : $is_owner ? $status{phy_pair} : "disabled" %>"></div>
 			</span>
-			<span class="bt_Runblueline"><a id="phy_pair_btn" href="javascript:;" onclick="phy.launch('pair')">Pair Builder</a></span>
+			<span class="bt_Runblueline"><a id="phy_pair_btn" href="javascript:;" <% $is_owner ? q{onclick="phy.launch('pair');"} : q{class="disabled"}%>>Pair Builder</a></span>
         </span>
         <span class="conBlueline_ConCell">
 			<span class="conIndicator_box">
 				<div id="phy_consensus_st" class="conIndicatorBL_<% $status{phy_pair} eq "done" ? $status{phy_consensus} eq "done" ? "done" : $status{phy_consensus} : "disabled" %>"></div>
 			</span>
-%	if ($status{phy_pair} ne "done") {
+%	if ($status{phy_pair} ne "done" || !$is_owner) {
 			<span class="bt_Runblueline">
 				<a id="phy_consensus_btn" class="conIndicatorBL_disabled" status="disabled" href="javascript:;">Consensus Builder</a>
 			</span>
@@ -43,55 +43,51 @@
 	<span class="conBlueline_ConColumn2">
 		<span class="conBlueline_ConCell">
 			<span class="conIndicator_box">
-				<div class="conIndicatorBL_not-processed"></div>
+				<div class="conIndicatorBL_<%$is_owner ? "not-processed" : "disabled" %>"></div>
 			</span>
-			<span class="bt_Runblueline"><a href="javascript:;" onclick="phy.launch('blast')">BLASTN</a></span>
+			<span class="bt_Runblueline"><a href="javascript:;" <% $is_owner ? q{onclick="phy.launch('blast');"} : q{class="disabled"}%>>BLASTN</a></span>
 		</span>
 		<span class="conBlueline_ConCell">
 			<span class="conIndicator_box">
-				<div class="conIndicatorBL_disabled"></div>
+				<div class="conIndicatorBL_<%$is_owner ? "not-processed" : "disabled" %>"></div>
 			</span>
-			<span class="bt_Runblueline"><a href="javascript:;" onclick="//phy.launch('data');">Upload Data</a></span>
+			<span class="bt_Runblueline"><a href="javascript:;" <% $is_owner ? q{onclick="phy.launch('data');"} : q{class="disabled"}%>>Upload Data</a></span>
 		</span>
 
 		<span class="conBlueline_ConCell">
 			<span class="conIndicator_box">
-				<div class="conIndicatorBL_not-processed"></div>
+				<div class="conIndicatorBL_<%$is_owner ? "not-processed" : "disabled" %>"></div>
 			</span>
-			<span class="bt_Runblueline"><a href="#" onclick="phy.launch('ref');">Reference Data</a></span>
+			<span class="bt_Runblueline"><a href="javascript:;" <% $is_owner ? q{onclick="phy.launch('ref');"} : ""%>>Reference Data</a></span>
 		</span>
-        
-        
 	</span><!--END of span conBlueline_ConColumn2-->
 
 	<span class="conBlueline_ConColumn3">
         <span class="conBlueline_ConCell">
 			<span class="conIndicator_box">
-				<div class="conIndicatorBL_not-processed"></div>
+				<div class="conIndicatorBL_<%$is_owner ? "not-processed" : "disabled" %>"></div>
 			</span>
-			<span class="bt_Runblueline"><a href="javascript:;" onclick="phy.launch('manage_sequences')">Select Data</a></span>
+			<span class="bt_Runblueline"><a href="javascript:;" <% $is_owner ? q{onclick="phy.launch('manage_sequences');"} : q{class="disabled"}%>>Select Data</a></span>
 		</span>
 
 		<span class="conBlueline_ConCell">
 			<span class="conIndicator_box">
-				<div id="phy_alignment_st" class="conIndicatorBL_<% $status{phy_alignment} eq "done" ? "done" : $status{phy_alignment} %>"></div>
+				<div id="phy_alignment_st" \
+				class="conIndicatorBL_<% $status{phy_alignment} eq "done" ? "done" : $is_owner ? $status{phy_alignment} : "disabled" %>"></div>
 			</span>
 				<& '.routine', routine => 'phy_alignment', pmanager => $pm, is_owner => $is_owner,
 					status => $status{phy_alignment}, delay => 20, pid => $pid &>
 		</span>
-        
      </span><!--END of span conBlueline_ConColumn3-->
-    
-     
 </div><!--END of ID conBluelineLeft2-->
 
- <!--right Content Start--------------> 
+<!--right Content Start--------------> 
 <div id="conBluelineRight2">
 	<!--<div style="clear: both;">&nbsp;</div>-->
     <span class="conBlueline_ConColumn4"> 
 		<span class="conBlueline_ConCell">
 			<span class="conIndicator_box">
-				<div id="phy_tree_st" class="conIndicatorBL_<% $status{phy_alignment} eq "done" ? $status{phy_tree} eq "done" ? "done" : $status{phy_tree} : "disabled" %>"></div>
+				<div id="phy_tree_st" class="conIndicatorBL_<% $status{phy_alignment} eq "done" ? $status{phy_tree} eq "done" ? "done" : $is_owner ? $status{phy_tree} : "disabled" : "disabled" %>"></div>
 			</span>
 %	if ($status{phy_alignment} ne "done") {
 			<span class="bt_Runblueline">
@@ -150,19 +146,18 @@
 			<span class="conProjectInfo_Cell1">Affiliation</span>
 			<span class="conProjectInfo_Cell2">: <% $institution |html%></span>
 		</div>
-
+% if ($is_owner) {
         <div class="conProjectInfo_Row">
 			<div class="conProjectInfo_Cell1">Status</div>
 			<div class="conProjectInfo_Cell3">: &nbsp;<input type="radio" name="public" id="public_no" <% $is_public ? "" : "checked=\"checked\"" %> onclick="set_public(0);" /> &nbsp; Private</div>
 			<div class="conProjectInfo_Cell3"><input type="radio" name="public" id="public_yes" <% $is_public ? "checked=\"checked\"" : "" %> onclick="set_public(1);"/> &nbsp; Public</div>
 		</div>
-
         <div class="conProjectInfo_Row">
 			<div class="conProjectInfo_Cell1">Processing</div>
 			<div class="conProjectInfo_Cell3">: &nbsp;<input type="radio" > &nbsp; On</span></div>
 			<div class="conProjectInfo_Cell3"><input type="radio" > &nbsp; Off</span></div>
 		</div>
-
+% }
 	</span><!--END of span conProjectInfo_column1-->
 
 	<span class="conProjectInfo_column2"><!--Start of CLASS conProjectInfo_column2-->
@@ -214,6 +209,7 @@
 	use Data::Dumper; 
 	use DNALC::Pipeline::App::Phylogenetics::ProjectManager ();
 	use DNALC::Pipeline::User ();
+	use DNALC::Pipeline::UserProfile ();
 	
 	my %routines = (
 			phy_pair => "Pair",
@@ -251,8 +247,8 @@ my $is_public = $mp ? $mp->public : 0;
 my $username = $s->{username};
 my $is_admin = grep {/^$username$/} @{$pcf->{ADMINS}};
 
-if (!$is_public && !$is_owner && !$is_admin) {
-	#$m->comp('/_message_add', 'Project is not accessible!', 'error');
+if (!$is_owner && !$is_public && !$is_admin) {
+	$m->comp('/_message_add', 'Project is not accessible!', 'error');
 	#print STDERR "Project not accesible...", $/;
 	$m->redirect('/project/browse');
 }

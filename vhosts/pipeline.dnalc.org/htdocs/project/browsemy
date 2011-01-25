@@ -15,7 +15,7 @@
     <th width="60" scope="col">Date</th>
     <th width="200" scope="col">Project Title</th>
 	<th width="250" scope="col">Description</th>
-    <th width="200" scope="col">Organism</th>
+    <th width="200" scope="col">Organism/Type</th>
     <th scope="col">Status</th>
 	<th scope="col">&nbsp;</th>
   </tr>
@@ -36,7 +36,11 @@
 	<td><% $created %></td>
 	<td><a href="<% $uri %>"><%$_->name |html%></a></td>
 	<td><% $description |html %></td>
+%	if ($_->{project_type} eq "phylogenetics") {
+	<td><% $_->{type} %></td>
+%	} else {
 	<td><% $_->{organism} %>, <% $_->{common_name} %></td>
+%	}
 %#	<td><% $_->can("clade") ? $clades{$_->clade} : $_->type eq "d" ? "DNA" : "Protein" %></td>
 	<td><% $_->{public} ? "public" : "private" %></td>
 	<td><a href="/project/remove?id=<% $_->{master_project_id} %>" onclick="return confirm('Remove this project?')"><img src="/images/v2/Trash_Can.png" style="border: none;" alt="[remove project]"/></a></td>

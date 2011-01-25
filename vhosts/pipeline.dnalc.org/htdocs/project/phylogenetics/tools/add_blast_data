@@ -17,17 +17,20 @@
 %#----------------------------------------------------------------------------
 <%init>
 	$r->content_type("text/javascript");
-	
+	my $s = $m->session->{pipeline};
+
 	my ($status, $msg) = ("error", "");
-	
+
 	$pid =~ s/\D//g;
 	$bid =~ s/\D//g;
 
 	my $pm = DNALC::Pipeline::App::Phylogenetics::ProjectManager->new($pid);
 	my $blast = DNALC::Pipeline::Phylogenetics::Blast->retrieve($bid);
 
-	#$msg = join ' ', @selected_results;
-	if ($blast && $pm) {
+	if ($pm->project && $pm->project->user_id != $s->{user_id}) {
+		$msg = "Project not found.";
+	}
+	elsif ($blast && $pm) {
 		my $dsource = DNALC::Pipeline::Phylogenetics::DataSource
 						->search( project_id => $pid, name => "blast:$bid");
 		print STDERR Dumper($dsource), $/;

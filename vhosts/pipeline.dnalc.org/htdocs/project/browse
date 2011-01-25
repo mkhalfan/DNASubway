@@ -8,15 +8,28 @@
 </div>
 %	}
 <div id="conProject_tableHolder">
+  <form id="form1" method="get" action="<& /_realurl &>">
   <table class="conProject_table" summary="">
   <tr>
-    <th width="32" scope="col">ID</th>
-    <th width="60" scope="col"><a href="<& /_realurl &>/1/date/<% $sort eq "date" && $dir eq "desc" ? "asc" : "desc" %>">Date</a></th>
-    <th width="200" scope="col"><a href="<& /_realurl &>/1/title/<% $sort eq "title" && $dir eq "asc" ? "desc" : "asc" %>">Project Title</a></th>
+    <th width="28" scope="col">ID</th>
+    <th width="60" scope="col"><a href="<& /_realurl &>/1/date/<% $sort eq "date" && $dir eq "desc" ? "asc" : "desc" %>?<%$filter_suffix%>">Date</a></th>
+    <th width="200" scope="col"><a href="<& /_realurl &>/1/title/<% $sort eq "title" && $dir eq "asc" ? "desc" : "asc" %>?<%$filter_suffix%>">Project Title</a></th>
 	<th width="250" scope="col">Description</th>
-    <th width="200" scope="col"><a href="<& /_realurl &>/1/organism/<% $sort eq "organism" && $dir eq "asc" ? "desc" : "asc" %>">Organism</a></th>
-    <th width="120" scope="col"><a href="<& /_realurl &>/1/owner/<% $sort eq "owner" && $dir eq "asc" ? "desc" : "asc" %>">Owner</a></th>
+%#  <th width="200" scope="col"><a href="<& /_realurl &>/1/organism/<% $sort eq "organism" && $dir eq "asc" ? "desc" : "asc" %>?<%$filter_suffix%>">Organism</a></th>
+    <th width="200" scope="col">Organism/Type</th>
+    <th width="124" scope="col"><a href="<& /_realurl &>/1/owner/<% $sort eq "owner" && $dir eq "asc" ? "desc" : "asc" %>?<%$filter_suffix%>">Owner</a></th>
   </tr>
+% if (0) {
+  <tr id="filters">
+    <th scope="col"><a href="#" onclick="$('filters').toggle();">hide filters</a></th>
+    <th scope="col">&nbsp;</th>
+    <th scope="col"><input type="text" value="<% $ftitle |html %>" id="ftitle" name="ftitle" size="10" maxlength="32"/></th>
+	<th scope="col">&nbsp;</th>
+    <th scope="col"><input type="text" value="<% $forg |html %>" id="forg" name="forg" size="10" maxlength="32"/></th>
+    <th scope="col"><input type="text" value="<% $fowner |html %>" id="fowner" name="fowner" size="10" maxlength="32"/>&nbsp;
+		<a href="javascript:;" onclick="$('form1').submit()">GO</a></th>
+  </tr>
+% }
 % for (@projects) {
 %	my $created = DNALC::Pipeline::App::Utils->format_datetime($_->created, undef, "%m/%d/%Y");
 %	my $color = "#c1272d";
@@ -24,23 +37,32 @@
 %	if ($_->{project_type} eq "target") {
 %		$uri = "/project/target/view?tid=" . $_->id;
 %		$color = "#fdba3e"; #blue = "#3953A4"
-% 	}
+%	} elsif ($_->{project_type} eq "phylogenetics") {
+%		$uri = "/project/phylogenetics/console.html?pid=" . $_->id;
+%		$color = "#3953A4"
+%	}
 %	my $description = break_long_text($_->description, 35);
 <tr>
 	<td style="background-color: <% $color %>;"><% $_->id %></td>
 	<td><% $created %></td>
 	<td><a href="<% $uri %>"><%$_->name |html%></a></td>
 	<td><% $description |html %></td>
-	<td><% $_->organism %>, <% $_->common_name %></td>
+%	if ($_->{project_type} eq "phylogenetics") {
+	<td><% $_->{type} %></td>
+%	} else {
+	<td><% $_->{organism} %>, <% $_->{common_name} %></td>
+%	}
+%#	<td><% $_->organism %>, <% $_->common_name %></td>
 	<td><% $_->{full_name} %></td>
 	<!--<td><% $_->user_id %></td>-->
 </tr>
 % }
-
 </table>
-
+	</form>
+<% $filter_suffix %>
 <& '/_pager', cur=>$page, pages => $pages, 
-	suffix => "/$sort/$dir", prefix => '/project/browse/' &>
+	prefix => '/project/browse/',
+	suffix => "/$sort/$dir" . $filter_suffix ? "$filter_suffix" : "" &>
 
 </div>
 <div class="clear"> </div>
@@ -51,16 +73,22 @@
 	$page => 1
 	$sort => 'date'
 	$dir => 'desc'
+	$ftitle => ''
+	$forg => ''
+	$fowner => ''
 </%args>
 <%once>
 	use DNALC::Pipeline::MasterProject ();
 	use DNALC::Pipeline::Project ();
 	use DNALC::Pipeline::TargetProject ();
+	use DNALC::Pipeline::Phylogenetics::Project ();
 	use DNALC::Pipeline::User ();
 	use DNALC::Pipeline::Config ();
 	use DNALC::Pipeline::Utils qw(random_string);
 	use DNALC::Pipeline::App::Utils ();
 	use DNALC::Pipeline::Utils qw(break_long_text);
+	
+	use Apache2::Util ();
 	
 	#use Switch 'Perl6';
 	
@@ -78,12 +106,17 @@
 			organism => 'organism',
 			owner => 'u.name_last',
 	);
+	my %filter_map = (
+			forg => 'organism',
+			fowner => 'user_name',
+			ftitle => 'title',
+	);
 
 	my $epp = 10;
 </%once>
 
 <%init>
-#my $pcf = DNALC::Pipeline::Config->new->cf('PIPELINE');
+
 $r->content_type('text/html');
 
 $m->session->{pipeline} ||= {};
@@ -98,6 +131,15 @@ if ($r->uri =~ /\/(\d+)\/?(date|title|organism|owner)?\/?(asc|desc)?$/) {
 
 unless ($page =~ /^\d+$/) {
 	$page = 1;
+}
+
+my %filters = ();
+for (qw/fowner forg ftitle/) {
+	if (defined $filter_map{$_} && $ARGS{$_}) {
+		$ARGS{$_} =~ s/^\s+//;
+		$ARGS{$_} =~ s/\s+$//;
+		$filters{$filter_map{$_}} = lc($ARGS{$_}) if $ARGS{$_};
+	}
 }
 
 unless ($dir && $dir =~ /^(?:asc|desc)$/) {
@@ -117,16 +159,26 @@ my @projects = grep { defined $_ } map {
 				if ($_->project_type eq "target") {
 					$pclass = 'DNALC::Pipeline::TargetProject';
 				}
-				#my $u = DNALC::Pipeline::User->retrieve($_->user_id);
+				elsif ($_->project_type eq 'phylogenetics') {
+					$pclass = 'DNALC::Pipeline::Phylogenetics::Project';
+				}
+				
 				my $p = $pclass->retrieve($pid);
 				if ($p) {
 					$p->{project_type} = $_->project_type;
 					$p->{full_name} = $_->{full_name};
 				}
 				$p;
-			} $pager->get_public_sorted({order_by => $order_by});
+			} $pager->get_public_sorted({order_by => $order_by, where => \%filters});
 
 my $pages = int($pager->total_entries/$epp) + ($pager->total_entries % $epp > 0 ? 1 : 0);
+
+my $filter_suffix = "";
+for (keys %filter_map) {
+	next unless $ARGS{$_};
+	$filter_suffix .= $_ . "=" . Apache2::Util::escape_path($ARGS{$_}, $r->pool) . q{;}
+}
+$filter_suffix =~ s/;$//;
 
 </%init>
 

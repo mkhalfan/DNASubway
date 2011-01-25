@@ -27,6 +27,7 @@
 	<param name="debug" value="true" />
 </applet>
 
+% if ($is_owner) {
 <form id="forma1" method="post">
 	<div style="text-align:center">
 		<input type="hidden" id="data" name="data" value="" />
@@ -38,6 +39,7 @@
 </form>
 %#	<% $m->comp('../../.comp/filepath_to_web', file => $algn_file ) %>?<% rand(1000) %>
 %#	<% $algn_file %>
+% }
 	</div>
 % }
 % } # end if_else $ok
@@ -56,19 +58,23 @@
 <%init>
 	$r->content_type("text/html");
 	$r->no_cache(1);
+
+	my $s = $m->session->{pipeline};
 	my $pcf = DNALC::Pipeline::Config->new->cf('PIPELINE');
 	$pid =~ s/\D+//g;
+
 	my $pm = DNALC::Pipeline::App::Phylogenetics::ProjectManager->new($pid);
 	my $proj = $pm->project;
 	my $algn_file = $pm->get_alignment;
+
+	my $is_owner = $s->{user_id} == $proj->user_id;
 
 	my $aln_length = undef;
 	my $fn = IO::File->new;
 	
 	my $ok = 0;
 	
-	if ($r->method eq 'POST') {
-		
+	if ($r->method eq 'POST' && $is_owner) {
 		if (-f $algn_file && $fn->open(">$algn_file")) {
 			print $fn $data;
 			$fn->close;

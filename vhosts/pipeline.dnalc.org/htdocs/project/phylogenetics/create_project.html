@@ -234,7 +234,7 @@ if ($r->method eq "POST") {
 			#if (@files2process) 
 			for my $ftype (qw/fasta trace/) {
 				my @_files = grep {$_->{type} =~ /^$ftype$/i} @files2process;
-				print STDERR "** $ftype files: ", Dumper(\@_files), $/;
+				#print STDERR "** $ftype files: ", Dumper(\@_files), $/;
 				next unless @_files;
 				my $st = $pm->add_data({
 						source => "init",
@@ -259,7 +259,7 @@ if ($r->method eq "POST") {
 		#do some cleaning.. rm any temporary file.. uploaded/pasted..
 		if ($seq_src ne "sample") { 
 			# remove temporary file
-			print STDERR  "Removing file: xxxx";#, $file2process, $/;
+			#print STDERR  "Removing file: xxxx";#, $file2process, $/;
 			#unlink $file2process;
 		}
 

@@ -5,9 +5,9 @@
 	var yZoom = 1;
 	var yLimit = 80; // max y a trace can have, so the graph stays in the canvas
 	
+	var _dbg;
 (function() {
-	// keep open windows
-
+	// keeps open windows
 	var windows = {};
 	
 	phy = function() {
@@ -65,14 +65,14 @@
 		}
 		
 		if ($('name') && $('name').value == '') {
-			show_messages("Please provide a title for you project!");
+			show_messages("Please provide a title for your project!");
 			return;
 		}
 
 		//-------------------------------------------------------
 		// show modal window
 		if (!UI) {
-			alert('UI is missing!');
+			alert('Error: Some of the UI components were not loded properly!');
 			return;
 		}
 		var options = {	
@@ -776,8 +776,89 @@
 			}
 		});
 	};
+
+	// send a request to wikipedia to get the data for the wanted words
+	phy.getWikiData = function(words) {
+		var apiUri = "http://en.wikipedia.org/w/api.php?"
+					+ "action=query&format=json&callback=_parseWikiData&prop=revisions&rvprop=content&rvsection=0&redirects&titles=";
+		var uri = apiUri + escape(words);
+		var elem = new Element('script', {src: uri, title: 'text/javascript'});
+		$$('head').first().insert(elem);
+	};
+
+	// callback called when wikipedia data is ready
+	// 
+	_parseWikiData = function (content) {
+
+		if ( typeof content == "object" ) {
+			//tmp_arr.each(function(str, index) {
+			//console.info('parsing..');
+			Object.keys(content).each(function(k,v) {
+				//console.info(k + ' ' + content[k]);
+				//if (/)
+				if ( k == "*" ) {
+					var desc = content["*"];
+					
+					//_dbg = desc;
+					desc = desc.replace(/\n/g, 'NewLine$')
+							.replace(/<ref.*?>.*?<\/ref>/g, '')
+							.replace(/{{.+?}}/mg, '')
+							.replace(/NewLine\$/g, '\n')
+							.replace(/''+/g, '')
+							.replace(/\[\[(?:.*\|)*?(.+?)\]\]/mg, '$1')
+							.replace(/^\s+/, '');
+
+					// only the 1st 20 words...
+					var short_desc = desc.split(/\W+/).splice(0, 20).join(' ');
+					short_desc += " ... ";
+					_displayWikiData(short_desc);
+					
+				}
+				// sometimes the term is not found in wikipedia..
+				else if (k == "missing") {
+					_displayWikiData('');
+				}
+				else  {
+					_parseWikiData(content[k]);
+				}
+			});
+		} else {  
+			//console.info(typeof content);
+		}
+	};
 	
+	// 
+	_displayWikiData = function(content) {
+		
+		// since we may have more then one wiki_header divs ...
+		var wikidiv = null;
+		$$("div.prototip").each(function(el, i) {
+			//console.info(i + " " + el.style.display);
+			if (el.style.display != 'none') {
+				wikidiv = el;
+				return;
+			}
+		});
+
+		var more_re = /\s\.{3}\s$/;
+		if (more_re.test(content)) {
+			// get the term we're displaying
+			var title = wikidiv.select('#wiki_header').first().innerHTML;
+			//content.replace(more_re, '');
+			content += "<a href=\"http://en.wikipedia.org/wiki/" + escape(title) + "\">more</a>";
+		}
+
+		// update our div with the wiki info
+		wikidiv.select('#wiki_header').first().update(content);
+		//$('wiki_header').update(desc);
+	};
+	
+	// google search triggers this callback when data is available.
+	//
     _searchComplete = function(searcher, el) {
+	
+	  phy.getWikiData(el.innerHTML);
+
       // Check that we got results
       if (searcher.results && searcher.results.length > 0) {
         // Grab our content div, clear it.
@@ -785,6 +866,10 @@
         //var contentDiv = document.getElementById('content');
         //contentDiv.innerHTML = '';
 		var contentDiv = new Element('div', 'tipcontent');
+		var imagesDiv = new Element('div', 'images');
+		
+		contentDiv.insert(new Element('div', {id:'wiki_header'}).update(el.innerHTML));
+		contentDiv.insert(imagesDiv);
     
         // Loop through our results, printing them to the page.
         var results = searcher.results;
@@ -804,26 +889,32 @@
           // There is also a result.url property which has the escaped version
           newImg.src = result.tbUrl;
 
-          imgContainer.appendChild(newImg);
+          imgContainer.insert(newImg);
     
           // Put our title + image in the content
-          contentDiv.appendChild(imgContainer);
+          imagesDiv.insert(imgContainer);
         }
 		var t = new Tip(el.id, contentDiv, {
 				title : el.innerHTML,
 				style: 'blue',
-				hideOn: false,
+				//hideOn: false,
+				hideOn: { element: 'closeButton', event: 'click' },
+				hook: { target: 'bottomMiddle', tip: 'topLeft' },
+				offset : {x: 20, y: 10},
 				//hideAfter: 3,
 				hideOthers: true
 				//delay: 0.3
 			});
-		  debug(t);
+		  //debug(t);
 		  //t.build();
 		  //t.prototip.show();
 		  el.prototip.show();
+		  el.onclick = null; // function() {}
       }
     };
-	
+
+	// initiates the search, on success, the data is parsed
+	// and displayed in _searchComplete function
 	phy.get_ggl_image = function(el) {
 		if (!el)
 			return;
@@ -833,7 +924,7 @@
 		debug(query);
 		var imageSearch = new google.search.ImageSearch();
 		// Restrict to extra large images only
-		//imageSearch.setRestriction(google.search.ImageSearch.RESTRICT_IMAGESIZE,
+		// imageSearch.setRestriction(google.search.ImageSearch.RESTRICT_IMAGESIZE,
         //                         google.search.ImageSearch.IMAGESIZE_MEDIUM);
 		imageSearch.setSearchCompleteCallback(this, _searchComplete, [imageSearch, el]);
 		imageSearch.execute(query);

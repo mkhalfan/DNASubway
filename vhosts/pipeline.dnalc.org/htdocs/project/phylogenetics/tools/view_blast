@@ -21,12 +21,12 @@
 %			my $desc = join (' ', splice @tmp, 2);
 %			my $mismatchcount = $hsp->length('total') - ($hsp->num_conserved + $hsp->gaps('total'));
 	<div class="trow">
-		<div class="tcell trownum"><% $num %>.</div> 
+		<div class="tcell trownum"><% $num %>.<a name="<% $num %>"></a></div> 
 		<div class="tcell" id="tip_<% $num %>" desc="<% $hit->description |html %>">\
 %#			<input type="checkbox" name="selected_results" id="selected_results" value="<% $name |html%>" />
 			<% $name |html%>\
 		</div>
-		<div class="tcell"><a id="xtip_<% $num %>" href="#" onclick="phy.get_ggl_image(this);"><% $species |html%></a> - <% $desc |html%></div>
+		<div class="tcell"><a id="xtip_<% $num %>" href="#<% $num %>" onclick="phy.get_ggl_image(this);"><% $species |html%></a> - <% $desc |html%></div>
 		<div class="tcell"><% $hsp->evalue |html%></div>
 		<div class="tcell"><% $mismatchcount |html%></div>
 	</div>
