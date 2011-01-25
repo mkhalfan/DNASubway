@@ -158,6 +158,9 @@ use Bio::Trace::ABIF ();
 			# this will return the path of the stored file, if any
 			#my $stored_file = $self->store_file(src => $f, target => 'x', type => 'yy');
 			my $stored_file = $fhash->{path};
+			unless ($self->project->sample) {
+				$stored_file = $self->store_file( $fhash );
+			}
 			my $filename = $fhash->{filename};
 			my $f = $fhash->{path};
 
@@ -804,8 +807,27 @@ use Bio::Trace::ABIF ();
 
 	#-----------------------------------------------------------------------------
 	sub store_file {
-		my ($self, $params) = @_;
-		
+		my ($self, $fhash) = @_;
+
+		my $source_file = $fhash->{path};
+
+		my $store = File::Spec->catfile($self->work_dir, 'data_files');
+		unless (-d $store ) {
+			unless(mkdir $store) {
+				print STDERR  "Unable to create dir for storing files for project: ", $self->project, $/;
+				return $source_file;
+			}
+		}
+
+		my $target_file = File::Spec->catfile($store, $fhash->{filename});
+		$target_file =~ s/[\s]+/_/g;
+		if (move $source_file, $target_file) {
+			#print STDERR  "++ moved to :", $target_file, $/;
+			return $target_file;
+		}
+		else {
+			return $source_file;
+		}
 	}
 
 	#-----------------------------------------------------------------------------
