@@ -44,6 +44,7 @@ span.bold {
 	</div>
 
 	<div id="seqops" class="seqops">
+% if ($is_owner) {
 		<pre>
 % for (@sequences) {
 %	my $dir = $_->{type} eq "s" ? "F" : $_->{strand};
@@ -51,13 +52,13 @@ span.bold {
 <input type="checkbox" id="op<% $_->{s} %>" <%$_->{type} eq "p" ? "checked=\"checked\"" : ""%>/>
 % }
 </pre>
+% }
 	</div>
 	<div style="clear: both;">&nbsp;</div>
-% if (1) {
+% if ($is_owner) {
 %	if (!@pairs) {
 	<div style="text-align: center;">
 		<input type="button" id="do_pair" value="Save" onclick="javascript:phy.do_pair();"/>
-%#		<input type="button" id="x" value="Test" onclick="javascript:top.phy.close_window('pair');"/>
 	</div>
 % 	}
 	<form method="post" id="forma1">
@@ -82,13 +83,14 @@ span.bold {
 	use File::Slurp qw/read_file/;
 	use DNALC::Pipeline::App::Phylogenetics::ProjectManager ();
 	use DNALC::Pipeline::Config ();
+	use DNALC::Pipeline::User ();
 	use JSON::XS ();
 	use Data::Dumper;
 </%once>
 <%init>
 	$r->content_type("text/html");
-	#my $gcf = DNALC::Pipeline::Config->new->cf("GREENLINE");
-	#my $dir = $gcf->{PROJECTS_DIR} . '/fasta';
+	my $s = $m->session->{pipeline};
+
 	my $json = JSON::XS->new->utf8;
 	my $new_pairs = undef;
 	my @files = ();
@@ -101,7 +103,10 @@ span.bold {
 		print "Project not found!";
 		return;
 	}
-	
+
+	my $user = DNALC::Pipeline::User->retrieve($proj->user_id);
+	my $is_owner = $s->{user_id} == $user->user_id;
+
 	my @sequences = ();
 	my @pairs = $pm->pairs;
 	my @paired_seqids = map {[ map {$_->seq->id} $_->paired_sequences]} @pairs;
