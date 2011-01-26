@@ -156,13 +156,12 @@ use Bio::Trace::ABIF ();
 		for my $fhash (@files) {
 			# store files
 			# this will return the path of the stored file, if any
-			#my $stored_file = $self->store_file(src => $f, target => 'x', type => 'yy');
 			my $stored_file = $fhash->{path};
 			unless ($self->project->sample) {
 				$stored_file = $self->store_file( $fhash );
 			}
 			my $filename = $fhash->{filename};
-			my $f = $fhash->{path};
+			my $f = $stored_file;
 
 			my $data_file = DataFile->create({
 						project_id => $self->project,
