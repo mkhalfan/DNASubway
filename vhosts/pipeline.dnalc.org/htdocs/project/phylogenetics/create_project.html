@@ -246,8 +246,9 @@ if ($r->method eq "POST") {
 					push @err, @{$st->{errors}};
 				}
 			}
+			print STDERR  "Added seqs =  ", $added, $/;
 			# do we have at least one sequence added?
-			unless ($st->{seq_count}) {
+			unless ($added) {
 				push @err, "Unable to add sequences!";
 			}
 		}
@@ -265,16 +266,9 @@ if ($r->method eq "POST") {
 
 		unless ($proj) {
 			push @err, "Error creating the project.";
-			#$wfm->set_status('upload_fasta', 'error');
 		}
 		else {
-			#my $wfm = DNALC::Pipeline::App::WorkflowManager->new( $proj );
-			#$wfm->set_status('upload_fasta', 'done');
 			print STDERR "project_created: id = ", $proj, ",\tname = ", $proj->name, $/;
-
-			#if ( $sequence_id ) {
-			#	$pm->log("Saved sequence's id: " . $sequence_id);
-			#}
 
 			if ($converted_to_dna) {
 				$s->{converted_to_dna} = $proj->id;

@@ -6,6 +6,11 @@
 <title></title>
 <link type="text/css" rel="stylesheet" href="/css/toolPanel.css" />
 <link rel="stylesheet" type="text/css" href="/css/prototip.css" />
+% if ($s->{logged_in} == 0) {
+<script type="text/javascript">
+	top.document.location.replace("/");
+</script>
+% }
 </head>
 <body>
 
@@ -34,9 +39,9 @@
 		delete $s->{user_id};
 	}
 	$s->{last} = $now;
-	unless ($s->{logged_in}) {
-		$m->redirect("/");
-	}
+	#unless ($s->{logged_in}) {
+	#	$m->redirect("/");
+	#}
 </%init>
 %#---------------------------------
 <%flags>

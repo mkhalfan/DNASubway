@@ -98,8 +98,10 @@
 	};
 	
 	phy.select_source = function (el) {
-		debug(el);
+		return;
+		//debug(el);
 		debug($$('#' + el + '_inputs, #' + el + '_inputs textarea'));
+		debug($$('#' + el + '_inputs, #' + el + '_inputs input'));
 		if (el && (el == 'upload' || el == 'paste')) {
 			//$('specie').selectedIndex = -1;
 		}
@@ -192,7 +194,7 @@
 
 	phy.add_pair = function(pair) {
 		pair.each(function(el) {
-			//console.info('to add BG ' + el);
+
 			$(el).addClassName(pairs.length % 2 ? 'paired-light' : 'paired-dark');
 			//seq2pairs[el] = pairs.length;
 		});
@@ -213,18 +215,16 @@
 			//alert('pop ' + pairs.length);
 			for(var i = 0; i < pairs.length; i++) {
 				if (pairs[i][0] == id || pairs[i][1] == id) {
-					//console.info('removed pair ' + pairs[i]);
+
 					[0,1].each(function(k) {
 						$(pairs[i][k]).removeClassName('bold');
 						$(pairs[i][k]).removeClassName('paired-light');
 						$(pairs[i][k]).removeClassName('paired-dark');
 						$('op' + pairs[i][k]).checked = false;
-						//console.debug($('op' + pairs[i][k]));
-						//delete seq2pairs[pairs[i][k]];
 					});
 					delete pairs[i];
 					pairs = pairs.compact();
-					break;
+					throw $break;
 				}
 			}
 		}
@@ -804,8 +804,57 @@
 			}
 		});
 	};
+	
+	// ---------------------------------------------------------------
+	// sends a request to EOL.org to get the data for the wanted words
+	//
+	phy.getEOLData = function(words, tip_content_div) {
+	
+		new Ajax.Request('/project/phylogenetics/tools/get_eol_data', {
+			method: 'get',
+			parameters: { q : words },
+			onSuccess: function(transport){
+				var response = transport.responseText || "{'status':'error', 'message':'No response'}";
+				var r = response.evalJSON();
+				if (r && r.status == 'success') {
+					// update our div with the eol info
+					var eolh = tip_content_div.select('#eol_header').first();
+					//eolh.insert(new Element('span').update("<strong>EOL</strong>: "));
 
-	// send a request to wikipedia to get the data for the wanted words
+					if (r.data && r.data.length > 0) {
+						r['data'].each(function(d, i) {
+							if (i > 2) {
+								eolh.insert('<span> '
+									+ '<a target=\"_blank\" '
+									+	'href="http://www.eol.org/search?ie=UTF-8&search_type=text&q=' 
+									+ 	escape(words) + '">more</a>'
+									+ '</span>'
+									);
+
+								throw $break;
+							}
+							eolh.insert(new Element('span', {style: 'padding-left: 4px;'}).update(
+								new Element('a', {href: d['link']}).update(d['title'])
+							));
+						});
+					} // end if_r.status==success
+					else {
+						eolh.insert(new Element('span').update("No entries"));
+					}
+				} // end else_r.status==success
+				else {
+					alert("Error: " + r.message);
+				}
+			},
+			onFailure: function(){
+				alert('Something went wrong!\nAborting...');
+			}
+		});
+	};
+
+	// ---------------------------------------------------------------
+	// sends a request to wikipedia to get the data for the wanted words
+	//
 	phy.getWikiData = function(words) {
 		var apiUri = "http://en.wikipedia.org/w/api.php?"
 					+ "action=query&format=json&callback=_parseWikiData&prop=revisions&rvprop=content&rvsection=0&redirects&titles=";
@@ -844,7 +893,7 @@
 				}
 				// sometimes the term is not found in wikipedia..
 				else if (k == "missing") {
-					_displayWikiData('');
+					_displayWikiData('No entries');
 				}
 				else  {
 					_parseWikiData(content[k]);
@@ -855,6 +904,7 @@
 		}
 	};
 	
+	// ---------------------------------------------------------------
 	// 
 	_displayWikiData = function(content) {
 		
@@ -864,81 +914,78 @@
 			//console.info(i + " " + el.style.display);
 			if (el.style.display != 'none') {
 				wikidiv = el;
-				return;
+				throw $break;
 			}
 		});
 
-		var more_re = /\s\.{3}\s$/;
-		if (more_re.test(content)) {
-			// get the term we're displaying
-			var title = wikidiv.select('#wiki_header').first().innerHTML;
-			//content.replace(more_re, '');
-			content += "<a href=\"http://en.wikipedia.org/wiki/" + escape(title) + "\">more</a>";
-		}
+		if (wikidiv) {
+			var more_re = /\s\.{3}\s$/;
+			if (more_re.test(content)) {
+				// get the term we're displaying
+				var title = wikidiv.select('#wiki_header').first().innerHTML;
+				//content.replace(more_re, '');
+				content += "<a target=\"_blank\" href=\"http://en.wikipedia.org/wiki/" + escape(title) + "\">more</a>";
+			}
 
-		// update our div with the wiki info
-		wikidiv.select('#wiki_header').first().update(content);
-		//$('wiki_header').update(desc);
+			// update our div with the wiki info
+			wikidiv.select('#wiki_header').first().update(
+					"<strong>Wikipedia:</strong> " + content
+				);
+		}
 	};
 	
+	//---------------------------------------------------------------
 	// google search triggers this callback when data is available.
 	//
-    _searchComplete = function(searcher, el) {
-	
-	  phy.getWikiData(el.innerHTML);
+	_searchComplete = function(searcher, el) {
 
-      // Check that we got results
-      if (searcher.results && searcher.results.length > 0) {
-        // Grab our content div, clear it.
-
-        //var contentDiv = document.getElementById('content');
-        //contentDiv.innerHTML = '';
+		// main div in the tooltip
 		var contentDiv = new Element('div', 'tipcontent');
-		var imagesDiv = new Element('div', 'images');
-		
-		contentDiv.insert(new Element('div', {id:'wiki_header'}).update(el.innerHTML));
-		contentDiv.insert(imagesDiv);
-    
-        // Loop through our results, printing them to the page.
-        var results = searcher.results;
-		debug(results.length);
-		var imgContainer = new Element('div');
-        for (var i = 0; i < results.length; i++) {
-          // For each result write it's title and image to the screen
-          var result = results[i];
-    
-          /*var title = document.createElement('h2');
-          // We use titleNoFormatting so that no HTML tags are left in the title
-          title.innerHTML = result.titleNoFormatting;
-		  imgContainer.appendChild(title);
-		  */
-    
-          var newImg = new Element('img', {style: "padding: 2px;"});
-          // There is also a result.url property which has the escaped version
-          newImg.src = result.tbUrl;
 
-          imgContainer.insert(newImg);
-    
-          // Put our title + image in the content
-          imagesDiv.insert(imgContainer);
-        }
-		var t = new Tip(el.id, contentDiv, {
-				title : el.innerHTML,
-				style: 'blue',
-				//hideOn: false,
-				hideOn: { element: 'closeButton', event: 'click' },
-				hook: { target: 'bottomMiddle', tip: 'topLeft' },
-				offset : {x: 20, y: 10},
-				//hideAfter: 3,
-				hideOthers: true
-				//delay: 0.3
-			});
-		  //debug(t);
-		  //t.build();
-		  //t.prototip.show();
-		  el.prototip.show();
-		  el.onclick = null; // function() {}
-      }
+		// init Wikipedia search
+		phy.getEOLData(el.innerHTML, contentDiv, el.id);
+
+		// init Wikipedia search
+		phy.getWikiData(el.innerHTML);
+
+		contentDiv.insert(new Element('div', {id:'wiki_header'}).update(el.innerHTML))
+				.insert(new Element('div', {id:'eol_header'}).update(new Element('span').update("<strong>EOL</strong>: "))
+			);
+
+		// Check that we got results
+		if (searcher.results && searcher.results.length > 0) {
+			var imagesDiv = new Element('div', 'images');
+			contentDiv.insert(imagesDiv);
+
+			// Loop through our results, printing them to the page.
+			var results = searcher.results;
+			var imgContainer = new Element('div');
+			for (var i = 0; i < results.length; i++) {
+				// For each result write it's title and image to the screen
+				var result = results[i];
+
+				var newImg = new Element('img', {style: "padding: 2px;"});
+				// There is also a result.url property which has the escaped version
+				newImg.src = result.tbUrl;
+
+				imgContainer.insert(newImg);
+
+				// Put our title + image in the content
+				imagesDiv.insert(imgContainer);
+			}
+			var t = new Tip(el.id, contentDiv, {
+						title : el.innerHTML,
+						style: 'blue',
+						hideOn: { element: 'closeButton', event: 'click' },
+						hook: { target: 'bottomMiddle', tip: 'topLeft' },
+						offset : {x: 20, y: 10},
+						stem: { height: 12, width: 15 },
+						hideOthers: true
+						//delay: 0.3
+					});
+			el.prototip.show();
+			el.onclick = null;
+		}
     };
 
 	// initiates the search, on success, the data is parsed
@@ -949,7 +996,7 @@
 		var query = el.innerHTML;
 		if (!query)
 			return;
-		debug(query);
+		//debug(query);
 		var imageSearch = new google.search.ImageSearch();
 		// Restrict to extra large images only
 		// imageSearch.setRestriction(google.search.ImageSearch.RESTRICT_IMAGESIZE,
@@ -1008,11 +1055,9 @@
 			parameters: { 't': type}, 
 			onSuccess: function(transport){
 				var response = transport.responseText || "{'status':'error', 'message':'No response'}";
-				debug(response);
 				var samples = response.evalJSON();
 				samples.each (function(s) {
 					if (s) {
-						debug(s);
 						$('sample').insert(new Element('option', {id:'o' + s['id'], value:s['id']}).update(s['name']));
 					}
 				});
@@ -1211,6 +1256,27 @@
 		});
 	}
 	
+
+	phy.add_data = function () {
+		var seq_src = $$('input[type="radio"]').find(function(el){
+			return el.checked == true
+		});
+		debug(seq_src.value);
+		if (seq_src.value == "upload") {
+			if ($('seq_file').value == "") {
+				alert("Select a file to upload.");
+				return;
+			}
+		}
+		else if (seq_src.value == "paste") {
+			if ($('sequence').value == "") {
+				alert("Sequence is missing.");
+				$('sequence').focus();
+				return;
+			}
+		}
+		$('forma1').submit();
+	};
 	
 })();
 
@@ -1242,8 +1308,6 @@ Event.observe(window, Prototype.Browser.IE ? 'load' : 'dom:loaded', function() {
 				var el = Event.element(ev);
 				//el.checked = false;
 				var id = el.id.replace(/^op/,'');
-				//console.info(id + " " + el.id);
-				//console.info(el.checked);
 				if (el.checked) {
 					$(id).addClassName('bold');
 					phy.push_to_pair(id);
@@ -1261,7 +1325,7 @@ Event.observe(window, Prototype.Browser.IE ? 'load' : 'dom:loaded', function() {
 		pairs.each(function(pair, cnt) {
 			pair.each(function(el){
 				var a_rc = $('rc' + el);
-				//console.info(el + ' ' + a_rc.innerHTML);
+
 				if (a_rc && a_rc.innerHTML == "R") {
 					phy.toggle_strand(a_rc, 1);
 				}
@@ -1271,8 +1335,8 @@ Event.observe(window, Prototype.Browser.IE ? 'load' : 'dom:loaded', function() {
 			$('do_pair').disabled = true;
 	}
 	else if (step == 2) {
-		//phy.draw_qvalues();		
-		//phy.draw($('data').value.evalJSON(), 'canvas1');
+		//alert(step);
+		//phy.draw_qvalues();
 		phy.prepare_draw();
 	}
 	else if (step == 3) {

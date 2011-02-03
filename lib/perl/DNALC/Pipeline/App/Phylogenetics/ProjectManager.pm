@@ -818,7 +818,7 @@ use Bio::Trace::ABIF ();
 			}
 		}
 
-		my $target_file = File::Spec->catfile($store, $fhash->{filename});
+		my $target_file = File::Spec->catfile($store, $fhash->{filename} || basename($source_file));
 		$target_file =~ s/[\s]+/_/g;
 		if (move $source_file, $target_file) {
 			#print STDERR  "++ moved to :", $target_file, $/;

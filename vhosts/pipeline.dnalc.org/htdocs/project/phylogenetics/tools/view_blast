@@ -87,8 +87,9 @@ google.load("search", "1");
 	elsif ($sid =~ /^p/) {
 		$sid =~ s/\D//g;
 		my $pair = DNALC::Pipeline::Phylogenetics::Pair->retrieve($sid);
-		$display_id = "Pair " . join " + ", map {$_->seq->display_id} $pair->paired_sequences;
-		#$pid = $pair->project_id;
+		if ($pair) {
+			$display_id = "Pair " . join " + ", map {$_->seq->display_id} $pair->paired_sequences;
+		}
 	}
 	
 	my $blast = DNALC::Pipeline::Phylogenetics::Blast->retrieve($bid);

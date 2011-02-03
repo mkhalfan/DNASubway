@@ -6,7 +6,7 @@ use Exporter;
 use Time::Local ();
 use HTML::Entities ();
 use List::Util qw();
-
+use Algorithm::Diff qw(LCS);
 
 use vars qw(
             $VERSION
@@ -22,6 +22,7 @@ use vars qw(
                     escape_js
                     isin
                     html_escape
+					lcs_name
                     md5_salt
 					nicebasepairs
                     nicebytes
@@ -173,6 +174,22 @@ sub array_diff {
         push @res, $_ unless exists $h{$_}
     }    
     @res
+}
+
+# it returns the LCS base on the given two strings
+# if theere are more then $x (=3) diffs, is concatenates the input strings
+sub lcs_name {
+	my ($a, $b, $x) = @_;
+	$x ||= 2;
+
+    my @f = split(//, $a);
+    my @r = split(//, $b);
+    my @common = LCS( \@f, \@r );
+    if (!@common || @common < @f - $x) {
+        return join('_', $a, $b);
+    }
+    
+	return join('', @common);
 }
 
 sub round {
