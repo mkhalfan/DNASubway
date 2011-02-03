@@ -1,4 +1,17 @@
-
+<style type="text/css">
+input.btn { 
+	  color: #85b2dd; 
+	  background-color:#f3f7fa; 
+	  border:1px solid; 
+	  border-color: #a7cff5; 
+	  margin-right: 2px;
+	} 
+	
+.label{
+font: "Arial";
+color: #85b2dd;
+}
+</style>
 <div class="container_data1">
 	<div id="container_data_line">&nbsp;</div>
 	<div id="seqids" class="seqids">
@@ -8,6 +21,7 @@
 % }
 % for (@sequences) {
 <span id="x<% $_->display_id |html %>"><% $_->display_id |html%></span>
+
 % }
 </pre>
 	</div>
@@ -15,12 +29,15 @@
 % if ($file) {
 	<input type="hidden" id="step" value="2" />
 	<input type="hidden" id="seq_data" value="<% $file->seq |html%>" />
-	<input type="hidden" id="seq_a" value="<% join ",", @{$traces->{A}} %>" />
-	<input type="hidden" id="seq_t" value="<% join ",", @{$traces->{T}} %>" />
-	<input type="hidden" id="seq_c" value="<% join ",", @{$traces->{C}} %>" />
-	<input type="hidden" id="seq_g" value="<% join ",", @{$traces->{G}} %>" />
+	<input type="hidden" id="seq_A" value="<% join ",", @{$traces->{A}} %>" />
+	<input type="hidden" id="seq_T" value="<% join ",", @{$traces->{T}} %>" />
+	<input type="hidden" id="seq_C" value="<% join ",", @{$traces->{C}} %>" />
+	<input type="hidden" id="seq_G" value="<% join ",", @{$traces->{G}} %>" />
 	<input type="hidden" id="qvalues" value="<% join ",", $file->quality_values %>" />
 	<input type="hidden" id="b_locations" value="<% join ",", $file->base_locations %>" />
+	<input type="hidden" id="seq_display_id" value="<% $file->file_name %>" />
+
+	
 	<div>
 		<canvas id="canvas1" height="200">
 			Your browser isn't supporting canvas objects.
@@ -41,12 +58,13 @@
 %#     <div style="clear: both;">&nbsp;</div>
 % if ($file) {
 	 <div class="seqs">
-		<div style="float:left; width: 100px;"><input type="button" id="zoom_reset" value=" Reset " onclick="phy.zoomReset()"/></div>
+	 <br />
+		<div style="float:left; width: 100px;"><input type="button" id="zoom_reset" value=" Reset " onclick="phy.zoomReset()" class="btn" /></div>
 		<div style="float:left; width: 200px; text-align: center;">
-			X:<input type="button" id="x_zoom_in" value="  +  " onclick="phy.zoomIn('x')"/><input type="button" id="x_zoom_out" value="  -  " onclick="phy.zoomOut('x')"/>
+			<span class="label">X:</span><input type="button" id="x_zoom_in" value="  +  " onclick="phy.zoomIn('x')" class="btn" /><input type="button" id="x_zoom_out" value="  -  " onclick="phy.zoomOut('x')" class="btn" />
 		</div>
 		<div style="float:left; width: 200px; text-align: right;">
-			Y:<input type="button" id="y_zoom_in" value="  +  " onclick="phy.zoomIn('y')"/><input type="button" id="y_zoom_out" value="  -  " onclick="phy.zoomOut('y')"/>
+			<span class="label">Y:</span><input type="button" id="y_zoom_in" value="  +  " onclick="phy.zoomIn('y')" class="btn" /><input type="button" id="y_zoom_out" value="  -  " onclick="phy.zoomOut('y')" class="btn"/>
 		</div>
 	</div>
 % }
@@ -73,6 +91,7 @@
 	
 	my @sequences = ();
 	my ($file, $traces);
+	my $display_id;
 
 	my $pm = DNALC::Pipeline::App::Phylogenetics::ProjectManager->new($pid);
 	my $proj = $pm->project;

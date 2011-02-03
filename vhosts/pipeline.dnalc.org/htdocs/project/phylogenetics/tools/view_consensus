@@ -1,7 +1,46 @@
+<style type="text/css">
+.non-match{
+	background: #FFF333;
+	cursor: pointer;
+}
+
+.new-nucleotide-option{
+	margin-left:5px;
+	cursor: pointer;
+	border: 1px solid black;
+	padding-left:2px;
+	padding-right:2px;
+}
+
+.current-nucleotide{
+	margin-left:5px;
+	border: 1px solid silver;
+	cursor: pointer;
+	padding-left:2px;
+	padding-right:2px;
+}
+
+.changed-base{
+	background: #FF9999;
+}
+
+
+.monospace{
+	font-family:     "Courier New", Courier, monospace;
+}
+
+canvas {
+	border: 1px black solid;
+	margin: 20px;
+	background: #FFFFFF;
+}
+</style>
+
 <div id="conbodyx">
 % unless ($proj) {
 	Error: can't open project "<% $pid|html%>".
-% } else {
+% } 
+% else {
 	<div style="width: 15%;float:left;overflow: none;">
 	<ul style="list-style-type:none; margin:0; padding: 5px;">
 %	my $cnt = 1;
@@ -17,26 +56,35 @@
 %	if ($pair) {
 		<div>Pair <% join "+", map{$_->seq->display_id} $pair->paired_sequences |html%></div>
 		<div style="overflow: auto;padding-left: 10px;"><pre>\
-%	if (0) {
-%	  for ($pair->paired_sequences) {
-<% sprintf("%-15s", substr($_->seq->display_id, 0, 15)) |html %>: \
-%		if ($_->strand eq 'R') {
-%			my $seq = Bio::Seq->new(-seq => $_->seq->seq);
-<% $seq->revcom->seq %>
-%		} else {
-<% $_->seq->seq %>
-%		}
-%	  }
-% 	}
-<% $pair->alignment |html %>
-%#Consensus      : <% $pair->consensus |html %>
+		
+<div id="seq1_name" class="monospace" style="display:inline;width:10px;"></div><div id="seq1_div" class="monospace" style="display:inline;"></div>
+<div id="seq2_name" class="monospace" style="display:inline;"></div><div id="seq2_div" class="monospace" style="display:inline;"></div>
+<div id="consensus_div_name" class="monospace" style="float:left"></div><div id="consensus_div_seq" class="monospace" style="display:inline;"></div>
 		</pre></div>
-%#		<hr/>
-%#		<pre><% read_file("/tmp/pair-$pair.txt")%></pre>
+		
+	<p style="display:none;" id="progress"/><img id="progress_image" style="padding-left:100px" src="/images/ajax-loader-2.gif" alt=""></p> 
+
+<div id="trace_canvas_div" style="display:none">
+	<div id="change_base_area" class="monospace" style="padding-top:15px;padding-left:5px; line-height:30px;"></div>
+	
+	<canvas id="trace_viewer_1" height="210">Your browser doesnt support canvas objects.</canvas>
+	<canvas id="trace_viewer_2" height="210">Your browser doesnt support canvas objects.</canvas>
+</div>
+
 %	}
 	</div>
 % }
 </div>
+
+
+<input type="hidden" id="step" value="5" />		
+<input type="hidden" id="seq1" value="<% $seq1 %>" />
+<input type="hidden" id="seq2" value="<% $seq2 %>" />
+<input type="hidden" id="display_name_1" value="<% $display_name_1 %>" />
+<input type="hidden" id="display_name_2" value="<% $display_name_2 %>" />
+<input type="hidden" id="consensus" value="<% $consensus %>" />
+<input type="hidden" id="pair_id" value="<% $pair_id %>" />
+
 %#----------------------------------------------------------------------------
 <%args>
 	$pid => 0
@@ -45,7 +93,7 @@
 %#----------------------------------------------------------------------------
 <%once>
 	use DNALC::Pipeline::App::Phylogenetics::ProjectManager ();
-	#use DNALC::Pipeline::Phylogenetics::Pair ();
+	use DNALC::Pipeline::Phylogenetics::Pair ();
 	use File::Slurp qw(read_file);
 </%once>
 %#----------------------------------------------------------------------------
@@ -56,13 +104,38 @@
 	my $pm = DNALC::Pipeline::App::Phylogenetics::ProjectManager->new($pid);
 	my $proj = $pm->project;
 	my @pairs = ();
-	my $pair = undef;
+	my @seqs = ();
+	my ($pair) = undef;
+	my $seq1;
+	my $seq2;
+	my $display_name_1;
+	my $display_name_2;
+	my $consensus; 
+	my $alignment;
+	my @alignment_line_1;
+	my @alignment_line_2;
+	
+	
+	
 	unless ($proj) {
 		$msg = "Project not found."
 	}
 	else {
 		@pairs = $pm->pairs;
 		($pair) = grep {$_->id == $pair_id} @pairs;
+		@seqs = $pair->paired_sequences if $pair;
+		$alignment = $pair->alignment if $pair;
+		@alignment_line_1 =(split(': ',(split('\n', $alignment))[0]));
+		@alignment_line_2 =(split(': ',(split('\n', $alignment))[1]));
+		($display_name_1, $seq1) = ($alignment_line_1[0], $alignment_line_1[1]);
+		($display_name_2, $seq2) = ($alignment_line_2[0], $alignment_line_2[1]);
+		$consensus = $pair->consensus if $pair;
+		
+
 	}
 </%init>
+<%attr>
+	js => ['prototype-1.6.1.js', 'phylogenetics.js']
+	load_ie_canvas => 1
+</%attr>
 %#----------------------------------------------------------------------------

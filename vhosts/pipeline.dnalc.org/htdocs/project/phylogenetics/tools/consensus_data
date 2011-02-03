@@ -1,0 +1,127 @@
+<% $json->encode($data) %>
+%#<% Dumper($data) %>
+%#<% Dumper(\@all_base_locations) %>
+%#<% Dumper($f_dash_count) %>
+%#-----------------------------------------------------
+<%args>
+	$pid => 0
+	$pair_id => 0
+	$pos => 0
+	$which_of_the_pair => 0
+</%args>
+<%once>
+	use File::Slurp qw/read_file/;
+	use DNALC::Pipeline::App::Phylogenetics::ProjectManager ();
+	use DNALC::Pipeline::Phylogenetics::DataSequence ();
+	use DNALC::Pipeline::Phylogenetics::Pair;
+	use DNALC::Pipeline::Phylogenetics::DataFile;
+	use DNALC::Pipeline::Config ();
+	use JSON::XS ();
+	use Data::Dumper;
+</%once>
+<%init>
+	$r->content_type("text/plain");
+	my $json = JSON::XS->new->ascii;
+	my $pair = DNALC::Pipeline::Phylogenetics::Pair->retrieve($pair_id);
+	my @pseq = $pair->paired_sequences;
+	my $data = [];
+	my $original_seq_pos;
+	my $flag = "";
+	my $seq_substring;
+	my $dash_count;
+	my $reversed_seq;
+	
+	
+	# ------------------------------
+	# Parse the Alignemnt Data
+	# ------------------------------
+	my $alignment = $pair->alignment;
+	my @alignment_line_1 = (split(': ', (split('\n', $alignment))[0]));
+	my @alignment_line_2 = (split(': ', (split('\n', $alignment))[1]));
+	my ($display_name_1, $seq1) = ($alignment_line_1[0], $alignment_line_1[1]);
+	my ($display_name_2, $seq2) = ($alignment_line_2[0], $alignment_line_2[1]);
+
+	
+	for (0, 1){
+		my $file = DNALC::Pipeline::Phylogenetics::DataFile->retrieve($pseq[$_]->seq->file_id);
+	
+		my @all_base_locations = $file->base_locations;
+		my @all_qscores = $file->quality_values;
+		my $all_traces = $file->trace;
+		my $entire_sequence =  $file->seq;
+		
+		# ---------------------------
+		# Calculate Position In Original Sequence
+		# ---------------------------
+		if ($pseq[$_]->seq->display_id eq trim($display_name_1)){
+			if ($pseq[$_]->strand eq "F"){
+				$seq_substring = substr $seq1, 0, $pos;
+				$dash_count = ($seq_substring =~ s/-//g);
+				$original_seq_pos = $pos - $dash_count;
+				$flag = "1F";
+			}
+			elsif ($pseq[$_]->strand eq "R"){
+				$reversed_seq = reverse $seq1;
+				$seq_substring = substr ($reversed_seq, 0, $pos);
+				$dash_count = ($seq_substring =~ s/-//g);
+				$original_seq_pos = length($seq1) - ($pos + $dash_count) - 1;
+				$flag = "1R";
+			}
+		}
+		elsif ($pseq[$_]->seq->display_id eq trim($display_name_2)){
+			if ($pseq[$_]->strand eq "F"){
+				$seq_substring = substr $seq2, 0, $pos;
+				$dash_count = ($seq_substring =~ s/-//g);
+				$original_seq_pos = $pos - $dash_count;
+				$flag = "2F";
+			}
+			elsif ($pseq[$_]->strand eq "R"){
+				$reversed_seq = reverse $seq2;
+				$seq_substring = substr ($reversed_seq, 0, $pos);
+				$dash_count = ($seq_substring =~ s/-//g);
+				$original_seq_pos = length($seq2) - ($pos + $dash_count) - 1;
+				$flag = "2R";
+			}
+		}
+
+		my ($low, $high) = ($original_seq_pos - 3, $original_seq_pos + 3);
+		$low = 0 if $low < 0;
+		$high = $#all_base_locations if $high > $#all_base_locations;
+
+		my $qscores = [@all_qscores[$low .. $high]];
+		my $sequence = substr $entire_sequence, $low, $high - $low + 1;
+		my $five_bases_down_pos = $all_base_locations[$low];
+		my $five_bases_up_pos = $all_base_locations[$high];
+		my $base_locations = [@all_base_locations[$low .. $high]];
+		
+		my %trace_values = ();
+		foreach (keys %$all_traces){
+			$trace_values{$_} = [@{$all_traces->{$_}}[$five_bases_down_pos .. $five_bases_up_pos]];
+		}
+		
+		my $d = {
+			seq_id => $pseq[$_]->seq->id,
+			seq_display_id => $pseq[$_]->seq->display_id,
+			sequence => $sequence,
+			qscores => $qscores,
+			trace_values => \%trace_values,
+			base_locations => $base_locations,
+			position => $original_seq_pos,
+			flag => $flag,
+			#pos => { $pos => $all_base_locations[$pos], down => $five_bases_down_pos, up => $five_bases_up_pos},
+		};
+		
+		push @$data, $d;
+	}
+	
+	sub trim($){
+	my $string = shift;
+	$string =~ s/^\s+//;
+	$string =~ s/\s+$//;
+	return $string;
+	}
+
+</%init>
+<%flags>
+	inherit => undef
+</%flags>

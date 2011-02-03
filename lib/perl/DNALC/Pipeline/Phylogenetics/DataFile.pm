@@ -3,6 +3,7 @@ package DNALC::Pipeline::Phylogenetics::DataFile;
 use base qw(DNALC::Pipeline::DBI);
 use POSIX ();
 use List::Util qw/max/;
+use Bio::Trace::ABIF ();
 
 __PACKAGE__->table('phy_data_file');
 __PACKAGE__->columns(Primary => qw/id/);

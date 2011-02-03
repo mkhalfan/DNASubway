@@ -544,14 +544,15 @@
 	 phy.zoomReset = function() {
 		$('zoom_reset').disabled = true;
 		yZoom = xZoom = 1;
-		phy.draw();
+		//phy.draw();
+		phy.prepare_draw();
 		$('zoom_reset').disabled = false;
 	}
 	phy.zoomIn = function(axis) {
 		$(axis + '_zoom_in').disabled = true;
 		var zVar = axis + 'Zoom';
 		eval(zVar + " *= 1.3");
-		phy.draw();
+		phy.prepare_draw();
 		$(axis + '_zoom_in').disabled = false;
 	}
 
@@ -559,22 +560,17 @@
 		$(axis + '_zoom_out').disabled = true;
 		var zVar = axis + 'Zoom';
 		eval(zVar + " /= 1.3");
-		phy.draw();
+		phy.prepare_draw();
 		$(axis + '_zoom_out').disabled = false;
 	}
 	//---------------------------------------------------------
-	phy.draw = function() {
-
-		var canvas = $('canvas1');       
-
-		if (!canvas.getContext)
-			return;
-			
+	phy.prepare_draw = function() {
 		var sequence = $('seq_data').value;
 		var baseLocations = [];
 		var qualityScores = [];
+		var display_id = $('seq_display_id').value;
 		
-		var qual = [];
+		var traces = {};
 		//var str  = $('seq_data').value;
 		var qval = $('qvalues').value;
 		//debug(str.length);
@@ -586,9 +582,44 @@
 		$('b_locations').value.split(',').each(function(q){
 				baseLocations.push(parseInt(q, 10));
 			});
+		['A', 'T', 'C', 'G'].each(function(base, i) {
+			var arr = [];
+			$('seq_' + base).value.split(',').each(function(b){
+				arr.push(parseInt(b, 10));
+			});
+			traces[base] = arr;
+		});
+		
+		
+		var data = {
+			seq_display_id : display_id,
+			sequence : sequence,
+			qscores : qualityScores,
+			trace_values: traces,
+			base_locations: baseLocations
+		};
+		
+		phy.draw(data, 'canvas1');
+	};
+	//---------------------------------------------------------
+	
+	phy.draw = function(data, canvasID) {
+	
+	//function draw(data, canvasID) {
+		var canvas = $(canvasID);       
+		if (!canvas.getContext)
+			return;
+	
+		var sequence = data['sequence'];
+		var baseLocations = data['base_locations']; // The position of the base in the entire sequence
+		var qualityScores = data['qscores'];
+		var baseLocationsPositions = []; // The position of the base on the canvas (in our subsequence)
+		
+		// Normalize the base locations to baseLocationsPositions
+		for (var b = 0; b < baseLocations.length; b++){
+			baseLocationsPositions[b] = baseLocations[b] - baseLocations[0];
+		}
 
-		//console.info(qualityScores);
-		//	return 0;
 		var padding = 5;
 		var height = 200;
 		//var width = 6000;
@@ -596,72 +627,59 @@
 		var qualScoreSectionHeight = 30;
 		var qualScoreYPos = baseCallYPos + qualScoreSectionHeight;
 		var baseLocationYPos = 70;
-		var lastBase = Math.max.apply(Math, baseLocations);
+		var lastBase = Math.max.apply(Math, baseLocationsPositions);
 		canvas.width = lastBase * xZoom + 15;
-		var width = canvas.width;
-
-		var ctx = canvas.getContext('2d');
 		
+		var ctx = canvas.getContext('2d');
+				
 		function drawTrace(n, color){
 			ctx.strokeStyle = color;
 			ctx.beginPath();		
 			ctx.moveTo(padding, height - padding);
-			var i = 1;
-			//for (var x in n) {
 			n.each(function(x, i) {
-				/*
-				if (x % 2) {
-					return;
-				}*/
-				var y = height - padding - x*yZoom;
-				//console.info(y);
-				if (y < yLimit) {
+				var y = height - padding - x * yZoom;
+				
+				if (y < yLimit){
 					y = yLimit;
 				}
+				
 				ctx.lineTo(padding + i * xZoom, y);
 			});
 			ctx.stroke();
 			ctx.closePath();
 		}
-
-		//a = a.splice(0, 1000);
-		// Draw The Traces
-
-		var colors = ["green", "red", "blue", "black"];
-		['a', 't', 'c', 'g'].each(function(base, i) {
-			var a = [];
-			$('seq_' + base).value.split(',').each(function(b){
-				a.push(parseInt(b, 10));
-			});
-			drawTrace(a, colors[i]);
-		});
+		
+		drawTrace(data['trace_values']['A'], "green");
+		drawTrace(data['trace_values']['T'], "red");
+		drawTrace(data['trace_values']['C'], "blue");
+		drawTrace(data['trace_values']['G'], "black");
 
 		// Draw The Labels
+		var title = data['seq_display_id'];
 		ctx.fillStyle = "black";
-		ctx.fillText("Sequence", padding, 15);
-		ctx.fillText("Quality", padding, 45); 
-		ctx.fillText("Traces", padding, 80);
+		ctx.fillText(title, padding, 15);
+		ctx.fillText("Quality", padding, 43); 
+		ctx.fillText("Traces", padding, 83);
 		ctx.fillStyle = "rgba(0, 0, 0, 0.1)";
-		ctx.fillRect(padding - 2, 4, 60, 14);
-		ctx.fillRect(padding - 2, 34, 44, 14);
-		ctx.fillRect(padding - 2, 69, 40, 14);
+		ctx.fillRect(padding - 2, 4, ctx.measureText(title).width + 4, 14);
+		ctx.fillRect(padding - 2, 32, 38, 14);
+		ctx.fillRect(padding - 2, 72, 36, 14);
 		
 		// Draw the 'Quality Score = 20' line (99% accuracy line)
 		// Setting line to 5 instead of 20 since I will divide all 
 		// the QS's by 4 (so they fit in the designated height of 50px)
 		ctx.strokeStyle = "#33CCFF";
 		ctx.beginPath();
-		ctx.moveTo(padding, qualScoreYPos - 5);
-		ctx.lineTo(width - padding, qualScoreYPos - 5);
+		ctx.moveTo(padding, qualScoreYPos - 5.5);
+		ctx.lineTo(canvas.width - padding, qualScoreYPos - 5.5);
 		ctx.stroke();
 		ctx.closePath();
 		
-
 		// Draw The Base Calls at the appropriate base locations
 		//ctx.fillStyle = "black";
 		var i = 0;
 		//for (var x in baseLocations){
-		baseLocations.each(function(bl, i) {
+		baseLocationsPositions.each(function(bl, i) {
 			var base = sequence.charAt(i);
 			switch (base){
 				case 'A':
@@ -681,12 +699,14 @@
   				break;
 			}
 			//console.info(base, ' - ', padding + bl , ' - ', baseCallYPos);
-			ctx.fillText(base, padding + bl, baseCallYPos);
+			ctx.fillText(base, padding + bl * xZoom, baseCallYPos);
 			//i++;
-			// Drawing every 10th base location
-			if (i%10 == 0){
-				ctx.fillStyle = "black";
-				ctx.fillText(i, padding + bl * xZoom - 3, baseLocationYPos);
+			// Drawing every 10th base location, IF it is the entire trace
+			if (!data['seq_id']){
+				if (i%10 == 0){
+					ctx.fillStyle = "black";
+					ctx.fillText(i, padding + bl * xZoom - 3, baseLocationYPos);
+				}
 			}
 		});
 						
@@ -697,14 +717,22 @@
 		// Note: I'm dividing the quality score values by 4 so eveything fits
 		// in the designated 50px area
 		var nucleotideWidth = ctx.measureText(sequence).width / sequence.length;
-		var qualScoreBarWidth = nucleotideWidth; 
+
 		ctx.fillStyle = "rgba(0, 0, 200, 0.5)";
-		var i = 0;
-		//for (var x in baseLocations){
-		baseLocations.each(function(bl, i) {
-			ctx.fillRect(padding + bl * xZoom, qualScoreYPos - qualityScores[i]/4, qualScoreBarWidth, qualityScores[i]/4);
-			i++;
+
+		baseLocationsPositions.each(function(bl, i) {
+			ctx.fillRect(
+					padding + bl * xZoom, qualScoreYPos - qualityScores[i]/4, 
+					nucleotideWidth, qualityScores[i]/4
+				);
 		});
+		
+		// Draw lines surrounding base in question (for consensus only)
+		if (data['seq_id']){
+			ctx.fillStyle = "#666666";
+			ctx.fillRect(baseLocationsPositions[3] + 3, baseCallYPos - 10, 0.5, 185);
+			ctx.fillRect(baseLocationsPositions[3] + 13, baseCallYPos - 10, 0.5, 185);
+		}
 	};
 	
 	phy.do_blast = function (sid) {
@@ -996,6 +1024,194 @@
 		});
 	};
 	
+	/*
+	 * Displays the alignment in the consensus editor, 
+	 * highlighting any mismatches between the sequences
+	 * (typically forward, reverse, and consensus sequences)
+	 *
+	 */
+	phy.show_mismatches = function () {
+		var seq1 = $('seq1').value;
+		var seq2 = $('seq2').value;
+		var display_name_1 = $('display_name_1').value;
+		var display_name_2 = $('display_name_2').value;
+		var consensus = $('consensus').value;
+		var cd = "";
+		var re = /[N-]/;
+
+		var sequenceLength = consensus.length;
+		var consensus_span, seq1_span, seq2_span;
+		
+		$('seq1_name').update(display_name_1);
+		$('seq1_div').insert(" : ");
+		$('seq2_name').update(display_name_2);
+		$('seq2_div').insert(" : ");
+		$('consensus_div_name').insert("Consensus");
+		$('consensus_div_seq').insert(" : ");
+		
+		var display_name_div_width = $('seq1_name').getWidth();
+		$('consensus_div_name').setStyle({
+			width: display_name_div_width + 'px',
+		});
+		
+		for ( var i = 0; i < sequenceLength; i++){
+			//console.debug(i + "\t" + consensus.charAt(i) + " = " + seq2.charAt(i) + " + " + seq1.charAt(i) );
+			if ( !re.test(seq1.charAt(i)) && !re.test(seq2.charAt(i)) 
+					&& (consensus.charAt(i) != seq1.charAt(i) || consensus.charAt(i) != seq2.charAt(i) )
+				) 
+			{
+				//temp = "<span class='non-match'>" + consensus.charAt(i) + "</span>";
+				//span = new Element('span', {class: 'non-match', 'position': i, 'base': consensus.charAt(i)}).update(consensus.charAt(i));
+				consensus_span = new Element('span', {id: 'con' + i, 'position': i, 'base': consensus.charAt(i)}).update(consensus.charAt(i));
+				seq1_span = new Element('span', {'position': i, 'base': consensus.charAt(i)}).update(seq1.charAt(i));
+				seq2_span = new Element('span', {'position': i, 'base': consensus.charAt(i)}).update(seq2.charAt(i));
+				
+				seq1_span.addClassName('non-match');
+				seq2_span.addClassName('non-match');
+				consensus_span.addClassName('non-match');
+				
+				Event.observe(consensus_span, 'click', phy.view_mismatch_trace);
+				Event.observe(seq1_span, 'click', phy.view_mismatch_trace);
+				Event.observe(seq2_span, 'click', phy.view_mismatch_trace);
+				
+			}
+			else{
+				//temp = "<span>" + consensus.charAt(i) + "</span>";
+				consensus_span = new Element('span').update(consensus.charAt(i));
+				seq1_span = new Element('span').update(seq1.charAt(i));
+				seq2_span = new Element('span').update(seq2.charAt(i));
+			}
+			//cd += temp;
+			$('consensus_div_seq').insert(consensus_span);
+			$('seq1_div').insert(seq1_span);
+			$('seq2_div').insert(seq2_span);
+		} 
+	}
+	
+	/*
+	 * Displays and adds functionality to allow 
+	 * the user to edit the consensus sequence
+	 *
+	 */
+	phy.change_bases = function(ev) {
+		var span = ev.element();
+
+		var current_base = span.getAttribute('base');
+		var current_base_position = parseInt(span.getAttribute('position'), 10) + 1;
+		var bases = 'ATCG';
+		var bases_array;
+		
+		base_span = new Element('span', {id : 'con'}).update(current_base);
+		base_span.addClassName('non-match');
+		base_span.addClassName('current-nucleotide');
+		
+		// allow users to reset any base change back to the original consensus base
+		Event.observe(base_span, 'click', function(ev) {
+			var span_to_update = $('con' + (current_base_position - 1));
+			if (span_to_update && span_to_update.hasClassName('changed-base')) {
+				span_to_update.update(current_base);
+				span_to_update.removeClassName('changed-base');
+				span_to_update.addClassName('non-match');
+				
+				// reset the change-base-area buttons (remove the red backgrounds)
+				// if you click the original consensus base (current_base)
+				$$('#change_base_area span.new-nucleotide-option').each(function(el) {
+							if (el.hasClassName('changed-base'))
+								el.removeClassName('changed-base');
+						});
+			}
+		});
+		
+		// Displays the info 'Change Base X at position # to:'
+		$('change_base_area').update('Change Base ')
+					.insert(base_span)
+					.insert('&nbsp;at position ' + current_base_position + ' to: ');
+		
+		// Removes the Current Base from the string ATCG and then splits the 
+		// remaining string into an array, to be displayed as your selectable 
+		// base change options
+		bases_array = (bases.replace(current_base, '')).split('');
+
+		bases_array.each(function(b) {
+			var base_span = new Element('span', {pos: (current_base_position - 1)}).update(b);
+			base_span.addClassName('new-nucleotide-option')
+			
+			// If you select another base...
+			Event.observe(base_span, 'click', function(ev) {
+			
+					// Remove the red background from a previously selected base
+					$$('#change_base_area span.new-nucleotide-option').each(function(el) {
+							if (el.hasClassName('changed-base'))
+								el.removeClassName('changed-base');
+						});
+			
+					// Give the newly selected base a red background
+					var el = ev.element();
+					el.addClassName('changed-base');
+					
+					// Reflect the base change in the consensus sequence
+					var span_to_update = $('con' + el.getAttribute('pos'));
+					if (span_to_update) {
+						span_to_update.update(el.innerHTML);
+						span_to_update.removeClassName('non-match');
+						span_to_update.addClassName('changed-base');
+					}
+					
+					// Make the current consensus base selectable after you select
+					// another base (well, just make it look more selectable)
+					$('con').removeClassName('current-nucleotide');
+					$('con').addClassName('new-nucleotide-option');
+					
+					// Insert the save changes button, if it's not already there
+					if (!$('save_changes_btn')){
+						$('change_base_area').insert('<input type="button" id="save_changes_btn" value="Save Changes" onclick="" style="margin-left:20px;"/> ');
+					}
+					
+				});
+			$('change_base_area').insert(base_span);
+		});
+	};		
+	
+	/*
+	 * View the traces for the mismatched bases in the Consensus Editor
+	 * Also calls the function to edit the consensus sequence (phy.change_bases())
+	 *
+	 */
+	phy.view_mismatch_trace = function (ev) {
+		var span = ev.element();
+
+		// Show the 'Loading' image
+		$('progress').show();
+		// Hide the Trace Canvas Div
+		$('trace_canvas_div').hide();
+		
+		new Ajax.Request('/project/phylogenetics/tools/consensus_data', {
+				method:'get',	
+				parameters: {'pair_id': $('pair_id').value, 'pos': span.getAttribute('position')},
+				onSuccess: function(transport){
+					var response = transport.responseText || "{'status':'error', 'message':'No response'}";
+					var data = response.evalJSON();
+					//debug(response);
+					if (data) {
+						
+						phy.change_bases(ev);
+
+						phy.draw(data[0], 'trace_viewer_1');
+						phy.draw(data[1], 'trace_viewer_2');
+						
+						// Show the Trace Canvas Div
+						$('trace_canvas_div').show();
+						// Hide the 'Loading' Image
+						$('progress').hide();
+					}
+				},
+				onFailure: function(){
+						alert('Something went wrong!\nAborting...');
+					}
+		});
+	}
+	
+	
 })();
 
 function debug(msg) {
@@ -1055,9 +1271,9 @@ Event.observe(window, Prototype.Browser.IE ? 'load' : 'dom:loaded', function() {
 			$('do_pair').disabled = true;
 	}
 	else if (step == 2) {
-		//alert(step);
-		//phy.draw_qvalues();
-		phy.draw();
+		//phy.draw_qvalues();		
+		//phy.draw($('data').value.evalJSON(), 'canvas1');
+		phy.prepare_draw();
 	}
 	else if (step == 3) {
 		/*
@@ -1112,4 +1328,14 @@ pre.insert({top:spn});
 
 		*/
 	}
+	
+	/*
+	 * Consensus Editor
+	 *
+	 */
+	else if (step == 5) {
+		phy.show_mismatches();
+	}
+	
+	
 });
