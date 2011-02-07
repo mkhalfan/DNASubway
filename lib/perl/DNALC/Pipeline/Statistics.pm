@@ -98,7 +98,8 @@ __PACKAGE__->set_sql( group_by_occupation => q{
 
 __PACKAGE__->set_sql( group_by_institution_country => q{
 	SELECT count(*) AS num, a1.a_value AS Institution, a2.a_value AS Country
-        FROM user_profile_answer a1
+		FROM users u
+        LEFT JOIN user_profile_answer a1 on a1.a_user_id = u.user_id
         LEFT JOIN user_profile_answer a2 ON a1.a_user_id = a2.a_user_id
         WHERE a1.a_question_id IN (
             SELECT q_id FROM sub_questions(36)
