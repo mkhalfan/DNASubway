@@ -109,9 +109,12 @@ sub save_upload_files {
 	my @excluded_files = ();
 
 	for my $u (@{$args->{u}}) {
+		
 		my $filename = basename($u);
 		$filename =~ s/.*[\\\/]+//;
 
+		#my $mt = $u->type;
+		#print STDERR  $filename, ": ", $mt, $/;
 		my $path = $upl_dir . '/' . random_string();
 		print STDERR  "UPLOAD saved to: ", $path, $/;
 
@@ -152,13 +155,31 @@ sub save_upload_files {
 		}
 		else {
 			# text file
-			my $seq_data = '';
-			while (my $line = <$fh>) {
-				$seq_data .= $line;
+
+			my $in = Bio::SeqIO->new(-fh => $fh, -format => "fasta");
+			unless ($in) {
+				push @excluded_files, {filename => $filename, 'Unable to process file. Not a fasta file.'};
 			}
 
-			my $fixer = Text::FixEOL->new;
-			$seq_data = $fixer->fix_eol($seq_data);
+			my $seq_data = '';
+			my ($added, $seq_counter) = (0, 0);
+			while (my $seq = $in->next_seq) {
+				my $seq_name = $seq->display_id || ('seq_' . $seq_counter++);
+				my $seq_alphabet = $seq->alphabet;
+
+				#print STDERR  $args->{alphabet}, ' vs. ', $seq_alphabet, $/;
+				if (defined $args->{alphabet} && $args->{alphabet} ne $seq_alphabet) {
+					print STDERR  "Seq: ", $seq_name, " alphabet doesn't match the project type.", $/;
+					next;
+				}
+				my $seq_len  = $seq->length;
+				$seq_data .= ">$seq_name\n" . $seq->seq;
+				$added++;
+			}
+
+			unless ($added) {
+				$msg = "No $args->{alphabet} sequences found!";
+			}
 
 			unless ($msg) {
 				my $out = IO::File->new;
@@ -173,7 +194,7 @@ sub save_upload_files {
 				}
 			}
 		}
-	}
+	} # end for @files
 
 	$status = @files ? 'success' : 'fail';
 	return { status => $status, 

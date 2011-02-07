@@ -1,7 +1,7 @@
 
 <div id="conbody">
 % if (@err) {
-	<div style="display:block" id="error_list">
+	<div style="display:block; color: red; font-weight: bold;" id="error_list">
 %	foreach (@err) {
 		<div><% $_ %></div>\
 %	}
@@ -11,7 +11,7 @@
 % if ($added) {
 <script type="text/javascript">
 	//top.phy.set_status('phy_alignment', 'not-processed');
-	alert("test adding data for sample based projects...");
+	//alert("Data added");
 	top.phy.close_window('data');
 </script>
 % }
@@ -26,13 +26,14 @@
 	<div class="con_BL_menu_box"> 
 		<div class="con_BL_menu_box1">
 			<input class="conRadiobox_align" type="radio" name="seq_src" id="seq_src_upload" 
-				<% $seq_src eq "upload" ? "checked=\"checked\"" : ""%> \
-				value="upload" onclick="phy.select_source(this.value)" />
+				<% $seq_src eq "upload" ? "checked=\"checked\"" : ""%> value="upload" />
+%#				onclick="phy.select_source(this.value)"				
 			Upload <a href="#">AB1</a> or <a href="http://en.wikipedia.org/wiki/FASTA_format#Format">FASTA formated</a> files
 		</div>                     
 	</div>
 	<div class="con_BL_menu_box" id="upload_inputs">
-		<input class="conStylized_input1" type="file" multiple id="seq_file" name="seq_file" />
+		<input class="conStylized_input1" type="file" multiple id="seq_file" name="seq_file" 
+			onchange="$('seq_src_upload').checked = true;" />
 		<input class="" type="button" id="upload_data" name="upload_data" value="Upload" 
 			onclick="phy.add_data()" />
 	</div>
@@ -42,15 +43,15 @@
 	<div class="con_BL_menu_box"> 
 		<div class="con_BL_menu_box1">
 			<input class="conRadiobox_align" type="radio" name="seq_src" id="seq_src_paste" 
-				<% $seq_src eq "paste" ? "checked=\"checked\"" : ""%> \
-				value="paste" onclick="phy.select_source(this.value)" />
+				value="paste" <% $seq_src eq "paste" ? "checked=\"checked\"" : ""%> />
 			&nbsp; Enter a new sequence in FASTA format
 		</div>                     
 	</div>
 	<div class="con_BL_menu_box" id="paste_inputs">
 		<div class="con_BL_menu_box2">Please type or copy &amp; paste your sequence(s):</div>
-		<textarea class="conStylized_input2" name="sequence" id="sequence" rows="4" cols="30"><% $sequence|html %></textarea>
-		<div align="left"><input type="button" value="Add data" onclick="phy.add_data()" /></div>
+		<textarea class="conStylized_input2" name="sequence" id="sequence" rows="4" cols="30"
+			onfocus="$('seq_src_paste').checked = true;" onchange="$('seq_src_paste').checked = true;" ><% $sequence|html %></textarea>
+		<div align="left"><input type="button" value="Add sequence(s)" onclick="phy.add_data()" /></div>
 	</div>
 
 	<!-- IMPORT -->
@@ -145,12 +146,16 @@
 
 				my $st = DNALC::Pipeline::App::Utils->save_upload_files( {
 							u => [$r->upload("seq_file")],
+							alphabet => $proj->type =~ /protein/i ? 'protein' : 'dna',
 						});
 
 				print STDERR Dumper($st), $/;
 
 				if ($st->{status} eq "fail") {
 					push @err, "Unable to upload file(s): ". $st->{message};
+					for (@{$st->{excluded_files}}) {
+						push @err, $_->{filename} . " " . $_->{msg};
+					}
 				}
 				else {
 					push @files2process, @{$st->{files}};
@@ -192,3 +197,6 @@
 <%attr>
 	js => ['prototype-1.6.1.js', 'phylogenetics.js']
 </%attr>
+<%filter>
+	s/^\s+/ /gm;
+</%filter>
