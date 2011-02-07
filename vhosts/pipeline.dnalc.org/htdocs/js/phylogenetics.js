@@ -615,7 +615,6 @@
 		var qualScoreSectionHeight = 30;
 		var qualScoreYPos = baseCallYPos + qualScoreSectionHeight;
 		var baseLocationYPos = 70;
-		var lastBase = Math.max.apply(Math, baseLocationsPositions);
 		var ctx = canvas.getContext('2d');
 		
 		var title = data['seq_display_id'];
@@ -623,6 +622,7 @@
 		var qualityScores = data['qscores'];
 		var baseLocations = data['base_locations']; // The position of the base in the entire sequence
 		var baseLocationsPositions = []; // The position of the base on the canvas (in our subsequence)
+		var lastBase = Math.max.apply(Math, baseLocations);
 		
 		// Normalize the base locations to baseLocationsPositions
 		for (var b = 0; b < baseLocations.length; b++){
@@ -639,8 +639,7 @@
 		else {
 			canvas.width = lastBase * xZoom + 15;
 		}
-		
-				
+	
 		function drawTrace(n, color){
 			ctx.strokeStyle = color;
 			ctx.beginPath();		
@@ -1094,6 +1093,8 @@
 		$('seq1_name').update(display_name_1);
 		$('seq2_name').update(display_name_2);
 		$('consensus_div_name').update("Consensus");
+		$('colons').show();
+		$('save_changes_btn').show();
 		
 		for ( var i = 0; i < sequenceLength; i++){
 			//console.debug(i + "\t" + consensus.charAt(i) + " = " + seq2.charAt(i) + " + " + seq1.charAt(i) );
@@ -1210,7 +1211,7 @@
 						span_to_update.addClassName('changed-base');
 					}
 					
-					// Updatet he save changes button
+					// Updatet the save changes button
 					phy.prepare_consensus_change();
 						
 				});
@@ -1262,24 +1263,32 @@
 		$$('#consensus_div_seq span.changed-base').each(function(el) {
 			baseChanges.push([el.getAttribute('position'), el.innerHTML]);
 		});
-		console.info(baseChanges.toJSON());
+
 		
 		new Ajax.Request('/project/phylogenetics/tools/commit_consensus_changes', {
 				method:'get',	
 				parameters: {'pair_id': $('pair_id').value, 'base_changes': baseChanges.toJSON()},
-				onSuccess: function(){
-					// Update the Save Changes button
-					$('save_changes_btn').value = 'Changes Made';
-					$('save_changes_btn').disable();
-					
-					// Hide the Trace Canvas Div
-					$('trace_canvas_div').hide();
-					
-					// Update the consensus div (so all BG's are yellow)
-					$$('#consensus_div_seq span.changed-base').each(function(el) {
-								el.removeClassName('changed-base');
-								el.addClassName('non-match');
-						});
+				onSuccess: function(transport){
+					var response = transport.responseText || "{'status':'error', 'message':'No response'}";
+					debug(response);
+					var r = response.evalJSON();
+					if (r.status == 'success') {
+						// Update the Save Changes button
+						$('save_changes_btn').value = 'Changes Made!';
+						$('save_changes_btn').disable();
+						
+						// Hide the Trace Canvas Div
+						$('trace_canvas_div').hide();
+						
+						// Update the consensus div (so all BG's are yellow)
+						$$('#consensus_div_seq span.changed-base').each(function(el) {
+									el.removeClassName('changed-base');
+									el.addClassName('non-match');
+							});
+					}
+					else {
+						alert('Error: ' + r.message);
+					}
 				},
 				onFailure: function(){
 						alert('Something went wrong!\nAborting...');

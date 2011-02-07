@@ -1,4 +1,4 @@
-<div id="conbodyx">
+<div id="consensus_8">
 % unless ($proj) {
 	Error: can't open project "<% $pid|html%>".
 % } 
@@ -23,10 +23,10 @@
 				<div id="seq2_name"></div>
 				<div id="consensus_div_name"></div>
 			</div>
-			<div id="colons" style="float:left; padding-top:10px;padding-right:5px;">
-				:<br />
-				:<br />
-				:<br />
+			<div id="colons" style="float:left; padding-top:10px;padding-right:5px;display:none">
+				<div>:</div>
+				<div>:</div>
+				<div>:</div>
 			</div>
 			<div id="sequences" style="overflow:auto;padding-top:10px;white-space:nowrap;">
 				<div id="seq1_div"></div>
@@ -42,7 +42,7 @@
 			<canvas id="trace_viewer_1" height="210">Your browser doesnt support canvas objects.</canvas>
 			<canvas id="trace_viewer_2" height="210">Your browser doesnt support canvas objects.</canvas>
 		</div>
-		<div id="save_changes_button_div"><input type="button" id="save_changes_btn" value="Save Changes" onclick="phy.consensus_change()" style="margin-left:5px;"/></div>
+		<div id="save_changes_button_div"><input type="button" id="save_changes_btn" value="Save Changes" onclick="phy.consensus_change()" style="margin-left:5px;display:none"/></div>
 %	}
 	</div>
 % }
