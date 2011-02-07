@@ -403,7 +403,7 @@ use Bio::Trace::ABIF ();
 		my ($self) = @_;
 		return unless $self->project;
 		
-		my @pairs = Pair->search(project_id => $self->project);
+		my @pairs = Pair->search(project_id => $self->project, { order_by => 'pair_id' });
 		wantarray ? @pairs : \@pairs;
 	}
 
