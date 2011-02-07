@@ -605,32 +605,41 @@
 	
 	phy.draw = function(data, canvasID) {
 	
-	//function draw(data, canvasID) {
 		var canvas = $(canvasID);       
 		if (!canvas.getContext)
 			return;
-	
+			
+		var padding = 5;
+		var height = 200;
+		var baseCallYPos = 30;
+		var qualScoreSectionHeight = 30;
+		var qualScoreYPos = baseCallYPos + qualScoreSectionHeight;
+		var baseLocationYPos = 70;
+		var lastBase = Math.max.apply(Math, baseLocationsPositions);
+		var ctx = canvas.getContext('2d');
+		
+		var title = data['seq_display_id'];
 		var sequence = data['sequence'];
-		var baseLocations = data['base_locations']; // The position of the base in the entire sequence
 		var qualityScores = data['qscores'];
+		var baseLocations = data['base_locations']; // The position of the base in the entire sequence
 		var baseLocationsPositions = []; // The position of the base on the canvas (in our subsequence)
 		
 		// Normalize the base locations to baseLocationsPositions
 		for (var b = 0; b < baseLocations.length; b++){
 			baseLocationsPositions[b] = baseLocations[b] - baseLocations[0];
 		}
-
-		var padding = 5;
-		var height = 200;
-		//var width = 6000;
-		var baseCallYPos = 30;
-		var qualScoreSectionHeight = 30;
-		var qualScoreYPos = baseCallYPos + qualScoreSectionHeight;
-		var baseLocationYPos = 70;
-		var lastBase = Math.max.apply(Math, baseLocationsPositions);
-		canvas.width = lastBase * xZoom + 15;
 		
-		var ctx = canvas.getContext('2d');
+		// Calculate the width of the canvas 
+		// If it's the consensus editor, make it the width of the Display ID.
+		// If it's the View Sequences (entire sequence), make it the width of the entire sequence.
+		// ('seq_id' is only passed from the consensus editor - that's how we check)
+		if (data['seq_id']){
+			canvas.width = ctx.measureText(title).width + 4 + padding;
+		}
+		else {
+			canvas.width = lastBase * xZoom + 15;
+		}
+		
 				
 		function drawTrace(n, color){
 			ctx.strokeStyle = color;
@@ -655,15 +664,14 @@
 		drawTrace(data['trace_values']['G'], "black");
 
 		// Draw The Labels
-		var title = data['seq_display_id'];
 		ctx.fillStyle = "black";
 		ctx.fillText(title, padding, 15);
 		ctx.fillText("Quality", padding, 43); 
-		ctx.fillText("Traces", padding, 83);
+		ctx.fillText("Trace", padding, 83);
 		ctx.fillStyle = "rgba(0, 0, 0, 0.1)";
 		ctx.fillRect(padding - 2, 4, ctx.measureText(title).width + 4, 14);
 		ctx.fillRect(padding - 2, 32, 38, 14);
-		ctx.fillRect(padding - 2, 72, 36, 14);
+		ctx.fillRect(padding - 2, 72, 31, 14);
 		
 		// Draw the 'Quality Score = 20' line (99% accuracy line)
 		// Setting line to 5 instead of 20 since I will divide all 
@@ -676,7 +684,6 @@
 		ctx.closePath();
 		
 		// Draw The Base Calls at the appropriate base locations
-		//ctx.fillStyle = "black";
 		var i = 0;
 		//for (var x in baseLocations){
 		baseLocationsPositions.each(function(bl, i) {
@@ -698,10 +705,8 @@
   				ctx.fillStyle = "black";
   				break;
 			}
-			//console.info(base, ' - ', padding + bl , ' - ', baseCallYPos);
 			ctx.fillText(base, padding + bl * xZoom, baseCallYPos);
-			//i++;
-			// Drawing every 10th base location, IF it is the entire trace
+
 			if (!data['seq_id']){
 				if (i%10 == 0){
 					ctx.fillStyle = "black";
@@ -717,7 +722,6 @@
 		// Note: I'm dividing the quality score values by 4 so eveything fits
 		// in the designated 50px area
 		var nucleotideWidth = ctx.measureText(sequence).width / sequence.length;
-
 		ctx.fillStyle = "rgba(0, 0, 200, 0.5)";
 
 		baseLocationsPositions.each(function(bl, i) {
@@ -1088,16 +1092,8 @@
 		var consensus_span, seq1_span, seq2_span;
 		
 		$('seq1_name').update(display_name_1);
-		$('seq1_div').insert(" : ");
 		$('seq2_name').update(display_name_2);
-		$('seq2_div').insert(" : ");
-		$('consensus_div_name').insert("Consensus");
-		$('consensus_div_seq').insert(" : ");
-		
-		var display_name_div_width = $('seq1_name').getWidth();
-		$('consensus_div_name').setStyle({
-			width: display_name_div_width + 'px',
-		});
+		$('consensus_div_name').update("Consensus");
 		
 		for ( var i = 0; i < sequenceLength; i++){
 			//console.debug(i + "\t" + consensus.charAt(i) + " = " + seq2.charAt(i) + " + " + seq1.charAt(i) );
@@ -1130,6 +1126,9 @@
 			$('consensus_div_seq').insert(consensus_span);
 			$('seq1_div').insert(seq1_span);
 			$('seq2_div').insert(seq2_span);
+			
+			// Initially, set the save_changes_button to be disabled
+			$('save_changes_btn').disabled = true;
 		} 
 	}
 	
@@ -1143,7 +1142,7 @@
 
 		var current_base = span.getAttribute('base');
 		var current_base_position = parseInt(span.getAttribute('position'), 10) + 1;
-		var bases = 'ATCG';
+		var bases = 'ACGT';
 		var bases_array;
 		
 		base_span = new Element('span', {id : 'con'}).update(current_base);
@@ -1165,12 +1164,15 @@
 								el.removeClassName('changed-base');
 						});
 			}
+			// Update the Save Changes Button
+			phy.prepare_consensus_change();
 		});
 		
 		// Displays the info 'Change Base X at position # to:'
 		$('change_base_area').update('Change Base ')
 					.insert(base_span)
 					.insert('&nbsp;at position ' + current_base_position + ' to: ');
+					
 		
 		// Removes the Current Base from the string ATCG and then splits the 
 		// remaining string into an array, to be displayed as your selectable 
@@ -1179,7 +1181,13 @@
 
 		bases_array.each(function(b) {
 			var base_span = new Element('span', {pos: (current_base_position - 1)}).update(b);
-			base_span.addClassName('new-nucleotide-option')
+			base_span.addClassName('new-nucleotide-option');
+			
+			// If you've made a change previously, when you come back, you're
+			// change will still be indicated 
+			if ($('con' + span.getAttribute('position')).innerHTML == b){
+				base_span.addClassName('changed-base');
+			}
 			
 			// If you select another base...
 			Event.observe(base_span, 'click', function(ev) {
@@ -1202,20 +1210,83 @@
 						span_to_update.addClassName('changed-base');
 					}
 					
-					// Make the current consensus base selectable after you select
-					// another base (well, just make it look more selectable)
-					$('con').removeClassName('current-nucleotide');
-					$('con').addClassName('new-nucleotide-option');
-					
-					// Insert the save changes button, if it's not already there
-					if (!$('save_changes_btn')){
-						$('change_base_area').insert('<input type="button" id="save_changes_btn" value="Save Changes" onclick="" style="margin-left:20px;"/> ');
-					}
-					
+					// Updatet he save changes button
+					phy.prepare_consensus_change();
+						
 				});
 			$('change_base_area').insert(base_span);
 		});
 	};		
+	
+	/*
+	 * Count the number of changes made to the consensus sequence,
+	 * inform user of number of changes pending via the save button,
+	 * enable the save button if there are any changes to be saved
+	 *
+	 */
+	phy.prepare_consensus_change = function() {
+		var changedBaseCount = 0;
+		var saveBtnTxt;
+		
+		// Enable the save changes button
+		$('save_changes_btn').enable();
+		
+		// Count how many changes have been made
+		$$('#consensus_div_seq span.changed-base').each(function(el) {
+			changedBaseCount++;
+		});
+		
+		// Update the Save Changes button with the number of changes made
+		if (changedBaseCount == 1){
+			saveBtnTxt = "Save 1 Change";
+		}
+		else if (changedBaseCount > 1){
+			saveBtnTxt = "Save " + changedBaseCount + " Changes";
+		}	
+		else if (changedBaseCount == 0){
+			saveBtnTxt = "Save Changes";
+			$('save_changes_btn').disable();
+		}
+		$('save_changes_btn').value = saveBtnTxt;	
+	}
+	
+	/*
+	 * Commits consensus sequence changes made by the user to the database
+	 *
+	 */
+	phy.consensus_change = function () {
+		var baseChanges = [];
+		
+		// Finds all bases in the consensus which have been changed
+		// Gets the position and new base and stores these in a hash
+		$$('#consensus_div_seq span.changed-base').each(function(el) {
+			baseChanges.push([el.getAttribute('position'), el.innerHTML]);
+		});
+		console.info(baseChanges.toJSON());
+		
+		new Ajax.Request('/project/phylogenetics/tools/commit_consensus_changes', {
+				method:'get',	
+				parameters: {'pair_id': $('pair_id').value, 'base_changes': baseChanges.toJSON()},
+				onSuccess: function(){
+					// Update the Save Changes button
+					$('save_changes_btn').value = 'Changes Made';
+					$('save_changes_btn').disable();
+					
+					// Hide the Trace Canvas Div
+					$('trace_canvas_div').hide();
+					
+					// Update the consensus div (so all BG's are yellow)
+					$$('#consensus_div_seq span.changed-base').each(function(el) {
+								el.removeClassName('changed-base');
+								el.addClassName('non-match');
+						});
+				},
+				onFailure: function(){
+						alert('Something went wrong!\nAborting...');
+					}
+		});
+		
+	}
 	
 	/*
 	 * View the traces for the mismatched bases in the Consensus Editor

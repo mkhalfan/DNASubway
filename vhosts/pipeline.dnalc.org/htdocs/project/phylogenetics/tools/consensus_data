@@ -7,7 +7,6 @@
 	$pid => 0
 	$pair_id => 0
 	$pos => 0
-	$which_of_the_pair => 0
 </%args>
 <%once>
 	use File::Slurp qw/read_file/;
@@ -26,7 +25,6 @@
 	my @pseq = $pair->paired_sequences;
 	my $data = [];
 	my $original_seq_pos;
-	my $flag = "";
 	my $seq_substring;
 	my $dash_count;
 	my $reversed_seq;
@@ -58,14 +56,12 @@
 				$seq_substring = substr $seq1, 0, $pos;
 				$dash_count = ($seq_substring =~ s/-//g);
 				$original_seq_pos = $pos - $dash_count;
-				$flag = "1F";
 			}
 			elsif ($pseq[$_]->strand eq "R"){
 				$reversed_seq = reverse $seq1;
 				$seq_substring = substr ($reversed_seq, 0, $pos);
 				$dash_count = ($seq_substring =~ s/-//g);
 				$original_seq_pos = length($seq1) - ($pos + $dash_count) - 1;
-				$flag = "1R";
 			}
 		}
 		elsif ($pseq[$_]->seq->display_id eq trim($display_name_2)){
@@ -73,16 +69,15 @@
 				$seq_substring = substr $seq2, 0, $pos;
 				$dash_count = ($seq_substring =~ s/-//g);
 				$original_seq_pos = $pos - $dash_count;
-				$flag = "2F";
 			}
 			elsif ($pseq[$_]->strand eq "R"){
 				$reversed_seq = reverse $seq2;
 				$seq_substring = substr ($reversed_seq, 0, $pos);
 				$dash_count = ($seq_substring =~ s/-//g);
 				$original_seq_pos = length($seq2) - ($pos + $dash_count) - 1;
-				$flag = "2R";
 			}
 		}
+		# ---------------------------
 
 		my ($low, $high) = ($original_seq_pos - 3, $original_seq_pos + 3);
 		$low = 0 if $low < 0;
@@ -107,7 +102,6 @@
 			trace_values => \%trace_values,
 			base_locations => $base_locations,
 			position => $original_seq_pos,
-			flag => $flag,
 			#pos => { $pos => $all_base_locations[$pos], down => $five_bases_down_pos, up => $five_bases_up_pos},
 		};
 		

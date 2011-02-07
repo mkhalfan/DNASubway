@@ -503,3 +503,39 @@ span.bold {
 	font-family: courier new, courier, monospace;
 
 }
+
+.non-match{
+	background: #FFF333;
+	cursor: pointer;
+}
+
+.new-nucleotide-option{
+	margin-left:5px;
+	cursor: pointer;
+	border: 1px solid black;
+	padding-left:2px;
+	padding-right:2px;
+}
+
+.current-nucleotide{
+	margin-left:5px;
+	border: 1px solid black;
+	cursor: pointer;
+	padding-left:2px;
+	padding-right:2px;
+}
+
+.changed-base{
+	background: #FF9999;
+	cursor: pointer;
+}
+
+.monospace{
+	font-family: "Courier New", Courier, monospace;
+}
+
+canvas {
+	border: 1px black solid;
+	margin: 20px;
+	background: #FFFFFF;
+}
