@@ -7,10 +7,15 @@
 		onclick="var chk=this.checked;$$('#seqs input[type=checkbox]').each(function(el) { el.checked = chk});"/> Select all
 	</div>
 	<div id="seqs" class="seqs">
-% for my $source (keys %sequence_groups) {
-	<fieldset id="f<% $source %>">
+%# show "init" sources at the top
+% for my $source (("init", keys %sequence_groups)) {
+%	next unless($sequence_groups{$source});
+%	my $source_id = $source;
+%	$source_id =~ s/\W+/_/g;
+	<fieldset id="f<% $source_id %>">
 		<legend>
-			<input type="checkbox" id="s<%$source%>" onchange="var val=$('s<% $source %>').checked;$$('#f<% $source %> input').each(function(i){i.checked = val;});" /> <% $source %>
+			<input type="checkbox" id="s<%$source_id%>" onchange="var val=this.checked;$$('#f<% $source_id %> input').each(function(i){i.checked = val;});" />
+			<& _buildSourceName, $source &>
 		</legend>
 %	for (@{$sequence_groups{$source}}) {
 	<div style="padding-left: 20px;">
@@ -20,6 +25,7 @@
 	</div>
 %	}
 		</fieldset>
+%	delete $sequence_groups{ $source } if $source eq "init";
 % }
 	</div>
 
@@ -50,6 +56,7 @@
 	#use File::Slurp qw/read_file/;
 	use DNALC::Pipeline::App::Phylogenetics::ProjectManager ();
 	use DNALC::Pipeline::Phylogenetics::DataSequence ();
+	use DNALC::Pipeline::Phylogenetics::Blast ();
 	use DNALC::Pipeline::CacheMemcached ();
 	use DNALC::Pipeline::Utils qw/lcs_name/;
 	use Data::Dumper;
@@ -114,6 +121,25 @@
 		}
 	}
 </%init>
+<%def _buildSourceName>
+<% $source %>
+<%init>
+	my $source = $_[0];
+	if ($source eq "init") {
+		$source = "User data";
+	} elsif ($source =~ /^blast:(\d+)$/) {
+		$source = "Blast hits";
+		#my $blast = DNALC::Pipeline::Phylogenetics::Blast->retrieve($1);
+		#if ($blast && $blast->sequence_id) {
+		#	my $seq = DNALC::Pipeline::Phylogenetics::DataSequence->retrieve($blast->sequence_id);
+		#	$source .= " " . $seq->display_id if $seq;
+		#}
+	} elsif ($source =~ /^ref:(.+)$/) {
+		$source = "Reference data set <strong>$1</strong>";
+	}
+</%init>
+</%def>
+
 <%attr>
 	js => ['prototype-1.6.1.js', 'phylogenetics.js']
 </%attr>

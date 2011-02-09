@@ -82,7 +82,6 @@
 <%args>
 	$pid => 0
 	$seq_src => ''
-	#$seq_paste => ''
 	$sequence => ''
 </%args>
 %#------------------------------------------------------------
@@ -116,14 +115,9 @@
 
 	if (!@err && $r->method eq "POST") {
 
-		print STDERR "seq_src = ", $seq_src, $/;
+		#print STDERR "seq_src = ", $seq_src, $/;
 		my @files2process = ();
 
-		#for ($name) {
-		#	$_ =~ s/\s+/ /g;
-		#	$_ =~ s/^\s+//;
-		#	$_ =~ s/\s+$//;
-		#}
 		if ($seq_src eq "paste" && !defined $sequence) {
 			push @err, "Sequence is missing!", $/;
 		}
@@ -146,10 +140,10 @@
 
 				my $st = DNALC::Pipeline::App::Utils->save_upload_files( {
 							u => [$r->upload("seq_file")],
-							alphabet => $proj->type =~ /protein/i ? 'protein' : 'dna',
+							alphabet => $proj->type =~ /protein/i ? "protein" : "dna",
 						});
 
-				print STDERR Dumper($st), $/;
+				#print STDERR Dumper($st), $/;
 
 				if ($st->{status} eq "fail") {
 					push @err, "Unable to upload file(s): ". $st->{message};
@@ -173,10 +167,10 @@
 		unless (@err) {
 			for my $ftype (qw/fasta trace/) {
 				my @_files = grep {$_->{type} =~ /^$ftype$/i} @files2process;
-				print STDERR "** $ftype files: ", Dumper(\@_files), $/;
+				#print STDERR "** $ftype files: ", Dumper(\@_files), $/;
 				next unless @_files;
 				my $st = $pm->add_data({
-						source => "upload",
+						source => "init",
 						files => \@_files,
 						type => $ftype,
 					});

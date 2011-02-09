@@ -39,6 +39,17 @@ __PACKAGE__->set_sql(trace_sequences =>q {
 	AND f.file_type = 'trace'
 });
 
+__PACKAGE__->set_sql(initial_non_trace_sequences =>q {
+	SELECT s.id
+	FROM phy_data_sequence AS s
+	LEFT JOIN phy_data_source ds ON s.source_id = ds.id
+	LEFT JOIN phy_data_file f ON s.file_id = f.id
+	WHERE s.project_id = ?
+	AND ds.name = 'init'
+	AND f.file_type != 'trace'
+});
+
+
 __PACKAGE__->set_sql(initial_non_paired_sequences =>q {
 	SELECT s.id
 	FROM phy_data_sequence AS s

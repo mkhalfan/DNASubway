@@ -16,11 +16,12 @@ color: #85b2dd;
 	<div id="container_data_line">&nbsp;</div>
 	<div id="seqids" class="seqids">
 		<pre>
-% for (@files) {
-<span id="x<% $_ |html %>"><a href="./view_sequences.html?pid=<% $pid |html%>;fid=<% $_->id %>"><% $_->file_name |html%></a></span>
-% }
 % for (@sequences) {
 <span id="x<% $_->display_id |html %>"><% $_->display_id |html%></span>
+% }
+% for (@files) {
+%	my $name = $_->file_name; $name =~ s/\..*?$//;
+<span id="x<% $_ |html %>"><a href="./view_sequences.html?pid=<% $pid |html%>;fid=<% $_->id %>"><% $name |html%></a></span>
 % }
 </pre>
 	</div>
@@ -112,6 +113,7 @@ color: #85b2dd;
 			}
 			$traces = $file->trace if $file;
 		}
+		@sequences = DNALC::Pipeline::Phylogenetics::DataSequence->search_initial_non_trace_sequences($pid) unless $file;
 	}
 	else {
 		@sequences = $pm->sequences;
