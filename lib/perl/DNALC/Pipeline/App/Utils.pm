@@ -173,7 +173,7 @@ sub save_upload_files {
 					next;
 				}
 				my $seq_len  = $seq->length;
-				$seq_data .= ">$seq_name\n" . $seq->seq;
+				$seq_data .= ">$seq_name\n" . $seq->seq . "\n";
 				$added++;
 			}
 
