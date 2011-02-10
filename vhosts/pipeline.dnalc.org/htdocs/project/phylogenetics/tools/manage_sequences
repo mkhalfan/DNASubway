@@ -27,16 +27,13 @@
 		</fieldset>
 %	delete $sequence_groups{ $source } if $source eq "init";
 % }
+	</div>    
+	<div class="list_refdata">
+		<input type="submit" id="save_selection" value="Save selection" />
+		<input type="button" id="close" value="Close" onclick="top.phy.close_window('manage_sequences');"/>
+		<input type="hidden" id="pid" value="<% $proj->id %>" />
 	</div>
-
-    
-<div class="list_refdata">
-	<input type="submit" id="save_selection" value="Save selection" />
-	<input type="button" id="close" value="Close" onclick="top.phy.close_window('manage_sequences');"/>
-	<input type="hidden" id="pid" value="<% $proj->id %>" />
-    </div>
-    
-    </form>
+</form>
 % if ($ok == 1) {
 <script type="text/javascript">
 	top.phy.set_status("phy_alignment", "not-processed");
@@ -83,8 +80,8 @@
 		my @pair_sequences = $pair->paired_sequences;
 		my $name = lcs_name( map {$_->seq->display_id} @pair_sequences);
 		$name =~ s/[-_\s]+$//;
-		#push @sequences,  { name => "Pair $name", id => "p$pair", source => 'pairs'};
-		push @{$sequence_groups{pairs}}, { name => "Pair $name", id => "p$pair", source => 'pairs'};
+		push @{$sequence_groups{init}}, { name => "Pair $name", id => "p$pair"};
+		$available_sequences{ "p$pair" } = 1;
 	}
 	# TODO DataSequence->search_non_paired_sequences_with_sources($self->project);
 	for my $seq (sort { $a->source_name cmp $b->source_name } $pm->non_paired_sequences) {
