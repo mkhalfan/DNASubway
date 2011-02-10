@@ -544,11 +544,40 @@ use Bio::Trace::ABIF ();
 			#my $alignment = slurp($outfile);
 			#$alignment =~ s/#{3,}.*Report_file.*#{3,}\n*//ms;
 
-			my $consensus = uc slurp($outseq);
-			$consensus =~ s/>.*//;
-			$consensus =~ s/\n//g;
+			# create a fasta file out of the $alignment;
+			my @alignment_line_1 =(split(': ',(split('\n', $alignment))[0]));
+			my @alignment_line_2 =(split(': ',(split('\n', $alignment))[1]));
+			my @alignment_line_3 =(split(': ',(split('\n', $alignment))[2]));
+			my ($display_name_1, $seq1) = ($alignment_line_1[0], $alignment_line_1[1]); #Sequence 1
+			my ($display_name_2, $seq2) = ($alignment_line_2[0], $alignment_line_2[1]); #Sequence 2
+			my ($display_name_3, $seq3) = ($alignment_line_3[0], $alignment_line_3[1]); #Consensus
 
-			$pair->alignment($alignment);
+			my $muscle_input = File::Spec->catfile($wd, "muscle-$pair.fasta");
+			open (MYFILE, ">$muscle_input");
+			print MYFILE ">$display_name_1\n$seq1\n>$display_name_2\n$seq2\n>$display_name_3\n$seq3";
+			close (MYFILE);
+
+			# call MUSCLE 
+			my $m = DNALC::Pipeline::Process::Muscle->new($wd);
+			my $st = $m->run(pretend=>0, debug => 1, input => $muscle_input);
+			
+			# parse muscle output
+			my $muscle_output = slurp($wd . '/MUSCLE/output.fasta');
+			my @muscle_output_array = split('>', $muscle_output);
+			shift(@muscle_output_array);
+
+			my $muscle_alignment = '';
+			my $consensus;
+			my @display_name_array = ($display_name_1, $display_name_2, $display_name_3);
+			for my $i (0 .. 2) {
+				my @temp = split('\n', @muscle_output_array[$i]);
+				shift (@temp);
+			    my $seqa = join('', @temp);
+			    $muscle_alignment = $muscle_alignment . $display_name_array[$i] . ': ' . $seqa . "\n";
+				$consensus = $seqa;
+			}
+
+			$pair->alignment($muscle_alignment);
 			$pair->consensus($consensus);
 			$pair->update;
 		}

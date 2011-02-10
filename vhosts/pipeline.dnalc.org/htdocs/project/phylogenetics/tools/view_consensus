@@ -1,10 +1,10 @@
-<div id="consensus_8">
+<div id="view-consensus">
 % unless ($proj) {
 	Error: can't open project "<% $pid|html%>".
 % } 
 % else {
 	<div style="width: 15%;float:left;overflow: none;">
-	<ul style="list-style-type:none; margin:0; padding: 5px;">
+	<ul>
 %	my $cnt = 1;
 %	for my $p (@pairs) {
 		<li>
@@ -18,31 +18,32 @@
 %	if ($pair) {
 		<div>Pair <% join "+", map{$_->seq->display_id} $pair->paired_sequences |html%></div>
 		<div style="overflow: auto;" class="monospace">
-			<div id="labels" style="float:left; padding-left:10px;padding-top:10px;padding-right:15px;">
+			<div id="labels">
 				<div id="seq1_name"></div>
 				<div id="seq2_name"></div>
 				<div id="consensus_div_name"></div>
 			</div>
-			<div id="colons" style="float:left; padding-top:10px;padding-right:5px;display:none">
+			<div id="colons" style="display:none">
 				<div>:</div>
 				<div>:</div>
 				<div>:</div>
 			</div>
-			<div id="sequences" style="overflow:auto;padding-top:10px;white-space:nowrap;">
+			<div id="sequences">
 				<div id="seq1_div"></div>
 				<div id="seq2_div"></div>
 				<div id="consensus_div_seq"></div>
 			</div>
 		</div>
 		
-		<p style="display:none;" id="progress"/><img id="progress_image" style="padding-left:100px" src="/images/ajax-loader-2.gif" alt=""></p> 
-
+		<p><img id="progress" style="padding-left:100px;display:none" src="/images/ajax-loader-2.gif" alt=""></p> 
+		<div id="change_base_area" class="monospace" style="padding-top:15px;padding-left:5px;"></div>
 		<div id="trace_canvas_div" style="display:none">
-			<div id="change_base_area" class="monospace" style="padding-top:15px;padding-left:5px; line-height:30px;"></div>
 			<canvas id="trace_viewer_1" height="210">Your browser doesnt support canvas objects.</canvas>
 			<canvas id="trace_viewer_2" height="210">Your browser doesnt support canvas objects.</canvas>
 		</div>
-		<div id="save_changes_button_div"><input type="button" id="save_changes_btn" value="Save Changes" onclick="phy.consensus_change()" style="margin-left:5px;display:none"/></div>
+		<div id="save_changes_button_div">
+			<input type="button" id="save_changes_btn" value="Save Changes" onclick="phy.consensus_change()" style="margin-left:5px;display:none"/>
+		</div>
 %	}
 	</div>
 % }

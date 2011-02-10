@@ -504,12 +504,12 @@ span.bold {
 
 }
 
-.non-match{
+#view-consensus .non-match {
 	background: #FFF333;
 	cursor: pointer;
 }
 
-.new-nucleotide-option{
+#view-consensus .new-nucleotide-option {
 	margin-left:5px;
 	cursor: pointer;
 	border: 1px solid black;
@@ -517,7 +517,7 @@ span.bold {
 	padding-right:2px;
 }
 
-.current-nucleotide{
+#view-consensus .current-nucleotide {
 	margin-left:5px;
 	border: 1px solid black;
 	cursor: pointer;
@@ -525,13 +525,36 @@ span.bold {
 	padding-right:2px;
 }
 
-.changed-base{
+#view-consensus .changed-base {
 	background: #FF9999;
 	cursor: pointer;
 }
 
-.monospace{
+#view-consensus .monospace {
 	font-family: "Courier New", Courier, monospace;
+}
+
+#view-consensus #labels {
+float:left; 
+padding-left:10px;
+padding-top:10px;
+padding-right:15px;
+}
+
+#view-consensus #colons {
+float:left; 
+padding-top:10px;
+padding-right:5px;
+}
+
+#view-consensus #sequences {
+overflow:auto;
+padding-top:10px;
+white-space:nowrap;
+}
+
+#view-consensus ul {
+list-style-type:none; margin:0; padding: 5px;
 }
 
 canvas {

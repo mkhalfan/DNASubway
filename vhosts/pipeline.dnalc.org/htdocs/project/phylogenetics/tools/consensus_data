@@ -42,6 +42,11 @@
 	
 	for (0, 1){
 		my $file = DNALC::Pipeline::Phylogenetics::DataFile->retrieve($pseq[$_]->seq->file_id);
+		
+		if ($file->file_type ne 'trace') {
+			push @$data, 0;
+			next;
+		}
 	
 		my @all_base_locations = $file->base_locations;
 		my @all_qscores = $file->quality_values;

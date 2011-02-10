@@ -622,19 +622,24 @@
 		var qualityScores = data['qscores'];
 		var baseLocations = data['base_locations']; // The position of the base in the entire sequence
 		var baseLocationsPositions = []; // The position of the base on the canvas (in our subsequence)
-		var lastBase = Math.max.apply(Math, baseLocations);
 		
 		// Normalize the base locations to baseLocationsPositions
 		for (var b = 0; b < baseLocations.length; b++){
 			baseLocationsPositions[b] = baseLocations[b] - baseLocations[0];
 		}
+		var lastBase = Math.max.apply(Math, baseLocationsPositions);
 		
 		// Calculate the width of the canvas 
 		// If it's the consensus editor, make it the width of the Display ID.
 		// If it's the View Sequences (entire sequence), make it the width of the entire sequence.
 		// ('seq_id' is only passed from the consensus editor - that's how we check)
 		if (data['seq_id']){
-			canvas.width = ctx.measureText(title).width + 4 + padding;
+			if (ctx.measureText(title).width > lastBase){
+				canvas.width = ctx.measureText(title).width + 15;
+				}
+			else{
+				canvas.width = lastBase + 15;
+			}
 		}
 		else {
 			canvas.width = lastBase * xZoom + 15;
@@ -1073,6 +1078,44 @@
 	};
 	
 	/*
+	 * 
+	 *
+	 *
+	 */
+	phy.getDashPositions = function(seq) {
+
+		// LDP = Last Dash Position
+		var forwardLDP = 0; 
+		var reverseLDP = 0; 
+		var substr;
+		var startStop = [];
+		
+		for (var i = 0; i <= seq.length; i++){
+			substr = seq.substring(i);
+			if (substr.charAt(0) == '-'){
+				forwardLDP++;
+				substr = substr.substring(i + 1);
+			}
+			else{
+				break; 
+			}
+		}
+		for (i = seq.length-1; i >=0; i--){
+			substr = seq.substring(i);
+			if (substr.charAt(0) == '-'){
+				reverseLDP++;
+				substr = substr.substring(i - 1);
+			}
+			else{
+				break; 
+			}
+		}
+		startStop.push(forwardLDP - 1, seq.length - reverseLDP);
+		return startStop;
+	};
+	
+	
+	/*
 	 * Displays the alignment in the consensus editor, 
 	 * highlighting any mismatches between the sequences
 	 * (typically forward, reverse, and consensus sequences)
@@ -1084,10 +1127,9 @@
 		var display_name_1 = $('display_name_1').value;
 		var display_name_2 = $('display_name_2').value;
 		var consensus = $('consensus').value;
-		var cd = "";
 		var re = /[N-]/;
 
-		var sequenceLength = consensus.length;
+		var sequenceLength = seq1.length;
 		var consensus_span, seq1_span, seq2_span;
 		
 		$('seq1_name').update(display_name_1);
@@ -1096,26 +1138,45 @@
 		$('colons').show();
 		$('save_changes_btn').show();
 		
+		var startStop1 = phy.getDashPositions(seq1);
+		var startStop2 = phy.getDashPositions(seq2);
+		
+		var start = Math.max(startStop1[0], startStop2[0]);
+		var stop = Math.min(startStop1[1], startStop2[1]);;
+		
+		//debug(startStop);
+		var y = 0;
 		for ( var i = 0; i < sequenceLength; i++){
-			//console.debug(i + "\t" + consensus.charAt(i) + " = " + seq2.charAt(i) + " + " + seq1.charAt(i) );
-			if ( !re.test(seq1.charAt(i)) && !re.test(seq2.charAt(i)) 
-					&& (consensus.charAt(i) != seq1.charAt(i) || consensus.charAt(i) != seq2.charAt(i) )
+			
+			//if ( (!re.test(seq1.charAt(i)) || !re.test(seq2.charAt(i))) 
+			if ((i > start && i < stop) && (seq1.charAt(i) != 'N' && seq2.charAt(i) != "N")
+					&& (consensus.charAt(i - y) != seq1.charAt(i) || consensus.charAt(i - y) != seq2.charAt(i) )
 				) 
 			{
-				//temp = "<span class='non-match'>" + consensus.charAt(i) + "</span>";
-				//span = new Element('span', {class: 'non-match', 'position': i, 'base': consensus.charAt(i)}).update(consensus.charAt(i));
-				consensus_span = new Element('span', {id: 'con' + i, 'position': i, 'base': consensus.charAt(i)}).update(consensus.charAt(i));
-				seq1_span = new Element('span', {'position': i, 'base': consensus.charAt(i)}).update(seq1.charAt(i));
-				seq2_span = new Element('span', {'position': i, 'base': consensus.charAt(i)}).update(seq2.charAt(i));
+			
+				/*if (i > start && i < stop && seq1.charAt(i) == '-'){
+					debug(i);
+					consensus_span = new Element('span').update(' ').insert(consensus.charAt(i));
+					seq1_span = new Element('span').update(seq1.charAt(i));
+					seq2_span = new Element('span').update(seq2.charAt(i));
+					y++;
+				}
+				else{ */
 				
-				seq1_span.addClassName('non-match');
-				seq2_span.addClassName('non-match');
-				consensus_span.addClassName('non-match');
-				
-				Event.observe(consensus_span, 'click', phy.view_mismatch_trace);
-				Event.observe(seq1_span, 'click', phy.view_mismatch_trace);
-				Event.observe(seq2_span, 'click', phy.view_mismatch_trace);
-				
+					//temp = "<span class='non-match'>" + consensus.charAt(i) + "</span>";
+					//span = new Element('span', {class: 'non-match', 'position': i, 'base': consensus.charAt(i)}).update(consensus.charAt(i));
+					consensus_span = new Element('span', {id: 'con' + i, 'position': i, 'base': consensus.charAt(i)}).update(consensus.charAt(i));
+					seq1_span = new Element('span', {'position': i, 'base': consensus.charAt(i - y)}).update(seq1.charAt(i));
+					seq2_span = new Element('span', {'position': i, 'base': consensus.charAt(i - y)}).update(seq2.charAt(i));
+					
+					seq1_span.addClassName('non-match');
+					seq2_span.addClassName('non-match');
+					consensus_span.addClassName('non-match');
+					
+					Event.observe(consensus_span, 'click', phy.view_mismatch_trace);
+					Event.observe(seq1_span, 'click', phy.view_mismatch_trace);
+					Event.observe(seq2_span, 'click', phy.view_mismatch_trace);
+				//}
 			}
 			else{
 				//temp = "<span>" + consensus.charAt(i) + "</span>";
@@ -1123,7 +1184,7 @@
 				seq1_span = new Element('span').update(seq1.charAt(i));
 				seq2_span = new Element('span').update(seq2.charAt(i));
 			}
-			//cd += temp;
+			
 			$('consensus_div_seq').insert(consensus_span);
 			$('seq1_div').insert(seq1_span);
 			$('seq2_div').insert(seq2_span);
@@ -1131,7 +1192,7 @@
 			// Initially, set the save_changes_button to be disabled
 			$('save_changes_btn').disabled = true;
 		} 
-	}
+	};
 	
 	/*
 	 * Displays and adds functionality to allow 
@@ -1309,6 +1370,8 @@
 		$('progress').show();
 		// Hide the Trace Canvas Div
 		$('trace_canvas_div').hide();
+		// Hide the Change Bases Area Div
+		$('change_base_area').hide();
 		
 		new Ajax.Request('/project/phylogenetics/tools/consensus_data', {
 				method:'get',	
@@ -1318,16 +1381,25 @@
 					var data = response.evalJSON();
 					//debug(response);
 					if (data) {
-						
 						phy.change_bases(ev);
-
-						phy.draw(data[0], 'trace_viewer_1');
-						phy.draw(data[1], 'trace_viewer_2');
 						
-						// Show the Trace Canvas Div
-						$('trace_canvas_div').show();
+						if (data[0])
+							phy.draw(data[0], 'trace_viewer_1');
+						if (data[1])
+							phy.draw(data[1], 'trace_viewer_2');
+						
+						if (data[0] || data[1]) {
+							// Show the Trace Canvas Div
+							$('trace_canvas_div').show();
+						}
+
 						// Hide the 'Loading' Image
 						$('progress').hide();
+						// Show the Change Bases Area Div
+						$('change_base_area').show();
+					}
+					else{
+					alert('No trace data associated with this sequence');
 					}
 				},
 				onFailure: function(){
