@@ -181,21 +181,69 @@
 		};*/
 	};
 	
-	// pairing
+	//---------------------------------------------------------------
+	// pairing related functions
+	//
 	phy.push_to_pair = function (id) {
 		if (current_pair.indexOf(id) == -1) {
 			current_pair.push(id);
 		}
 		if (current_pair.length == 2) {
-			phy.add_pair(current_pair);
-			current_pair = [];
+
+			function remove_tip(clear_selection) {
+				$('op' + id).prototip.remove();
+				if (clear_selection) {
+					current_pair.each(function(iid) {
+							$('op' + iid).checked = false;
+							$('op' + iid).enable();
+						});
+				}
+				current_pair = [];
+			}
+			var tipContent = new Element('div').update( "Would you like to pair these two sequences?");
+			tipContent.insert(			
+				new Element('div', {style: 'text-align: center;'})
+					.insert(new Element('input', {type: 'button', value: "Yes"})
+						.observe('click', function(ev){phy.add_pair(current_pair);remove_tip();}))
+					.insert(new Element('input', {type: 'button', value: "No"})
+						.observe('click', function (ev){/*phy.pop_from_pair(id);*/remove_tip(true);}))
+			);
+			//var t1 = new Date();
+			var tip = new Tip('op' + id, tipContent, {
+				title: "Pair them?",
+				style: 'protogrey',
+				stem: 'rightMiddle',
+				showOn: 'click',
+				hideOn: 'click',
+				//hideOn: { element: 'closeButton', event: 'click' },
+				hook: { mouse: false, tip: 'rightMiddle' },
+				offset: { x: 5, y: 10 },
+				width: 200
+			});
+			
+			debug(id);
+			$('op' + id).prototip.show();
+			current_pair.each(function(iid) {
+					$('op' + iid).disable();
+				});
+			//phy.add_pair(current_pair);
+			//current_pair = [];
 		}
 	};
 
 	phy.add_pair = function(pair) {
+		var classname = pairs.length % 2 ? 'paired-light' : 'paired-dark';
+		debug(classname);
 		pair.each(function(el) {
-
-			$(el).addClassName(pairs.length % 2 ? 'paired-light' : 'paired-dark');
+			$(el).addClassName(classname);
+			$('id_' + el).addClassName(classname);
+			$('op' + el).hide();
+			if ($('pb' + el)) {
+				$('pb' + el).removeClassName('paired-dark');
+				$('pb' + el).removeClassName('paired-light');
+				$('pb' + el).addClassName(classname);
+				$('pb' + el).style.visibility = 'visible';
+			}
 			//seq2pairs[el] = pairs.length;
 		});
 
@@ -220,11 +268,24 @@
 						$(pairs[i][k]).removeClassName('bold');
 						$(pairs[i][k]).removeClassName('paired-light');
 						$(pairs[i][k]).removeClassName('paired-dark');
+						$('id_' + pairs[i][k]).removeClassName('paired-dark');
+						$('id_' + pairs[i][k]).removeClassName('paired-light');
+						$('op' + pairs[i][k]).parentNode.removeClassName('paired-dark');
+						$('op' + pairs[i][k]).parentNode.removeClassName('paired-light');
 						$('op' + pairs[i][k]).checked = false;
+						$('op' + pairs[i][k]).enable();
+						$('op' + pairs[i][k]).show();
+						if ($('pb' + pairs[i][k])) {
+							$('pb' + pairs[i][k]).style.visibility = 'hidden';
+							$('pb' + pairs[i][k]).update(' ');
+							if ($('pb' + pairs[i][k]).hasAttribute('pair_id')) {
+								$('rm_pairs').value += $('pb' + pairs[i][k]).getAttribute('pair_id') + ",";
+							}
+						}
 					});
 					delete pairs[i];
 					pairs = pairs.compact();
-					throw $break;
+					break;
 				}
 			}
 		}
@@ -247,7 +308,7 @@
 			parameters: { 't' : op, pid : p, params: params}, 
 			onSuccess: function(transport){
 				var response = transport.responseText || "{'status':'error', 'message':'No response'}";
-				debug(response);
+				//debug(response);
 				var r = response.evalJSON();
 				//dbg = r;
 				//alert('after launch job:\n' + response + ' ' + r.h);
@@ -335,8 +396,8 @@
 			//console.info(el);
 		});*/
 		pairs.each(function(p,index){
-			//console.info(p + " " + index);
 			var lpair = [];
+			p = p.sort(function (a,b){ return a - b;});
 			p.each(function(id) {
 				var a = $('rc' + id);
 				lpair.push([id, a.hasAttribute("rc") ? a.getAttribute("rc") : "0"]);
@@ -344,9 +405,7 @@
 			lpairs.push(lpair);
 		});
 
-		//debug(lpairs.toJSON());
-		
-		if (lpairs.length == 0)
+		if (lpairs.length == 0 && $('has_pairs').value == "0")
 			return;
 
 		$('data').value = lpairs.toJSON();
@@ -382,6 +441,11 @@
 			ind.removeClassName(ind.className);
 			ind.addClassName('conIndicatorBL_not-processed');
 			b.onclick = function(){ phy.run(op); };
+		}
+		else if (status == 'disabled') {
+			ind.removeClassName(ind.className);
+			ind.addClassName('conIndicatorBL_disabled');
+			b.onclick = null;
 		}
 	};
 	
@@ -1477,10 +1541,11 @@ Event.observe(window, Prototype.Browser.IE ? 'load' : 'dom:loaded', function() {
 		pairs.each(function(pair, cnt) {
 			pair.each(function(el){
 				var a_rc = $('rc' + el);
-
 				if (a_rc && a_rc.innerHTML == "R") {
 					phy.toggle_strand(a_rc, 1);
 				}
+				$('op' + el).disable();
+				$('op' + el).hide();
 			});
 		});
 		if ($('do_pair') != null)

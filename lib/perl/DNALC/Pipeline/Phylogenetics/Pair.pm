@@ -21,7 +21,7 @@ sub paired_sequences {
 	return unless ref $self eq __PACKAGE__;
 
 	DNALC::Pipeline::Phylogenetics::PairSequence->search(
-			pair_id => $self
+			pair_id => $self, { order_by => 'seq_id' }
 		);
 }
 
