@@ -207,7 +207,7 @@ if ($r->method eq "POST") {
 
 	my $pm = DNALC::Pipeline::App::Phylogenetics::ProjectManager->new;
 	
-	if (0) { # was => unless (@err) 
+	unless (@err) {
 		
 		my $proj = $pm->search(user_id => $s->{user_id}, name => $name);
 		if ($proj) {

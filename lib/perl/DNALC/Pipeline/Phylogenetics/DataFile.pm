@@ -7,7 +7,7 @@ use Bio::Trace::ABIF ();
 
 __PACKAGE__->table('phy_data_file');
 __PACKAGE__->columns(Primary => qw/id/);
-__PACKAGE__->columns(Essential => qw/project_id source_id file_name file_path file_type created/);
+__PACKAGE__->columns(Essential => qw/project_id source_id file_name file_path file_type has_low_q created/);
 __PACKAGE__->sequence('phy_data_file_id_seq');
 
 __PACKAGE__->has_a(project_id => 'DNALC::Pipeline::Phylogenetics::Project');

@@ -14,6 +14,7 @@ color: #85b2dd;
 </style>
 <div class="container_data1">
 	<div id="container_data_line">&nbsp;</div>
+	
 	<div id="seqids" class="seqids">
 		<pre>
 % for (@sequences) {
@@ -25,6 +26,21 @@ color: #85b2dd;
 % }
 </pre>
 	</div>
+	
+	<div id="mini-trace-icons">
+		<pre>
+% for (@files) {
+%	if ($_->has_low_q){
+<span><a href="./view_sequences.html?pid=<% $pid |html%>;fid=<% $_->id %>"><img src="/images/chart_curve_error.png" border=0 alt="View Trace" style="vertical-align: middle;" /></a></span>
+%	}
+%	else {
+<span><a href="./view_sequences.html?pid=<% $pid |html%>;fid=<% $_->id %>"><img src="/images/chart_curve.png" border=0 alt="View Trace" style="vertical-align: middle;" /></a></span>
+%	}
+% }		
+</pre>
+	</div>
+	
+	
 	<div id="seqs" class="seqs">
 % if ($file) {
 	<input type="hidden" id="step" value="2" />

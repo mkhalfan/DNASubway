@@ -220,11 +220,46 @@ span.rot { -moz-transform:rotate(90deg); font-size: smaller;}
 	float:left; width: 140px; font-family:arial; line-height: 1.2em; overflow-x:auto; color:#996600; 
 	}
 .container_data1 .seqs {
-	float:left; width:680px; margin-left:20px; overflow-x:auto; font-family:courier, monospace; line-height: 1.2em; text-transform: uppercase; 
+	float:left; width:648px; margin-left:10px; overflow-x:auto; font-family:courier, monospace; line-height: 1.2em; text-transform: uppercase; 
 	}
+	
+.container_data1 #mini-trace-icons {
+	float:left; 
+	width: 15px; 
+	line-height: 1.2em; 
+	margin-left:10px;
+	}	
+	
+.container_data1 #q-score-alert {
+	float:left; 
+	width: 15px; 
+	line-height: 1.2em; 
+	margin-right:1px;
+	}	
 
+#phy-pair-builder {
+	width: 840px;
+	height: auto;
+	padding-top: 8px;
+	float: left;
+	position: relative;
+	padding-left: 20px;
+	font-family:  arial, monospace;
+	}	
+	
+#phy-pair-builder #seqids {
+	float:left; width: 120px;font-family:arial, monospace; line-height: 1.2em;overflow-x:auto; color: #996600; 
+	}
+#phy-pair-builder #seqs {
+	float:left;width:630px;margin-left:15px;overflow-x:auto;font-family:courier;line-height: 1.2em;text-transform: uppercase;
+	}
+#phy-pair-builder #seqops {
+	float:left; padding-left:15px; width: 50px;font-family:arial;line-height: 1.2em; color: #996600;
+	}
+	
+	
 
-.container_data2 {
+#phy-blast {
 	width: 840px;
 	height: auto;
 	padding-top: 8px;
@@ -233,14 +268,15 @@ span.rot { -moz-transform:rotate(90deg); font-size: smaller;}
 	padding-left: 20px;
 	font-family:  arial, monospace;
 	}
-
-.container_data2 .seqids {
+	
+	
+#phy-blast #seqids {
 	float:left; width: 120px;font-family:arial, monospace; line-height: 1.2em;overflow-x:auto; color: #996600; 
 	}
-.container_data2 .seqs {
+#phy-blast #seqs {
 	float:left;width:630px;margin-left:15px;overflow-x:auto;font-family:courier;line-height: 1.2em;text-transform: uppercase;
 	}
-.container_data2 .seqops {
+#phy-blast #seqops {
 	float:left; padding-left:15px; width: 50px;font-family:arial;line-height: 1.2em; color: #996600;
 	}
 	
