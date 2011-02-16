@@ -10,7 +10,7 @@
 
 #title{
 	width: 410px;
-	height: autopx;
+	height: auto;
 	padding: 8px 120px 10px 120px;
 	font-size: .95em;
 	color: #000066;
@@ -96,7 +96,7 @@
 	border: .1em; 
 	border-style: solid; 
 	
-	color: #00669;  
+	color: #006699;  
 	width:260px;
 	font-size:.7em; font-family: courier, monaco, monospace;
 	text-transform: uppercase;
@@ -248,18 +248,25 @@ span.rot { -moz-transform:rotate(90deg); font-size: smaller;}
 	}	
 	
 #phy-pair-builder #seqids {
-	float:left; width: 120px;font-family:arial, monospace; line-height: 1.2em;overflow-x:auto; color: #996600; 
+	float:left; width: 140px;font-family:arial, monospace; line-height: 1.2em;overflow-x:auto; color: #996600; 
 	}
 #phy-pair-builder #seqs {
-	float:left;width:630px;margin-left:15px;overflow-x:auto;font-family:courier;line-height: 1.2em;text-transform: uppercase;
+	float:left;width:570px;margin-left:15px;overflow-x:hidden;font-family:courier;line-height: 1.2em;text-transform: uppercase;
 	}
 #phy-pair-builder #seqops {
 	float:left; padding-left:15px; width: 50px;font-family:arial;line-height: 1.2em; color: #996600;
 	}
-	
+#phy-pair-builder #seqops2 {
+	/*float:left; 
+	padding-left:0px; 
+	width: 30px;
+	color: #996600;
+	font-family:arial;*/
+	line-height: 2.4em;
+}	
 	
 
-#phy-blast {
+.container_data2 {
 	width: 840px;
 	height: auto;
 	padding-top: 8px;
@@ -268,16 +275,15 @@ span.rot { -moz-transform:rotate(90deg); font-size: smaller;}
 	padding-left: 20px;
 	font-family:  arial, monospace;
 	}
-	
-	
-#phy-blast #seqids {
-	float:left; width: 120px;font-family:arial, monospace; line-height: 1.2em;overflow-x:auto; color: #996600; 
+
+.container_data2 .seqids {
+	float:left; width: 140px;font-family:arial, monospace; line-height: 1.2em;overflow-x:auto; color: #996600; 
 	}
-#phy-blast #seqs {
-	float:left;width:630px;margin-left:15px;overflow-x:auto;font-family:courier;line-height: 1.2em;text-transform: uppercase;
+.container_data2 .seqs {
+	float:left;width:610px;margin-left:15px;overflow-x:hidden;font-family:courier;line-height: 1.2em;text-transform: uppercase;
 	}
-#phy-blast #seqops {
-	float:left; padding-left:15px; width: 50px;font-family:arial;line-height: 1.2em; color: #996600;
+.container_data2 .seqops {
+	float:left; padding-left:15px; width: 30px;font-family:arial;line-height: 1.2em; color: #996600;
 	}
 	
 .container_data3 {
@@ -479,9 +485,11 @@ span.bold {
 	vertical-align: top;
 	
 }
+/*
 .conBL_menu_table tr.rowOne {
 	background-color: none; 
-}
+}*/
+
 .conBL_menu_table tr.rowTwo {
 	background-color: #EEF3F7; 
 }

@@ -1,4 +1,4 @@
-<div id="container_data2" class="container_data2">
+<div id="phy-pair-builder">
 <style type="text/css">
 input[type="checkbox"] {
 	border: none;
@@ -20,7 +20,7 @@ input[type="checkbox"] {
 % }
 %#pairs: <% Dumper(\@pairs) %>
 	<div id="container_data_line">&nbsp;</div>
-	<div id="seqids" class="seqids">
+	<div id="seqids">
 		<pre>
 % $cnt = 0;
 % for (@sequences) {
@@ -30,7 +30,7 @@ input[type="checkbox"] {
 		</pre>
 	</div>
 %#-----------------------------------------------------
-	<div id="seqs" class="seqs">
+	<div id="seqs">
 		<pre>
 % $cnt = 0;
 % for (@sequences) {
@@ -40,7 +40,7 @@ input[type="checkbox"] {
 		</pre>
 	</div>
 %#-----------------------------------------------------
-	<div id="seqops" class="seqops">
+	<div id="seqops">
 % if ($is_owner) {
 		<pre>
 % $cnt = 0;
@@ -57,7 +57,7 @@ input[type="checkbox"] {
 % }
 	</div>
 %#-----------------------------------------------------
-	<div id="seqops2" style="font-family:arial;line-height: 2.4em;">
+	<div id="seqops2">
 % if ($is_owner) {
 		<pre>
 % $cnt = 0;

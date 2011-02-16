@@ -80,22 +80,24 @@ sub run_merger {
 	else {
 		my @pairs = $pm->pairs;
 		if (@pairs) {
-			if ($pm->get_task_status("phy_consensus")->name ne "done") {
-				for my $p (@pairs) {
-					$pm->build_consensus($p);
-				}
-				$pm->set_task_status("phy_consensus", "done");
-				$status = "success";
+			for my $p (@pairs) {
+				next if $p->consensus;
+				$pm->build_consensus($p);
 			}
+			$pm->set_task_status("phy_consensus", "done");
+			$status = "success";
 			$msg = $pm->get_task_status('phy_consensus')->name;
 		}
 		else {
+			#if ($pm->get_task_status("phy_consensus")->name eq "done") {
+			#	$pm->set_task_status("phy_consensus", "not-processed");
+			#}
 			$msg = "This project has no pairs!";
 		}
 
 	}
 
-   return nfreeze({status => $status});
+   return nfreeze({status => $status, message => $msg});
 }
 
 #-------------------------------------------------
