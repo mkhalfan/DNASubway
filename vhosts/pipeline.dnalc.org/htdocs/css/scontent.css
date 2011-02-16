@@ -1402,7 +1402,7 @@
 
 #conBluelineLeft2 {
 	width: 482px;
-	height: 290px;
+	height: 320px;
 	background: url("/images/v2/map-blueline_L2.jpg") top left no-repeat;
 	float: left;
 	position: relative;
@@ -1413,7 +1413,7 @@
 
 .conBlueline_ConColumn1{
   width:160px;
-  height: 246px;
+  height: 270px;
   position: relative;
   float:left;
   }
@@ -1428,7 +1428,7 @@
   width:148px;
   height: 140px;
   padding-left: 10px;
-  padding-top: 95px;
+  padding-top: 84px;
   position: relative;
   float:left;
   }
@@ -1437,7 +1437,7 @@
   width:148px;
   height: 130px;
   padding-left: 14px;
-  padding-top: 48px;
+  padding-top: 43px;
   position: relative;
   float:left;
   }
@@ -1472,7 +1472,7 @@
 .conBlueline_ConCell{
   width: 148px;
   height: 26px;
-  margin: 0px 0px 19px 0px;
+  margin: 0px 0px 14px 0px;
   position: relative;
   float: left;
 }
