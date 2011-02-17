@@ -1,0 +1,38 @@
+{"status":"<% $status %>", "message":""}
+
+<%args> 
+	$pid => 0
+</%args>
+<%once>
+	use DNALC::Pipeline::App::Phylogenetics::ProjectManager ();
+	use Data::Dumper;
+</%once>
+
+<%init>
+	my $status = "failed";
+	
+	# Make sure the project belongs to the right user
+	my $s = $m->session->{pipeline};
+	my $pm = DNALC::Pipeline::App::Phylogenetics::ProjectManager->new($pid);
+	if (!$pid || $s->{user_id} != $pm->project->user_id) {
+		print '{"status":"failed", "message":"Project not found!"}';
+		return;
+	}
+	
+	if ($pm->get_task_status("phy_trim")->name eq "done") {
+		print '{"status":"success"}';
+	}
+
+	my @seq = $pm->sequences;
+	# Trim each sequence and update the DB
+	foreach my $seq (@seq){
+		$seq->trim;
+	}
+
+	$pm->set_task_status("phy_trim", "done");
+	$status = "success";
+</%init>
+
+<%flags>
+	inherit => undef
+</%flags>

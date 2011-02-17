@@ -122,6 +122,7 @@
 		
 		var urls = {
 				viewer: ['/project/phylogenetics/tools/view_sequences.html?pid=', 'Sequence Viewer'],
+				phy_trim: ['/project/phylogenetics/tools/view_sequences.html?show_trimmed=1;pid=', 'Trimmed Sequence Viewer'],
 				pair: ['/project/phylogenetics/tools/pair?pid=', 'Pair Builder'],
 				blast: ['/project/phylogenetics/tools/blast.html?pid=', 'BLASTN'],
 				data: ['/project/phylogenetics/tools/add_data?pid=', 'Add data'],
@@ -629,20 +630,22 @@
 	}
 	//---------------------------------------------------------
 	phy.prepare_draw = function() {
+		
+		// Get the data
+		var display_id = $('seq_display_id').value;
+		
 		var sequence = $('seq_data').value;
 		var baseLocations = [];
 		var qualityScores = [];
-		var display_id = $('seq_display_id').value;
-		
 		var traces = {};
-		//var str  = $('seq_data').value;
+		
 		var qval = $('qvalues').value;
-		//debug(str.length);
+
+		// Put the data in the right format (array)
 		qval.split(',').each(function(q){
 				qualityScores.push(parseInt(q, 10));
 			});
 			
-		
 		$('b_locations').value.split(',').each(function(q){
 				baseLocations.push(parseInt(q, 10));
 			});
@@ -654,6 +657,19 @@
 			traces[base] = arr;
 		});
 		
+		// Trim the data if show_trimmed is true
+		if ($('show_trimmed').value == "1"){
+			var start = $('start').value;
+			var end = $('end').value;
+			
+			sequence = sequence.substring(start, end);
+			baseLocations = baseLocations.slice(start, end);
+
+			qualityScores = qualityScores.slice(start, end);
+			['A', 'T', 'C', 'G'].each(function(base, i) {
+				traces[base] = traces[base].slice(baseLocations[0], baseLocations[baseLocations.length - 1]);
+			});
+		}
 		
 		var data = {
 			seq_display_id : display_id,
@@ -686,7 +702,7 @@
 		var qualityScores = data['qscores'];
 		var baseLocations = data['base_locations']; // The position of the base in the entire sequence
 		var baseLocationsPositions = []; // The position of the base on the canvas (in our subsequence)
-		
+	
 		// Normalize the base locations to baseLocationsPositions
 		for (var b = 0; b < baseLocations.length; b++){
 			baseLocationsPositions[b] = baseLocations[b] - baseLocations[0];
@@ -1552,9 +1568,21 @@ Event.observe(window, Prototype.Browser.IE ? 'load' : 'dom:loaded', function() {
 			$('do_pair').disabled = true;
 	}
 	else if (step == 2) {
-		//alert(step);
-		//phy.draw_qvalues();
-		phy.prepare_draw();
+
+		// attach tool tip for low quality score alerts
+		$$('#mini-trace-icons span[id^=low]').each(function(el) {
+			var span_id = el.getAttribute('id');
+			debug("tip " + span_id);
+			new Tip(span_id, "This trace suffers from overall poor quality scores. Be advised this may affect downstream analysis of this sequence.", {
+				title: "Low Quality Score Alert",
+				style: 'yellow',
+				showOn: 'mouseover',
+				hideOthers: true
+			});
+		});	
+
+		phy.prepare_draw();		
+		
 	}
 	else if (step == 3) {
 		/*

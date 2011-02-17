@@ -1,0 +1,83 @@
+#{"status":"<% $status %>"}
+
+<%args> 
+	$pid => 0
+</%args>
+
+<%once>
+	use DNALC::Pipeline::Phylogenetics::DataSequence;
+	use DNALC::Pipeline::Phylogenetics::DataSequenceTrim;
+
+	use Data::Dumper;
+	use JSON::XS ();
+</%once>
+
+<%init>
+	my $json = JSON::XS->new->ascii;
+	my $status = "failed";
+	
+	# Make sure the project belongs to the right user
+	my $s = $m->session->{pipeline};
+	#if (!$pid || $s->{user_id} != $pid->user_id) {
+	#	print '{"status":"failed", "message":"Project not found!"}';
+	#	return;
+	#}
+
+	# The Trimming Function. Takes the sequence to be trimmed
+	# and optionally the window length and "N" Threshold
+	sub trim {
+		my ($seq, $window_length, $threshold) = @_;
+
+			$window_length ||= 10;
+			$threshold ||= 2;
+			my $total = 0;
+
+			for (my $i = 0; $i <= length $seq; $i++) {
+				my $window = substr($seq, $i, $window_length);
+
+				if (index($window, "N") != -1){
+					substr($seq, $i, 1, '-');
+					$total++;
+				}
+				elsif (index($window, "N") == -1){
+					last;
+				}
+			}
+			return $total;
+	}
+
+	my @seq = DNALC::Pipeline::Phylogenetics::DataSequence->search(project_id => $pid);
+
+	# Trim each sequence and update the DB
+	foreach my $seq (@seq){
+	#print "seq: $_", $/;
+		my $sequence = $seq->seq;
+		#print ">",  $_->display_id, $/;
+		my $forward_total = trim($sequence);
+		my $reverse_total = trim(scalar reverse $sequence);
+		#print "Original Sequence Length: ", length $sequence, $/;
+		my $trimmed_seq_length = (length $sequence) - $reverse_total - $forward_total;
+		#print "Trimmed Sequence Length: ", $trimmed_seq_length, $/;
+		my $trimmed_sequence = substr($sequence, $forward_total, $trimmed_seq_length);
+		#print $trimmed_sequence, $/, $/;
+		
+		
+		
+		# Update The Database
+	    #$seq->id($seq->id);
+		$seq->right_trim(substr ($sequence, 0, $forward_total));
+		$seq->left_trim(substr ($sequence, length $sequence - $reverse_total, $reverse_total));
+		$seq->start_pos($forward_total);
+		$seq->end_pos((length $sequence) - $reverse_total);
+		$seq->seq($trimmed_sequence);
+		if ($seq->update) {
+			$status = "success";
+		}
+		
+	}
+
+</%init>
+
+<%flags>
+	inherit => undef
+</%flags>

@@ -16,15 +16,29 @@
 			</span>
 			<span class="bt_Runblueline"><a href="javascript:;" onclick="phy.launch('viewer')">Sequence Viewer</a></span>
         </span>
-        
-        <span class="conBlueline_ConCell">
+		
+		
+% if (0) {		
+		<span class="conBlueline_ConCell">
 			<span class="conIndicator_box">
 				<div class="conIndicatorBL_done"></div>
 			</span>
-			<span class="bt_Runblueline"><a href="javascript:;" onclick="phy.launch('viewer')">Sequence Trimmer</a></span>
+			<span class="bt_Runblueline"><a href="/project/phylogenetics/tools/trim_sequences?pid=<% $pid | html %>">Sequence Trimmer</a></span>
         </span>
-
-
+% }
+        <span class="conBlueline_ConCell">
+			<span class="conIndicator_box">
+				<div id="phy_trim_st" class="conIndicatorBL_<% $status{phy_trim} eq "done" ? "done" : $is_owner ? $status{phy_trim} : "disabled" %>"></div>
+			</span>
+%	if ($status{phy_trim} ne "done" && !$is_owner) {
+			<span class="bt_Runblueline">
+				<a id="phy_trim_btn" class="conIndicatorBL_disabled" status="disabled" href="javascript:;">Seq Trimmer</a>
+			</span>
+%	} else {
+				<& '.routine', routine => 'phy_trim', pmanager => $pm, is_owner => $is_owner,
+					status => $status{phy_trim}, delay => 20, pid => $pid &>
+%	}
+        </span>
 
         <span class="conBlueline_ConCell">
 			<span class="conIndicator_box">
@@ -222,10 +236,10 @@
 	
 	my %routines = (
 			phy_pair => "Pair",
-			phy_consensus => "Consensus editor",
+			phy_trim => "Sequence Trimmer",
+			phy_consensus => "Consensus Editor",
 			phy_alignment => "MUSCLE",
 			phy_tree => "PHYLIP",
-
 		);
 </%once>
 %#-------------------------------------------------
