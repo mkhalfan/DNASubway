@@ -237,7 +237,7 @@ span.rot { -moz-transform:rotate(90deg); font-size: smaller;}
 	margin-right:1px;
 	}	
 
-#phy-pair-builder {
+#phy-pair-builder, #phy-blast {
 	width: 840px;
 	height: auto;
 	padding-top: 8px;
@@ -247,13 +247,13 @@ span.rot { -moz-transform:rotate(90deg); font-size: smaller;}
 	font-family:  arial, monospace;
 	}	
 	
-#phy-pair-builder #seqids {
+#phy-pair-builder #seqids, #phy-blast #seqids {
 	float:left; width: 140px;font-family:arial, monospace; line-height: 1.2em;overflow-x:auto; color: #996600; 
 	}
-#phy-pair-builder #seqs {
+#phy-pair-builder #seqs, #phy-blast #seqs {
 	float:left;width:570px;margin-left:15px;overflow-x:hidden;font-family:courier;line-height: 1.2em;text-transform: uppercase;
 	}
-#phy-pair-builder #seqops {
+#phy-pair-builder #seqops, #phy-blast #seqops {
 	float:left; padding-left:15px; width: 50px;font-family:arial;line-height: 1.2em; color: #996600;
 	}
 #phy-pair-builder #seqops2 {

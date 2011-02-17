@@ -1,8 +1,8 @@
 %# key = caf45f111ac3f8424b780d385b1e893c
 %# http://entrezajax.appspot.com/
-<div class="container_data2">
-	<div id="container_data_line">&nbsp;</div>
-	<div id="seqids" class="seqids">
+<div id="phy-blast">
+	<div id="container_data_line"></div>
+	<div id="seqids">
 		<pre>
 % for (@pairs) {
 %	my $name = join " + ", map {$_->seq->display_id} $_->paired_sequences;
@@ -13,7 +13,7 @@
 % }
 </pre>
 	</div>
-	<div id="seqs" class="seqs">
+	<div id="seqs">
 		<pre>
 % for (@pairs) {
 %	my $consensus = $_->consensus;
