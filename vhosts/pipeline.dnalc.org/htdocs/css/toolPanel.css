@@ -602,7 +602,7 @@ list-style-type:none; margin:0; padding: 5px;
 }
 
 canvas {
-	border: 1px black solid;
-	margin: 20px;
+	//border: 1px black solid;
+	//margin: 20px;
 	background: #FFFFFF;
 }

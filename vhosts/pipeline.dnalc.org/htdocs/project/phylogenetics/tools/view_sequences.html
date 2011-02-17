@@ -1,28 +1,32 @@
 <style type="text/css">
 input.btn { 
-	  color: #85b2dd; 
+	  color: #000; 
 	  background-color:#f3f7fa; 
 	  border:1px solid; 
-	  border-color: #a7cff5; 
+	  border-color: #000; 
 	  margin-right: 2px;
 	} 
 	
 .label{
 font: "Arial";
-color: #85b2dd;
+color: #000;
 }
 </style>
+
 <div class="container_data1">
 	<div id="container_data_line">&nbsp;</div>
-	
+%	if ($show_trimmed) {
+<div id="showing-trimmed-notice" style="font-size:10px;border:#a7cff5 solid 1px;background-color:#f3f7fa;padding:5px;float:left; width: 194px;"><img src="/images/info.png" style="vertical-align: middle;padding-right:7px;" />Your sequences have been trimmed</div>
+<div style="clear: both;"></div>
+%	}	
 	<div id="seqids" class="seqids">
 		<pre>
-% for (@sequences) {
-<span id="x<% $_->display_id |html %>"><% $_->display_id |html%></span>
-% }
 % for (@files) {
 %	my $name = $_->file_name; $name =~ s/\..*?$//;
-<span id="x<% $_ |html %>"><a href="./view_sequences.html?pid=<% $pid |html%>;fid=<% $_->id %>"><% $name |html%></a></span>
+<span id="x<% $_ |html %>"><a href="./view_sequences.html?pid=<% $pid |html%>;fid=<% $_->id %>;show_trimmed=<% $show_trimmed %>"><% $name |html%></a></span>
+% }
+% for (@sequences) {
+<span id="x<% $_->display_id |html %>"><% $_->display_id |html%></span>
 % }
 </pre>
 	</div>
@@ -31,19 +35,21 @@ color: #85b2dd;
 		<pre>
 % for (@files) {
 %	if ($_->has_low_q){
-<span><a href="./view_sequences.html?pid=<% $pid |html%>;fid=<% $_->id %>"><img src="/images/chart_curve_error.png" border=0 alt="View Trace" style="vertical-align: middle;" /></a></span>
+<span id="low_qs_<% $_->id %>"><a href="./view_sequences.html?pid=<% $pid |html%>;fid=<% $_->id %>;show_trimmed=<% $show_trimmed %>"><img src="/images/chart_curve_error.png" border=0 alt="View Trace" style="vertical-align: middle;" /></a></span>
 %	}
 %	else {
-<span><a href="./view_sequences.html?pid=<% $pid |html%>;fid=<% $_->id %>"><img src="/images/chart_curve.png" border=0 alt="View Trace" style="vertical-align: middle;" /></a></span>
+<span><a href="./view_sequences.html?pid=<% $pid |html%>;fid=<% $_->id %>;show_trimmed=<% $show_trimmed %>"><img src="/images/chart_curve.png" border=0 alt="View Trace" style="vertical-align: middle;" /></a></span>
 %	}
-% }		
+% }	
+% for (@sequences) {
+
+%}	
 </pre>
 	</div>
 	
-	
 	<div id="seqs" class="seqs">
-% if ($file) {
 	<input type="hidden" id="step" value="2" />
+% if ($file) {
 	<input type="hidden" id="seq_data" value="<% $file->seq |html%>" />
 	<input type="hidden" id="seq_A" value="<% join ",", @{$traces->{A}} %>" />
 	<input type="hidden" id="seq_T" value="<% join ",", @{$traces->{T}} %>" />
@@ -52,38 +58,52 @@ color: #85b2dd;
 	<input type="hidden" id="qvalues" value="<% join ",", $file->quality_values %>" />
 	<input type="hidden" id="b_locations" value="<% join ",", $file->base_locations %>" />
 	<input type="hidden" id="seq_display_id" value="<% $file->file_name %>" />
-
-	
-	<div>
+	<input type="hidden" id="show_trimmed" value="<% $show_trimmed %>" />
+%	if ($show_trimmed) {
+%	my $seq_obj = $file->seq_object;
+	<input type="hidden" id="start" value="<% $seq_obj->start_pos %>" />
+	<input type="hidden" id="end" value="<% $seq_obj->end_pos %>" />
+% 	}
+	<div style="margin-top:17px;margin-left:10px;margin-bottom:20px;border:#000 1px solid;overflow:auto;">
 		<canvas id="canvas1" height="200">
-			Your browser isn't supporting canvas objects.
-		</canvas>  
+			Your browser doesn't support this Trace Viewer.
+		</canvas>
+	</div>
+	<div style="float:left; width: 100px;padding-left:10px;"><input type="button" id="zoom_reset" value=" Reset " onclick="phy.zoomReset()" class="btn" /></div>
+	<div style="float:left; width: 200px; text-align: center;">
+		<span class="label">X: </span><input type="button" id="x_zoom_in" value="  +  " onclick="phy.zoomIn('x')" class="btn" /><input type="button" id="x_zoom_out" value="  -  " onclick="phy.zoomOut('x')" class="btn" />
+	</div>
+	<div style="float:left; width: 200px; text-align: right;">
+		<span class="label">Y: </span><input type="button" id="y_zoom_in" value="  +  " onclick="phy.zoomIn('y')" class="btn" /><input type="button" id="y_zoom_out" value="  -  " onclick="phy.zoomOut('y')" class="btn"/>
 	</div>
 %#	<pre><% Dumper($file)%></pre>
 % } else {
 		<pre>
-% for (@files) {
+% if (!$show_trimmed) {
+% 	for (@files) {
 <span id="<%$_%>" ><% $_->seq|html %></span>
+% 	}
+% } else {
+% 	for (@files) {
+<span id="<%$_%>" ><% $_->seq_object->seq|html %></span>
+% 	}
 % }
-% for (@sequences) {
+% if (!$show_trimmed) {
+% 	for (@sequences) {
+<span id="<%$_%>" ><% $_->left_trim|html %><% $_->seq|html %><% $_->right_trim|html %></span>
+% 	}
+% }
+% else {
+% 	for (@sequences) {
 <span id="<%$_%>" ><% $_->seq|html %></span>
+% 	}
 % }
 </pre>
 % }
 	 </div>
 %#     <div style="clear: both;">&nbsp;</div>
-% if ($file) {
-	 <div class="seqs">
-	 <br />
-		<div style="float:left; width: 100px;"><input type="button" id="zoom_reset" value=" Reset " onclick="phy.zoomReset()" class="btn" /></div>
-		<div style="float:left; width: 200px; text-align: center;">
-			<span class="label">X:</span><input type="button" id="x_zoom_in" value="  +  " onclick="phy.zoomIn('x')" class="btn" /><input type="button" id="x_zoom_out" value="  -  " onclick="phy.zoomOut('x')" class="btn" />
-		</div>
-		<div style="float:left; width: 200px; text-align: right;">
-			<span class="label">Y:</span><input type="button" id="y_zoom_in" value="  +  " onclick="phy.zoomIn('y')" class="btn" /><input type="button" id="y_zoom_out" value="  -  " onclick="phy.zoomOut('y')" class="btn"/>
-		</div>
-	</div>
-% }
+
+	<div style="clear: both;">&nbsp;</div>
      <div id="container_data_lineBottom">&nbsp;</div>
 </div> <!-- END of container_rightContent-->
 
@@ -92,6 +112,7 @@ color: #85b2dd;
 	$data => ''
 	$pid => 0
 	$fid => 0
+	$show_trimmed => 0
 </%args>
 <%once>
 	use File::Slurp qw/read_file/;
@@ -129,14 +150,14 @@ color: #85b2dd;
 			}
 			$traces = $file->trace if $file;
 		}
-		@sequences = DNALC::Pipeline::Phylogenetics::DataSequence->search_initial_non_trace_sequences($pid) unless $file;
 	}
 	else {
-		@sequences = $pm->sequences;
+		#@sequences = $pm->sequences;
 	}
+	@sequences = DNALC::Pipeline::Phylogenetics::DataSequence->search_initial_non_trace_sequences($pid) unless $file;
 </%init>
 <%attr>
-	js => ['prototype-1.6.1.js', 'phylogenetics.js']
+	js => ['prototype-1.6.1.js', 'phylogenetics.js', 'prototip/prototip.js']
 	load_ie_canvas => 1
 </%attr>
 
