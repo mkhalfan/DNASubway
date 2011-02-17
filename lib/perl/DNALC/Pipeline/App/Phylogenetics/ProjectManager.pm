@@ -324,9 +324,11 @@ use Bio::Trace::ABIF ();
 		
 		my $out = '';
 
+		my $num = 0;
 		while( my $res = $in->next_result ) {
 			while( my $hit = $res->next_hit ) {
 				while( my $hsp = $hit->next_hsp ) {
+					last if $num++ >= ($self->config->{MAX_BLAST_RESULTS} || 20);
 					my $seq_obj = $hsp->seq("hit");
 					my $name = $seq_obj->display_id;
 					$name =~ s/(\.1)?\|$//;

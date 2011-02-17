@@ -5,13 +5,16 @@
 		<div class="tcell trownum">#</div> 
 		<div class="tcell">Name</div>
 		<div class="tcell">Details</div>
-		<div class="tcell">E</div>
-		<div class="tcell">Mismatches</div>
+		<div class="tcell">Aln. length</div>
+		<div class="tcell">Bit score</div>
+		<div class="tcell">e</div>
+		<div class="tcell" style="width:50px">Mis- matches</div>
 	</div>
 %	my $num = 1;
-% 	while( my $res = $in->next_result ) {
+% 	while( my $res = $bsio_in->next_result ) {
 %		while( my $hit = $res->next_hit ) {
 %		  while( my $hsp = $hit->next_hsp ) {
+%			last if $num > ($config->{MAX_BLAST_RESULTS} || 20);
 %			my @tmp = split /\s+/, $hit->description;
 %#			my $name = join ' ', splice @tmp, 0, 2;
 %#			my $desc = $hsp->seq("hit")->display_id . ' - ' . join ' ', splice @tmp, 2;
@@ -27,6 +30,8 @@
 			<% $name |html%>\
 		</div>
 		<div class="tcell"><a id="xtip_<% $num %>" href="#<% $num %>" onclick="phy.get_ggl_image(this);"><% $species |html%></a> - <% $desc |html%></div>
+		<div class="tcell"><% $hsp->length() |html%></div>
+		<div class="tcell"><% $hsp->bits |html%></div>
 		<div class="tcell"><% $hsp->evalue |html%></div>
 		<div class="tcell"><% $mismatchcount |html%></div>
 	</div>
@@ -60,14 +65,11 @@ google.load("search", "1");
 </%args>
 %#----------------------------------------------------------------------------
 <%once>
-	use File::Slurp qw/read_file/;
-	use DNALC::Pipeline::App::Phylogenetics::ProjectManager ();
 	use DNALC::Pipeline::Phylogenetics::DataSequence ();
 	use DNALC::Pipeline::Phylogenetics::Pair ();
 	use DNALC::Pipeline::Phylogenetics::Blast ();
 	use DNALC::Pipeline::Config ();
 	use Bio::SearchIO ();
-	#use JSON::XS ();
 	use IO::Scalar ();
 	use Data::Dumper;
 </%once>
@@ -92,8 +94,9 @@ google.load("search", "1");
 		}
 	}
 	
+	my $config = DNALC::Pipeline::Config->new->cf("PHYLOGENETICS");
 	my $blast = DNALC::Pipeline::Phylogenetics::Blast->retrieve($bid);
-	my ($in_fh, $dsource, $in);
+	my ($in_fh, $dsource, $bsio_in);
 	
 	if ($blast) {
 		$in_fh = IO::Scalar->new;
@@ -103,7 +106,7 @@ google.load("search", "1");
 		$dsource = DNALC::Pipeline::Phylogenetics::DataSource
 					->search( project_id => $pid, name => "blast:$bid");
 
-		$in = Bio::SearchIO->new(-format => 'blast', -fh => $in_fh);
+		$bsio_in = Bio::SearchIO->new(-format => 'blast', -fh => $in_fh);
 	}
 
 </%init>

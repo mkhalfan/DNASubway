@@ -2,6 +2,7 @@
 {
 	PROJECTS_DIR => '/var/www/vhosts/pipeline.dnalc.org/var/projects/phylogenetics', 
 	Q_THRESHOLD => 20,
+	MAX_BLAST_RESULTS => 20,
 	MAX_SEQ_NO => 100,
 	MAX_SEQ_LEN => 2000,
 }
