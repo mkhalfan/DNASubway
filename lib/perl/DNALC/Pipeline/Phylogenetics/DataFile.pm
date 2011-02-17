@@ -4,6 +4,7 @@ use base qw(DNALC::Pipeline::DBI);
 use POSIX ();
 use List::Util qw/max/;
 use Bio::Trace::ABIF ();
+use DNALC::Pipeline::Phylogenetics::DataSequence();
 
 __PACKAGE__->table('phy_data_file');
 __PACKAGE__->columns(Primary => qw/id/);
@@ -15,6 +16,14 @@ __PACKAGE__->has_a(project_id => 'DNALC::Pipeline::Phylogenetics::Project');
 __PACKAGE__->add_trigger(before_create => sub {
 	$_[0]->{created} ||= POSIX::strftime "%Y-%m-%d %H:%M:%S", localtime(+time);
 });
+
+# retursn the DataSequence of this file
+sub seq_object {
+	my ($self) = @_;
+
+	my ($seq) = DNALC::Pipeline::Phylogenetics::DataSequence->search(file_id => $self, project_id => $self->project_id);
+	return $seq;
+}
 
 # returns the sequence(s) from the file
 sub seq {

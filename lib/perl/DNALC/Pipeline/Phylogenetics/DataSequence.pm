@@ -17,9 +17,58 @@ __PACKAGE__->sequence('phy_data_sequence_id_seq');
 
 __PACKAGE__->has_a(project_id => 'DNALC::Pipeline::Phylogenetics::Project');
 
+__PACKAGE__->might_have(trimming => 'DNALC::Pipeline::Phylogenetics::DataSequenceTrim' => qw/left_trim right_trim start_pos end_pos/);
+
 __PACKAGE__->add_trigger(before_create => sub {
 	$_[0]->{created} ||= POSIX::strftime "%Y-%m-%d %H:%M:%S", localtime(+time);
 });
+
+
+# The Trimming Function. Takes the sequence to be trimmed
+# and optionally the window length and "N" Threshold
+sub trim {
+	my ($self, $window_length, $threshold) = @_;
+
+	my $sequence = $self->seq;
+	
+	my $forward_total = _trim_sequence_string($sequence);
+	my $reverse_total = _trim_sequence_string(scalar reverse $sequence);
+	my $trimmed_seq_length = (length $sequence) - $reverse_total - $forward_total;
+	my $trimmed_sequence = substr($sequence, $forward_total, $trimmed_seq_length);
+	
+	
+	# Update The Database
+	$self->left_trim(substr ($sequence, 0, $forward_total));
+	$self->right_trim(substr ($sequence, (length $sequence) - $reverse_total, $reverse_total));
+	$self->start_pos($forward_total);
+	$self->end_pos((length $sequence) - $reverse_total);
+	$self->seq($trimmed_sequence);
+	return $self->update;
+}
+
+sub _trim_sequence_string {
+	my ($seq, $window_length, $threshold) = @_;
+
+	$window_length ||= 12;
+	$threshold ||= 2;
+	my $total = 0;
+
+	for (my $i = 0; $i <= length $seq; $i++) {
+		my $window = substr($seq, $i, $window_length);
+		my $cnt = () = $window =~ /N/g;
+		if (index($window, "N") == 0){
+			$total++;
+		}
+		elsif ($cnt >= $threshold){
+			$total++;
+		}
+		else {
+			last;
+		}
+	}
+	return $total;
+	
+}
 
 __PACKAGE__->set_sql(non_paired_sequences =>q {
  	SELECT s.id, ds.name as source_name
