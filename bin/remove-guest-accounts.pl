@@ -27,7 +27,9 @@ use DNALC::Pipeline::User ();
 use DNALC::Pipeline::Utils qw(random_string);
 use DNALC::Pipeline::Config ();
 use DNALC::Pipeline::Project ();
+use DNALC::Pipeline::Phylogenetics::Project ();
 use DNALC::Pipeline::App::ProjectManager ();
+use DNALC::Pipeline::App::Phylogenetics::ProjectManager ();
 use DNALC::Pipeline::App::Utils ();
 use DNALC::Pipeline::TargetProject ();
 
@@ -64,6 +66,7 @@ for my $u (@users) {
 	&remove_target_projects($u);
 	&remove_apollo_files($u);
 	&drop_chadodb($u);
+	&remove_phy_projects($u);
 
 	$u->delete;
 	last if $counter++ >= 5;
@@ -84,7 +87,7 @@ sub remove_projects {
 
 	my $u = shift;
 	my @projects = DNALC::Pipeline::Project->search(user_id => $u->id);
-	print STDERR  "------------PROJECTS OF USER ----", $u->username, $/;
+	print STDERR  "------------PROJECTS OF USER ----", $u->username, $/, $/;
 	for my $p (@projects) {
 		my $pm = DNALC::Pipeline::App::ProjectManager->new($p);
 		# gbrowse dir/files
@@ -155,7 +158,7 @@ sub remove_target_projects() {
 	for my $p (@projects) {
 		my $dir = $p->work_dir;
 		print STDERR  "target rm.$p: dir => ", $p->work_dir, $/;
-		print STDERR  "Target $p", $/;
+		#print STDERR  "Target $p", $/;
 		$p->delete;
 		DNALC::Pipeline::App::Utils->remove_dir($dir);
 	}
@@ -167,6 +170,19 @@ sub remove_apollo_files {
 	my $apollo_dir = $cf->{APOLLO_USERCONF_DIR};
 	my @files = grep {/$apollo_dir\/$username/} <$apollo_dir/*>;
 	unlink @files if @files;
+}
+
+sub remove_phy_projects {
+	my $u = shift;
+
+	my @projects = DNALC::Pipeline::Phylogenetics::Project->search(user_id => $u->id);
+	for my $p (@projects) {
+		my $pm = DNALC::Pipeline::App::Phylogenetics::ProjectManager->new($p);
+		my $dir = $pm->work_dir;
+		print STDERR  "Phy rm $p: dir => ", $dir, $/;
+		$p->delete;
+		DNALC::Pipeline::App::Utils->remove_dir($dir);
+	}
 }
 
 sub drop_chadodb {

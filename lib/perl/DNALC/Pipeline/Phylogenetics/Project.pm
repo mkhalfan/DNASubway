@@ -45,9 +45,9 @@ __PACKAGE__->add_trigger(before_delete => sub {
 	if ($mp) {
 		$mp->delete;
 	}
-	else {
-		print STDERR  "MasterP for project ", $_[0]->{project_id}, " not found.", $/;
-	}
+	#else {
+	#	print STDERR  "MasterP for project ", $_[0]->{project_id}, " not found.", $/;
+	#}
 });
 
 

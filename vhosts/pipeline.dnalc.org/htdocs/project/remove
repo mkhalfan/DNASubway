@@ -52,8 +52,9 @@ elsif ($mp->project_type eq "annotation") {
 elsif ($mp->project_type eq "phylogenetics") {
 	my $pm = DNALC::Pipeline::App::Phylogenetics::ProjectManager->new($mp->project_id);
 	if ($pm->project) {
-		print STDERR "TODO: remove project's files...", $/;
+		$dir = $pm->work_dir;
 		$pm->project->delete;
+		DNALC::Pipeline::App::Utils->remove_dir($dir);
 		$m->comp('/_message_add', 'Project removed!', 'error');
 	}
 }
