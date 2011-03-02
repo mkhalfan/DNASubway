@@ -579,12 +579,13 @@ use Bio::Trace::ABIF ();
 
 			my $muscle_alignment = '';
 			my $consensus;
-			my @display_name_array = ($display_name_1, $display_name_2, $display_name_3);
+			# my @display_name_array = ($display_name_1, $display_name_2, $display_name_3);
 			for my $i (0 .. 2) {
 				my @temp = split('\n', @muscle_output_array[$i]);
+				$muscle_alignment = $muscle_alignment . @temp[0] . ': ';
 				shift (@temp);
 			    my $seqa = join('', @temp);
-			    $muscle_alignment = $muscle_alignment . $display_name_array[$i] . ': ' . $seqa . "\n";
+			    $muscle_alignment = $muscle_alignment . $seqa . "\n";
 				$consensus = $seqa;
 			}
 
