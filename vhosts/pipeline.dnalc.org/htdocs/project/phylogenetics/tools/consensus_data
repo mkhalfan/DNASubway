@@ -28,6 +28,9 @@
 	my $seq_substring;
 	my $dash_count;
 	my $reversed_seq;
+	my $temp;
+	my $trimmed_f = 0;
+	my $trimmed_r = 0;
 	
 	
 	# ------------------------------
@@ -60,33 +63,59 @@
 			if ($pseq[$_]->strand eq "F"){
 				$seq_substring = substr $seq1, 0, $pos;
 				$dash_count = ($seq_substring =~ s/-//g);
-				$original_seq_pos = $pos - $dash_count;
+				
+				if ($temp = DNALC::Pipeline::Phylogenetics::DataSequenceTrim->retrieve($pseq[$_]->seq->id)){
+				$trimmed_f = $temp->start_pos;
+				}
+				
+				$original_seq_pos = $pos- $dash_count + $trimmed_f;
 			}
 			elsif ($pseq[$_]->strand eq "R"){
 				$reversed_seq = reverse $seq1;
-				$seq_substring = substr ($reversed_seq, 0, $pos);
+				$seq_substring = substr ($reversed_seq, 0, length($seq1) - $pos);
 				$dash_count = ($seq_substring =~ s/-//g);
-				$original_seq_pos = length($seq1) - ($pos + $dash_count) - 1;
+				
+				if ($temp = DNALC::Pipeline::Phylogenetics::DataSequenceTrim->retrieve($pseq[$_]->seq->id)){
+				$trimmed_r = length ($temp->left_trim);
+				}
+				
+				$original_seq_pos = length($seq1) - ($pos + $dash_count) - 1 + $trimmed_r;
 			}
 		}
 		elsif ($pseq[$_]->seq->display_id eq trim($display_name_2)){
 			if ($pseq[$_]->strand eq "F"){
 				$seq_substring = substr $seq2, 0, $pos;
 				$dash_count = ($seq_substring =~ s/-//g);
-				$original_seq_pos = $pos - $dash_count;
+				
+				if ($temp = DNALC::Pipeline::Phylogenetics::DataSequenceTrim->retrieve($pseq[$_]->seq->id)){
+				$trimmed_f = $temp->start_pos;
+				}
+				
+				$original_seq_pos = $pos - $dash_count + $trimmed_f;
 			}
 			elsif ($pseq[$_]->strand eq "R"){
 				$reversed_seq = reverse $seq2;
-				$seq_substring = substr ($reversed_seq, 0, $pos);
+				$seq_substring = substr ($reversed_seq, 0, length($seq2) - $pos);
 				$dash_count = ($seq_substring =~ s/-//g);
-				$original_seq_pos = length($seq2) - ($pos + $dash_count) - 1;
+
+				if ($temp = DNALC::Pipeline::Phylogenetics::DataSequenceTrim->retrieve($pseq[$_]->seq->id)){
+				$trimmed_r = length ($temp->left_trim);
+				}
+				
+				$original_seq_pos = length($seq2) - ($pos + $dash_count) - 1 + $trimmed_r;
 			}
 		}
 		# ---------------------------
 
 		my ($low, $high) = ($original_seq_pos - 3, $original_seq_pos + 3);
-		$low = 0 if $low < 0;
-		$high = $#all_base_locations if $high > $#all_base_locations;
+		$low = $trimmed_f if $low < $trimmed_f;
+		$high = ($#all_base_locations - $trimmed_r) if $high > ($#all_base_locations - $trimmed_r);
+		
+		#my $f_indicator_pos;
+		#if ($low < $trimmed_f){
+		#	$f_indicator_pos = $low + 3 - $trimmed_f;
+		#	$low = $trimmed_f;
+		#}
 
 		my $qscores = [@all_qscores[$low .. $high]];
 		my $sequence = substr $entire_sequence, $low, $high - $low + 1;
@@ -96,7 +125,7 @@
 		
 		my %trace_values = ();
 		foreach (keys %$all_traces){
-			$trace_values{$_} = [@{$all_traces->{$_}}[$five_bases_down_pos .. $five_bases_up_pos]];
+			$trace_values{$_} = [@{$all_traces->{$_}}[$five_bases_down_pos .. $five_bases_up_pos + 5]];
 		}
 		
 		my $d = {
