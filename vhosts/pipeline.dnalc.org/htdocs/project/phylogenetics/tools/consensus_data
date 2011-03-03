@@ -31,6 +31,7 @@
 	my $temp;
 	my $trimmed_f = 0;
 	my $trimmed_r = 0;
+	my $reverse_flag = 0;
 	
 	
 	# ------------------------------
@@ -71,6 +72,8 @@
 				$original_seq_pos = $pos- $dash_count + $trimmed_f;
 			}
 			elsif ($pseq[$_]->strand eq "R"){
+				$reverse_flag = 1;
+				
 				$reversed_seq = reverse $seq1;
 				$seq_substring = substr ($reversed_seq, 0, length($seq1) - $pos);
 				$dash_count = ($seq_substring =~ s/-//g);
@@ -94,6 +97,8 @@
 				$original_seq_pos = $pos - $dash_count + $trimmed_f;
 			}
 			elsif ($pseq[$_]->strand eq "R"){
+				$reverse_flag = 1;
+			
 				$reversed_seq = reverse $seq2;
 				$seq_substring = substr ($reversed_seq, 0, length($seq2) - $pos);
 				$dash_count = ($seq_substring =~ s/-//g);
@@ -136,6 +141,7 @@
 			trace_values => \%trace_values,
 			base_locations => $base_locations,
 			position => $original_seq_pos,
+			reverse_flag => $reverse_flag,
 			#pos => { $pos => $all_base_locations[$pos], down => $five_bases_down_pos, up => $five_bases_up_pos},
 		};
 		

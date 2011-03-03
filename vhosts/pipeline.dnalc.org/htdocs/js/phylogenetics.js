@@ -352,9 +352,15 @@
 
 		if ($(id)) {
 			var seq = $(id).innerHTML;
-			var revcom = [];
-			var rev = seq.split('').reverse();
-			for (var i =0; i < rev.length; i++) {
+			
+			$(id).innerHTML = phy.rev_com(seq).join('');
+		}// end if
+	};
+	
+	phy.rev_com = function(seq){
+		var revcom = [];
+		var rev = seq.split('').reverse();
+		for (var i =0; i < rev.length; i++) {
 				let = rev[i];
 				switch (let) {
 					case 'A':
@@ -372,9 +378,8 @@
 					default:
 						revcom.push(let);
 				}// end switch
-			}// end for
-			$(id).innerHTML = revcom.join('');
-		}// end if
+		}// end for
+		return revcom;
 	};
 	
 	phy.do_pair = function() {
@@ -700,8 +705,38 @@
 		var title = data['seq_display_id'];
 		var sequence = data['sequence'];
 		var qualityScores = data['qscores'];
+		var a_trace_values = data['trace_values']['A'];
+		var t_trace_values = data['trace_values']['T'];
+		var c_trace_values = data['trace_values']['C'];
+		var g_trace_values = data['trace_values']['G'];
+		var a_color = 'green';
+		var t_color = 'red';
+		var c_color = 'blue';
+		var g_color = 'black';
 		var baseLocations = data['base_locations']; // The position of the base in the entire sequence
 		var baseLocationsPositions = []; // The position of the base on the canvas (in our subsequence)
+		
+		// 'reverse_flag' only exists for the consensus sequence. If it is set to true (1), 
+		// this sequence and trace needs to be reverse complemented. 
+		if (data['reverse_flag'] == 1){
+			// Reverse complement the sequence
+			console.info(sequence);
+			sequence = phy.rev_com(sequence).join('');
+			console.info(sequence);
+			
+			// Reverse the quality scores and trace values
+			qualityScores = qualityScores.reverse();
+			a_trace_values = a_trace_values.reverse();
+			t_trace_values = t_trace_values.reverse();
+			c_trace_values = c_trace_values.reverse();
+			g_trace_values = g_trace_values.reverse();
+			
+			// Change the trace colors to match the complements
+			var a_color = 'red';
+			var t_color = 'green';
+			var c_color = 'black';
+			var g_color = 'blue';
+		}
 	
 		// Normalize the base locations to baseLocationsPositions
 		for (var b = 0; b < baseLocations.length; b++){
@@ -709,8 +744,9 @@
 		}
 		var lastBase = Math.max.apply(Math, baseLocationsPositions);
 		
-		// Calculate the width of the canvas 
-		// If it's the consensus editor, make it the width of the Display ID.
+		// Calculate the width of the canvas.
+		// If it's the consensus editor, make it the width of the Display ID (unless the trace
+		// runs longer than than the title, then set it to the width of the trace).
 		// If it's the View Sequences (entire sequence), make it the width of the entire sequence.
 		// ('seq_id' is only passed from the consensus editor - that's how we check)
 		if (data['seq_id']){
@@ -724,6 +760,7 @@
 		else {
 			canvas.width = lastBase * xZoom + 15;
 		}
+		
 	
 		function drawTrace(n, color){
 			ctx.strokeStyle = color;
@@ -742,10 +779,10 @@
 			ctx.closePath();
 		}
 		
-		drawTrace(data['trace_values']['A'], "green");
-		drawTrace(data['trace_values']['T'], "red");
-		drawTrace(data['trace_values']['C'], "blue");
-		drawTrace(data['trace_values']['G'], "black");
+		drawTrace(a_trace_values, a_color);
+		drawTrace(t_trace_values, t_color);
+		drawTrace(c_trace_values, c_color);
+		drawTrace(g_trace_values, g_color);
 
 		// Draw The Labels
 		ctx.fillStyle = "black";
