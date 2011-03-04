@@ -720,9 +720,7 @@
 		// this sequence and trace needs to be reverse complemented. 
 		if (data['reverse_flag'] == 1){
 			// Reverse complement the sequence
-			console.info(sequence);
 			sequence = phy.rev_com(sequence).join('');
-			console.info(sequence);
 			
 			// Reverse the quality scores and trace values
 			qualityScores = qualityScores.reverse();
