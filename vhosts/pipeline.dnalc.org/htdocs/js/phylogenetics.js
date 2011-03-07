@@ -99,9 +99,6 @@
 	
 	phy.select_source = function (el) {
 		return;
-		//debug(el);
-		debug($$('#' + el + '_inputs, #' + el + '_inputs textarea'));
-		debug($$('#' + el + '_inputs, #' + el + '_inputs input'));
 		if (el && (el == 'upload' || el == 'paste')) {
 			//$('specie').selectedIndex = -1;
 		}
@@ -174,12 +171,6 @@
 		windows[what] = openWindow( uri, window_title, options);
 		
 		debug(what + ': ' + windows[what]);
-		
-		/*try {
-			pageTracker._trackEvent(title, "view");
-		} catch (e) {
-			debug(e.toString());
-		};*/
 	};
 	
 	//---------------------------------------------------------------
@@ -214,15 +205,14 @@
 				title: "Pair them?",
 				style: 'protogrey',
 				stem: 'rightMiddle',
-				showOn: 'click',
-				hideOn: 'click',
+				//showOn: 'click',
+				//hideOn: 'click',
 				//hideOn: { element: 'closeButton', event: 'click' },
 				hook: { mouse: false, tip: 'rightMiddle' },
 				offset: { x: 5, y: 10 },
 				width: 200
 			});
-			
-			debug(id);
+
 			$('op' + id).prototip.show();
 			current_pair.each(function(iid) {
 					$('op' + iid).disable();
@@ -234,7 +224,6 @@
 
 	phy.add_pair = function(pair) {
 		var classname = pairs.length % 2 ? 'paired-light' : 'paired-dark';
-		debug(classname);
 		pair.each(function(el) {
 			$(el).addClassName(classname);
 			$('id_' + el).addClassName(classname);
@@ -296,33 +285,22 @@
 	};
 	
 	phy.run = function(op, params) {
-		//var s = $(op);
 		var b = $(op + '_btn');
 		var p = $('pid').value;
 		var ind = $(op + '_st');
-
-		var delay = b ? parseFloat(b.getAttribute('delay')) : 10;
-		delay = !isNaN(delay) ? (delay * 1000) : 10000;
 
 		new Ajax.Request('/project/phylogenetics/launch_job',{
 			method:'get',
 			parameters: { 't' : op, pid : p, params: params}, 
 			onSuccess: function(transport){
 				var response = transport.responseText || "{'status':'error', 'message':'No response'}";
-				//debug(response);
 				var r = response.evalJSON();
-				//dbg = r;
-				//alert('after launch job:\n' + response + ' ' + r.h);
 				if (r.status == 'success') {
-					var h = r.h || '';
-					//intervalID[op] = setInterval(function (){ phy.check_status(p, op, h)}, delay);
-					
 				}
 				else  if (r.status == 'error') {
 					show_errors(r.message);
 				}
 				else {
-					//s.update('Unknown status!');
 					alert('Unknown status!');
 				}
 			},
@@ -488,15 +466,15 @@
 			parameters: { 't' : op, pid : p}, 
 			onSuccess: function(transport){
 				var response = transport.responseText || "{'status':'error', 'message':'No response'}";
-				//debug(response);
 				var r = response.evalJSON();
-				//debug(r);
 		
 				if (r.status == 'success') {
 					phy.set_status(op, "done");
 					if (op == "phy_alignment") {
 						phy.set_status("phy_tree", "not-processed");
-						debug("set Tree to not-processed");
+					}
+					else if (op == "phy_trim") {
+						phy.set_status("phy_consensus", "not-processed");
 					}
 				}
 				else  if (r.status == 'error') {
@@ -548,7 +526,6 @@
 		if (null != windows[id]) {
 			windows[id].close();
 			delete windows[id];
-			debug("change status if it's the case....");
 		}
 	};
 	
@@ -562,18 +539,14 @@
 			var ctx = canvas.getContext('2d');
 
 			// data
-			//var str = "NNNNNNNTGNATCAGCTGGTGTTAAGATTACAAATTGACTTATTATACTCCTGAGTATGACCCCGCGGATACTGATATCTTGGCAGCATTCCGAGTAACTCCTCAACCTGGAGTTCCGCCGGAAGAAGCAGGGGCCGCGGTAGCTGCCGAATCTTCTACTGG";
-			// var qual = [3,2,4,3,3,4,4,6,6,4,5,11,7,8,7,9,30,19,33,15,37,33,11,13,13,12,12,10,31,30,34,21,41,47,52,53,53,31,32,57,53,52,40,47,61,50,53,61,61,61,50,61,61,47,47,61,35,38,61,55,55,61,61,61,61,61,61,61,38,38,49,49,61,61,47,61,55,49,61,61,61,36,18,14,12,19,19,61,61,61,61,61,61,61,61,59,61,61,61,61,59,55,55,59,61,61,61,61,61,61,55,59,61,61,61,59,61,61,61,61,61,61,59,61,59,61,59,59,59,59,59,55,59,61,61,55,61,61,61,61,61,61,61,61,61,61,61,61,61,61,61,61,61,61,55,59,59,61,61,61,61,61];
 			var qual = [];
 			var str  = $('seq_data').value;
 			var qval = $('qvalues').value;
-			debug(str.length);
 			qval.split(',').each(function(q){
 					//debug(q);
 					qual.push(parseInt(q, 10));
 				});
-			debug(str.length + " " + qual.length);
-			
+
 			// get text's size and resize the canvas
 			ctx.font = font;
 			ctx.fillStyle = "Black";
@@ -582,9 +555,7 @@
 			canvas.width = text_width + 2*padding;
 
 			var char_width = text_width/str.length;
-			debug(text_width + " " + char_width);
-			
-			
+
 			// draw the text
 			ctx.font = font;
 			ctx.fillText(str, padding, 30);
@@ -758,7 +729,6 @@
 		else {
 			canvas.width = lastBase * xZoom + 15;
 		}
-		
 	
 		function drawTrace(n, color){
 			ctx.strokeStyle = color;
@@ -885,7 +855,6 @@
 					}
 				}
 				else {
-					//debug(show_messages);
 					$$("#seqops pre")[0].show();
 					$("seqops").removeClassName('blast_processing');
 					alert("Error: " + r.message);
@@ -1119,7 +1088,6 @@
 		var query = el.innerHTML;
 		if (!query)
 			return;
-		//debug(query);
 		var imageSearch = new google.search.ImageSearch();
 		// Restrict to extra large images only
 		// imageSearch.setRestriction(google.search.ImageSearch.RESTRICT_IMAGESIZE,
@@ -1144,13 +1112,11 @@
 			//tmp_arr.pop(); // we don't need the 1st empty value
 			var trimmed = false;
 			tmp_arr.each(function(str, index) {
-				//debug(str.length + ' ' + aln_length);
 				if (str.length > 0 && str.length != aln_length) {
 					trimmed = true;
 					//return;
 				}
 			});
-			//debug('trimmed: ' + trimmed);
 			if (!trimmed) {
 				alert('No trimming has been detected!');
 				return;
@@ -1258,8 +1224,7 @@
 		
 		var start = Math.max(startStop1[0], startStop2[0]);
 		var stop = Math.min(startStop1[1], startStop2[1]);;
-		
-		//debug(startStop);
+
 		var y = 0;
 		for ( var i = 0; i < sequenceLength; i++){
 			
@@ -1446,7 +1411,6 @@
 				parameters: {'pair_id': $('pair_id').value, 'base_changes': baseChanges.toJSON()},
 				onSuccess: function(transport){
 					var response = transport.responseText || "{'status':'error', 'message':'No response'}";
-					debug(response);
 					var r = response.evalJSON();
 					if (r.status == 'success') {
 						// Update the Save Changes button
@@ -1494,7 +1458,6 @@
 				onSuccess: function(transport){
 					var response = transport.responseText || "{'status':'error', 'message':'No response'}";
 					var data = response.evalJSON();
-					//debug(response);
 					if (data) {
 						phy.change_bases(ev);
 						

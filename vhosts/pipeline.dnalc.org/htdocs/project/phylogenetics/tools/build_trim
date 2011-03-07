@@ -21,12 +21,24 @@
 	
 	if ($pm->get_task_status("phy_trim")->name eq "done") {
 		print '{"status":"success"}';
+		return;
 	}
 
 	my @seq = $pm->sequences;
 	# Trim each sequence and update the DB
 	foreach my $seq (@seq){
 		$seq->trim;
+	}
+	
+	# if consesnsus was done, clear the consesnsus and the alignement for each pair
+	if ($pm->get_task_status("phy_consensus")->name eq "done") {
+		for my $pair ($pm->pairs) {
+			#print STDERR "clearing pair: ", $pair, $/;
+			$pair->consensus('');
+			$pair->alignment('');
+			$pair->update;
+		}
+		$pm->set_task_status("phy_consensus", "not-processed");
 	}
 
 	$pm->set_task_status("phy_trim", "done");

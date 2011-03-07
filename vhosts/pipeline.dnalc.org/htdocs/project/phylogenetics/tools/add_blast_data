@@ -28,12 +28,12 @@
 	my $blast = DNALC::Pipeline::Phylogenetics::Blast->retrieve($bid);
 
 	if ($pm->project && $pm->project->user_id != $s->{user_id}) {
-		$msg = "Project not found.";
+		$msg = "Project not found or you don't own the project.";
 	}
 	elsif ($blast && $pm) {
 		my $dsource = DNALC::Pipeline::Phylogenetics::DataSource
 						->search( project_id => $pid, name => "blast:$bid");
-		print STDERR Dumper($dsource), $/;
+		#print STDERR Dumper($dsource), $/;
 		unless ($dsource) {
 			my $st = $pm->add_blast_data($blast->id);
 			#print STDERR "XXXXXXXXXXXXX\n", Dumper($st), $/;

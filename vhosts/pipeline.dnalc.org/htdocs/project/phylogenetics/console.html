@@ -16,16 +16,7 @@
 			</span>
 			<span class="bt_Runblueline"><a href="javascript:;" onclick="phy.launch('viewer')">Sequence Viewer</a></span>
         </span>
-		
-		
-% if (0) {		
-		<span class="conBlueline_ConCell">
-			<span class="conIndicator_box">
-				<div class="conIndicatorBL_done"></div>
-			</span>
-			<span class="bt_Runblueline"><a href="/project/phylogenetics/tools/trim_sequences?pid=<% $pid | html %>">Sequence Trimmer</a></span>
-        </span>
-% }
+
         <span class="conBlueline_ConCell">
 			<span class="conIndicator_box">
 				<div id="phy_trim_st" class="conIndicatorBL_<% $status{phy_trim} eq "done" ? "done" : $is_owner ? $status{phy_trim} : "disabled" %>"></div>

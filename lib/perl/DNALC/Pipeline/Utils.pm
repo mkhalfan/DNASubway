@@ -188,8 +188,10 @@ sub lcs_name {
     if (!@common || @common < @f - $x) {
         return join('_', $a, $b);
     }
+	my $name = join('', @common);
+	$name =~ s/[=_-]+$//;
     
-	return join('', @common);
+	return $name;
 }
 
 sub round {

@@ -3,20 +3,20 @@
 	Error: can't open project "<% $pid|html%>".
 % } 
 % else {
-	<div style="width: 15%;float:left;overflow: none;">
+	<div style="color:#996600;width: 15%;float:left;overflow: none;">
 	<ul>
 %	my $cnt = 1;
 %	for my $p (@pairs) {
 		<li>
-			<div><a href="./view_consensus?pid=<%$pid |html%>;pair_id=<% $p->id %>">Pair <% $cnt++%></a></div>
-			<small>·<% join "+", map{$_->seq->display_id} $p->paired_sequences |html%></small>
+			<div><a style="color: #006699; font-weight: bold; text-decoration: none;" href="./view_consensus?pid=<%$pid |html%>;pair_id=<% $p->id %>">Pair <% $cnt++%></a></div>
+			<small><% lcs_name( map {$_->seq->display_id} $p->paired_sequences) |html%></small>
 		</li>
 %	}
 	</ul>
 	</div>
 	<div style="width: 85%;float:left;background:silver;">
 %	if ($pair) {
-		<div>Pair <% join "+", map{$_->seq->display_id} $pair->paired_sequences |html%></div>
+		<div>Pair <strong><% lcs_name( map {$_->seq->display_id} $pair->paired_sequences) |html%></strong></div>
 		<div style="overflow: auto;" class="monospace">
 			<div id="labels">
 				<div id="seq1_name"></div>
@@ -67,6 +67,7 @@
 <%once>
 	use DNALC::Pipeline::App::Phylogenetics::ProjectManager ();
 	use DNALC::Pipeline::Phylogenetics::Pair ();
+	use DNALC::Pipeline::Utils qw/lcs_name/;
 	use File::Slurp qw(read_file);
 </%once>
 %#----------------------------------------------------------------------------
@@ -109,6 +110,6 @@
 </%init>
 <%attr>
 	js => ['prototype-1.6.1.js', 'phylogenetics.js']
-	load_ie_canvas => 1
+	load_ie_canvas => 0
 </%attr>
 %#----------------------------------------------------------------------------
