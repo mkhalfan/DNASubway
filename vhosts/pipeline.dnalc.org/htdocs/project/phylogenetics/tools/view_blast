@@ -12,7 +12,10 @@
 	</div>
 %	my $num = 1;
 % 	while( my $res = $bsio_in->next_result ) {
-%		while( my $hit = $res->next_hit ) {
+%		my @hits = $res->hits; my $hit_num = 0;
+%#		for my $hit (sort { $a->significance <=> $b->significance } @hits) {
+%		for my $hit (@hits) {
+%	$hit_num++; # XXX
 %		  while( my $hsp = $hit->next_hsp ) {
 %			last if $num > ($config->{MAX_BLAST_RESULTS} || 20);
 %			my @tmp = split /\s+/, $hit->description;
@@ -24,7 +27,7 @@
 %			my $desc = join (' ', splice @tmp, 2);
 %			my $mismatchcount = $hsp->length('total') - ($hsp->num_conserved + $hsp->gaps('total'));
 	<div class="trow">
-		<div class="tcell trownum"><% $num %>.<a name="<% $num %>"></a></div> 
+		<div class="tcell trownum"><% $num %>(<% $hit_num%>).<a name="<% $num %>"></a></div> 
 		<div class="tcell" id="tip_<% $num %>" desc="<% $hit->description |html %>">\
 %#			<input type="checkbox" name="selected_results" id="selected_results" value="<% $name |html%>" />
 			<% $name |html%>\
@@ -36,6 +39,7 @@
 		<div class="tcell"><% $mismatchcount |html%></div>
 	</div>
 %			$num++;
+%			last if $skip_hsp;
 %		  }
 %		}
 % 	}
@@ -62,6 +66,7 @@ google.load("search", "1");
 	$sid => 0
 	$bid => 0
 	$pid => 0
+	$skip_hsp => 0;
 </%args>
 %#----------------------------------------------------------------------------
 <%once>
@@ -69,6 +74,7 @@ google.load("search", "1");
 	use DNALC::Pipeline::Phylogenetics::Pair ();
 	use DNALC::Pipeline::Phylogenetics::Blast ();
 	use DNALC::Pipeline::Config ();
+	use DNALC::Pipeline::Utils qw/lcs_name/;
 	use Bio::SearchIO ();
 	use IO::Scalar ();
 	use Data::Dumper;
@@ -84,13 +90,12 @@ google.load("search", "1");
 		$sid =~ s/\D//g;
 		my $seq = DNALC::Pipeline::Phylogenetics::DataSequence->retrieve($sid);
 		$display_id = $seq->display_id;
-		#$pid = $seq->project_id;
 	}
 	elsif ($sid =~ /^p/) {
 		$sid =~ s/\D//g;
 		my $pair = DNALC::Pipeline::Phylogenetics::Pair->retrieve($sid);
 		if ($pair) {
-			$display_id = "Pair " . join " + ", map {$_->seq->display_id} $pair->paired_sequences;
+			$display_id = lcs_name( map {$_->seq->display_id} $pair->paired_sequences);
 		}
 	}
 	

@@ -60,7 +60,7 @@
 	use DNALC::Pipeline::App::Phylogenetics::ProjectManager ();
 	use DNALC::Pipeline::Phylogenetics::DataSequence ();
 	use DNALC::Pipeline::Config ();
-	#use JSON::XS ();
+	use DNALC::Pipeline::Utils qw/lcs_name/;
 	use Data::Dumper;
 </%once>
 <%init>

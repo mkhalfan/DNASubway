@@ -17,6 +17,7 @@ use Data::Dumper;
 
 #use DNALC::Pipeline::ProjectLogger ();
 use DNALC::Pipeline::Config ();
+use DNALC::Pipeline::Utils qw/lcs_name/;
 use aliased 'DNALC::Pipeline::Phylogenetics::Project';
 use aliased 'DNALC::Pipeline::Phylogenetics::DataSource';
 use aliased 'DNALC::Pipeline::Phylogenetics::DataFile';
@@ -475,9 +476,8 @@ use Bio::Trace::ABIF ();
 		for my $pair ($self->pairs) {
 			next if ($has_selected_sequences && !defined $selected_sequences{"p$pair"});
 			next unless $pair->consensus;
-			my @pair_sequences = $pair->paired_sequences;
-			my $name = join '_', map {$_->seq->display_id} @pair_sequences;
-			push @data, ">pair_" . $name;
+			my $name = lcs_name( map {$_->seq->display_id} $pair->paired_sequences);
+			push @data, ">" . $name;
 			push @data, $pair->consensus;
 		}
 		for my $s ($self->non_paired_sequences) {
