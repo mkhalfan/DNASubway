@@ -20,7 +20,7 @@
 	<param name="windowHeight" value="800" />
 	<param name="windowWidth" value="750" />
 	<param name="showFullId" value="false" />
-	<param name="defaultColour" value="Clustal" />
+	<param name="defaultColour" value="<% $proj->type =~ /mtdna/i ? "% Identity" : "Clustal" %>" />
 	<param name="linkLabel_1" value="Details" />
 	<param name="linkUrl_1" value="null" />
 	<param name="showbutton" value="false" />

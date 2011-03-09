@@ -1,4 +1,4 @@
-<div id="conbodyx">
+naaa<div id="conbodyx">
 % unless ($proj) {
 	Error: can't open project "<% $pid|html%>".
 % } else {
@@ -16,7 +16,7 @@
 	<param name="windowHeight" value="500" />
 	<param name="windowWidth" value="750" />
 	<param name="showFullId" value="false" />
-	<param name="defaultColour" value="Clustal" />
+	<param name="defaultColour" value="<% $proj->type =~ /mtdna/i ? "% Identity" : "Clustal" %>" />
 %#	<param name="linkLabel_1" value="Details" />
 %#	<param name="linkUrl_1" value="<% $pcf->{PROJECT_HOME} %>/project/target/details?hn=$SEQUENCE_ID$" />
 	<param name="showbutton" value="false" />
