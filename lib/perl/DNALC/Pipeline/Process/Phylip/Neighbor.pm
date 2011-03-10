@@ -42,6 +42,11 @@ use strict;
 
 		# set params
 		my $instring = $self->{conf}->{menu_options};
+		if ($params{bootstrap}) {
+			my $phy_cfg = DNALC::Pipeline::Config->new->cf('PHYLOGENETICS');
+			my $bootstrap_num = $phy_cfg->{BOOTSTRAPS} || 100;
+			$instring = sprintf($self->{conf}->{menu_options_wb}, $bootstrap_num);
+		}
 		print STDERR "About to send parameters:\n", $instring if $debug;
 
 		my ($stdout_file, $stderr_file);

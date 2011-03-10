@@ -1,9 +1,8 @@
-package DNALC::Pipeline::Process::Phylip::DNADist;
+package DNALC::Pipeline::Process::Phylip::Consense;
 
 use base 'DNALC::Pipeline::Process';
 use File::chdir;
 use File::Copy;
-#use Capture::Tiny qw/capture tee/;
 use Time::HiRes qw/gettimeofday tv_interval/;
 
 use strict;
@@ -12,7 +11,7 @@ use strict;
 	sub new {
 		my ($class, $project_dir) = @_;
 
-		my $self = __PACKAGE__->SUPER::new('PHY_DNADIST', $project_dir);
+		my $self = __PACKAGE__->SUPER::new('PHY_CONSENSE', $project_dir);
 
 		return $self;
 	}
@@ -42,11 +41,6 @@ use strict;
 
 		# set params
 		my $instring = $self->{conf}->{menu_options};
-		if ($params{bootstrap}) {
-			my $phy_cfg = DNALC::Pipeline::Config->new->cf('PHYLOGENETICS');
-			my $bootstrap_num = $phy_cfg->{BOOTSTRAPS} || 100;
-			$instring = sprintf($self->{conf}->{menu_options_wb}, $bootstrap_num);
-		}
 		print STDERR "About to send parameters:\n", $instring if $debug;
 
 		my ($stdout_file, $stderr_file);
@@ -63,47 +57,33 @@ use strict;
 		open STDERR, '>', $stderr_file 
 					or die "Can't dup STDERR to $stderr_file: $!";
 
-		#my ($stdout, $stderr) = capture {
-			open(PROGRAM,"|" . $self->{conf}->{program});
-			print PROGRAM $instring;
-			close PROGRAM;
-		#};
+		open(PROGRAM,"|" . $self->{conf}->{program});
+		print PROGRAM $instring;
+		close PROGRAM;
+
 		close STDOUT;
 		close STDERR;
 		open STDOUT, '>&', \*OLDOUT;
 		open STDERR, '>&', \*OLDERR;
 
-		$self->{elapsed} = tv_interval($t0, [gettimeofday]);
-
-		my $outfile = File::Spec->catfile($self->{work_dir}, $self->{conf}->{output_file});
-		if (-f $outfile) {
+		my $outfile = File::Spec->catfile($self->{work_dir}, $self->{conf}->{output_tree});
+		if (-e $outfile) {
+			$self->{elapsed} = tv_interval($t0, [gettimeofday]);
 			$self->{exit_status} = 0;
-			print STDERR  "Dist file: ", $outfile, $/ if $debug;
+			print STDERR  "Outfile: ", $outfile, $/ if $debug;
 		}
 		else {
 			$self->{exit_status} = 1;
 		}
-		#my $stdout_file = 'stdout.txt';
-		#my $stderr_file = 'stderr.txt';
-	
-		#my $fh = IO::File->new;
-		#if ($stdout && $fh->open($stdout_file, 'w')) {
-		#	print $fh $stdout;
-		#	$fh->close;
-		#}
-		#if ($stderr && $fh->open($stderr_file, 'w')) {
-		#	print $fh $stderr;
-		#	$fh->close;
-		#}
 
 		return 0;
 	}
 
-	sub get_output {
+	sub get_tree {
 		my ($self) = @_;
 		if ($self->{exit_status} == 0) {
-			my $f = File::Spec->catfile($self->{work_dir}, $self->{conf}->{output_file});
-			return $f if -e $f;
+			my $file = File::Spec->catfile($self->{work_dir}, $self->{conf}->{output_tree});
+			return $file if -e $file;
 		}
 		return;
 	}

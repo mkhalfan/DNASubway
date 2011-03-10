@@ -2,6 +2,7 @@
 	program => '/usr/local/bin/dnadist',
 	menu => {},
 	menu_options => "L\n2\nY\n",
+	menu_options_wb => "L\n2\nM\nD\n%d\nY\n", # %d will be replaced by sprintf
 
 	input_file => 'infile',
 	output_file => 'outfile',
