@@ -8,9 +8,55 @@ use Gearman::Worker ();
 use Storable qw(nfreeze thaw);
 
 use DNALC::Pipeline::App::Phylogenetics::ProjectManager ();
+use DNALC::Pipeline::Process::Phylip::SeqBoot ();
+use DNALC::Pipeline::Process::Phylip::DNADist ();
+use DNALC::Pipeline::Process::Phylip::Neighbor ();
+use DNALC::Pipeline::Process::Phylip::Consense ();
 use DNALC::Pipeline::Config();
 use File::Basename;
 
+sub run_build_tree {
+	my $gearman = shift;
+	my $args = thaw( $gearman->arg );
+
+	my ($status, $msg) = ('error', '');
+
+	my $pm = DNALC::Pipeline::App::Phylogenetics::ProjectManager->new($args->{pid});
+	my $proj = $pm->project;
+	unless ($proj) {
+		$msg = "Project not found!";
+		print STDERR  "Project not found!", $/;
+	}
+	else {
+		my $pwd = $pm->work_dir;
+		my $input = $pm->get_alignment('phyi');
+		print STDERR "Alignment file to use: $input\n";
+
+		if (-f $input) {
+			my $s = DNALC::Pipeline::Process::Phylip::SeqBoot->new($pwd);
+			$s->run(input => $input);
+			$input = $s->get_output;
+
+			my $d = DNALC::Pipeline::Process::Phylip::DNADist->new($pwd);
+			$d->run(input => $input, debug => 0, bootstrap => 1);
+			$input = $d->get_output;
+
+			my $n = DNALC::Pipeline::Process::Phylip::Neighbor->new($pwd);
+			$n->run(input => $input, debug => 0, bootstrap => 1);
+			$input = $n->get_tree;
+
+			my $c = DNALC::Pipeline::Process::Phylip::Consense->new($pwd);
+			$c->run(input => $input, debug => 0);
+			my $stree = $pm->_store_tree($c->get_tree);
+
+			print STDERR  "Tree = ", $stree->{tree}, "\t", $stree->{tree_file}, $/;
+			$pm->set_task_status("phy_tree", "done");
+			$status = "success";
+		}
+	}
+
+   return nfreeze({status => $status, msg => $msg});
+}
 sub run_phylip {
 	my $gearman = shift;
 	my $args = thaw( $gearman->arg );
@@ -122,7 +168,8 @@ my $pcf = DNALC::Pipeline::Config->new->cf('PIPELINE');
 my $worker = Gearman::Worker->new;
 $worker->job_servers(@{$pcf->{GEARMAN_SERVERS}});
 $worker->register_function("phy_alignment", \&run_muscle);
-$worker->register_function("phy_tree", \&run_phylip);
+#$worker->register_function("phy_tree", \&run_phylip);
+$worker->register_function("phy_tree", \&run_build_tree);
 $worker->register_function("phy_consensus", \&run_merger);
 $worker->register_function("${script_name}_exit" => sub { 
 	$work_exit = 1; 

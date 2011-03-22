@@ -1,4 +1,4 @@
-naaa<div id="conbodyx">
+<div id="conbodyx">
 % unless ($proj) {
 	Error: can't open project "<% $pid|html%>".
 % } else {
