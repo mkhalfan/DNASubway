@@ -156,13 +156,13 @@
 				url: uri, 
 				close : function() {
 					if (what && windows[what]) {
-						if ($(windows[what].content.down().contentWindow.document).getElementById('selection_changed').value != "") {
+						/*if ($(windows[what].content.down().contentWindow.document).getElementById('selection_changed').value != "") {
 							if (!confirm("You haven't saved your selection.\nDo you really want to close this window?")) {
 								return false;
 							}
-						}
+						}*/
 						windows[what].destroy(); 
-						return true;
+						return true;  
 					}
 				}
 			};
@@ -694,6 +694,7 @@
 			sequence = phy.rev_com(sequence).join('');
 			
 			// Reverse the quality scores and trace values
+			// The are stored as array lists, so we can use reverse()
 			qualityScores = qualityScores.reverse();
 			a_trace_values = a_trace_values.reverse();
 			t_trace_values = t_trace_values.reverse();
@@ -706,16 +707,36 @@
 			var c_color = 'black';
 			var g_color = 'blue';
 		}
-	
+		
+		var offset = 0;
+		// 'offset' only exists for the consensus sequence. If represents how many
+		// bases the consensus trace should be offset by, in the event that there are
+		// less than 3 nucleotides in the sequence preceeding the base in question. 
+		// The purpose of this is to put the base in question in the middle of the mini
+		// consensus trace canvas (in between the 2 vertical lines) for a consistent look. 
+		//
+		// This function offsets the base locations, q scores, and sequence by the
+		// required offset (1 - 3). The trace itself is offset in the drawTrace fxn.
+		if (data['offset'] != 0){
+			offset = data['offset'];
+			var startingPoint = baseLocations[0];
+			for (var i = 1; i <= offset; i++){
+				baseLocations.splice(i - 1, 0, startingPoint - ((offset-i+1)*15));
+				qualityScores.splice(0, 0, 0);
+				sequence = " " + sequence;
+			}
+		}
+		
 		// Normalize the base locations to baseLocationsPositions
 		for (var b = 0; b < baseLocations.length; b++){
 			baseLocationsPositions[b] = baseLocations[b] - baseLocations[0];
 		}
+		
 		var lastBase = Math.max.apply(Math, baseLocationsPositions);
 		
 		// Calculate the width of the canvas.
 		// If it's the consensus editor, make it the width of the Display ID (unless the trace
-		// runs longer than than the title, then set it to the width of the trace).
+		// runs longer than than the Display ID, then set it to the width of the trace).
 		// If it's the View Sequences (entire sequence), make it the width of the entire sequence.
 		// ('seq_id' is only passed from the consensus editor - that's how we check)
 		if (data['seq_id']){
@@ -733,7 +754,7 @@
 		function drawTrace(n, color){
 			ctx.strokeStyle = color;
 			ctx.beginPath();		
-			ctx.moveTo(padding, height - padding);
+			ctx.moveTo(padding + (offset * 15), height - padding);
 			n.each(function(x, i) {
 				var y = height - padding - x * yZoom;
 				
@@ -741,7 +762,7 @@
 					y = yLimit;
 				}
 				
-				ctx.lineTo(padding + i * xZoom, y);
+				ctx.lineTo(padding + (i * xZoom) + (offset * 15), y);
 			});
 			ctx.stroke();
 			ctx.closePath();

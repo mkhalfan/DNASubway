@@ -29,9 +29,9 @@
 	my $dash_count;
 	my $reversed_seq;
 	my $temp;
-	my $trimmed_f = 0;
-	my $trimmed_r = 0;
+	my $trimmed = 0;
 	my $reverse_flag = 0;
+	my $offset = 0;
 	
 	
 	# ------------------------------
@@ -61,15 +61,17 @@
 		# Calculate Position In Original Sequence
 		# ---------------------------
 		if ($pseq[$_]->seq->display_id eq trim($display_name_1)){
+		$offset = 0;
 			if ($pseq[$_]->strand eq "F"){
 				$seq_substring = substr $seq1, 0, $pos;
 				$dash_count = ($seq_substring =~ s/-//g);
 				
 				if ($temp = DNALC::Pipeline::Phylogenetics::DataSequenceTrim->retrieve($pseq[$_]->seq->id)){
-				$trimmed_f = $temp->start_pos;
+				$trimmed = $temp->start_pos;
 				}
 				
-				$original_seq_pos = $pos- $dash_count + $trimmed_f;
+				$original_seq_pos = $pos- $dash_count + $trimmed;
+				$offset = 3 - ($original_seq_pos - $trimmed)  if $original_seq_pos - $trimmed < 3;
 			}
 			elsif ($pseq[$_]->strand eq "R"){
 				$reverse_flag = 1;
@@ -79,22 +81,24 @@
 				$dash_count = ($seq_substring =~ s/-//g);
 				
 				if ($temp = DNALC::Pipeline::Phylogenetics::DataSequenceTrim->retrieve($pseq[$_]->seq->id)){
-				$trimmed_r = length ($temp->left_trim);
+				$trimmed = length ($temp->left_trim);
 				}
 				
-				$original_seq_pos = length($seq1) - ($pos + $dash_count) - 1 + $trimmed_r;
+				$original_seq_pos = length($seq1) - ($pos + $dash_count) - 1 + $trimmed;
 			}
 		}
 		elsif ($pseq[$_]->seq->display_id eq trim($display_name_2)){
+		$offset = 0;
 			if ($pseq[$_]->strand eq "F"){
 				$seq_substring = substr $seq2, 0, $pos;
 				$dash_count = ($seq_substring =~ s/-//g);
 				
 				if ($temp = DNALC::Pipeline::Phylogenetics::DataSequenceTrim->retrieve($pseq[$_]->seq->id)){
-				$trimmed_f = $temp->start_pos;
+				$trimmed = $temp->start_pos;
 				}
 				
-				$original_seq_pos = $pos - $dash_count + $trimmed_f;
+				$original_seq_pos = $pos - $dash_count + $trimmed;
+				$offset = 3 - ($original_seq_pos - $trimmed)  if $original_seq_pos - $trimmed < 3;
 			}
 			elsif ($pseq[$_]->strand eq "R"){
 				$reverse_flag = 1;
@@ -104,23 +108,17 @@
 				$dash_count = ($seq_substring =~ s/-//g);
 
 				if ($temp = DNALC::Pipeline::Phylogenetics::DataSequenceTrim->retrieve($pseq[$_]->seq->id)){
-				$trimmed_r = length ($temp->left_trim);
+				$trimmed = length ($temp->left_trim);
 				}
 				
-				$original_seq_pos = length($seq2) - ($pos + $dash_count) - 1 + $trimmed_r;
+				$original_seq_pos = length($seq2) - ($pos + $dash_count) - 1 + $trimmed;
 			}
 		}
 		# ---------------------------
 
 		my ($low, $high) = ($original_seq_pos - 3, $original_seq_pos + 3);
-		$low = $trimmed_f if $low < $trimmed_f;
-		$high = ($#all_base_locations - $trimmed_r) if $high > ($#all_base_locations - $trimmed_r);
-		
-		#my $f_indicator_pos;
-		#if ($low < $trimmed_f){
-		#	$f_indicator_pos = $low + 3 - $trimmed_f;
-		#	$low = $trimmed_f;
-		#}
+		$low = $trimmed if $low < $trimmed;
+		$high = ($#all_base_locations - $trimmed) if $high > ($#all_base_locations - $trimmed);
 
 		my $qscores = [@all_qscores[$low .. $high]];
 		my $sequence = substr $entire_sequence, $low, $high - $low + 1;
@@ -142,6 +140,9 @@
 			base_locations => $base_locations,
 			position => $original_seq_pos,
 			reverse_flag => $reverse_flag,
+			offset => $offset,
+			high => $high,
+			low => $low,
 			#pos => { $pos => $all_base_locations[$pos], down => $five_bases_down_pos, up => $five_bases_up_pos},
 		};
 		

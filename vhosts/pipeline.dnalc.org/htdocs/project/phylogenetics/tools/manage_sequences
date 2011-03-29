@@ -1,9 +1,9 @@
 <div class="container_data3">
 <div id="container_data_line">&nbsp;</div>
 <form method="post">
-	<input type="hidden" id="selection_changed" value="" />
+%#	<input type="hidden" id="selection_changed" value="" />
 	<div class="con_BL_subTitle">
-		<input type="checkbox" id="" title="Select all" onchange="$('selection_changed').value='1'" \
+		<input type="checkbox" id="" title="Select all" onchange="$('selection_changed').show()" \
 		onclick="var chk=this.checked;$$('#seqs input[type=checkbox]').each(function(el) { el.checked = chk});"/> Select all
 	</div>
 	<div id="seqs" class="seqs">
@@ -12,25 +12,35 @@
 %	next unless($sequence_groups{$source});
 %	my $source_id = $source;
 %	$source_id =~ s/\W+/_/g;
-	<fieldset id="f<% $source_id %>">
+	<fieldset id="f<% $source_id %>" style="width:500px;float:left;">
 		<legend>
-			<input type="checkbox" id="s<%$source_id%>" onchange="var val=this.checked;$$('#f<% $source_id %> input').each(function(i){i.checked = val;});" />
+			<input type="checkbox" id="s<%$source_id%>" onchange="$('selection_changed').show()" \
+			onclick="var val=this.checked;$$('#f<% $source_id %> input').each(function(i){i.checked = val;});" />
 			<& _buildSourceName, $source &>
 		</legend>
 %	for (@{$sequence_groups{$source}}) {
 	<div style="padding-left: 20px;">
 		<input type="checkbox" name="seqids" value="<% $_->{id} %>" id="seq<% $_->{s} %>" \
-		<% $selected_sequences{$_->{id}} ? "checked=\"checked\"" : "" %> onchange="$('selection_changed').value='1';"/>
+		<% $selected_sequences{$_->{id}} ? "checked=\"checked\"" : "" %> onchange="$('selection_changed').show();"/>
 		<span id="seq<% $_->{id} |html %>"><% $_->{name} |html%></span>
 	</div>
 %	}
 		</fieldset>
 %	delete $sequence_groups{ $source } if $source eq "init";
 % }
+	<div id="selection_changed" style="display:none;width:200px;border:1px solid #C2DBF3;background: #F8FAFC;margin-left:550px;position:fixed;top:85px;">
+		<div style="background: #C2DBF3; margin:0; padding:2px 0 2px 5px;color: #333">
+			<img src="/images/info.png" style="vertical-align: middle;padding-right:7px;" /><strong>Save Your Changes</strong>
+		</div>
+		<div style="padding:5px;color:#333">
+			Once you have selected the data you wish to use, you must save your changes.<br />
+			<input type="submit" id="save_selection" value="Save" style="background:#C2DBF3;margin-top:15px"/>
+		</div>
+	</div>
 	</div>    
 	<div class="list_refdata">
-		<input type="submit" id="save_selection" value="Save selection" />
-		<input type="button" id="close" value="Close" onclick="top.phy.close_window('manage_sequences');"/>
+%#		<input type="submit" id="save_selection" value="Save selection" />
+%#		<input type="button" id="close" value="Close" onclick="top.phy.close_window('manage_sequences');"/>
 		<input type="hidden" id="pid" value="<% $proj->id %>" />
 	</div>
 </form>
