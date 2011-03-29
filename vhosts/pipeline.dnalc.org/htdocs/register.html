@@ -169,9 +169,6 @@ if ($r->method eq "POST") {
 	}
 	
 	unless (@err ) {
-		# create passwd
-		#my $pwd = random_string(4, 15);
-
 		# create account		
 		my $u = eval {
 				DNALC::Pipeline::User->create({
@@ -181,6 +178,7 @@ if ($r->method eq "POST") {
 					title => $s->{title},
 					name_first => $s->{name_first},
 					name_last => $s->{name_last},
+					login_count => 1,
 				});
 			};
 
@@ -215,10 +213,7 @@ if ($r->method eq "POST") {
 			my ($users_group) = DNALC::Pipeline::Group->search(group_name => "user");
 			$u->add_to_group($users_group) if $users_group;
 
-			my $code = $u->create_reset_pwd_code;
-			$u->set_reset_pwd_code($code);
-
-			if ($code) {
+			if (1) {
 				my $text = "Welcome to DNA Subway, Fast Track to Gene Annotation and Genome Analysis.\n
 Your username is: \"$s->{username}\" (without the quotes).\n
 For information on using the site, take advantage of the DNA Subway Tour
