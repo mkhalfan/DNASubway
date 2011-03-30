@@ -33,7 +33,7 @@ use Data::Dumper;
 
 		my $out = IO::File->new("> $gff_file") 
 			or die "Can't write to gff file [$gff_file]: $!\n";
-		if (-z $file_to_parse) {
+		unless (-z $file_to_parse) {
 			my $in  = IO::File->new($file_to_parse) or die "Can't open tRNA_SCAN file: $!\n";
 			print $out "##gff-version 3\n";
 			while (my $line = <$in>) {
