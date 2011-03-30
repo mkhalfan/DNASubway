@@ -1271,3 +1271,109 @@ float: left;
 	background: url("/images/v2/bt_poster2.png") right no-repeat;
 	
 }
+
+/*//---------Training Workshop---------------*/
+#bt-workshopOpen {
+	width: 950px;
+	height: 18px;
+	margin-top: 3px;
+	padding: 6px 0px 0px 50px;
+	display: block;
+	float: left;
+	background: url("/images/v2/bt_workshop_dn.png") left no-repeat;
+	border-bottom: solid 4px #8c4a9d;
+	text-decoration: none;
+	color: #fff;
+	font-size: .85em;
+
+}
+
+#bt-workshopClose {
+	width: 936px;
+	height: 18px;
+	display: block;
+	margin-left: 20px;
+	padding: 6px 0px 0px 20px;
+	float: left;
+	border-bottom: solid 1px #8c4a9d;
+	text-decoration: none;
+	color: #000;
+	font-weight: bold;
+	font-size: .8em;
+
+}
+
+ul#workshop,ul#workshop ul {
+	margin: 0;
+	padding: 0px;
+	list-style: none;
+}
+ul#workshop {
+	width:1000px;
+	height:24px;
+
+}
+ul#workshop li {
+	position: relative;
+	float: left;
+	width:1000px;
+	height:24px;	
+}
+ul#workshop li a {
+	text-decoration: none;
+	
+}
+
+#workshop li ul {
+	position: absolute;
+	left: 0; 
+	top:-70px;
+	margin-left:-999em;
+	height:90px;
+	width:1000px;
+	background:#e9e9ea;
+	border-top:solid 4px #8c4a9d;
+	border-bottom:solid 4px #8c4a9d;
+	padding: 2px 0px 2px 0px;
+}
+
+ul#workshop li:hover ul, 
+ul#workshop li.over ul {
+	margin: 0px;
+	line-height: .75em;
+}
+
+
+table.workshop {
+	border:none;
+	width: 960px;
+	margin-left: 30px;
+	padding-top: 8px;
+
+}
+
+td.dot {
+	color:#000;
+	width: 6px;
+	vertical-align: top;
+	padding-left:10px;
+
+}
+
+td.workshop {
+	color:#000;
+	width: 434px;
+	vertical-align: top;
+
+}
+
+td.workshop a{
+	color:#000;
+	width: 434px;
+	font-size: .75em;
+
+}
+
+td.workshop a:hover {
+	color:#8c4a9d;
+}
