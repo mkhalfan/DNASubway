@@ -46,8 +46,9 @@ color: #000;
 	</div>
 	
 	<div id="seqs" class="seqs">
-	<input type="hidden" id="step" value="2" />
+	
 % if ($file) {
+    <input type="hidden" id="step" value="2" />
 	<input type="hidden" id="seq_data" value="<% $file->seq |html%>" />
 	<input type="hidden" id="seq_A" value="<% join ",", @{$traces->{A}} %>" />
 	<input type="hidden" id="seq_T" value="<% join ",", @{$traces->{T}} %>" />
@@ -76,6 +77,7 @@ color: #000;
 	</div>
 %#	<pre><% Dumper($file)%></pre>
 % } else {
+<input type="hidden" id="step" value="22" />
 		<pre>
 % if (!$show_trimmed) {
 % 	for (@files) {

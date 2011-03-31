@@ -1586,8 +1586,22 @@ Event.observe(window, Prototype.Browser.IE ? 'load' : 'dom:loaded', function() {
 		if ($('do_pair') != null)
 			$('do_pair').disabled = true;
 	}
+	
+	else if (step == 22) {
+		// attach tool tip for low quality score alerts
+		$$('#mini-trace-icons span[id^=low]').each(function(el) {
+			var span_id = el.getAttribute('id');
+			debug("tip " + span_id);
+			new Tip(span_id, "This trace suffers from overall poor quality scores. Be advised this may affect downstream analysis of this sequence.", {
+				title: "Low Quality Score Alert",
+				style: 'yellow',
+				showOn: 'mouseover',
+				hideOthers: true
+			});
+		});	
+	}
+	
 	else if (step == 2) {
-
 		// attach tool tip for low quality score alerts
 		$$('#mini-trace-icons span[id^=low]').each(function(el) {
 			var span_id = el.getAttribute('id');
