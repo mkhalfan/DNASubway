@@ -717,7 +717,7 @@
 		//
 		// This function offsets the base locations, q scores, and sequence by the
 		// required offset (1 - 3). The trace itself is offset in the drawTrace fxn.
-		if (data['offset'] != 0){
+		if (data['offset'] && data['offset'] != 0){
 			offset = data['offset'];
 			var startingPoint = baseLocations[0];
 			for (var i = 1; i <= offset; i++){
