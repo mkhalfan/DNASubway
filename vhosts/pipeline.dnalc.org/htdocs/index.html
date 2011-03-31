@@ -3,6 +3,12 @@
 			<span id="map_spacer">
 % if ($s->{logged_in} && $s->{new_user}) {
 			<div id="startHere"></div>
+<script type="text/javascript">
+	try {
+		if (pageTracker)
+			pageTracker._trackEvent("new_user", "registered");
+	} catch (e) {};
+</script>
 % }
 			</span>
      		<span class="bt_redStart_home" id="tt_red1"><a href="<% $s->{logged_in} ? "/project/create_project.html" : "#" %>"
@@ -277,9 +283,9 @@ if ($r->method eq "POST") {
 		$user->increment_login_count;
 		$dispatcher->info($user->username . " just logged in");
 
-		unless ($user->has_projects) {
-			$s->{new_user} = 1;
-		}
+		#unless ($user->has_projects) {
+		#	$s->{new_user} = 1;
+		#}
 	}
 	else {
 		if ($name =~ /^guest_/) {
