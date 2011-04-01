@@ -3,10 +3,9 @@ package DNALC::Pipeline::Process::Phylip::DNADist;
 use base 'DNALC::Pipeline::Process';
 use File::chdir;
 use File::Copy;
-#use Capture::Tiny qw/capture tee/;
 use Time::HiRes qw/gettimeofday tv_interval/;
 
-use strict;
+#use strict;
 
 {
 	sub new {
@@ -76,25 +75,20 @@ use strict;
 		$self->{elapsed} = tv_interval($t0, [gettimeofday]);
 
 		my $outfile = File::Spec->catfile($self->{work_dir}, $self->{conf}->{output_file});
+
+		my $msl_conf = DNALC::Pipeline::Config->new->cf('MUSCLE');
+		$self->fix_output($outfile, $msl_conf->{phylip_id_length});
+
 		if (-f $outfile) {
 			$self->{exit_status} = 0;
 			print STDERR  "Dist file: ", $outfile, $/ if $debug;
+
 		}
 		else {
 			$self->{exit_status} = 1;
 		}
-		#my $stdout_file = 'stdout.txt';
-		#my $stderr_file = 'stderr.txt';
-	
-		#my $fh = IO::File->new;
-		#if ($stdout && $fh->open($stdout_file, 'w')) {
-		#	print $fh $stdout;
-		#	$fh->close;
-		#}
-		#if ($stderr && $fh->open($stderr_file, 'w')) {
-		#	print $fh $stderr;
-		#	$fh->close;
-		#}
+		unlink $stderr_file if -z $stderr_file;
+		unlink $stdout_file if -z $stdout_file;
 
 		return 0;
 	}
@@ -107,6 +101,51 @@ use strict;
 		}
 		return;
 	}
+
+	sub fix_output {
+		my ($self, $in, $name_length) = @_;
+		return unless $in;
+
+		my $in_fixed = $in . "_fixed";
+
+		my $fhi = IO::File->new($in);
+		return unless $fhi;
+
+		# read 1st two lines from the file
+		my $l = <$fhi>;
+		$l = <$fhi>;
+		if ($l && $l =~ /^(\S.*\s*)$/) {
+			chomp $l;
+			if ($name_length == length $l) {
+				return;
+			}
+		}
+
+		$fhi->seek(0, 0);
+		my $fho = IO::File->new("> $in_fixed");
+		return unless $fho;
+
+		while (my $l = <$fhi>) {
+			chomp $l;
+			if ($l =~ /^(\S.*\s*)$/) {
+
+				my @x = split /\s+/, $l;
+				$x[0] = sprintf("%-${name_length}s", $x[0]);
+				print $fho "@x", "\n";
+			}
+			else {
+				print $fho $l, "\n";
+			}
+		}
+		$fhi->close;
+		$fho->close;
+
+		if (-s $in_fixed) {
+			move $in_fixed, $in;
+		}
+		print STDERR "fixed: ", $in, " ", -s $in, $/;
+	}
+
 }
 
 1;
