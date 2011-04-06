@@ -31,6 +31,11 @@ use strict;
 			return -1;
 		}
 
+		unless ($params{bootstraps}) {
+			print STDERR  "Bootstrap number is missing", $/;
+			return -1;
+		}
+
 		local $CWD = $self->{work_dir};
 
 		#set input
@@ -40,9 +45,7 @@ use strict;
 		}
 
 		# set params
-		my $phy_cfg = DNALC::Pipeline::Config->new->cf('PHYLOGENETICS');
-		my $bootstrap_num = $phy_cfg->{BOOTSTRAPS} || 100;
-		my $instring = sprintf($self->{conf}->{menu_options}, $bootstrap_num);
+		my $instring = sprintf($self->{conf}->{menu_options}, $params{bootstraps});
 		print STDERR "About to send parameters:\n", $instring if $debug;
 
 		my ($stdout_file, $stderr_file);

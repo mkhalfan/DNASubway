@@ -41,10 +41,8 @@ use Time::HiRes qw/gettimeofday tv_interval/;
 
 		# set params
 		my $instring = $self->{conf}->{menu_options};
-		if ($params{bootstrap}) {
-			my $phy_cfg = DNALC::Pipeline::Config->new->cf('PHYLOGENETICS');
-			my $bootstrap_num = $phy_cfg->{BOOTSTRAPS} || 100;
-			$instring = sprintf($self->{conf}->{menu_options_wb}, $bootstrap_num);
+		if ($params{bootstraps}) {
+			$instring = sprintf($self->{conf}->{menu_options_wb}, $params{bootstraps});
 		}
 		print STDERR "About to send parameters:\n", $instring if $debug;
 

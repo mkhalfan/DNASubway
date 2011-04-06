@@ -17,7 +17,7 @@ use Data::Dumper;
 
 #use DNALC::Pipeline::ProjectLogger ();
 use DNALC::Pipeline::Config ();
-use DNALC::Pipeline::Utils qw/lcs_name/;
+use DNALC::Pipeline::Utils qw/lcs_name isin/;
 use aliased 'DNALC::Pipeline::Phylogenetics::Project';
 use aliased 'DNALC::Pipeline::Phylogenetics::DataSource';
 use aliased 'DNALC::Pipeline::Phylogenetics::DataFile';
@@ -292,7 +292,7 @@ use Bio::Trace::ABIF ();
 	}
 	#-----------------------------------------------------------------------------
 	sub add_blast_data {
-		my ($self, $blast_id, $selected_results) = @_;
+		my ($self, $blast_id, $selected_sequences) = @_;
 
 		my @errors = ();
 		my $seq_count = 0;
@@ -334,9 +334,8 @@ use Bio::Trace::ABIF ();
 					my $name = $seq_obj->display_id;
 					$name =~ s/(\.1)?\|$//;
 				
-					# chack if $name is in the selected names
-					#
-					#
+					# check if $name is in the selected names
+					next if (@$selected_sequences && !isin($name, @$selected_sequences));
 
 					my @tmp = split /\s+/, $hit->description;
 					my $display_id = $name . '|' . join '_', map {lc $_} splice @tmp, 0, 2;
@@ -888,7 +887,7 @@ use Bio::Trace::ABIF ();
 			return $bail_out->("Blast: Missing or invalid type specified.");
 		}
 
-		if ($type eq 'sequence') {
+		if ($type =~ /^sequence/) {
 			unless ( ref ($seq) =~ /DataSequence/) {
 				($seq) = DataSequence->search(
 						project_id => $self->project->id,
@@ -939,7 +938,7 @@ use Bio::Trace::ABIF ();
 		}
 		
 		my @args = (
-				'-p', 'blastn',
+				'-p', $type =~ /protein/ ? 'blastp' : 'blastn',
 				'-d', 'nr',
 				'-i', $in_file,
 				'-o', $out_file,

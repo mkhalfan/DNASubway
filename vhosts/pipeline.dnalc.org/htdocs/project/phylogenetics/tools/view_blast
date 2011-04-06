@@ -29,7 +29,9 @@
 	<div class="trow">
 		<div class="tcell trownum"><% $num %>(<% $hit_num%>).<a name="<% $num %>"></a></div> 
 		<div class="tcell" id="tip_<% $num %>" desc="<% $hit->description |html %>">\
-%#			<input type="checkbox" name="selected_results" id="selected_results" value="<% $name |html%>" />
+%	unless ($dsource) {
+			<input type="checkbox" name="selected_results" value="<% $name |html%>" />
+% 	}
 			<% $name |html%>\
 		</div>
 		<div class="tcell"><a id="xtip_<% $num %>" href="#<% $num %>" onclick="phy.get_ggl_image(this);"><% $species |html%></a> - <% $desc |html%></div>
@@ -48,7 +50,7 @@
 %#	<div> &nbsp;&nbsp; <a href="javascript:void(0);" onclick="alert('will select all');">Select all</a></div>
 %	unless ($dsource) {
 <div style="text-align: center;margin: 20px">
-	<input type="button" onclick="javascript:phy.add_blast_data('<% $blast->id |html%>')" value="Add blast hits"/>
+	<input type="button" id="add_to_project_btn" onclick="javascript:phy.add_blast_data('<% $blast->id |html%>')" value="Add BLAST hits to project"/>
 </div>
 <div id="content"></div>
 <input type="hidden" id="pid" value="<% $pid |html %>" />

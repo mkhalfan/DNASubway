@@ -3,7 +3,7 @@
 <%args>
 	$pid => 0
 	$bid => 0
-	@selected_results => ()
+	$selected_results => []
 </%args>
 %#----------------------------------------------------------------------------
 <%once>
@@ -35,7 +35,7 @@
 						->search( project_id => $pid, name => "blast:$bid");
 		#print STDERR Dumper($dsource), $/;
 		unless ($dsource) {
-			my $st = $pm->add_blast_data($blast->id);
+			my $st = $pm->add_blast_data($blast->id, $selected_results);
 			#print STDERR "XXXXXXXXXXXXX\n", Dumper($st), $/;
 			if ($st->{seq_count} > 0) {
 				$status = 'success';

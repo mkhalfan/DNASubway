@@ -896,11 +896,15 @@
 	};
 	
 	phy.add_blast_data = function (bid) {
-		//top.phy.close_window('blast');
-		//return;
+		$('add_to_project_btn').disable();
+		var sel = [];
+		$$('div.tcell input[name=selected_results]').each(function(el) {
+			if (el.checked)
+				sel.push(el.value);
+		});
 		new Ajax.Request('/project/phylogenetics/tools/add_blast_data',{
 			method:'post',
-			parameters: { bid : bid, pid: $('pid').value},
+			parameters: { bid : bid, pid: $('pid').value, selected_results : sel},
 			onSuccess: function(transport){
 				var response = transport.responseText || "{'status':'error', 'message':'No response'}";
 				var r = response.evalJSON();
@@ -910,9 +914,11 @@
 				}
 				else {
 					alert("Error: " + r.message);
+					$('add_to_project_btn').enable();
 				}
 			},
 			onFailure: function(){
+				$('add_to_project_btn').enable();
 				alert('Something went wrong!\nAborting...');
 			}
 		});

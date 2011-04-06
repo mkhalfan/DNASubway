@@ -3,13 +3,13 @@
 use strict;
 use lib ("/var/www/lib/perl", "/home/gearman/dnasubway/lib/perl");
 
-use Data::Dumper;
 use Gearman::Worker ();
 use Storable qw(nfreeze thaw);
 
 use DNALC::Pipeline::App::Phylogenetics::ProjectManager ();
 use DNALC::Pipeline::Process::Phylip::SeqBoot ();
 use DNALC::Pipeline::Process::Phylip::DNADist ();
+use DNALC::Pipeline::Process::Phylip::ProtDist ();
 use DNALC::Pipeline::Process::Phylip::Neighbor ();
 use DNALC::Pipeline::Process::Phylip::Consense ();
 use DNALC::Pipeline::Config();
@@ -28,21 +28,34 @@ sub run_build_tree {
 		print STDERR  "Project not found!", $/;
 	}
 	else {
+
+		my $phy_cfg = DNALC::Pipeline::Config->new->cf('PHYLOGENETICS');
+		my $bootstrap_num = $phy_cfg->{BOOTSTRAPS} || 0;
+		$bootstrap_num = $bootstrap_num / 10 if ($bootstrap_num && $proj->type eq 'protein');
+
 		my $pwd = $pm->work_dir;
 		my $input = $pm->get_alignment('phyi');
 		print STDERR "Alignment file to use: $input\n";
 
 		if (-f $input) {
 			my $s = DNALC::Pipeline::Process::Phylip::SeqBoot->new($pwd);
-			$s->run(input => $input);
+			$s->run(input => $input, bootstraps => $bootstrap_num);
 			$input = $s->get_output;
 
-			my $d = DNALC::Pipeline::Process::Phylip::DNADist->new($pwd);
-			$d->run(input => $input, debug => 0, bootstrap => 1);
-			$input = $d->get_output;
+			if ($proj->type ne 'protein') {
+				my $d = DNALC::Pipeline::Process::Phylip::DNADist->new($pwd);
+				$d->run(input => $input, debug => 0, bootstraps => $bootstrap_num);
+				$input = $d->get_output;
+			}
+			else {
+				my $d = DNALC::Pipeline::Process::Phylip::ProtDist->new($pwd);
+				$d->run(input => $input, debug => 0, bootstraps => $bootstrap_num);
+				$input = $d->get_output;
+			}
 
 			my $n = DNALC::Pipeline::Process::Phylip::Neighbor->new($pwd);
-			$n->run(input => $input, debug => 0, bootstrap => 1);
+			$n->run(input => $input, debug => 0, bootstraps => $bootstrap_num, 
+					input_is_protein => $proj->type eq 'protein');
 			$input = $n->get_tree;
 
 			my $c = DNALC::Pipeline::Process::Phylip::Consense->new($pwd);

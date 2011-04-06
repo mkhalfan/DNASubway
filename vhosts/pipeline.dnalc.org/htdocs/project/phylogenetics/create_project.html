@@ -18,7 +18,7 @@
 			<div class="conNewPro_smallContainer_blue">
 				&nbsp;<input class="conRadiobox_align" type="radio" name="type" id="gd" value="DNA" <% $type eq "DNA" ? "checked=\"checked\"" : ""%>/>&nbsp; DNA</div>
 			<div class="conNewPro_smallContainer_blue">
-				&nbsp;<input class="conRadiobox_align" type="radio" name="type" id="gp" value="protein" <% $type eq "protein" ? "checked=\"checked\"" : ""%> disabled="disabled"/>&nbsp; Protein</div>
+				&nbsp;<input class="conRadiobox_align" type="radio" name="type" id="gp" value="protein" <% $type eq "protein" ? "checked=\"checked\"" : ""%> />&nbsp; Protein</div>
 			<div class="conNewPro_smallContainer_blue">
 				&nbsp;<input class="conRadiobox_align" type="radio" name="type" id="gm" value="mtDNA" <% $type eq "mtDNA" ? "checked=\"checked\"" : ""%>/>&nbsp; mtDNA</div>
 			</div>
@@ -203,7 +203,7 @@ if ($r->method eq "POST") {
 	}
 	
 	print STDERR "Errors: ", Dumper(\@err), $/ if @err;
-	#print STDERR "all files:", Dumper(\@files2process), $/;
+	print STDERR "all files:", Dumper(\@files2process), $/;
 
 	my $pm = DNALC::Pipeline::App::Phylogenetics::ProjectManager->new;
 	
@@ -222,7 +222,7 @@ if ($r->method eq "POST") {
 		my $st = $pm->create_project({
 					name => $name,
 					user_id => $s->{user_id},
-					has_tools => 1,
+					has_tools => $type ne "protein" ? 1 : 0,
 					type => $type,
 					description => $description,
 					sample => $sample ? $sample : 0,
