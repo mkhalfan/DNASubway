@@ -932,6 +932,28 @@
 	background: url("/images/v2/indicatorXb.png") bottom left no-repeat;
 }
 
+.conIndicatorBL_grey{
+	width: 18px;
+	height: 18px;
+	display: block;
+	position: relative;
+	background: url("/images/v2/indicatorBL_grey.png") bottom left no-repeat;
+}
+
+.bt_Runblueline_grey{
+	width: 122px;
+	height: 26px;
+	background: url("/images/v2/bt_blueRun_grey.png") top no-repeat;
+	display: block;
+	position: relative;
+	float:left;
+	padding-top: 6px;
+	color: #555;
+	font-size: 0.75em;
+	text-align: center;
+	text-decoration: none;
+}
+
 .bt_run {
 	width:100px;
 	height: 26px;
