@@ -67,6 +67,7 @@
 	use DNALC::Pipeline::User ();
 	use DNALC::Pipeline::Group ();
 	use DNALC::Pipeline::UserProfile ();
+	use DNALC::Pipeline::UserLDAP ();
 	use Email::Valid ();
 	use MIME::Lite ();
 	
@@ -136,7 +137,10 @@ if ($r->method eq "POST") {
 	if ($s->{username} && length($s->{username}) < 3) {
 		push @err, "Username is too short. Use at least 3 chars.";
 	}
-	
+	elsif ($s->{username} =~ /[A-Z]/) {
+		push @err, "Use lowecase letters for you username.";
+	}
+
 	if ($s->{pwd} && $s->{pwd} ne $s->{repwd}) {
 		push @err, "Passwords to not match.";
 	}
@@ -148,10 +152,11 @@ if ($r->method eq "POST") {
 		push @err, "Zip/Postal code is missing.";
 	}
 
+	unless (Email::Valid->address($s->{email})) {
+		push @err, "Email address is invalid!";
+	}
+
 	unless (@err) {
-		unless (Email::Valid->address($s->{email})) {
-			push @err, "Email address is invalid!";
-		}
 		my $user = DNALC::Pipeline::User->search( username => $s->{username});
 		if ($user || $s->{username} =~ /^(?:chado|guest|default|postgre|temp|mysql)/i || $s->{username} =~ /^de$/) {
 			push @err, "Username not available!";
@@ -165,6 +170,14 @@ if ($r->method eq "POST") {
 				push @err, "Username not available!";
 			}
 			$cutils->dbh->disconnect;
+		}
+
+		# check ldap 
+		if (!@err && $cf->{LDAP_ENABLED}) {
+			my $ldap_u = DNALC::Pipeline::UserLDAP->search($s->{username});
+			if ($ldap_u) {
+				push @err, "Username not available!";
+			}
 		}
 	}
 	
