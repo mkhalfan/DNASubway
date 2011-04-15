@@ -818,9 +818,9 @@
 			ctx.fillText(base, padding + bl * xZoom, baseCallYPos);
 
 			if (!data['seq_id']){
-				if (i%10 == 0){
+				if ((i + 1)%10 == 0){
 					ctx.fillStyle = "black";
-					ctx.fillText(i, padding + bl * xZoom - 3, baseLocationYPos);
+					ctx.fillText(i + 1, padding + bl * xZoom - 3, baseLocationYPos);
 				}
 			}
 		});
