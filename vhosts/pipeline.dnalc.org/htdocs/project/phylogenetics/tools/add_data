@@ -26,8 +26,7 @@
 	<div class="con_BL_menu_box"> 
 		<div class="con_BL_menu_box1">
 			<input class="conRadiobox_align" type="radio" name="seq_src" id="seq_src_upload" 
-				<% $seq_src eq "upload" ? "checked=\"checked\"" : ""%> value="upload" />
-%#				onclick="phy.select_source(this.value)"				
+				<% $seq_src eq "upload" ? "checked=\"checked\"" : ""%> value="upload" onchange="phy.select_source(this.value)" />
 			Upload <a href="#">AB1</a> or <a href="http://en.wikipedia.org/wiki/FASTA_format#Format">FASTA formated</a> files
 		</div>                     
 	</div>
@@ -43,7 +42,7 @@
 	<div class="con_BL_menu_box"> 
 		<div class="con_BL_menu_box1">
 			<input class="conRadiobox_align" type="radio" name="seq_src" id="seq_src_paste" 
-				value="paste" <% $seq_src eq "paste" ? "checked=\"checked\"" : ""%> />
+				value="paste" <% $seq_src eq "paste" ? "checked=\"checked\"" : ""%> onchange="phy.select_source(this.value)" />
 			&nbsp; Enter a new sequence in FASTA format
 		</div>                     
 	</div>
@@ -67,15 +66,16 @@
 				value="bold" onclick="phy.select_source('import')" /> &nbsp; Import sequence from BOLD
 		</div>
 		<div class="con_BL_menu_box1">
-			<input class="conRadiobox_align" type="radio" name="seq_src" id="seq_src_dnalc" disabled="disabled"
-				value="dnalc" onclick="phy.select_source('import')" /> &nbsp; Import sequence/trace from DNALC
+			<input class="conRadiobox_align" type="radio" name="seq_src" id="seq_src_dnalc"
+				value="dnalc" onclick="phy.select_source('importdnalc')" /> &nbsp; Import sequence/trace from DNALC
 		</div>                     
 	</div>
-	<div class="con_BL_menu_box" id="import_inputs">
+	<div class="con_BL_menu_box" id="import_inputs" style="">
 		<div class="con_BL_menu_box2">Please enter accession/sequence ID:</div>
 			<input class="conStylized_input3"  name="accession" id="accession" value="" disabled="disabled"/>
 		<div align="left"><input type="button" value="Import" disabled="disabled" /></div>
-	</div>		
+	</div>
+	<div id="dnalc_container" style="clear:both;"></div>
 	</form>
 </div>
 %#------------------------------------------------------------
@@ -112,6 +112,13 @@
 	unless ($proj || $s->{user_id} != $proj->user_id) {
 		push @err, "Project not found!";
 	}
+	
+	# genebank
+	# http://www.ncbi.nlm.nih.gov/books/NBK1058/#combining-utility-calls
+	# http://eutils.ncbi.nlm.nih.gov/
+	# http://eutils.ncbi.nlm.nih.gov/corehtml/query/static/esearch_help.html
+	# http://eutils.ncbi.nlm.nih.gov/corehtml/query/static/esummary_help.html
+	# http://eutils.ncbi.nlm.nih.gov/corehtml/query/static/efetchseq_help.html
 
 	if (!@err && $r->method eq "POST") {
 

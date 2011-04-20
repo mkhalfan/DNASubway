@@ -1,0 +1,36 @@
+{'oid':'<%$oid|html%>', 'h': '<% $h%>', 'd':'<% $dir %>'}
+<%args>
+	@ids => ()
+	$oid => 0
+</%args>
+<%once>
+	use DNALC::Pipeline::Config ();
+	use DNALC::Pipeline::Utils qw/random_string/;
+	use Gearman::Client ();
+	use Storable qw/nfreeze/;
+</%once>
+<%init>
+	$r->content_type("application/x-javascript; charset=utf-8");
+	my $bdir = "/tmp";
+	my $dir = random_string(4, 8);
+	my $path = $bdir . '/' . $dir;
+	if (mkdir $path) {
+		chmod 0777, $path;
+	}
+
+	my $arguments = nfreeze( {
+			o => $oid,
+			ids => [@ids],
+			dir => $dir,
+		});
+
+	my $client = Gearman::Client->new;
+	my $pcf = DNALC::Pipeline::Config->new->cf('PIPELINE');
+	my $sx = $client->job_servers(@{$pcf->{GEARMAN_SERVERS}});
+
+	my $h = $client->dispatch_background( dnalc_files => $arguments );
+
+</%init>
+<%flags>
+	inherit => undef
+</%flags>

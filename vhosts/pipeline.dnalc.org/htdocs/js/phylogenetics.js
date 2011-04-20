@@ -1,14 +1,14 @@
+	var _dbg;
+(function() {
+	// keeps open windows
+	var windows = {};
 	var pairs = [];
 	var current_pair = [];
 	var intervalID = {};
 	var xZoom = 1;
 	var yZoom = 1;
 	var yLimit = 80; // max y a trace can have, so the graph stays in the canvas
-	
-	var _dbg;
-(function() {
-	// keeps open windows
-	var windows = {};
+
 	
 	phy = function() {
 		this.task_states = {};
@@ -98,14 +98,15 @@
 	};
 	
 	phy.select_source = function (el) {
-		return;
-		if (el && (el == 'upload' || el == 'paste')) {
-			//$('specie').selectedIndex = -1;
+		if (!el)
+			return;
+
+		if (el == 'importdnalc') {
+			document.location.replace('./dnalc_data');
 		}
-		else if (el && el == 'sample') {
-			//$('organism_info').hide();
+		else {
+			$('dnalc_container').update();
 		}
-		//populate_fields(el.value);
 	};
 
 	phy.set_source = function(s) {
@@ -284,7 +285,7 @@
 		}
 	};
 	
-	phy.run = function(op, params) {
+	/*phy.run = function(op, params) {
 		var b = $(op + '_btn');
 		var p = $('pid').value;
 		var ind = $(op + '_st');
@@ -308,7 +309,7 @@
 					alert('Something went wrong!\nAborting...');
 				}
 		});
-	};
+	};*/
 	
 	phy.toggle_strand = function(el, norclbl) {
 		//debug(el);
@@ -474,7 +475,9 @@
 						phy.set_status("phy_tree", "not-processed");
 					}
 					else if (op == "phy_trim") {
-						phy.set_status("phy_consensus", "not-processed");
+						if (/done$/.test($('phy_pair_st').className)) {
+							phy.set_status("phy_consensus", "not-processed");
+						}
 					}
 				}
 				else  if (r.status == 'error') {
@@ -1534,6 +1537,223 @@
 		}
 		$('forma1').submit();
 	};
+	// -----------------------------------------------
+	// handlers for getting dnalc data
+	//
+	phy.get_dnalc_data = function (page, order_id) {
+
+		var apiUri = "http://dnalc02.cshl.edu/genewiz/json";
+		var uri = apiUri + "?p=" + (page ? page : 1);
+		//debug("order_id: " + order_id);
+		if (order_id && /^\d+$/.test(order_id)) {
+			uri += ";o=" + order_id;
+		}
+		
+		//$('dnalc_btn').disabled = true;
+		if ($('dnalc_btn'))
+			$('dnalc_btn').remove();
+
+		var elem = $('dnalc_provider');
+		if (elem)
+			elem.remove();
+		elem = new Element('script', {src: uri, title: 'text/javascript', id: 'dnalc_provider'});
+		$$('head').first().insert(elem);
+
+		$('progress_bar').hide();
+	};
+	
+	phy.parse_dnalc_data = function(meta, data) {
+		var page = meta.p;
+		//debug(meta);
+		if (meta.t == 'l') { // list
+			phy.display_dnalc_data(meta, data);
+		}
+		else if (meta.t == 'o') { // order details
+			phy.display_dnalc_files(meta, data);
+		}
+	};
+	
+	phy.display_dnalc_data = function(meta, data) {
+		var table = new Element('table');
+		var tr;
+		if (Object.isArray(data)) {
+			tr = phy.build_tr(["#", "Date", "Name", "Institution"], 'header');
+			table.insert(tr);
+			data.each(function(d) {
+				var lnk = new Element('a', {href: 'javascript:;'}).update(d.number);
+				Event.observe(lnk, 'click', function() {phy.get_dnalc_data(meta.p, d.id);});
+				//var col1 = new Element('div').update(lnk).insert(new Element('div').update(d.date));
+				tr = phy.build_tr([lnk, d.date, d.name, d.institution]);
+				table.insert(tr);
+			});
+		}
+		if (meta.pnum > 1) {
+			var nav = "";
+			if (meta.p > 1) {
+				nav += "<a href=\"javascript:phy.get_dnalc_data(" + (meta.p - 1) + ");\">«</a> ";
+			}
+			nav += "Page " + meta.p + " of " + meta.pnum;
+			if (meta.p < meta.pnum) {
+				nav += " <a href=\"javascript:phy.get_dnalc_data(" + (meta.p + 1) + ");\">»</a> ";
+			}
+			//tr = phy.build_tr([nav]);
+			//tr.cells[0].colspan = "3";
+			table.insert("<tr><td colspan=\"3\">" + nav + "</td></tr>");
+		}
+		$('dnalc_container').update(table);
+	};
+	phy.display_dnalc_files = function(meta, data) {
+		var table = new Element('table');
+		var a = new Element('a', {href:'javascript:;'}).update('« back');
+		a.observe('click', function(){ phy.get_dnalc_data(meta.p) });
+
+		var tr = phy.build_tr([a, '']);
+		table.insert(tr);
+		
+		['number', 'name', 'institution'].each(function(el) {
+			tr = phy.build_tr([el + ':', data[el]], 'ucfirst');
+			table.insert(tr);
+		});
+		if (data.files && data.files.length) {
+			var fall = new Element('input', {type: 'checkbox', id: 'files_all'});
+			a  = new Element('a', {href:'javascript:;', id: 's_alla', style: 'padding-left: 6px;'}).update('select all');
+			var f = new Element('div', {id: 'order_files'}).insert(new Element('div').insert(fall).insert(a));
+			var file_divs = [f];
+			if (data.files.length >=  16) {
+				var h1 = new Element('div', {'class': 'halfdiv'});
+				var h2 = new Element('div', {'class': 'halfdiv'});
+				f.insert(h1);
+				f.insert(h2);
+				file_divs = [h1, h2	];
+			}
+			debug(file_divs);
+			debug(file_divs.length);
+
+			fall.observe('click', function(){ phy.select_all_dnalc_files() });
+			a.observe('click', function(){ phy.select_all_dnalc_files(true) });
+			
+			data.files.each(function(el, i) {
+				var hdiv = file_divs.length == 2 && i >= data.files.length/2 ? 1 : 0;
+				var chk = new Element('input', {type: 'checkbox', value: el.id});
+				chk.observe('change', function(ev){ 
+								if (!ev.element.checked)
+									fall.checked = false;
+								phy.check_selection_dnalc_files();
+						});
+				file_divs[hdiv].insert(new Element('div')
+					.insert(chk )
+					.insert(new Element('span').update(' ' + el.file) )
+				);
+			});
+			tr = phy.build_tr(['Files:', f], 'vtop');
+			table.insert(tr);
+		}
+		$('dnalc_container').update(table);
+		$('dnalc_container').insert(new Element('input', {type: 'hidden', value: meta.o, id: 'oid'}));
+	};
+	phy.build_tr = function(data, _class) {
+		var tr = new Element('tr');
+		if (_class)
+			tr.addClassName(_class);
+		data.each(function(el, i) {
+			tr.insert(new Element('td').update(el));
+		});
+		return tr;
+	};
+	
+	phy.select_all_dnalc_files = function (from_a) {
+		var fall = $('files_all');
+		if (from_a) {
+			fall.checked = !fall.checked;
+		}
+		var all = fall.checked;
+		$$('div#order_files input[type=checkbox]').each(function(el) {
+			if (!/all/.test(el.id))
+				el.checked = all;
+		});
+		if (fall.checked) 
+			$('s_alla').update('unselect all');
+		else
+			$('s_alla').update('select all');
+		phy.check_selection_dnalc_files();
+	};
+	
+	phy.check_selection_dnalc_files = function () {
+		var ids = [];
+		$$('div#order_files input[type=checkbox]').each(function(el) {
+			if (el.checked && !el.id)
+				ids.push(el.value);
+		});
+		if (ids.length) {
+			$('add_btn').style.display = 'block';
+		}
+		else {
+			$('add_btn').style.display = 'none';
+		}
+		return ids;
+	};
+	
+	phy.get_dnalc_files = function () {
+		var oid = $('oid').value;
+		var ids = phy.check_selection_dnalc_files();
+		var data = {oid: oid, ids: ids};
+		debug(Object.toJSON(data));
+		new Ajax.Request('/project/phylogenetics/tools/dnalc_request_transfer', {
+				method:'get',	
+				parameters: data,
+				onSuccess: function(transport){
+					var response = transport.responseText || "{'status':'error', 'message':'No response'}";
+					debug(response);
+					var r = response.evalJSON();
+					if (r.h && r.d) {
+						phy.check_dnalc_transfer(r.h, r.d);
+						$('add_btn').hide();
+						$('progress_bar').style.display = 'block';
+					}
+					else {
+						alert('Error: ' + 'something went wrong.');
+					}
+				},
+				onFailure: function(){
+						alert('Something went wrong!\nAborting...');
+					}
+		});
+	};
+	phy.check_dnalc_transfer = function (h, d) {
+		var prev_p = 1;
+		new PeriodicalExecuter(function(pe) {
+			new Ajax.Request('/project/phylogenetics/tools/dnalc_check_transfer', {
+				method:'get',	
+				parameters: {h: h, d: d},
+				onSuccess: function(transport){
+					var response = transport.responseText || "{'status':'error', 'message':'No response'}";
+					var r = response.evalJSON();
+					//debug(r);
+					if (r.error || (r.known == 0 && r.running == 0 || r.percent == 100)) {
+						pe.stop();
+						if (prev_p > 1 || r.percent == 100) {
+							phy.update_progress_bar(100);
+						}
+					}
+					else {
+						phy.update_progress_bar(r.percent);
+						prev_p = r.percent;
+					}
+				},
+				onFailure: function(){
+						alert('Something went wrong!\nAborting...');
+					}
+			});
+		}, 3);
+	};
+	phy.update_progress_bar = function(p) {
+		if (p < 2)
+			p = 2;
+		$$('div.ui-progress')[0].style.width = p + '%';
+		$$('div.ui-progress span.ui-label')[0].show()
+		$$('div.ui-progress b.value')[0].update(p + '%');
+	};
+	//----------------------------------------------------
 	
 })();
 
@@ -1683,6 +1903,9 @@ pre.insert({top:spn});
 	 */
 	else if (step == 5) {
 		phy.show_mismatches();
+	}
+	else if (step == 7) {
+		phy.get_dnalc_data();
 	}
 	
 	

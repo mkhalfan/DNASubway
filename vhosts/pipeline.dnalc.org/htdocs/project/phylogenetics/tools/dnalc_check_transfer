@@ -1,0 +1,42 @@
+% if ($h && $st && $st->known) {
+{'known':<% $st->known %>, 'running':<% $st->running %>, 'percent':<% $percent %>}
+% } elsif ($percent) {
+{'known': 1, 'percent':<% $percent %>}
+% } else {
+{'error': 1}
+% }
+<%args>
+	$h => ''
+	$d => ''
+</%args>
+<%once>
+	use DNALC::Pipeline::Config ();
+	use DNALC::Pipeline::Utils qw/random_string/;
+	use Gearman::Client ();
+	use Storable qw/nfreeze/;
+</%once>
+<%init>
+	$r->content_type("application/x-javascript; charset=utf-8");
+	
+	my $client = Gearman::Client->new;
+	my $pcf = DNALC::Pipeline::Config->new->cf('PIPELINE');
+	my $sx = $client->job_servers(@{$pcf->{GEARMAN_SERVERS}});
+
+	my $percent = 0;
+	my $st = $client->get_status($h);
+	if ($st) {
+		if ($st->known || $st->running) {
+			$percent = sprintf("%.2f", ($st->percent || 0) * 100);
+		}
+	}
+	if ((!$st || $st->known == 0) && $d) {
+		my $dir = "/tmp/" . $d;
+		#print STDERR "checking: ", $dir, $/;
+		if (-d $dir && -f "$dir/.done") {
+			$percent = 100;
+		}
+	}
+</%init>
+<%flags>
+	inherit => undef
+</%flags>
