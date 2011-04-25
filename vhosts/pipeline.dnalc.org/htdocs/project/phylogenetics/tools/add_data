@@ -65,10 +65,12 @@
 			<input class="conRadiobox_align" type="radio" name="seq_src" id="seq_src_bold" disabled="disabled"
 				value="bold" onclick="phy.select_source('import')" /> &nbsp; Import sequence from BOLD
 		</div>
+% if ($proj->type ne "protein") {
 		<div class="con_BL_menu_box1">
 			<input class="conRadiobox_align" type="radio" name="seq_src" id="seq_src_dnalc"
 				value="dnalc" onclick="phy.select_source('importdnalc')" /> &nbsp; Import sequence/trace from DNALC
 		</div>                     
+% }
 	</div>
 	<div class="con_BL_menu_box" id="import_inputs" style="">
 		<div class="con_BL_menu_box2">Please enter accession/sequence ID:</div>
@@ -83,6 +85,7 @@
 	$pid => 0
 	$seq_src => ''
 	$sequence => ''
+	$d => ''
 </%args>
 %#------------------------------------------------------------
 <%once>
@@ -167,6 +170,20 @@
 					}
 				}
 			} # end if upload
+			elsif ($seq_src eq "dnalc" && $d ne "") {
+				my $cf = DNALC::Pipeline::Config->new->cf('PHYLOGENETICS');
+				my $base_dir = $cf->{DNALC_TRANSFER_DIR} || "/tmp";
+				my $temp_dir = $base_dir . '/' . $d;
+				print STDERR $temp_dir, $/;
+				if (-d $temp_dir) {
+					my @files = <$temp_dir/*>;
+					push @files2process, map {
+								{type => "trace", filename => basename($_), path => $_}
+							} @files;
+				}
+			}
+			#print STDERR "d = ", $d, $/;
+			#print STDERR "seq_src = ", $seq_src, $/;
 			#print STDERR "files = ", Dumper(\@files2process), $/;
 		}
 		

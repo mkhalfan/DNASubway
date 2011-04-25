@@ -19,8 +19,10 @@ sub get_dnalc_files {
    my $args = thaw ($gearman->arg);
 
    # args = {o => 24, ids => [523, 524, 525], dir => '/path/...'}
-   my $bdir = "/tmp";
-   my $dir = $bdir . '/' . $args->{dir};
+   my $cf = DNALC::Pipeline::Config->new->cf('PHYLOGENETICS');
+   my $base_dir = $cf->{DNALC_TRANSFER_DIR} || "/tmp";
+
+   my $dir = $base_dir . '/' . $args->{dir};
    my $o = $args->{o};
    return unless ($o && $o =~ /^\d+$/ && -d $dir);
 

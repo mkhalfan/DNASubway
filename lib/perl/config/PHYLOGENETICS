@@ -4,6 +4,9 @@
 	Q_THRESHOLD => 20,
 	BOOTSTRAPS => 100,
 	MAX_BLAST_RESULTS => 20,
+	DNALC_TRANSFER_DIR => '/var/tmp',
+
+	# not used yet
 	MAX_SEQ_NO => 100,
 	MAX_SEQ_LEN => 2000,
 }

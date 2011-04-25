@@ -102,7 +102,8 @@
 			return;
 
 		if (el == 'importdnalc') {
-			document.location.replace('./dnalc_data');
+			var pid = parent.document.getElementById('pid').value;
+			document.location.replace('./dnalc_data?pid=' + pid);
 		}
 		else {
 			$('dnalc_container').update();
@@ -1694,7 +1695,9 @@
 	};
 	
 	phy.get_dnalc_files = function () {
-		var oid = $('oid').value;
+		var oid = $('oid')? $('oid').value : null;
+		if (!oid)
+			return;
 		var ids = phy.check_selection_dnalc_files();
 		var data = {oid: oid, ids: ids};
 		debug(Object.toJSON(data));
@@ -1733,6 +1736,7 @@
 						pe.stop();
 						if (prev_p > 1 || r.percent == 100) {
 							phy.update_progress_bar(100);
+							phy.finish_dnalc_transfer(d, $('pid').value);
 						}
 					}
 					else {
@@ -1752,6 +1756,17 @@
 		$$('div.ui-progress')[0].style.width = p + '%';
 		$$('div.ui-progress span.ui-label')[0].show()
 		$$('div.ui-progress b.value')[0].update(p + '%');
+	};
+	phy.finish_dnalc_transfer = function(d, pid) {
+		var f = new Element('form');
+		f.action = "/project/phylogenetics/tools/add_data";
+		f.method = "post";
+		f.insert(new Element('input', {type: 'hidden', name: 'seq_src', value: 'dnalc'}));
+		f.insert(new Element('input', {type: 'hidden', name: 'd', value: d}));
+		f.insert(new Element('input', {type: 'hidden', name: 'pid', value: pid}));
+		
+		$('dnalc_container').insert(f);
+		f.submit();
 	};
 	//----------------------------------------------------
 	

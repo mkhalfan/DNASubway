@@ -7,9 +7,12 @@
 	  </div>
 	</div>
 </div>
-%#<input type="button" id="dnalc_btn" onclick="phy.get_dnalc_data();" value="Get DNALC Data" />
 <input type="button" id="add_btn" style="display:none;" onclick="phy.get_dnalc_files();" value="Add Selected Files" />
 <input type="hidden" value="7" id="step" />
+<input type="hidden" value="<% $pid |html%>" id="pid" />
+<%args>
+	$pid => 0
+</%args>
 <%init>
 	$r->content_type('text/html');
 </%init>
