@@ -17,6 +17,7 @@
 </%once>
 <%init>
 	$r->content_type("application/x-javascript; charset=utf-8");
+	$r->no_cache(1);
 	
 	my $client = Gearman::Client->new;
 	my $pcf = DNALC::Pipeline::Config->new->cf('PIPELINE');
