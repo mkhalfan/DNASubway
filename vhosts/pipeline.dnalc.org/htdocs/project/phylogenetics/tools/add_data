@@ -95,7 +95,7 @@
 	use DNALC::Pipeline::App::Phylogenetics::ProjectManager ();
 	use Carp;
 	use IO::File ();
-	use File::Basename qw(basename);
+	use File::Basename qw(basename dirname);
 	use Data::Dumper;
 </%once>
 %#------------------------------------------------------------
@@ -174,7 +174,6 @@
 				my $cf = DNALC::Pipeline::Config->new->cf('PHYLOGENETICS');
 				my $base_dir = $cf->{DNALC_TRANSFER_DIR} || "/tmp";
 				my $temp_dir = $base_dir . '/' . $d;
-				print STDERR $temp_dir, $/;
 				if (-d $temp_dir) {
 					my @files = <$temp_dir/*>;
 					push @files2process, map {
@@ -182,9 +181,6 @@
 							} @files;
 				}
 			}
-			#print STDERR "d = ", $d, $/;
-			#print STDERR "seq_src = ", $seq_src, $/;
-			#print STDERR "files = ", Dumper(\@files2process), $/;
 		}
 		
 		# add data
@@ -204,8 +200,27 @@
 					print STDERR Dumper($st), $/;
 				}
 			}
+
 			# do we have at least one sequence added?
-			unless ($added) {
+			if ($added) {
+				# we may very well remove all files, not matter what $seq_src is
+				#
+				if ($seq_src =~ /^(?:upload|dnalc|paste)$/) {
+					for (@files2process) {
+						my $rc = unlink $_->{path};
+						print STDERR "* can't rm: ", $_->{path}, $/ unless $rc;
+					}
+				}
+				if ($seq_src eq "dnalc") {
+					my $dir = dirname($files2process[0]->{path});
+					if (-d $dir) {
+						my $done = $dir . '/.done';
+						unlink $done if -f $done;
+						rmdir $dir;
+					}
+				}
+			}
+			else {
 				push @err, "Unable to add sequences!";
 			}
 		}
