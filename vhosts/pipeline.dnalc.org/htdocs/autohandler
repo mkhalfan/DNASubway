@@ -32,7 +32,7 @@
 	<div id="home_header_BG">
 	<div id="memberForm">
 
-		<form method="post" action="/" onsubmit="return do_login()">
+		<form method="post" action="<% $form_action %>" onsubmit="return do_login()">
  			<span class="memberRow1">
 				<label class="memberLabel" for="name">Username:</label> 
 				<input type="text" maxlength="20" id="name" name="name" class="memberInput" value="<% $s->{username} %>"/>
@@ -117,13 +117,6 @@ new Tip('tt_brick', "Bioinformatics analysis routines in  <i>DNA Subway</i>  wor
 
 </div><!--END of ID mainContainer-->
 % unless ($ENV{DEVEL_SERVER}) {
-<script type="text/javascript" src="http://include.reinvigorate.net/re_.js"></script>
-<script type="text/javascript">
-% if ($s->{username}) {
-var re_name_tag = "<% $s->{username} %>";
-% }
-try {reinvigorate.track("ktaz7-6gmi62748k");} catch(err) {}
-</script>
 <script type="text/javascript">
 var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
 document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
@@ -139,22 +132,24 @@ pageTracker._trackPageview();
 
 %#-------------------------------------------------------------------
 <%args>
-	$name => ''
-	$passw => ''
-	$guest => ''
-	$login => ''
 </%args>
 %#-------------------------------------------------------------------
 <%once>
 	use DNALC::Pipeline::Utils qw/random_string/;
 	use DNALC::Pipeline::User ();
+	use DNALC::Pipeline::Config ();
 </%once>
 %#-------------------------------------------------------------------
 <%init>
+my $pcf = DNALC::Pipeline::Config->new->cf("PIPELINE");
 $m->session->{pipeline} ||= { username => "", logged_in => 0};
 my $s = $m->session->{pipeline};
 
-#print STDERR "name = $name//sess =$s->{username} \n";
+my $form_action = '/';
+if ( exists $pcf->{SSL_LOGIN} && $pcf->{SSL_LOGIN}) {
+	$form_action = $pcf->{PROJECT_HOME} . '/index.html';
+	$form_action =~ s/^http:/https:/;
+}
 
 my @err = ();
 

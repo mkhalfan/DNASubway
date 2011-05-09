@@ -198,6 +198,7 @@ new Tip('tt_blue5', "Create phylogenetic trees using Phylip and determine sequen
 %#-------------------------------------------------------------------
 <%once>
 	use DNALC::Pipeline::Utils qw/random_string/;
+	use DNALC::Pipeline::UserLDAP ();
 	use DNALC::Pipeline::User ();
 	use DNALC::Pipeline::UserProfile ();
 	use DNALC::Pipeline::Config ();
@@ -210,6 +211,7 @@ $m->session->{pipeline} ||= { username => "", logged_in => 0};
 my $s = $m->session->{pipeline};
 
 #print STDERR "name = $name//sess =$s->{username} \n";
+my $pcf = DNALC::Pipeline::Config->new->cf("PIPELINE");
 
 my @err = ();
 
@@ -230,7 +232,6 @@ if ($r->method eq "POST") {
 
 			$name = "guest_$rand";
 			#my $chado_db = $name;
-			#my $pcf = DNALC::Pipeline::Config->new->cf("PIPELINE");
 			#my $guest_chado_instanced = $pcf->{CHADO_GUEST_INSTANCES};
 			#if ($guest_chado_instanced && $guest_chado_instanced =~ /^\d+$/) {
 			#	$chado_db = "guest_" . int(rand $guest_chado_instanced);
@@ -254,17 +255,50 @@ if ($r->method eq "POST") {
 		}
 	}
 	else {
+		my $ldap_u;
+		# check LDAP
+		if (DNALC::Pipeline::UserLDAP->auth( $name, $passw)) {
+			print STDERR "LDAP AUTH ok for $name", $/;
+			my $u = DNALC::Pipeline::UserLDAP->search($name);
+			if ($u) {
+				$ldap_u = $u;
+			}
+		}
+		else {
+			print STDERR "LDAP AUTH failed for $name", $/;
+		}
+
 		($user) = DNALC::Pipeline::User->search(username => $name);
 		$s->{username} = $name;
-		unless ($user && $user->password_valid($passw)) {
-			#$dispatcher->info("AUTH: Invalid pwd for user " . $name );
-			$dispatcher->emergency("AUTH: Invalid pwd for user " . $name );
-			$user = undef;
+		if ($ldap_u) { # we ldap auth was successful
+			unless ($user) { # unless the ldap user exist in out db, we have to create it
+				$dispatcher->info("AUTH: Adding new user from LDAP: ", $ldap_u->{username} );
+				$user = DNALC::Pipeline::User->create({
+						username => $ldap_u->{username},
+						name_first => $ldap_u->{name_first},
+						name_last => $ldap_u->{name_last},
+						email => $ldap_u->{email},
+						password => random_string(8,12),
+					});
+			}
+		}
+		else {
+			unless ($user && $user->password_valid($passw)) {
+				#$dispatcher->info("AUTH: Invalid pwd for user " . $name );
+				$dispatcher->emergency("AUTH: Invalid pwd for user " . $name );
+				$user = undef;
+			}
 		}
 		if ($user && !$user->active) {
 			$user = undef;
 			$m->comp("/_message_add", "Account is blocked. Contact the admin of the site for info.");
-			$m->redirect("/");
+
+			if ( exists $pcf->{SSL_LOGIN} && $pcf->{SSL_LOGIN}) {
+				$m->redirect($pcf->{PROJECT_HOME} . '/index2.html');
+			}
+			else {
+				$m->redirect('/index2.html');
+			}
 		}
 	}
 	if ($user) {
@@ -287,7 +321,12 @@ if ($r->method eq "POST") {
 		}
 		$m->comp("/_message_add", "Unable to log you in. Try again.");
 	}
-	$m->redirect("/project/browsemy");
+	if ( exists $pcf->{SSL_LOGIN} && $pcf->{SSL_LOGIN}) {
+		$m->redirect($pcf->{PROJECT_HOME} . "/project/browsemy");
+	}
+	else {
+		$m->redirect("/project/browsemy");
+	}
 }
 else {
 	#print STDERR "GET username = ", $s->{username}, $/;
