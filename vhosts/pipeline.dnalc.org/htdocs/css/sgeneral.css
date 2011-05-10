@@ -1011,39 +1011,41 @@ h5{
 	position: relative;
 	
 	}
+
 #footer_left {
-	width: 280px;
-	height: 26px;
-	padding-left: 30px;
-	position: relative;
-	float: left;
-	padding-top: 2px;
-	
-	}
+width: 290px;
+height: 26px;
+padding-left: 30px;
+position: relative;
+float: left;
+padding-top: 2px;
+}
 #footer_middle {
-	width: 280px;
-	height: 28px;
-	position: relative;
-	font-size: 0.65em;
-	font-family: helvetica, sans-serif;	
-	text-align: left;	
-	color: #000;
-	float: left;
-	position: relative;
-	padding:12px 0px 0px 40px;	
-	letter-spacing: 0.1em;
-	
-	}
-	
+width: 230px;
+height: 28px;
+position: relative;
+font-size: 0.65em;
+font-family: helvetica, sans-serif;
+ 
+text-align: left;
+ 
+color: #000;
+float: left;
+position: relative;
+padding:12px 0px 0px 70px;
+ 
+/*letter-spacing: 0.1em;*/
+}
 #footer_right {
-	width: 340px;
-	height: 28px;
-	float: right;
-	position: relative;
-	padding-right: 12px;
-	padding-top: 2px;
+width: 340px;
+height: 28px;
+float: right;
+position: relative;
+padding-right: 12px;
+padding-top: 2px;
+}
 	
-	}
+	
 	
 #footerCopy {
 	width:300px;

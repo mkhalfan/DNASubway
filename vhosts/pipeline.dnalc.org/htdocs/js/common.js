@@ -337,7 +337,31 @@ function launch_background() {
 		} catch (e) {};
 	}
 }
+function launch_help() {
+	var w = openWindow('/about/help.html',
+				'DNA Subway Help', {
+				width: 600, 
+				height: 400,
+				shadow: false,
+				draggable: false,
+				resizable: false,
+				url: '/about/help.html'
+			}
+		);
+	w.header.removeClassName('move_handle');
 
+	if (isMSIE) {
+		try {
+			var btns = w.buttons.childElements();
+			btns.each(function(btn){
+				if(btn.hasClassName('minimize') || btn.hasClassName('maximize') ) {
+					btn.remove();
+				}
+			});
+			w.setResizable(false);
+		} catch (e) {};
+	}
+}
 //------------------------
 function set_public(np) {
 	if ($('public_yes').disabled)
