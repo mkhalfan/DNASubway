@@ -259,4 +259,39 @@ sub get_user_institution {
 	$institution ||= '';
 }
 
+sub user_profile {
+	my ($class, $user_id) = @_;
+	my %profile = ();
+	return %profile unless $user_id;
+	my $sql = q{
+		SELECT q_parent_id, q_id, q_label AS question, a_value AS answer
+			FROM user_profile_answer
+			LEFT JOIN user_profile_question ON a_question_id = q_id
+			WHERE a_user_id = ?
+			AND a_question_id IN (
+			  SELECT q_id FROM user_profile_question
+			  WHERE q_type = 'q' AND q_parent_id in (1,2, 36, 48)
+			)
+		ORDER BY q_parent_id, q_order_num, a_answer_id
+		};
+	my $dbh = $class->getDBH;
+	my $sth = $dbh->prepare($sql) or do {
+					carp 'ERROR preparing query: ', $dbh->errstr;
+					return; };
+	$sth->execute($user_id) or do {
+                    carp 'ERROR executing query: ', $sth->errstr;
+                    return; };
+	while (my $answer = $sth->fetchrow_hashref) {
+		if (defined $profile{$answer->{question}}) {
+			$profile{$answer->{question}} .= ', ' . $answer->{answer};
+		}
+		else {
+			$profile{$answer->{question}} = $answer->{answer};
+		}
+	}
+	$sth->finish;
+	wantarray ? %profile : \%profile;
+
+}
+
 1;

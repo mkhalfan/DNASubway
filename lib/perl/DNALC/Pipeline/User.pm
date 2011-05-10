@@ -15,7 +15,7 @@ use DNALC::Pipeline::Utils qw(random_string);
 
 	__PACKAGE__->table('users');
 	__PACKAGE__->columns(Primary => 'user_id');
-	__PACKAGE__->columns(Essential => qw/username email password chado_db/);
+	__PACKAGE__->columns(Essential => qw/username email password/);
 	__PACKAGE__->columns(Others => qw/title name_first name_last login_count login_last active created /);
 	__PACKAGE__->sequence('users_user_id_seq');
 
@@ -153,6 +153,11 @@ use DNALC::Pipeline::Utils qw(random_string);
 		return DNALC::Pipeline::MasterProject->sql_count_per_user->select_val($self->id) > 0;
 	}
 	#--------------------------------------------------
+	sub profile {
+		my $self = shift;
+
+		return DNALC::Pipeline::UserProfile->user_profile($self->id);
+	}
 }
 
 1;

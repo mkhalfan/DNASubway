@@ -1,5 +1,4 @@
 package DNALC::Pipeline::UserLDAP;
-
 use Net::LDAP ();
 use Net::LDAP::Util qw(ldap_error_text);
 use DNALC::Pipeline::Config ();
@@ -21,7 +20,7 @@ use DNALC::Pipeline::Config ();
 		}
 
 
-		$cf ||= DNALC::Pipeline::Config->new->cf(LDAP);
+		$cf ||= DNALC::Pipeline::Config->new->cf('LDAP');
 		$msg = $ldap->search(
 				base   => $cf->{BASE},
 				filter => "(uid=$username)",
@@ -41,15 +40,34 @@ use DNALC::Pipeline::Config ();
 				email => $entry->get_value('mail'),
 			};
 		}
+		$ldap->unbind;
 
-		return $user;
+		$user;
+	}
+
+	sub auth {
+		my ($class, $username, $pass) = @_;
+		return unless $username;
+
+		my $ldap = $class->get_server;
+		return unless $ldap;
+
+		my $msg = $ldap->bind('uid='. $username. ',ou=People,dc=iplantcollaborative,dc=org', password => $pass);
+		if ($msg->code) {
+			print "Error binding: ", ldap_error_text($msg->code);
+			return;
+		}
+
+		$ldap->unbind;
+
+		return 1;
 	}
 
 	sub get_server {
-		$cf ||= DNALC::Pipeline::Config->new->cf(LDAP);
+		$cf ||= DNALC::Pipeline::Config->new->cf('LDAP');
+
 		my $ldap = Net::LDAP->new($cf->{SERVER}, version => 3)
 			or die "$@";
-		return $ldap;
 	}
 }
 
