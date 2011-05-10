@@ -338,14 +338,14 @@ function launch_background() {
 	}
 }
 function launch_help() {
-	var w = openWindow('/about/help.html',
+	var w = openWindow('/about/help',
 				'DNA Subway Help', {
 				width: 600, 
 				height: 400,
 				shadow: false,
 				draggable: false,
 				resizable: false,
-				url: '/about/help.html'
+				url: '/about/help'
 			}
 		);
 	w.header.removeClassName('move_handle');
