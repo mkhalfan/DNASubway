@@ -59,9 +59,10 @@
 % if ($seq_src eq "dnalc" && defined $d) {
 	<div id="transferred_files" style="font-size:smaller; padding-left: 40px;">
 	<input type="hidden" name="d" id="d" value="<% $d |html%>" />
-%	for (@transfered_files) {
-	<div><% $_->{name} |html%> </div>
-%	}
+	<span style="font-style:italic;">Successfully transfered <% scalar @transfered_files %> file(s).</span>
+%#	for (@transfered_files) {
+%#	<div><% $_->{name} |html%> </div>
+%#	}
 	</div>
 % }
 		</div>
