@@ -29,16 +29,17 @@
 			return;
 		}
 
-		if (! $('seq_src_upload').checked && !$('seq_src_paste').checked && !$('seq_src_sample').checked) {
+		if (! $('seq_src_upload').checked && !$('seq_src_paste').checked 
+				&& !$('seq_src_sample').checked && !$('seq_src_dnalc').checked) {
 			//alert("Source not selected!");
 			show_messages("Sequence source not selected!");
 			return;
 		}
 
 		var has_file = $('seq_src_upload').checked && ( $('seq_file').value != '' );
-		//var has_sample = $('seq_src_sample').checked && $('specie').selectedIndex != -1;
 		var has_actg = false;
 		var has_sample = $('seq_src_sample').checked && $('sample').selectedIndex >= 0;
+		var has_dnalc_file = $('seq_src_dnalc').checked && ( $('d').value != '' );
 
 		if ($('seq_src_paste').checked) {
 			var pasted_data_ok = function() {
@@ -59,7 +60,7 @@
 			}
 		}
 
-		if (!has_file && !has_actg && !has_sample) {
+		if (!has_file && !has_actg && !has_sample && !has_dnalc_file) {
 			show_messages("You must select a file to upload!");
 			return;
 		}
@@ -97,16 +98,24 @@
 		f.submit();
 	};
 	
-	phy.select_source = function (el) {
-		if (!el)
+	phy.select_source = function (src) {
+		if (!src)
 			return;
 
-		if (el == 'importdnalc') {
+		if (src == 'importdnalc') {
 			var pid = parent.document.getElementById('pid').value;
 			document.location.replace('./dnalc_data?pid=' + pid);
 		}
+		else if (src == 'newdnalc') {
+			if ($('transferred_files'))
+				$('transferred_files').show();
+			else
+				phy.launch(null, './tools/dnalc_data?pid=new', 'Import DNALC data');
+		}
 		else {
 			$('dnalc_container').update();
+			if ($('transferred_files'))
+				$('transferred_files').hide();
 		}
 	};
 
@@ -1162,7 +1171,22 @@
 	phy.show_tips = function () {
 		
 	};
-	
+
+	phy.type_chosen_handler = function(type) {
+		phy.get_samples(type);
+		$$('input[name=seq_src]').each(function(el) {
+			//debug(type + " " + el.id);
+			if (type == "protein" && el.id == "seq_src_dnalc") {
+				el.disabled = true;
+				el.checked = false;
+			}
+			else {
+				el.disabled = false;
+				if ($('transferred_files'))
+					$('transferred_files').hide();
+			}
+		});
+	};
 	phy.get_samples = function(type) {
 		// remove current samples
 		var ssamples = $('sample').options;
@@ -1758,14 +1782,21 @@
 		$$('div.ui-progress b.value')[0].update(p + '%');
 	};
 	phy.finish_dnalc_transfer = function(d, pid) {
-		var f = new Element('form');
-		f.action = "/project/phylogenetics/tools/add_data";
-		f.method = "post";
-		f.insert(new Element('input', {type: 'hidden', name: 'seq_src', value: 'dnalc'}));
+		var f;
+		if (pid == 'new') {
+			f = $(parent.document.getElementById('forma1'));
+			f.insert(new Element('input', {type: 'hidden', name: 'data_transfered', value: 'dnalc'}));
+		}
+		else {
+			f = new Element('form');
+			f.action = "/project/phylogenetics/tools/add_data";
+			f.method = "post";
+			f.insert(new Element('input', {type: 'hidden', name: 'pid', value: pid}));
+			f.insert(new Element('input', {type: 'hidden', name: 'seq_src', value: 'dnalc'}));
+			
+			$('dnalc_container').insert(f);
+		}
 		f.insert(new Element('input', {type: 'hidden', name: 'd', value: d}));
-		f.insert(new Element('input', {type: 'hidden', name: 'pid', value: pid}));
-		
-		$('dnalc_container').insert(f);
 		f.submit();
 	};
 	//----------------------------------------------------
@@ -1786,11 +1817,19 @@ Event.observe(window, Prototype.Browser.IE ? 'load' : 'dom:loaded', function() {
 	debug("step = " + step);
 
 	if (step == -1) {
+		var type_chosen = false;
 		$$('#project_types input[type=radio]').each(function(el) {
 			Event.observe(el, 'click', function(ev){
 				//debug('clicked ' + el.value);
-				phy.get_samples(el.value);
+				phy.type_chosen_handler(el.value);
 			});
+			if (!type_chosen && el.checked)
+				type_chosen = true;
+			
+			$$('input[name=seq_src]').each(function(el) {
+				el.disabled = !type_chosen;
+			});
+			//debug();
 		});
 	}
 	else if (step == 1) {
