@@ -1,6 +1,6 @@
 #!/usr/bin/perl 
 
-use strict;
+use common::sense;
 use lib ("/var/www/lib/perl", "/home/gearman/dnasubway/lib/perl");
 
 use DNALC::Pipeline::Process::Augustus ();
@@ -26,17 +26,6 @@ sub run_augustus {
 
    my $wfm = DNALC::Pipeline::App::WorkflowManager->new( $proj );
    my $st = $wfm->run_augustus;
-   return freeze $st;
-}
-
-sub run_repeatmasker {
-   my $gearman = shift;
-   my $pid = $gearman->arg;
-   my $proj = DNALC::Pipeline::Project->retrieve( $pid );
-   return unless $proj;
-
-   my $wfm = DNALC::Pipeline::App::WorkflowManager->new( $proj );
-   my $st = $wfm->run_repeat_masker;
    return freeze $st;
 }
 
@@ -82,7 +71,6 @@ my $worker = Gearman::Worker->new;
 $worker->job_servers(@{$pcf->{GEARMAN_SERVERS}});
 
 $worker->register_function("augustus", \&run_augustus);
-$worker->register_function("repeat_masker", \&run_repeatmasker);
 $worker->register_function("trna_scan", \&run_trnascan);
 $worker->register_function("snap", \&run_snap);
 $worker->register_function("fgenesh", \&run_fgenesh);
