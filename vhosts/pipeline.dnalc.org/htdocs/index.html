@@ -254,16 +254,18 @@ if ($r->method eq "POST") {
 	}
 	else {
 		my $ldap_u;
-		# check LDAP
-		if (DNALC::Pipeline::UserLDAP->auth( $name, $passw)) {
-			print STDERR "LDAP AUTH ok for $name", $/;
-			my $u = DNALC::Pipeline::UserLDAP->search($name);
-			if ($u) {
-				$ldap_u = $u;
+		if ($pcf->{LDAP_ENABLED}) {
+			# check LDAP
+			if (DNALC::Pipeline::UserLDAP->auth( $name, $passw)) {
+				print STDERR "LDAP AUTH ok for $name", $/;
+				my $u = DNALC::Pipeline::UserLDAP->search($name);
+				if ($u) {
+					$ldap_u = $u;
+				}
 			}
-		}
-		else {
-			print STDERR "LDAP AUTH failed for $name", $/;
+			else {
+				print STDERR "LDAP AUTH failed for $name", $/;
+			}
 		}
 
 		($user) = DNALC::Pipeline::User->search(username => $name);

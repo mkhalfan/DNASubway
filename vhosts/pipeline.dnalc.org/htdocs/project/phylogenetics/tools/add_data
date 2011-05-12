@@ -10,8 +10,6 @@
 
 % if ($added) {
 <script type="text/javascript">
-	//top.phy.set_status('phy_alignment', 'not-processed');
-	//alert("Data added");
 	top.phy.close_window('data');
 </script>
 % }
@@ -60,12 +58,12 @@
 			<input class="conRadiobox_align" type="radio" name="seq_src" id="seq_src_genbank" disabled="disabled"
 				<% $seq_src eq "genebank" ? "checked=\"checked\"" : ""%>
 				value="genbank" onclick="phy.select_source('import')" /> &nbsp; Import sequence from GenBank
-		</div>                     
+		</div>
+% if ($proj->type ne "protein") {
 		<div class="con_BL_menu_box1">
 			<input class="conRadiobox_align" type="radio" name="seq_src" id="seq_src_bold" disabled="disabled"
 				value="bold" onclick="phy.select_source('import')" /> &nbsp; Import sequence from BOLD
 		</div>
-% if ($proj->type ne "protein") {
 		<div class="con_BL_menu_box1">
 			<input class="conRadiobox_align" type="radio" name="seq_src" id="seq_src_dnalc"
 				value="dnalc" onclick="phy.select_source('importdnalc')" /> &nbsp; Import sequence/trace from DNALC
@@ -116,13 +114,6 @@
 		push @err, "Project not found!";
 	}
 	
-	# genebank
-	# http://www.ncbi.nlm.nih.gov/books/NBK1058/#combining-utility-calls
-	# http://eutils.ncbi.nlm.nih.gov/
-	# http://eutils.ncbi.nlm.nih.gov/corehtml/query/static/esearch_help.html
-	# http://eutils.ncbi.nlm.nih.gov/corehtml/query/static/esummary_help.html
-	# http://eutils.ncbi.nlm.nih.gov/corehtml/query/static/efetchseq_help.html
-
 	if (!@err && $r->method eq "POST") {
 
 		#print STDERR "seq_src = ", $seq_src, $/;

@@ -1,5 +1,5 @@
 <div id="container_rightContent">
-% if (@err) {
+% if (@err && !$data_transfered) {
 	<div style="display:none" id="error_list">
 %	foreach (@err) {
 		<div><% $_ %></div>\
@@ -47,7 +47,24 @@
 			<input class="conRadiobox_align" type="radio"/>&nbsp; Enter sequence tracking number:
 			<input class="conStylized_box7" type="text" />
 		</div>
+		<div class="conNewPro_label">
+			<input class="conRadiobox_align" type="radio" name="seq_src" id="seq_src_bold" disabled="disabled"
+				value="bold" onclick="phy.select_source('import')" /> &nbsp; Import sequence from BOLD
+		</div>
 % }
+		<div class="conNewPro_label">
+			<input class="conRadiobox_align" type="radio" name="seq_src" id="seq_src_dnalc"
+				<% $seq_src eq "dnalc" ? "checked=\"checked\"" : ""%>
+				value="dnalc" onclick="phy.select_source('newdnalc')" /> &nbsp; Import sequence/trace from DNALC
+% if ($seq_src eq "dnalc" && defined $d) {
+	<div id="transferred_files" style="font-size:smaller; padding-left: 40px;">
+	<input type="hidden" name="d" id="d" value="<% $d |html%>" />
+%	for (@transfered_files) {
+	<div><% $_->{name} |html%> </div>
+%	}
+	</div>
+% }
+		</div>
 		<div class="conNewPro_label">
 			<input class="conRadiobox_align" type="radio" name="seq_src" id="seq_src_sample" value="sample" <% $seq_src eq "sample" ? "checked=\"checked\"" : ""%>/>&nbsp; 
 		Select a sample sequence:  
@@ -101,6 +118,8 @@
 	$seq_paste => ''
 	$description => ''
 	$sample => ''
+	$d => undef
+	$data_transfered => undef
 </%args>
 <%once>
 	use DNALC::Pipeline::Utils qw/nicebasepairs random_string/;
@@ -120,6 +139,7 @@ my $s = $m->session->{pipeline};
 
 my $cf = DNALC::Pipeline::Config->new;
 my $pcf = $cf->cf('PIPELINE');
+my $ppcf = $cf->cf('PHYLOGENETICS');
 my $seq_max_len = int(($pcf->{sequence_length} || 50_000) / 1_000);
 
 my @samples = $type 
@@ -128,7 +148,8 @@ my @samples = $type
 
 my @err = ();
 my @messages = ();
-
+my @transfered_files = ();
+	
 if ($r->method eq "POST") {
 
 	my @files2process = ();
@@ -154,6 +175,30 @@ if ($r->method eq "POST") {
 	
 	if (length($description) > 140) {
 		push @err, "Description should be shorter or equal to 140 characters!";
+	}
+	
+	#print STDERR "data_transfered: ", $data_transfered, $/;
+	#print STDERR "d: ", $d, $/;
+	if ($data_transfered || $s->{data_transfered}) {
+		if (defined $d) {
+			my $base_dir = $ppcf->{DNALC_TRANSFER_DIR} || "/tmp";
+			#print STDERR "dir: ", $base_dir, $/;
+			my $dir = $base_dir . "/" . $d;
+			@transfered_files = map {
+					my $f = $_;
+					$f =~ s/^$dir\///;
+					$f =~ s/\.ab(?:1|i)$//;
+					{name => $f, file => $_}
+				} sort <$dir/*.ab1>;
+			
+			# make sure we give some feedback to user and show the transfered files
+			push @err, "" if $data_transfered;
+
+			$s->{data_transfered} = $data_transfered;
+		}
+		else {
+			$data_transfered = undef;
+		}
 	}
 
 	unless (@err) {
@@ -186,7 +231,7 @@ if ($r->method eq "POST") {
 						u => [$r->upload('seq_file')],
 					});
 
-			print STDERR Dumper($st), $/;
+			#print STDERR Dumper($st), $/;
 
 			if ($st->{status} eq "fail") {
 				push @err, "Unable to upload file: ". $st->{message};
@@ -200,10 +245,19 @@ if ($r->method eq "POST") {
 				}
 			}
 		} # end if upload
+		elsif ($seq_src eq "dnalc") {
+			if (@transfered_files) {
+				push @files2process, map {
+						{path => $_->{file}, type => -B $_->{file} ? "trace" : "fasta", 
+							filename => basename( $_->{file} ) }
+					} @transfered_files;
+			}
+		} # end if dnalc
 	}
-	
-	print STDERR "Errors: ", Dumper(\@err), $/ if @err;
-	print STDERR "all files:", Dumper(\@files2process), $/;
+
+
+	#print STDERR "Errors: ", Dumper(\@err), $/ if @err;
+	#print STDERR "all files:", Dumper(\@files2process), $/;
 
 	my $pm = DNALC::Pipeline::App::Phylogenetics::ProjectManager->new;
 	
@@ -260,7 +314,9 @@ if ($r->method eq "POST") {
 		#do some cleaning.. rm any temporary file.. uploaded/pasted..
 		if ($seq_src ne "sample") { 
 			# remove temporary file
-			#print STDERR  "Removing file: xxxx";#, $file2process, $/;
+			print STDERR  "Removing files ($seq_src):\n",
+				join "\n", map { "\t" . $_->{path} } @files2process;
+			print "\n";
 			#unlink $file2process;
 		}
 
@@ -275,7 +331,7 @@ if ($r->method eq "POST") {
 				$pm->log("RNA converted to DNA.");
 			}
 
-			# no longer a new user (it has projects now...)
+			# no longer a new user (he/she has project(s) now...)
 			delete $s->{new_user} if exists $s->{new_user};
 
 			for (@messages) {
