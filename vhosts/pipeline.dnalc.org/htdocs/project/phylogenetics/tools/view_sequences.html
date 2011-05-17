@@ -79,21 +79,17 @@ color: #000;
 % } else {
 <input type="hidden" id="step" value="22" />
 		<pre>
-% if (!$show_trimmed) {
+% unless ($show_trimmed) {
 % 	for (@files) {
 <span id="<%$_%>" ><% $_->seq|html %></span>
+% 	}
+% 	for (@sequences) {
+<span id="<%$_%>" ><% $_->left_trim|html %><% $_->seq|html %><% $_->right_trim|html %></span>
 % 	}
 % } else {
 % 	for (@files) {
 <span id="<%$_%>" ><% $_->seq_object->seq|html %></span>
 % 	}
-% }
-% if (!$show_trimmed) {
-% 	for (@sequences) {
-<span id="<%$_%>" ><% $_->left_trim|html %><% $_->seq|html %><% $_->right_trim|html %></span>
-% 	}
-% }
-% else {
 % 	for (@sequences) {
 <span id="<%$_%>" ><% $_->seq|html %></span>
 % 	}

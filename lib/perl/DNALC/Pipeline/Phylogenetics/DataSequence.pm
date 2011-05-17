@@ -110,5 +110,22 @@ __PACKAGE__->set_sql(initial_non_paired_sequences =>q {
 
 });
 
+sub undo_trimming {
+	my ($class, $pid) = @_;
+
+	# XXX FIXME
+	# there may be a problem with the fasta/text based sequences in that we can't really untrim them..
+
+	$class->db_Main->do(qq{
+		DELETE from phy_trim WHERE id IN 
+		(SELECT t.id
+			FROM phy_trim t
+			JOIN phy_data_sequence AS s ON t.id = s.id
+			JOIN phy_data_source ds ON s.source_id = ds.id
+			WHERE s.project_id = $pid
+			AND ds.name = 'init'
+		)
+	});
+}
 
 1;

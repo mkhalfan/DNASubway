@@ -158,7 +158,7 @@ use Bio::Trace::ABIF ();
 			# store files
 			# this will return the path of the stored file, if any
 			my $stored_file = $fhash->{path};
-			unless ($self->project->sample) {
+			unless ($self->project->sample && !$params->{existing_project}) {
 				$stored_file = $self->store_file( $fhash );
 			}
 			my $filename = $fhash->{filename};
@@ -248,6 +248,10 @@ use Bio::Trace::ABIF ();
 		}
 		$ab->close_abif if $ab && $ab->is_abif_open;
 		close $fasta_fh;
+
+		if ( $seq_count && $self->get_task_status('phy_trim')->name eq 'done') {
+			$self->undo_trimming;
+		}
 
 		return $bail_out->();
 	}
@@ -710,8 +714,6 @@ use Bio::Trace::ABIF ();
 
 		flock $afh, LOCK_UN;
 		$afh->close;
-		
-		print STDERR  "size 1: ", -s $alignment_file, $/;
 
 		# now write the trimmed alignment
 		$afh = IO::File->new;
@@ -726,6 +728,15 @@ use Bio::Trace::ABIF ();
 		}
 		print STDERR  "size 2: ", -s $alignment_file, $/;
 		return $trimmed_fasta;
+	}
+
+	#-----------------------------------------------------------------------------
+	#
+	sub undo_trimming {
+		my ($self) = @_;
+		my @seqs = $self->initial_sequences;
+		DataSequence->undo_trimming($self->project->id);
+		$self->set_task_status('phy_trim', 'not-processed');
 	}
 
 	#-----------------------------------------------------------------------------
@@ -865,6 +876,7 @@ use Bio::Trace::ABIF ();
 			return $target_file;
 		}
 		else {
+			#print STDERR  "-- not moved :", $source_file, $/;
 			return $source_file;
 		}
 	}

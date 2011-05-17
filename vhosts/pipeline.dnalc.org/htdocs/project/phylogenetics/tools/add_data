@@ -10,7 +10,8 @@
 
 % if ($added) {
 <script type="text/javascript">
-	top.phy.close_window('data');
+	//top.phy.close_window('data');
+	top.document.location.reload();
 </script>
 % }
 	<form id="forma1" method="POST" enctype="multipart/form-data">
@@ -178,12 +179,12 @@
 		unless (@err) {
 			for my $ftype (qw/fasta trace/) {
 				my @_files = grep {$_->{type} =~ /^$ftype$/i} @files2process;
-				#print STDERR "** $ftype files: ", Dumper(\@_files), $/;
 				next unless @_files;
 				my $st = $pm->add_data({
 						source => "init",
 						files => \@_files,
 						type => $ftype,
+						existing_project => 1, # must be set every time we add data to an existing project
 					});
 				$added += $st->{seq_count};
 				if (@{$st->{errors}}) {
@@ -193,15 +194,8 @@
 			}
 
 			# do we have at least one sequence added?
-			if ($added) {
-				# we may very well remove all files, not matter what $seq_src is
-				#
-				if ($seq_src =~ /^(?:upload|dnalc|paste)$/) {
-					for (@files2process) {
-						my $rc = unlink $_->{path};
-						print STDERR "* can't rm: ", $_->{path}, $/ unless $rc;
-					}
-				}
+			if ($added) {				
+				# we want to remove the temporary directory created for while transfering the data from dnalc
 				if ($seq_src eq "dnalc") {
 					my $dir = dirname($files2process[0]->{path});
 					if (-d $dir) {

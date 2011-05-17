@@ -9,7 +9,6 @@
 	var yZoom = 1;
 	var yLimit = 80; // max y a trace can have, so the graph stays in the canvas
 
-	
 	phy = function() {
 		this.task_states = {};
 		
@@ -181,7 +180,7 @@
 		
 		windows[what] = openWindow( uri, window_title, options);
 		
-		debug(what + ': ' + windows[what]);
+		//debug(what + ': ' + windows[what]);
 	};
 	
 	//---------------------------------------------------------------
@@ -206,12 +205,14 @@
 			var tipContent = new Element('div').update( "Would you like to pair these two sequences?");
 			tipContent.insert(			
 				new Element('div', {style: 'text-align: center;'})
-					.insert(new Element('input', {type: 'button', value: "Yes"})
-						.observe('click', function(ev){phy.add_pair(current_pair);remove_tip();}))
-					.insert(new Element('input', {type: 'button', value: "No"})
+					.insert(new Element('input', {type: 'button', value: "Yes", id: "pair_yes_btn"})
+						.observe('click', function(ev){phy.add_pair(current_pair);remove_tip();})
+						.observe('custom:focus', function(ev){ev.target.focus();ev.target.stopObserving('custom:focus');})
+						)
+					.insert(new Element('input', {type: 'button', value: "No", id: "pair_no_btn"})
 						.observe('click', function (ev){/*phy.pop_from_pair(id);*/remove_tip(true);}))
 			);
-			//var t1 = new Date();
+
 			var tip = new Tip('op' + id, tipContent, {
 				title: "Pair them?",
 				style: 'protogrey',
@@ -228,8 +229,9 @@
 			current_pair.each(function(iid) {
 					$('op' + iid).disable();
 				});
-			//phy.add_pair(current_pair);
-			//current_pair = [];
+
+			setTimeout("$('pair_yes_btn').fire('custom:focus')", 200);
+
 		}
 	};
 
@@ -294,35 +296,10 @@
 			$('do_pair').disabled = false;
 		}
 	};
-	
-	/*phy.run = function(op, params) {
-		var b = $(op + '_btn');
-		var p = $('pid').value;
-		var ind = $(op + '_st');
 
-		new Ajax.Request('/project/phylogenetics/launch_job',{
-			method:'get',
-			parameters: { 't' : op, pid : p, params: params}, 
-			onSuccess: function(transport){
-				var response = transport.responseText || "{'status':'error', 'message':'No response'}";
-				var r = response.evalJSON();
-				if (r.status == 'success') {
-				}
-				else  if (r.status == 'error') {
-					show_errors(r.message);
-				}
-				else {
-					alert('Unknown status!');
-				}
-			},
-			onFailure: function(){
-					alert('Something went wrong!\nAborting...');
-				}
-		});
-	};*/
-	
+	// visual representation of revers complementing a requence
+	//
 	phy.toggle_strand = function(el, norclbl) {
-		//debug(el);
 		var id = el.id.replace(/^rc/, '');
 		
 		if (norclbl == undefined) {
@@ -373,23 +350,7 @@
 	
 	phy.do_pair = function() {
 		var lpairs = [];
-		/*$('seqops').descendants().each(function(el){
-			if (el.nodeName == "A") {		
-				var id = el.id.replace(/^\D+/, '');
 
-				console.info(el.getAttribute("pair")
-					+ " " + $(id).id
-					+ " " + el.getAttribute("rc")
-				);
-
-				var pair = {'id' : id, 
-							'rc' : el.getAttribute("rc") == "1" ? 1 : 0,
-							'pair' : el.getAttribute("pair") ? el.getAttribute("pair") : 0
-						};
-				lpairs.push(pair);
-			}
-			//console.info(el);
-		});*/
 		pairs.each(function(p,index){
 			var lpair = [];
 			p = p.sort(function (a,b){ return a - b;});

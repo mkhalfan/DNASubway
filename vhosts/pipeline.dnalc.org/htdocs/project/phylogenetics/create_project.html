@@ -283,7 +283,7 @@ if ($r->method eq "POST") {
 					sample => $sample ? $sample : 0,
 				});
 		if ($st->{status} eq "success") {
-			print STDERR  "New PID = ", $pm->project, $/;
+			#print STDERR  "New PID = ", $pm->project, $/;
 			$proj = $pm->project;
 			my $added = 0;
 			#if (@files2process) 
@@ -301,7 +301,7 @@ if ($r->method eq "POST") {
 					push @err, @{$st->{errors}};
 				}
 			}
-			print STDERR  "Added seqs =  ", $added, $/;
+			#print STDERR  "Added seqs =  ", $added, $/;
 			# do we have at least one sequence added?
 			unless ($added) {
 				push @err, "Unable to add sequences!";
