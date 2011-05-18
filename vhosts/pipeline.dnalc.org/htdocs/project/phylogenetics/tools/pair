@@ -48,7 +48,7 @@ input[type="checkbox"] {
 %	my $is_pair = $_->{type} eq "p";
 %	my $class = $is_pair ? $pair_classes[$cnt++] : "";
 %	my $dir = $_->{type} eq "s" ? "F" : $_->{strand};
-<div class="<% $class %>"><a href="javascript:;" id="rc<% $_->{s}->id %>"\
+<div class="<% $class %>" id="opdiv_<% $_->{s}->id %>"><a href="javascript:;" id="rc<% $_->{s}->id %>"\
  onclick="phy.toggle_strand(this);"><% $dir %></a>\
  <input type="checkbox" id="op<% $_->{s} %>" <% $is_pair ? "checked=\"checked\"" : ""%>/>\
 </div>\

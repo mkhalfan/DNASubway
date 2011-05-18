@@ -10,8 +10,8 @@
 
 % if ($added) {
 <script type="text/javascript">
-	//top.phy.close_window('data');
-	top.document.location.reload();
+	top.phy.set_status("phy_trim", "not-processed");
+	top.phy.close_window('data');
 </script>
 % }
 	<form id="forma1" method="POST" enctype="multipart/form-data">

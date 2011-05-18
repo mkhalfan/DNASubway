@@ -1,9 +1,9 @@
 	var _dbg;
+	var pairs = [];
+	var current_pair = [];
 (function() {
 	// keeps open windows
 	var windows = {};
-	var pairs = [];
-	var current_pair = [];
 	var intervalID = {};
 	var xZoom = 1;
 	var yZoom = 1;
@@ -191,9 +191,9 @@
 			current_pair.push(id);
 		}
 		if (current_pair.length == 2) {
-
+			var opdiv = $('opdiv_' + id);
 			function remove_tip(clear_selection) {
-				$('op' + id).prototip.remove();
+				opdiv.prototip.remove();
 				if (clear_selection) {
 					current_pair.each(function(iid) {
 							$('op' + iid).checked = false;
@@ -213,24 +213,25 @@
 						.observe('click', function (ev){/*phy.pop_from_pair(id);*/remove_tip(true);}))
 			);
 
-			var tip = new Tip('op' + id, tipContent, {
+			//var tip = new Tip('op' + id, tipContent, {
+			var tip = new Tip('opdiv_' + id, tipContent, {
 				title: "Pair them?",
 				style: 'protogrey',
 				stem: 'rightMiddle',
-				//showOn: 'click',
-				//hideOn: 'click',
+				showOn: 'click',
+				hideOn: 'click',
 				//hideOn: { element: 'closeButton', event: 'click' },
 				hook: { mouse: false, tip: 'rightMiddle' },
-				offset: { x: 5, y: 10 },
+				offset: { x: 15, y: 10 },
 				width: 200
 			});
 
-			$('op' + id).prototip.show();
 			current_pair.each(function(iid) {
 					$('op' + iid).disable();
 				});
 
-			setTimeout("$('pair_yes_btn').fire('custom:focus')", 200);
+			opdiv.prototip.show();
+			setTimeout("$('pair_yes_btn').fire('custom:focus')", 100);
 
 		}
 	};
@@ -259,11 +260,11 @@
 	phy.pop_from_pair = function(id) {
 		var idx = current_pair.indexOf(id);
 		if ( idx != -1) {
+			debug('pop_from_pair: found in current_pair at pos: ' + idx);
 			delete current_pair[idx];
 			current_pair = current_pair.compact();
 		}
 		else {
-			//alert('pop ' + pairs.length);
 			for(var i = 0; i < pairs.length; i++) {
 				if (pairs[i][0] == id || pairs[i][1] == id) {
 
