@@ -379,7 +379,7 @@ span.rot { -moz-transform:rotate(90deg); font-size: smaller;}
 
 /* //--------START View Trace MENU ---ADD-as it is ------------------ */
 
-
+/* If you modify any widths here (including padding, margins) - you must update the JS at step == 2 and step == 22 to reflect this change */
 .container_data1 {
 	width: 840px;
 	height: auto;
@@ -388,23 +388,19 @@ span.rot { -moz-transform:rotate(90deg); font-size: smaller;}
 	position: relative;
 	padding-left: 20px;
 	font-family:  arial, monospace;
-	 
-	
 	}
 .container_data1 .seqids {
-	float:left; width: 140px; font-family:arial; line-height: 1.2em; overflow-x:auto; color:#996600; 
+	float:left; width: auto; max-width: 275px; font-family:arial; line-height: 1.2em; overflow-x:auto; color:#996600; 
 	}
 .container_data1 .seqs {
-	float:left; width:648px; margin-left:10px; overflow-x:auto; font-family:courier, monospace; line-height: 1.2em; text-transform: uppercase; 
+	float:left; width:1px; margin-left:10px; overflow-x:auto; font-family:courier, monospace; line-height: 1.2em; text-transform: uppercase; display:none;
 	}
-	
 .container_data1 #mini-trace-icons {
 	float:left; 
 	width: 15px; 
 	line-height: 1.2em; 
 	margin-left:10px;
 	}	
-	
 .container_data1 #q-score-alert {
 	float:left; 
 	width: 15px; 
@@ -412,6 +408,7 @@ span.rot { -moz-transform:rotate(90deg); font-size: smaller;}
 	margin-right:1px;
 	}	
 
+/* If you modify any widths here (including padding, margins) - you must update the JS at step == 0 */
 #phy-pair-builder, #phy-blast {
 	width: 840px;
 	height: auto;
@@ -423,13 +420,13 @@ span.rot { -moz-transform:rotate(90deg); font-size: smaller;}
 	}	
 	
 #phy-pair-builder #seqids, #phy-blast #seqids {
-	float:left; width: 140px;font-family:arial, monospace; line-height: 1.2em;overflow-x:auto; color: #996600; 
+	float:left; width: auto; max-width: 400px; font-family:arial, monospace; line-height: 1.2em;overflow-x:auto; color: #996600; 
 	}
 #phy-pair-builder #seqs, #phy-blast #seqs {
-	float:left;width:570px;margin-left:15px;overflow-x:hidden;font-family:courier;line-height: 1.2em;text-transform: uppercase;
+	float:left;width:1px;margin-left:15px;overflow-x:hidden;font-family:courier;line-height: 1.2em;text-transform: uppercase; display:none;
 	}
 #phy-pair-builder #seqops, #phy-blast #seqops {
-	float:left; padding-left:15px; width: 50px;font-family:arial;line-height: 1.2em; color: #996600;
+	float:left; padding-left:15px; width: 50px;font-family:arial;line-height: 1.2em; color: #996600; display:none;
 	}
 #phy-pair-builder #seqops2 {
 	/*float:left; 
@@ -438,9 +435,11 @@ span.rot { -moz-transform:rotate(90deg); font-size: smaller;}
 	color: #996600;
 	font-family:arial;*/
 	line-height: 2.4em;
+	display:none;
 }	
-	
 
+
+/*** not being used any more -> converted to #phy-pair-builder and #phy-blast (see above)	
 .container_data2 {
 	width: 840px;
 	height: auto;
@@ -452,15 +451,16 @@ span.rot { -moz-transform:rotate(90deg); font-size: smaller;}
 	}
 
 .container_data2 .seqids {
-	float:left; width: 140px;font-family:arial, monospace; line-height: 1.2em;overflow-x:auto; color: #996600; 
+	float:left; width: 165px;font-family:arial, monospace; line-height: 1.2em;overflow-x:auto; color: #996600; 
 	}
 .container_data2 .seqs {
-	float:left;width:610px;margin-left:15px;overflow-x:hidden;font-family:courier;line-height: 1.2em;text-transform: uppercase;
+	float:left;width:585px;margin-left:15px;overflow-x:hidden;font-family:courier;line-height: 1.2em;text-transform: uppercase;
 	}
 .container_data2 .seqops {
 	float:left; padding-left:15px; width: 30px;font-family:arial;line-height: 1.2em; color: #996600;
 	}
-	
+*/
+
 .container_data3 {
 	width: 840px;
 	height: auto;

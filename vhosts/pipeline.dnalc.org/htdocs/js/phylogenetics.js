@@ -1777,6 +1777,17 @@ function debug(msg) {
 Event.observe(window, Prototype.Browser.IE ? 'load' : 'dom:loaded', function() {
 	var step = document.getElementById('step') != null ? parseInt(document.getElementById('step').value, 10) : 0;
 	debug("step = " + step);
+	
+	if (step == 0) {
+		// set seqs column width and display seqs, and seqops
+		var idsWidth = $('seqids').getWidth();
+		var seqsWidth = 740 - idsWidth;
+		$('seqs').setStyle({
+			width: seqsWidth + 'px',
+			display: 'block'
+		});
+		$('seqops').style.display = 'block';
+	}
 
 	if (step == -1) {
 		var type_chosen = false;
@@ -1827,8 +1838,20 @@ Event.observe(window, Prototype.Browser.IE ? 'load' : 'dom:loaded', function() {
 		});
 		if ($('do_pair') != null)
 			$('do_pair').disabled = true;
+			
+		// set seqs column width and display seqs, seqops, and seqops2
+		var idsWidth = $('seqids').getWidth();
+		var seqsWidth = 740 - idsWidth;
+		$('seqs').setStyle({
+			width: seqsWidth + 'px',
+			display: 'block'
+		});
+		$('seqops').style.display = 'block';
+		$('seqops2').style.display = 'block';
+	
 	}
 	
+	// step 22 is from the sequence viewer before you select a trace to view
 	else if (step == 22) {
 		// attach tool tip for low quality score alerts
 		$$('#mini-trace-icons span[id^=low]').each(function(el) {
@@ -1841,8 +1864,15 @@ Event.observe(window, Prototype.Browser.IE ? 'load' : 'dom:loaded', function() {
 				hideOthers: true
 			});
 		});	
+		var idsWidth = $('seqids').getWidth();
+		var seqsWidth = 795 - idsWidth;
+		$('seqs').setStyle({
+			width: seqsWidth + 'px',
+			display: 'block'
+		});
 	}
 	
+	// step 2 is from the sequence viewer, once you select a trace file to view
 	else if (step == 2) {
 		// attach tool tip for low quality score alerts
 		$$('#mini-trace-icons span[id^=low]').each(function(el) {
@@ -1857,6 +1887,13 @@ Event.observe(window, Prototype.Browser.IE ? 'load' : 'dom:loaded', function() {
 		});	
 
 		phy.prepare_draw();		
+		
+		var idsWidth = $('seqids').getWidth();
+		var seqsWidth = 795 - idsWidth;
+		$('seqs').setStyle({
+			width: seqsWidth + 'px',
+			display: 'block'
+		});
 		
 	}
 	else if (step == 3) {

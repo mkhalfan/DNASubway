@@ -16,14 +16,14 @@
 			</span>
 			<span class="bt_Runblueline"><a href="javascript:;" onclick="phy.launch('viewer')">Sequence Viewer</a></span>
         </span>
-% if ($proj->has_tools) {
+
         <span class="conBlueline_ConCell">
 			<span class="conIndicator_box">
 				<div id="phy_trim_st" class="conIndicatorBL_<% $status{phy_trim} eq "done" ? "done" : $is_owner ? $status{phy_trim} : "disabled" %>"></div>
 			</span>
 %	if ($status{phy_trim} ne "done" && !$is_owner) {
 			<span class="bt_Runblueline">
-				<a id="phy_trim_btn" class="conIndicatorBL_disabled" status="disabled" href="javascript:;">Sequence Trimmer</a>
+				<a id="phy_trim_btn" class="conIndicatorBL_disabled" status="disabled" href="javascript:;">Seq Trimmer</a>
 			</span>
 %	} else {
 				<& '.routine', routine => 'phy_trim', pmanager => $pm, is_owner => $is_owner,
@@ -50,15 +50,7 @@
 					status => $status{phy_consensus}, delay => 20, pid => $pid &>
 %	}
         </span>
-% } else {
-%	for ("Sequence Trimmer", "Pair Builder", "Consensus Builder") {
-		<span class="conBlueline_ConCell">
-			<span class="conIndicator_box"><div class="conIndicatorBL_grey"></div></span>
-			<span class="bt_Runblueline_grey"><% $_ %></span>
-		</span>
-%	}
-% }
-	</span>
+	</span>  
 	<span class="conBlueline_keys"></span>
 	</span><!--END of span conBlueline_ConColumn1-->
 
@@ -100,14 +92,8 @@
 				<& '.routine', routine => 'phy_alignment', pmanager => $pm, is_owner => $is_owner,
 					status => $status{phy_alignment}, delay => 20, pid => $pid &>
 		</span>
-     </span><!--END of span conBlueline_ConColumn3-->
-</div><!--END of ID conBluelineLeft2-->
-
-<!--right Content Start--------------> 
-<div id="conBluelineRight2">
-	<!--<div style="clear: both;">&nbsp;</div>-->
-    <span class="conBlueline_ConColumn4"> 
-		<span class="conBlueline_ConCell">
+        
+        <span class="conBlueline_ConCell">
 			<span class="conIndicator_box">
 				<div id="phy_tree_st" class="conIndicatorBL_<% $status{phy_alignment} eq "done" ? $status{phy_tree} eq "done" ? "done" : $is_owner ? $status{phy_tree} : "disabled" : "disabled" %>"></div>
 			</span>
@@ -120,6 +106,15 @@
 				status => $status{phy_tree}, delay => 20, pid => $pid &>
 %	}
 		</span>
+        
+     </span><!--END of span conBlueline_ConColumn3-->
+</div><!--END of ID conBluelineLeft2-->
+
+<!--right Content Start--------------> 
+<div id="conBluelineRight2">
+	<!--<div style="clear: both;">&nbsp;</div>-->
+    <span class="conBlueline_ConColumn4"> 
+	&nbsp;
 	</span>
 	
 
@@ -131,9 +126,7 @@
     
   <div id="spacer_Runblueline">&nbsp;</div> 
     
-	<div class="con_browserBT ">
-    <span class="conIndicator_boxBrowse"><div class="conIndicatorBL_disabled"></div> </span>
-	<span class="bt_browserBlue"><a href="#">Export to<br/>Genbank</a></span>	</div>
+	
     
     </span>
     
@@ -174,13 +167,11 @@
 			<div class="conProjectInfo_Cell3">: &nbsp;<input type="radio" name="public" id="public_no" <% $is_public ? "" : "checked=\"checked\"" %> onclick="set_public(0);" /> &nbsp; Private</div>
 			<div class="conProjectInfo_Cell3"><input type="radio" name="public" id="public_yes" <% $is_public ? "checked=\"checked\"" : "" %> onclick="set_public(1);"/> &nbsp; Public</div>
 		</div>
-		<!--
         <div class="conProjectInfo_Row">
 			<div class="conProjectInfo_Cell1">Processing</div>
 			<div class="conProjectInfo_Cell3">: &nbsp;<input type="radio" > &nbsp; On</span></div>
 			<div class="conProjectInfo_Cell3"><input type="radio" > &nbsp; Off</span></div>
 		</div>
-		-->
 % }
 	</span><!--END of span conProjectInfo_column1-->
 
