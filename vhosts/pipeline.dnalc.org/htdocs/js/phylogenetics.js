@@ -928,7 +928,7 @@
 								throw $break;
 							}
 							eolh.insert(new Element('span', {style: 'padding-left: 4px;'}).update(
-								new Element('a', {href: d['link']}).update(d['title'])
+								new Element('a', {href: d['link'], target: '_blank'}).update(d['title'])
 							));
 						});
 					} // end if_r.status==success
