@@ -1761,6 +1761,17 @@
 		f.insert(new Element('input', {type: 'hidden', name: 'd', value: d}));
 		f.submit();
 	};
+	
+	//----------------------------------------------------
+	//
+	phy.setColumnWidths = function(w) {
+		var idsWidth = $('seqids').getWidth();
+		var seqsWidth = w - idsWidth;
+		$('seqs').setStyle({
+			width: seqsWidth + 'px',
+			display: 'block'
+		});
+	}
 	//----------------------------------------------------
 	
 })();
@@ -1774,21 +1785,11 @@ function debug(msg) {
 	catch (e) {}
 }
 
+
 Event.observe(window, Prototype.Browser.IE ? 'load' : 'dom:loaded', function() {
 	var step = document.getElementById('step') != null ? parseInt(document.getElementById('step').value, 10) : 0;
 	debug("step = " + step);
 	
-	if (step == 0) {
-		// set seqs column width and display seqs, and seqops
-		var idsWidth = $('seqids').getWidth();
-		var seqsWidth = 740 - idsWidth;
-		$('seqs').setStyle({
-			width: seqsWidth + 'px',
-			display: 'block'
-		});
-		$('seqops').style.display = 'block';
-	}
-
 	if (step == -1) {
 		var type_chosen = false;
 		$$('#project_types input[type=radio]').each(function(el) {
@@ -1805,6 +1806,7 @@ Event.observe(window, Prototype.Browser.IE ? 'load' : 'dom:loaded', function() {
 			//debug();
 		});
 	}
+	// Step 1 : Pair Builder
 	else if (step == 1) {
 		$('seqops').down().descendants().each(function(sp){
 		  if (sp.type && sp.type == "checkbox") {
@@ -1839,13 +1841,8 @@ Event.observe(window, Prototype.Browser.IE ? 'load' : 'dom:loaded', function() {
 		if ($('do_pair') != null)
 			$('do_pair').disabled = true;
 			
-		// set seqs column width and display seqs, seqops, and seqops2
-		var idsWidth = $('seqids').getWidth();
-		var seqsWidth = 740 - idsWidth;
-		$('seqs').setStyle({
-			width: seqsWidth + 'px',
-			display: 'block'
-		});
+		// Set column widths and display columns
+		phy.setColumnWidths(740);
 		$('seqops').style.display = 'block';
 		$('seqops2').style.display = 'block';
 	
@@ -1857,19 +1854,16 @@ Event.observe(window, Prototype.Browser.IE ? 'load' : 'dom:loaded', function() {
 		$$('#mini-trace-icons span[id^=low]').each(function(el) {
 			var span_id = el.getAttribute('id');
 			debug("tip " + span_id);
-			new Tip(span_id, "This trace suffers from overall poor quality scores. Be advised this may affect downstream analysis of this sequence.", {
+			new Tip(span_id, "The average error rate for this sequence is greater than 1%. This indicates that the sequence is of low quality and may produce erroneous analysis results.", {
 				title: "Low Quality Score Alert",
-				style: 'yellow',
+				style: 'blue',
 				showOn: 'mouseover',
+				//hideOn: { element: 'closeButton', event: 'click' },
 				hideOthers: true
 			});
 		});	
-		var idsWidth = $('seqids').getWidth();
-		var seqsWidth = 795 - idsWidth;
-		$('seqs').setStyle({
-			width: seqsWidth + 'px',
-			display: 'block'
-		});
+		// Set column widths and display columns
+		phy.setColumnWidths(795);
 	}
 	
 	// step 2 is from the sequence viewer, once you select a trace file to view
@@ -1878,22 +1872,20 @@ Event.observe(window, Prototype.Browser.IE ? 'load' : 'dom:loaded', function() {
 		$$('#mini-trace-icons span[id^=low]').each(function(el) {
 			var span_id = el.getAttribute('id');
 			debug("tip " + span_id);
-			new Tip(span_id, "This trace suffers from overall poor quality scores. Be advised this may affect downstream analysis of this sequence.", {
+			new Tip(span_id, "The average error rate for this sequence is greater than 1%. This indicates that the sequence is of low quality and may produce erroneous analysis results.", {
 				title: "Low Quality Score Alert",
-				style: 'yellow',
+				style: 'blue',
 				showOn: 'mouseover',
+				//hideOn: 'click',
+				//hideOn: { element: 'closeButton', event: 'click' },
 				hideOthers: true
 			});
 		});	
 
 		phy.prepare_draw();		
 		
-		var idsWidth = $('seqids').getWidth();
-		var seqsWidth = 795 - idsWidth;
-		$('seqs').setStyle({
-			width: seqsWidth + 'px',
-			display: 'block'
-		});
+		// Set column widths and display columns
+		phy.setColumnWidths(795);
 		
 	}
 	else if (step == 3) {
@@ -1959,6 +1951,10 @@ pre.insert({top:spn});
 	}
 	else if (step == 7) {
 		phy.get_dnalc_data();
+	}
+	else if (step == 8) {
+		phy.setColumnWidths(740);
+		$('seqops').style.display = 'block';
 	}
 	
 	

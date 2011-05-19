@@ -1,4 +1,6 @@
+
 <div id="phy-blast">
+	<input type="hidden" id="step" value="8" />
 	<div id="container_data_line"></div>
 	<div id="seqids">
 		<pre>
@@ -12,6 +14,7 @@
 </pre>
 	</div>
 	<div id="seqs">
+	
 		<pre>
 % for (@pairs) {
 %	my $consensus = $_->consensus;
@@ -39,6 +42,7 @@
 % }
 </pre>
 <input type="hidden" id="pid" value="<% $proj->id %>" />
+
 </div>
 
 <div style="clear: both;">&nbsp;</div>
