@@ -17,7 +17,7 @@ use Data::Dumper;
 
 #use DNALC::Pipeline::ProjectLogger ();
 use DNALC::Pipeline::Config ();
-use DNALC::Pipeline::Utils qw/lcs_name isin/;
+use DNALC::Pipeline::Utils qw/lcs_name isin random_string/;
 use aliased 'DNALC::Pipeline::Phylogenetics::Project';
 use aliased 'DNALC::Pipeline::Phylogenetics::DataSource';
 use aliased 'DNALC::Pipeline::Phylogenetics::DataFile';
@@ -84,7 +84,7 @@ use Bio::Trace::ABIF ();
 		my ($status, $msg) = ('fail', '');
 		my $name = $params->{name};
 		my $user_id = $params->{user_id};
-		my $data = $params->{data};
+		#my $data = $params->{data};
 
 		my $proj = $self->search(user_id => $user_id, name => $name);
 		if ($proj) {
@@ -113,7 +113,115 @@ use Bio::Trace::ABIF ();
 
 		return {status => 'success', msg => $msg};
 	}
+	#-----------------------------------------------------------------------------
+	# creates a copy of the project, the ProjectManager will contain the new project
+	# it returns a hashref: {status => 'x', msg => 'y'}
+	# 
+	sub duplicate_project {
+		my ($self, $params) = @_;
+		
+		my ($status, $msg) = ('fail', '');
+		my $oproj = $self->project;
+		return {status => $status, msg => "Can't duplicate undefined project."} unless $oproj;
 
+		# find a better name
+		my $name = $oproj->name . '_' . random_string(3,8);
+		my $user_id = $params->{user_id};
+
+		# create project
+		my $proj = eval { $oproj->copy({
+					user_id => $user_id,
+					name => $name,
+				});
+			};
+		if ($@) {
+			$msg = "Error duplicating the project: $@";
+			print STDERR $msg, $/;
+			return {status => 'fail', msg => $msg};
+		}
+		#print STDERR  "NEW PID = ", $proj, $/;
+		
+		my $mp = $proj->master_project;
+		$mp->public(0);
+		$mp->update;
+
+		my %source_map = ();
+		my %file_map = ();
+		my %seq_map = ();
+		my %status_map = ();
+
+		for (qw/phy_trim phy_pair phy_consensus/) {
+			$status_map{$_} = $self->get_task_status($_)->name;
+		}
+
+		# duplicate sources
+		for my $s (DataSource->search(project_id => $oproj->id)) {
+			my $cs = $s->copy({project_id => $proj->id});
+			$source_map{$s->id} = $cs->id;
+		}
+
+		# duplicate files
+		for my $f (DataFile->search(project_id => $oproj->id)) {
+			my $cf = $f->copy({project_id => $proj->id, source_id => $source_map{$f->source_id}});
+			$file_map{$f->id} = $cf->id;
+		}
+
+		# duplicate sequences
+		for my $s ($self->sequences) {
+			my $cs = $s->copy({
+						project_id => $proj->id, 
+						file_id => $file_map{ $s->file_id }, 
+						source_id => $source_map{ $s->source_id },
+					});
+			if (defined $s->left_trim) {
+				print "Defined left_trim in seq: ", $s, $/;
+				$cs->left_trim($s->left_trim);
+				$cs->right_trim($s->right_trim);
+				$cs->start_pos($s->start_pos);
+				$cs->end_pos($s->end_pos);
+				$cs->update;
+			}
+			$seq_map{$s->id} = $cs->id;
+		}
+		
+		if ($status_map{phy_pair} eq 'done') {
+			for my $pair ($self->pairs) {
+				my $cpair = $pair->copy({
+						project_id => $proj->id,
+						alignment => $status_map{phy_consensus} eq 'done' ? $pair->consensus : '',
+						consensus => $status_map{phy_consensus} eq 'done' ? $pair->consensus : '',
+					});
+				for my $pq ($pair->paired_sequences) {
+ 					my $npq = eval {
+ 						PairSequence->create({
+ 							seq_id => $seq_map{ $pq->seq->id },
+ 							pair_id => $cpair->id,
+ 							project_id => $proj->id,
+ 							strand => $pq->strand,
+ 						});
+ 					};
+ 					if ($@) {
+ 						confess "Can't  sequence ", $npq->seq_id, " to pair in project " . $proj;
+ 					}
+					#print STDERR "new seq for pair: ", $cpair, "\n", Dumper( $npq ), $/;
+				}
+			}
+		}
+
+		$self->project($proj);
+		$self->create_work_dir;
+
+		#for (qw/phy_trim phy_pair phy_consensus/) 
+		for (qw/phy_trim phy_pair/) {
+			if ($status_map{$_} eq 'done') {
+				$self->set_task_status($_, "done");
+			}
+		}
+
+		print STDERR  $self->work_dir, '; exists: ', -d $self->work_dir , $/;
+
+		return {status => 'success', msg => $msg};
+	}
 	#-----------------------------------------------------------------------------
 	sub project {
 		my ($self, $project) = @_;
