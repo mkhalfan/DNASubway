@@ -182,7 +182,7 @@ input[type="checkbox"] {
 				}
 				# is must be a new pair
 				unless ($found) {
-					print STDERR "new pair: ", $d->[0][0], "/", $d->[1][0], $/;
+					#print STDERR "new pair: ", $d->[0][0], "/", $d->[1][0], $/;
 					push @new_pairs, $d;
 				}
 			}

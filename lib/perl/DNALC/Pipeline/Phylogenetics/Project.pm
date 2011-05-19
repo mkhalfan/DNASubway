@@ -52,7 +52,7 @@ __PACKAGE__->add_trigger(before_delete => sub {
 
 
 sub master_project {
-	my ($mp) = DNALC::Pipeline::MasterProject->search(project_id => $_[0]);
+	my ($mp) = DNALC::Pipeline::MasterProject->search(project_id => $_[0], project_type => 'phylogenetics');
 	return $mp;
 }
 
