@@ -12,31 +12,32 @@
 <div id="container_data_line">&nbsp;</div>
 
 % if ($proj) {
+	<div style="width: 35%;float:left;">
 	<div class="con_BL_subTitle"><% $type %> reference data</div>
 	<form method="post" id="forma1">
 
 % 	for my $ref (@$refs) {
 %		my $disabled = $in_use_refs{$ref->{id}} ? "disabled=\"disabled\"" : "";
 	<div class="list_refdata">
-		<input type="radio" name="refid" id="r<% $ref->{id}%>" value="<% $ref->{id} |html%>" <% $disabled %>/> 
+		<input type="radio" name="refid" id="r<% $ref->{id}%>" value="<% $ref->{id} |html%>" <% $disabled %> onchange="phy.show_ref_details('<%$ref->{id}%>')" /> 
 		<label for="r<% $ref->{id}%>"><% $ref->{id} %></label> \
 %		if ($in_use_refs{$ref->{id}}) {
 		<small>(Added already)</small>
 %		}
+		<div style="display:none;" id="rd<% $ref->{id} %>"><% $refs_det->{$ref->{id}}%></div>
 	</div>
 % 	}
-
-	<p>
-		<div class="list_refdata"><input type="button" id="buttonas" value="Add ref data" onclick="phy.do_add_ref()"/></div>
-	</p>
-	
+		<p>
+			<div class="list_refdata"><input type="button" id="buttonas" value="Add ref data" onclick="phy.do_add_ref()"/></div>
+		</p>
 		<input type="hidden" id="pid" value="<% $pid %>"/>
 		<input type="hidden" id="ref_id" name="ref_id" value="" />
 	</form>
+	</div>
+	<div class="list_refdata" style="float:left;width:50%;height:auto;color:#555;" id="ref_details"></div>
 % } else {
-	Uable to locate project <% $pid |html %>
+	Unable to locate project <% $pid |html %>!
 % }
-
 
 <div style="clear: both;">&nbsp;</div>
      <div id="container_data_lineBottom">&nbsp;</div>
@@ -52,6 +53,7 @@
 <%once>
 	use DNALC::Pipeline::App::Phylogenetics::ProjectManager ();
 	#use DNALC::Pipeline::Utils qw(random_string);
+	use IO::File ();
 	use Data::Dumper;
 </%once>
 %#----------------------------------------------------------------------------
@@ -61,7 +63,7 @@
 	my $pm = DNALC::Pipeline::App::Phylogenetics::ProjectManager->new($pid);
 	my $proj = $pm->project;
 	my $error = '';
-	my ($type, $refs);
+	my ($type, $refs, $refs_det);
 	my %in_use_refs = ();
 	if ($proj) {
 		$type = $proj->type;
@@ -69,26 +71,46 @@
 		$refs = defined $ref_cf->{$type} ? $ref_cf->{$type} : [];
 
 		%in_use_refs = map {$_ => 1} $pm->references;
-		#print STDERR "z: ", Dumper (\%in_use_refs), $/;
 
 		if ($r->method eq "POST") {
-			print STDERR "POST", $/;
-			
-			#my @in_use_refs = $pm->references;
+
 			if (@$refs && $ref_id) {
 				my ($ref) = grep {$_->{id} eq $ref_id} @$refs;
 				if ($ref) {
-					#print STDERR Dumper( $ref ), $/;
 					$pm->add_reference($ref->{id});
-					if ($pm->get_task_status('phy_alignment')->name eq 'done') {
-						$pm->set_task_status('phy_alignment', 'not-processed');
+					if ($pm->get_task_status("phy_alignment")->name eq "done") {
+						$pm->set_task_status("phy_alignment", "not-processed");
 					}
-					$m->redirect("./add_ref?pid=" . $pid . ';ok=1');
+					$m->redirect("./add_ref?pid=" . $pid . ";ok=1");
 				}
 				else {
 					$error = "Can't find reference with id=[$ref_id]";
 				}
 			}
+		}
+		else {	# get the details about the references
+
+			if (%$refs) {
+				$refs_det = $m->cache->get("ref-details-$type");
+				unless ($refs_det && %$refs_det) {
+					for my $ref (@$refs) {
+						my $fh = IO::File->new;
+						if ($fh->open($ref->{file})) {
+							my $details = "";
+							while(<$fh>) {
+								if ($_ =~ /^>/) {
+									$_ =~ s/[><]//g;
+									$details .= "<div>" . $_ . "</div>";
+								}
+							}
+							$refs_det->{$ref->{id}} = $details;
+							$fh->close;
+						}
+					}
+					$m->cache->set("ref-details-$type", $refs_det, "60m");
+				} # end unless
+
+			} #end if %$refs
 		}
 	}
 </%init>
