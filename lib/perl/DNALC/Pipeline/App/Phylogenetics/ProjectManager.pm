@@ -9,7 +9,7 @@ use IO::Scalar ();
 use File::Basename;
 use File::Path;
 use File::Spec;
-use File::Copy qw/move/;
+use File::Copy;
 use File::Slurp qw/slurp/;
 use Carp;
 use Digest::MD5();
@@ -141,6 +141,8 @@ use Bio::Trace::ABIF ();
 		}
 		#print STDERR  "NEW PID = ", $proj, $/;
 		
+		my $o_work_dir = $self->work_dir;
+
 		my $mp = $proj->master_project;
 		$mp->public(0);
 		$mp->update;
@@ -149,6 +151,7 @@ use Bio::Trace::ABIF ();
 		my %file_map = ();
 		my %seq_map = ();
 		my %status_map = ();
+		my %pair_map = ();
 
 		for (qw/phy_trim phy_pair phy_consensus/) {
 			$status_map{$_} = $self->get_task_status($_)->name;
@@ -188,9 +191,10 @@ use Bio::Trace::ABIF ();
 			for my $pair ($self->pairs) {
 				my $cpair = $pair->copy({
 						project_id => $proj->id,
-						alignment => $status_map{phy_consensus} eq 'done' ? $pair->consensus : '',
+						alignment => $status_map{phy_consensus} eq 'done' ? $pair->alignment : '',
 						consensus => $status_map{phy_consensus} eq 'done' ? $pair->consensus : '',
 					});
+				$pair_map {$pair->id} = $cpair->id;
 				for my $pq ($pair->paired_sequences) {
  					my $npq = eval {
  						PairSequence->create({
@@ -208,17 +212,34 @@ use Bio::Trace::ABIF ();
 			}
 		}
 
+		# set pm's new project
 		$self->project($proj);
+
 		$self->create_work_dir;
 
-		#for (qw/phy_trim phy_pair phy_consensus/) 
-		for (qw/phy_trim phy_pair/) {
+		my $work_dir = $self->work_dir;
+
+		#for (qw/phy_trim phy_pair/)
+		for (qw/phy_trim phy_pair phy_consensus/) {
 			if ($status_map{$_} eq 'done') {
 				$self->set_task_status($_, "done");
 			}
 		}
 
-		print STDERR  $self->work_dir, '; exists: ', -d $self->work_dir , $/;
+		# copy pairs' consensi
+		if ($status_map{phy_consensus} eq 'done') {
+			my $dest_dir = sprintf("%s/pairs", $work_dir);
+			mkdir $dest_dir;
+			for my $pair_id (keys %pair_map) {
+				my $src  = sprintf("%s/pairs/pair-%d.txt", $o_work_dir, $pair_id);
+				my $dest = sprintf("%s/pair-%d.txt", $dest_dir, $pair_map{$pair_id});
+				copy($src, $dest) or do {
+						print STDERR  "Can't copy pair file:\n", $src, " -> ", $dest, $/;
+					};
+			}
+		}
+
+		#print STDERR  $self->work_dir, '; exists: ', -d $self->work_dir , $/;
 
 		return {status => 'success', msg => $msg};
 	}

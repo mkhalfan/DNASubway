@@ -10,43 +10,21 @@
 </%once>
 <%init>
 	my ($status, $msg) = ("error", "");
+	my $s = $m->session->{pipeline};
 
 	$pid =~ s/\D+//g;
 	my $pcf = DNALC::Pipeline::Config->new->cf('PIPELINE');
 	my $client = Gearman::Client->new;
 	my $sx = $client->job_servers(@{$pcf->{GEARMAN_SERVERS}});
 	
-	my $params = nfreeze( {pid => $pid});
+	my $params = nfreeze( {pid => $pid, user_id => $s->{user_id}});
 	my $rc = $client->do_task( 'phy_consensus' =>  $params);
 	$rc = thaw($$rc);
 	if ($rc && defined $rc->{status}) {
 		$status = $rc->{status};
 		$msg = $rc->{msg};
 	}
-	
-if (0) {
-	my $pm = DNALC::Pipeline::App::Phylogenetics::ProjectManager->new($pid);
-	my $proj = $pm->project;
-	unless ($proj) {
-		$msg = "Project not found."
-	}
-	else {
-		my @pairs = $pm->pairs;
-		if (@pairs) {
-			if ($pm->get_task_status("phy_consensus")->name ne "done") {
-				for my $p (@pairs) {
-					$pm->build_consensus($p);
-				}
-				$pm->set_task_status("phy_consensus", "done");
-				$status = "success";
-			}
-			$msg = $pm->get_task_status('phy_consensus')->name;
-		}
-		else {
-			$msg = "This project has no pairs!";
-		}
-	}
-}
+
 </%init>
 
 <%flags>

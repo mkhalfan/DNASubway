@@ -110,7 +110,7 @@ sub run_muscle {
 
 	my $pm = DNALC::Pipeline::App::Phylogenetics::ProjectManager->new($args->{pid});
 	my $proj = $pm->project;
-	unless ($proj) {
+	unless ($proj && $proj->user_id == $args->{user_id}) {
 		$msg = "Project not found!";
 		print STDERR  "Project not found!", $/;
 	}
@@ -132,8 +132,8 @@ sub run_merger {
 
 	my $pm = DNALC::Pipeline::App::Phylogenetics::ProjectManager->new($args->{pid});
 	my $proj = $pm->project;
-	unless ($proj) {
-		#$msg = "Project not found."
+	unless ($proj && $proj->user_id == $args->{user_id}) {
+		$msg = "Project not found.";
 		print STDERR  "Project [$args->{pid}] not found!", $/;
 	}
 	else {
