@@ -1,18 +1,7 @@
 {
 	program => '/usr/local/bin/neighbor',
-	menu => {
-		OUTGROUP => "O\n",
-		LOWTRI => "L\n",
-		UPPTRI => "R\n",
-		SUBREP => "S\n",
-		JUMBLE => "J\n",
-		SUBMIT => "Y\n",
-		MULTIPLE => "M\n",
-		QUIET => "2\n",
-	},
-	#menu_options => "L\nR\nS\nY\n",
 	menu_options => "L\n2\nY\n",
-	menu_options_wb => "L\n2\nM\n%d\n101\nY\n", # %d will be replaced by sprintf
+	#menu_options_wb => "L\n2\nM\n%d\n101\nY\n", # %d will be replaced by sprintf
 
 	input_file => 'infile',
 	output_file => 'outfile',

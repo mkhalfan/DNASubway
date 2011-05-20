@@ -9,14 +9,17 @@
 	use Storable qw/thaw nfreeze/;
 </%once>
 <%init>
+	my $s = $m->session->{pipeline};
 	my ($status, $msg) = ("error", "");
 	$pid =~ s/\D+//g;
+
+	my $tree_type = 'ML';
 
 	my $pcf = DNALC::Pipeline::Config->new->cf('PIPELINE');
 	my $client = Gearman::Client->new;
 	my $sx = $client->job_servers(@{$pcf->{GEARMAN_SERVERS}});
 	
-	my $params = nfreeze( {pid => $pid});
+	my $params = nfreeze( {pid => $pid, tree_type => $tree_type, user_id => $s->{user_id}});
 	my $rc = $client->do_task( 'phy_tree' =>  $params);
 	$rc = thaw($$rc);
 	if ($rc && defined $rc->{status}) {
@@ -24,29 +27,6 @@
 		$msg = $rc->{status};
 	}
 
-if (0) {
-	my $pm = DNALC::Pipeline::App::Phylogenetics::ProjectManager->new($pid);
-	my $proj = $pm->project;
-	unless ($proj) {
-		$msg = "Project not found."
-	}
-	else {
-		my $phyi_file = $pm->get_alignment('phyi');
-
-		print STDERR "Alignment file to use: $phyi_file\n";
-
-		my $dist_file = $pm->compute_dist_matrix;
-		print STDERR "Dist matrix file to use: $dist_file\n";
-		if (-f $dist_file) {
-			print STDERR  "Dist = ", $dist_file, "\tsize = ", -s $dist_file, $/;
-
-			my $stree = $pm->compute_tree($dist_file);
-			print STDERR  "Tree = ", $stree->{tree}, "\t", $stree->{tree_file}, $/;
-			$pm->set_task_status("phy_tree", "done");
-			$status = "success";
-		}
-	}
-}
 </%init>
 
 <%flags>

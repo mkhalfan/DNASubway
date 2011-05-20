@@ -763,10 +763,9 @@ use Bio::Trace::ABIF ();
 			flock $fh, LOCK_UN;
 		}
 
-		#my $m = DNALC::Pipeline::Process::Muscle->new($wd->dirname);
 		my $m = DNALC::Pipeline::Process::Muscle->new($pwd);
 
-		my $st = $m->run(pretend=>0, debug => 1, input => $fasta_file);
+		my $st = $m->run(pretend=>0, debug => 0, input => $fasta_file);
 
 		my ($output, $phy_out);
 
