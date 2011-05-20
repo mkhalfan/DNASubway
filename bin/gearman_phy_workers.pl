@@ -10,12 +10,77 @@ use DNALC::Pipeline::App::Phylogenetics::ProjectManager ();
 use DNALC::Pipeline::Process::Phylip::SeqBoot ();
 use DNALC::Pipeline::Process::Phylip::DNADist ();
 use DNALC::Pipeline::Process::Phylip::ProtDist ();
+use DNALC::Pipeline::Process::Phylip::DNAMl ();
+use DNALC::Pipeline::Process::Phylip::ProMl ();
 use DNALC::Pipeline::Process::Phylip::Neighbor ();
 use DNALC::Pipeline::Process::Phylip::Consense ();
 use DNALC::Pipeline::Config();
 use File::Basename;
+use Data::Dumper;
 
 sub run_build_tree {
+	my $gearman = shift;
+	my $args = thaw( $gearman->arg );
+
+	my ($status, $msg) = ('error', '');
+
+	my $pm = DNALC::Pipeline::App::Phylogenetics::ProjectManager->new($args->{pid});
+	my $proj = $pm->project;
+	unless ($proj && $proj->user_id == $args->{user_id}) {
+		$msg = "Project not found!";
+		print STDERR  "Project not found!", $/;
+	}
+	else {
+
+		my $tree_type = $args->{tree_type} || 'ML';
+		my $pwd = $pm->work_dir;
+		my $input = $pm->get_alignment('phyi');
+		#print STDERR "Tree type: $tree_type\n";
+		#print STDERR "Alignment file to use: $input\n";
+		my ($tree, $tb);
+
+		if (-f $input) {
+
+			if ($tree_type eq 'ML') {
+				$tb = $proj->type ne 'protein'
+						? DNALC::Pipeline::Process::Phylip::DNAMl->new($pwd)
+						: DNALC::Pipeline::Process::Phylip::ProMl->new($pwd);
+			}
+			else {
+				# compute distance
+				my $d;
+
+				$d = $proj->type ne 'protein'
+						? DNALC::Pipeline::Process::Phylip::DNADist->new($pwd)
+						: DNALC::Pipeline::Process::Phylip::ProtDist->new($pwd);
+				$d->run(input => $input, debug => 0);
+				$input = $d->get_output;
+
+				$tb = DNALC::Pipeline::Process::Phylip::Neighbor->new($pwd);
+
+			}
+
+			if ($tb) {
+				$tb->run(input => $input, debug => 0, input_is_protein => $proj->type eq 'protein');
+				#print STDERR Dumper( $tb ), $/;
+				$tree = $tb->get_tree;
+				#print STDERR "Tree: ", $tree, $/;
+
+				my $stree = $pm->_store_tree($tree) if -f $tree;
+
+				#print STDERR  "Tree = ", $stree->{tree}, "\t", $stree->{tree_file}, $/;
+				if (-s $stree->{tree_file}) {
+					$pm->set_task_status("phy_tree", "done", $tb->{elapsed});
+					$status = "success";
+				}
+			}
+		}
+	}
+
+   return nfreeze({status => $status, msg => $msg});
+}
+
+sub run_build_tree_save {
 	my $gearman = shift;
 	my $args = thaw( $gearman->arg );
 
@@ -70,6 +135,7 @@ sub run_build_tree {
 
    return nfreeze({status => $status, msg => $msg});
 }
+
 sub run_phylip {
 	my $gearman = shift;
 	my $args = thaw( $gearman->arg );
