@@ -20,7 +20,7 @@
 	<param name="windowHeight" value="800" />
 	<param name="windowWidth" value="750" />
 	<param name="showFullId" value="false" />
-	<param name="defaultColour" value="<% $proj->type =~ /mtdna|protein/i ? "% Identity" : "Clustal" %>" />
+	<param name="defaultColour" value="<%  defined $color{lc $proj->type} ? $color{lc $proj->type} : $color{default} %>" />
 	<param name="linkLabel_1" value="Details" />
 	<param name="linkUrl_1" value="null" />
 	<param name="showbutton" value="false" />
@@ -53,6 +53,12 @@
 <%once>
 	use DNALC::Pipeline::App::Phylogenetics::ProjectManager ();
 	use DNALC::Pipeline::Utils qw(random_string);
+
+	my %color = (
+			default => 'Clustal',
+			mtdna => '% Identity',
+			protein => 'Zappo',
+		);
 </%once>
 %#----------------------------------------------------------------------------
 <%init>

@@ -16,7 +16,7 @@
 	<param name="windowHeight" value="500" />
 	<param name="windowWidth" value="750" />
 	<param name="showFullId" value="false" />
-	<param name="defaultColour" value="<% $proj->type =~ /mtdna|protein/i ? "% Identity" : "Clustal" %>" />
+	<param name="defaultColour" value="<%  defined $color{lc $proj->type} ? $color{lc $proj->type} : $color{default} %>" />
 %#	<param name="linkLabel_1" value="Details" />
 %#	<param name="linkUrl_1" value="<% $pcf->{PROJECT_HOME} %>/project/target/details?hn=$SEQUENCE_ID$" />
 	<param name="showbutton" value="false" />
@@ -38,8 +38,11 @@
 %#----------------------------------------------------------------------------
 <%once>
 	use DNALC::Pipeline::App::Phylogenetics::ProjectManager ();
-	#use DNALC::Pipeline::Utils qw(random_string);
-	use Data::Dumper;
+	my %color = (
+			default => 'Clustal',
+			mtdna => '% Identity',
+			protein => 'Zappo',
+		);
 </%once>
 %#----------------------------------------------------------------------------
 <%init>
@@ -49,6 +52,5 @@
 	my $pm = DNALC::Pipeline::App::Phylogenetics::ProjectManager->new($pid);
 	my $tinfo = $pm->get_tree;
 	my $proj = $pm->project;
-	#print STDEER Dumper $tinfo, $/;
 </%init>
 %#----------------------------------------------------------------------------
