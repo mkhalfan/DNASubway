@@ -38,7 +38,7 @@
 		var has_file = $('seq_src_upload').checked && ( $('seq_file').value != '' );
 		var has_actg = false;
 		var has_sample = $('seq_src_sample').checked && $('sample').selectedIndex >= 0;
-		var has_dnalc_file = $('seq_src_dnalc').checked && ( $('d').value != '' );
+		var has_dnalc_file = $('seq_src_dnalc').checked && ( $$('input[name=d]').value != '' );
 
 		if ($('seq_src_paste').checked) {
 			var pasted_data_ok = function() {

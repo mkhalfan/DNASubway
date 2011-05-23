@@ -90,7 +90,7 @@
 		}
 		else {	# get the details about the references
 
-			if (%$refs) {
+			if ($refs && @$refs) {
 				$refs_det = $m->cache->get("ref-details-$type");
 				unless ($refs_det && %$refs_det) {
 					for my $ref (@$refs) {

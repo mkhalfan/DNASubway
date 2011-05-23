@@ -56,13 +56,13 @@
 			<input class="conRadiobox_align" type="radio" name="seq_src" id="seq_src_dnalc"
 				<% $seq_src eq "dnalc" ? "checked=\"checked\"" : ""%>
 				value="dnalc" onclick="phy.select_source('newdnalc')" /> &nbsp; Import sequence/trace from DNALC
-% if ($seq_src eq "dnalc" && defined $d) {
+% if ($seq_src eq "dnalc" && @d) {
 	<div id="transferred_files" style="font-size:smaller; padding-left: 40px;">
-	<input type="hidden" name="d" id="d" value="<% $d |html%>" />
-	<span style="font-style:italic;">Successfully transfered <% scalar @transfered_files %> file(s).</span>
-%#	for (@transfered_files) {
-%#	<div><% $_->{name} |html%> </div>
-%#	}
+%	for my $d (@d) {
+	<input type="hidden" name="d" value="<% $d |html%>" />\
+%	}
+	<span style="font-style:italic;">Successfully transferred <% scalar @transfered_files %> file(s).</span>
+	<div><a href="javascript:;" onclick="phy.launch(null, './tools/dnalc_data?pid=new', 'Import DNALC data');">+ import more files from DNALC</a></div>
 	</div>
 % }
 		</div>
@@ -119,7 +119,7 @@
 	$seq_paste => ''
 	$description => ''
 	$sample => ''
-	$d => undef
+	@d => ()
 	$data_transfered => undef
 </%args>
 <%once>
@@ -179,23 +179,26 @@ if ($r->method eq "POST") {
 	}
 	
 	#print STDERR "data_transfered: ", $data_transfered, $/;
-	#print STDERR "d: ", $d, $/;
+	#print STDERR "d: ", "@d", $/;
 	if ($data_transfered || $s->{data_transfered}) {
-		if (defined $d) {
+		if (@d) {
 			my $base_dir = $ppcf->{DNALC_TRANSFER_DIR} || "/tmp";
 			#print STDERR "dir: ", $base_dir, $/;
-			my $dir = $base_dir . "/" . $d;
-			@transfered_files = map {
-					my $f = $_;
-					$f =~ s/^$dir\///;
-					$f =~ s/\.ab(?:1|i)$//;
-					{name => $f, file => $_}
-				} sort <$dir/*.ab1>;
-			
-			# make sure we give some feedback to user and show the transfered files
-			push @err, "" if $data_transfered;
-
-			$s->{data_transfered} = $data_transfered;
+			for my $d (@d) {
+				next if $d =~ m|[/.]|;
+				my $dir = $base_dir . "/" . $d;
+				#print STDERR "dir: ", $dir, $/;
+				push @transfered_files, map {
+						my $f = $_;
+						$f =~ s/^$dir\///;
+						$f =~ s/\.ab(?:1|i)$//;
+						{name => $f, file => $_}
+					} sort <$dir/*.ab1>;
+				
+				# make sure we give some feedback to user and show the transfered files
+				push @err, "" if $data_transfered;
+			}
+			$s->{data_transfered} ||= $data_transfered;
 		}
 		else {
 			$data_transfered = undef;
@@ -312,20 +315,26 @@ if ($r->method eq "POST") {
 			$proj = undef;
 		}
 
-		#do some cleaning.. rm any temporary file.. uploaded/pasted..
-		if ($seq_src ne "sample") { 
-			# remove temporary file
-			print STDERR  "Removing files ($seq_src):\n",
-				join "\n", map { "\t" . $_->{path} } @files2process;
-			print "\n";
-			#unlink $file2process;
-		}
-
 		unless ($proj) {
 			push @err, "Error creating the project.";
 		}
 		else {
 			print STDERR "project_created: id = ", $proj, ",\tname = ", $proj->name, $/;
+			
+			#do some cleaning.. rm any temporary file.. uploaded/pasted..
+			if ($seq_src eq "dnalc") {
+				for my $d (@d) {
+					my $base_dir = $ppcf->{DNALC_TRANSFER_DIR} || "/tmp";
+					my $dir = $base_dir . "/" . $d;
+					if (-d $dir) {
+						my $done = $dir . "/.done";
+						unlink $done if -f $done;
+						rmdir $dir;
+					}
+				}
+			}
+			
+			delete $s->{data_transfered};
 
 			if ($converted_to_dna) {
 				$s->{converted_to_dna} = $proj->id;

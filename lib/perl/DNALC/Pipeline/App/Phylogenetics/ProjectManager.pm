@@ -378,8 +378,10 @@ use Bio::Trace::ABIF ();
 		$ab->close_abif if $ab && $ab->is_abif_open;
 		close $fasta_fh;
 
-		if ( $seq_count && $self->get_task_status('phy_trim')->name eq 'done') {
-			$self->undo_trimming;
+		if ($params->{type} ne 'reference') {
+			if ( $seq_count && $self->get_task_status('phy_trim')->name eq 'done') {
+				$self->undo_trimming;
+			}
 		}
 
 		return $bail_out->();
