@@ -5,7 +5,7 @@ use POSIX ();
 
 __PACKAGE__->table('phy_tree');
 __PACKAGE__->columns(Primary => qw/id/);
-__PACKAGE__->columns(Essential => qw/project_id tree_name created/);
+__PACKAGE__->columns(Essential => qw/project_id tree_name tree_type created/);
 __PACKAGE__->sequence('phy_tree_id_seq');
 
 __PACKAGE__->has_a(project_id => 'DNALC::Pipeline::Phylogenetics::Project');

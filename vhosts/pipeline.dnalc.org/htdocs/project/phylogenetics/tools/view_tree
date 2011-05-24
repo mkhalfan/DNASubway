@@ -26,6 +26,7 @@
 	<pre>
 	1: <% $m->comp('../../.comp/filepath_to_web', file => $pm->get_alignment )%>
 	2: <% $m->comp('../../.comp/filepath_to_web', file => $tinfo->{tree_file} ) %>
+	3: tt= <% $tinfo->{tree}->tree_type %>
 	</pre>
 	</div>
 % }
@@ -33,7 +34,8 @@
 %#----------------------------------------------------------------------------
 <%args>
 	$pid => 0
-	$pair_id => 0
+	$t => ''
+	$tid => ''
 </%args>
 %#----------------------------------------------------------------------------
 <%once>
@@ -49,8 +51,11 @@
 	$r->content_type("text/html");
 	my $pcf = DNALC::Pipeline::Config->new->cf('PIPELINE');
 	$pid =~ s/\D+//g;
+
+	my $tree_type = ($t =~ /^phy_tree_ml$/) ? 'ML' : 'NJ';
+
 	my $pm = DNALC::Pipeline::App::Phylogenetics::ProjectManager->new($pid);
-	my $tinfo = $pm->get_tree;
 	my $proj = $pm->project;
+	my $tinfo = $proj ? $pm->get_tree($tree_type) : {};
 </%init>
 %#----------------------------------------------------------------------------

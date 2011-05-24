@@ -32,7 +32,7 @@ sub run_build_tree {
 	}
 	else {
 
-		my $tree_type = $args->{tree_type} || 'ML';
+		my $tree_type = $args->{tree_type} || 'NJ';
 		my $pwd = $pm->work_dir;
 		my $input = $pm->get_alignment('phyi');
 		#print STDERR "Tree type: $tree_type\n";
@@ -66,11 +66,16 @@ sub run_build_tree {
 				$tree = $tb->get_tree;
 				#print STDERR "Tree: ", $tree, $/;
 
-				my $stree = $pm->_store_tree($tree) if -f $tree;
+				my $stree = $pm->_store_tree($tree, $tree_type) if -f $tree;
 
 				#print STDERR  "Tree = ", $stree->{tree}, "\t", $stree->{tree_file}, $/;
 				if (-s $stree->{tree_file}) {
-					$pm->set_task_status("phy_tree", "done", $tb->{elapsed});
+					if ($tree_type eq 'ML') {
+						$pm->set_task_status("phy_tree_ml", "done", $tb->{elapsed});
+					}
+					else {
+						$pm->set_task_status("phy_tree", "done", $tb->{elapsed});
+					}
 					$status = "success";
 				}
 			}

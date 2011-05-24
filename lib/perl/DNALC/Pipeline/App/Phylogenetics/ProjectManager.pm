@@ -918,7 +918,7 @@ use Bio::Trace::ABIF ();
 	#-----------------------------------------------------------------------------
 	#
 	sub get_tree {
-		my ($self) = @_;
+		my ($self, $tree_type) = @_;
 
 		my $pwd = $self->work_dir;
 		return unless -d $pwd;
@@ -936,11 +936,16 @@ use Bio::Trace::ABIF ();
 				return;
 			}
 		}
-		my $trees = Tree->search(project_id => $project->id,  {order_by => 'id DESC' });
+		my $trees = Tree->search(project_id => $project->id,  tree_type => $tree_type, {order_by => 'id DESC' });
 		#print STDERR "Trees= ", $trees, $/;
 		if ($trees) {
 			$tree = $trees->next;
-			$tree_file = File::Spec->catfile($tree_dir, sprintf("%d.nw", $tree->id) );
+			$tree_file = File::Spec->catfile($tree_dir, sprintf("%d-%s.nw", $tree->id, $tree_type) );
+
+			#play nice with older tree files
+			unless (-f $tree_file) {
+				$tree_file = File::Spec->catfile($tree_dir, sprintf("%d.nw", $tree->id) );
+			}
 		}
 
 		return {tree => $tree, tree_file => $tree_file};
@@ -949,7 +954,7 @@ use Bio::Trace::ABIF ();
 	#-----------------------------------------------------------------------------
 	#
 	sub _store_tree {
-		my ($self, $file) = @_;
+		my ($self, $file, $tree_type) = @_;
 
 		return unless ($file && -f $file);
 
@@ -962,6 +967,7 @@ use Bio::Trace::ABIF ();
 		my $tree = eval {
 			Tree->create({
 				project_id => $project,
+				tree_type => $tree_type,
 			});
 		};
 		if ($@) {
@@ -976,7 +982,7 @@ use Bio::Trace::ABIF ();
 				return;
 			}
 		}
-		my $tree_file = File::Spec->catfile($tree_dir, sprintf("%d.nw", $tree->id) );
+		my $tree_file = File::Spec->catfile($tree_dir, sprintf("%d-%s.nw", $tree->id, $tree_type) );
 		unless (move $file, $tree_file) {
 			return;
 		}

@@ -1,6 +1,7 @@
 {status:'<% $status|js%>', message:'<% $msg |js%>'}
 <%args>
 	$pid => 0
+	$t => ''
 </%args>
 <%once>
 	use DNALC::Pipeline::App::Phylogenetics::ProjectManager ();
@@ -13,7 +14,7 @@
 	my ($status, $msg) = ("error", "");
 	$pid =~ s/\D+//g;
 
-	my $tree_type = 'ML';
+	my $tree_type = ($t =~ /^phy_tree_ml$/) ? 'ML' : 'NJ';
 
 	my $pcf = DNALC::Pipeline::Config->new->cf('PIPELINE');
 	my $client = Gearman::Client->new;

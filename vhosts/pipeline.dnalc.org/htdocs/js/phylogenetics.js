@@ -378,31 +378,34 @@
 		var b = $(op + '_btn');
 		var ind = $(op + '_st');
 		
+		ind.removeClassName(ind.className);
+
 		if (status == 'processing') {
 			b.onclick = null;
-			ind.removeClassName(ind.className);
 			ind.addClassName('conIndicatorBL_processing');
 		}
 		else if (status == 'done') {
-			ind.removeClassName(ind.className);
 			ind.addClassName('conIndicatorBL_done');
 			if (op == 'phy_pair')
 				return;
 			var uri = op;
 			uri = uri.replace(/phy_/, "view_");
+			uri = uri.replace(/tree_ml$/, "tree");
 			b.onclick = function(){
-					phy.launch(op, '/project/phylogenetics/tools/' + uri + '?pid=' + p, '');
+					phy.launch(op, '/project/phylogenetics/tools/' + uri + '?pid=' + p + ';t=' + op, '');
 				};
 		}
 		else if (status == 'not-processed') {
-			ind.removeClassName(ind.className);
 			ind.addClassName('conIndicatorBL_not-processed');
 			b.onclick = function(){ phy.run(op); };
 		}
 		else if (status == 'disabled') {
-			ind.removeClassName(ind.className);
 			ind.addClassName('conIndicatorBL_disabled');
 			b.onclick = null;
+		}
+		else if (status == 'error') {
+			ind.addClassName('conIndicatorBL_error');
+			b.onclick = function(){ phy.run(op); };
 		}
 	};
 	
@@ -434,6 +437,7 @@
 
 		var uri = op;
 		uri = uri.replace(/phy_/, "build_");
+		uri = uri.replace(/tree_ml$/, "tree");
 		new Ajax.Request('/project/phylogenetics/tools/' + uri,{
 			method:'get',
 			parameters: { 't' : op, pid : p}, 
@@ -445,6 +449,7 @@
 					phy.set_status(op, "done");
 					if (op == "phy_alignment") {
 						phy.set_status("phy_tree", "not-processed");
+						phy.set_status("phy_tree_ml", "not-processed");
 					}
 					else if (op == "phy_trim") {
 						if (/done$/.test($('phy_pair_st').className)) {
@@ -453,6 +458,8 @@
 					}
 				}
 				else  if (r.status == 'error') {
+					phy.set_status(op, "error");
+					/*
 					b.removeClassName(b.className);
 					b.addClassName('error');
 					
@@ -460,6 +467,7 @@
 					ind.addClassName('conIndicatorBL_error');
 					//ind.title = 'Error';
 					b.onclick = function(){phy.run(op);};
+					*/
 					
 					show_errors(r.message);
 				}
@@ -469,7 +477,8 @@
 				}
 			},
 			onFailure: function(){
-					alert('Something went wrong!\nAborting...');
+					phy.set_status(op, "error");
+					alert('Something went wrong (' + op + ')!\nAborting...');
 				}
 		});
 		
