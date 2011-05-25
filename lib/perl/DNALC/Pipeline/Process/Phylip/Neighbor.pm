@@ -44,9 +44,9 @@ use strict;
 		my $instring = $self->{conf}->{menu_options};
 		if ($params{bootstraps}) {
 			$instring = sprintf($self->{conf}->{menu_options_wb}, $params{bootstraps});
-			if ($params{input_is_protein}) {
-				$instring = "R\n" . $instring;
-			}
+		}
+		if ($params{input_is_protein}) {
+			$instring =~ s/[LR]\n//;
 		}
 		print STDERR "About to send parameters:\n", $instring if $debug;
 
