@@ -101,26 +101,43 @@
 					status => $status{phy_alignment}, delay => 20, pid => $pid &>
 		</span>
         
+        
+        <span class="conBlueline_ConColumnPHYLIP"> 
+        
 		<span class="conBlueline_ConCell">
 			<span class="conIndicator_box">
 				<div id="phy_tree_st" class="conIndicatorBL_<% $status{phy_alignment} eq "done" ? $status{phy_tree} eq "done" ? "done" : $is_owner ? $status{phy_tree} : "disabled" : "disabled" %>"></div>
 			</span>
 %	if ($status{phy_alignment} ne "done") {
 			<span class="bt_Runblueline">
-				<a id="phy_tree_btn" class="conIndicatorBL_disabled" status="disabled" href="javascript:;">PHYLIP</a>
+				<a id="phy_tree_btn" class="conIndicatorBL_disabled" status="disabled" href="javascript:;">PHYLIP NJ</a>
 			</span>
 %	} else {
 			<& '.routine', routine => 'phy_tree', pmanager => $pm, is_owner => $is_owner,
 				status => $status{phy_tree}, delay => 20, pid => $pid &>
 %	}
 		</span>
-        
+
+		<span class="conBlueline_ConCell">
+			<span class="conIndicator_box">
+				<div id="phy_tree_ml_st" class="conIndicatorBL_<% $status{phy_alignment} eq "done" ? $status{phy_tree_ml} eq "done" ? "done" : $is_owner ? $status{phy_tree_ml} : "disabled" : "disabled" %>"></div>
+			</span>
+%	if ($status{phy_alignment} ne "done") {
+			<span class="bt_Runblueline">
+				<a id="phy_tree_ml_btn" class="conIndicatorBL_disabled" status="disabled" href="javascript:;">PHYLIP ML</a>
+			</span>
+%	} else {
+			<& '.routine', routine => 'phy_tree_ml', pmanager => $pm, is_owner => $is_owner,
+				status => $status{phy_tree_ml}, delay => 20, pid => $pid &>
+        </span>
+%	}
+        </span>
+
      </span><!--END of span conBlueline_ConColumn3-->
 </div><!--END of ID conBluelineLeft2-->
 
 <!--right Content Start--------------> 
 <div id="conBluelineRight2">
-    <span class="conBlueline_ConColumn4">&nbsp;</span>
     
 <span class="conBlueline_ConColumn5">
 <div class="con_browserBT ">
@@ -145,6 +162,9 @@
 		<div id="conProjectInfo_title">Project Information</div>
 		<div id="conProjectInfo_edit">
 			<div class="bt_projectInfo_edit"><a href="javascript:;" onclick="javascript:show_edit();"></a></div>
+% if (0 && ($is_owner || $is_public)) {
+			<a href="tools/clone_project?pid=<% $proj->id %>">clone</a>
+% }
 		</div>
 		<div id="conProjectInfo_projecttitle" origtitle=""><% $proj->name |html%></div>
 		<div id="conProjectInfo_projectlog">Description</div>
@@ -170,7 +190,7 @@
 			<div class="conProjectInfo_Cell3"><input type="radio" name="public" id="public_yes" <% $is_public ? "checked=\"checked\"" : "" %> onclick="set_public(1);"/> &nbsp; Public</div>
 		</div>
 		<!--
-        <div class="conProjectInfo_Row">
+        <div class="conProjectInfo_Row" style="display:none;">
 			<div class="conProjectInfo_Cell1">Clonable</div>
 			<div class="conProjectInfo_Cell3">: &nbsp;<input type="radio" > &nbsp; On</span></div>
 			<div class="conProjectInfo_Cell3"><input type="radio" > &nbsp; Off</span></div>
@@ -235,7 +255,8 @@
 			phy_trim => "Sequence Trimmer",
 			phy_consensus => "Consensus Editor",
 			phy_alignment => "MUSCLE",
-			phy_tree => "PHYLIP",
+			phy_tree => "PHYLIP NJ",
+			phy_tree_ml => "PHYLIP ML",
 		);
 </%once>
 %#-------------------------------------------------
@@ -296,38 +317,31 @@ my $link   = 'javascript:;';
 my $target = 'target="_blank"';
 my $action = $is_owner ? qq{onclick="phy.run('$routine')"} : '';
 my $title  = '';
-##my $label  = '';
 my $class = "disabled";
 
 if ($status eq 'processing') {
 	$action = "";
 	$target = "";
-	#$title = $label = 'Processing';
 }
 elsif ($status eq 'done') {
-	my $url = "/project/phylogenetics/tools/view_$routine?pid=$pid";
+	my $url = "/project/phylogenetics/tools/view_$routine?pid=$pid;t=";
 	$url =~ s/phy_//;
-	$action = qq{onclick="phy.launch('$routine', '$url', '$routines{$routine}')"};
+	$url =~ s/tree_ml/tree/;
+	$action = qq{onclick="phy.launch('$routine', '$url} . $routine . qq{', '$routines{$routine}')"};
 	$target = '';
-	#$title  = 'Click to view results';
-	#$label  = 'View';
 	$class = '';
 } 
 else {
-		if ($status eq 'error') {
-			#$label = 'Failed/Run';
-			$class = "";
+	if ($status eq 'error') {
+		$class = "";
+	}
+	else {
+		if ($is_owner) {
+			$class = '';
 		}
-		else {
-			#$label = 'Run';
-			if ($is_owner) {
-				$class = '';
-			}
-		}
-		#$title = 'Click to process';
+	}
 	$target = "";
 }
-
 </%init>
 <span class="bt_Runblueline"><a id="<% $routine %>_btn" href="<% $link %>" class="<% $class %>" <% $target %> \
 % if ($is_owner) {

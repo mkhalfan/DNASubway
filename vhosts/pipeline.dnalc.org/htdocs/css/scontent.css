@@ -1423,7 +1423,7 @@
 /*---BLUE Console--left RUN----*/
 
 #conBluelineLeft2 {
-	width: 482px;
+	width: 540px;
 	height: 320px;
 	background: url("/images/v2/map-blueline_L2.jpg") top left no-repeat;
 	float: left;
@@ -1455,11 +1455,20 @@
   float:left;
   }
   
-  .conBlueline_ConColumn3{
+ .conBlueline_ConColumn3{
   width:148px;
-  height: 130px;
+  height: auto;
   padding-left: 14px;
   padding-top: 43px;
+  position: relative;
+  float:left;
+  }
+  
+.conBlueline_ConColumnPHYLIP{
+  width:120px;
+  height: auto;
+  padding-left: 28px;
+  padding-top: 20px;
   position: relative;
   float:left;
   }
@@ -1476,7 +1485,7 @@
  .conBlueline_ConColumn5{
   width:126px;
   height: 110px;
-  padding-left: 46px;
+  padding-left: 136px;
   padding-top: 80px;
   position: relative;
   float:left;
@@ -1538,7 +1547,7 @@
 
 
 #conBluelineRight2 {
-	width: 326px;
+	width: 268px;
 	height: 208px;
 	background: url("/images/v2/map-blueline_R2.jpg") bottom left no-repeat;
 	float: left;
