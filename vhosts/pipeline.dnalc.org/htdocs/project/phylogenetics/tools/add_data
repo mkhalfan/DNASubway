@@ -56,9 +56,9 @@
 	<div class="con_BL_subTitle">Import sequence</div>
 	<div class="con_BL_menu_box"> 
 		<div class="con_BL_menu_box1">
-			<input class="conRadiobox_align" type="radio" name="seq_src" id="seq_src_genbank" disabled="disabled"
+			<input class="conRadiobox_align" type="radio" name="seq_src" id="seq_src_genbank" 
 				<% $seq_src eq "genebank" ? "checked=\"checked\"" : ""%>
-				value="genbank" onclick="phy.select_source('import')" /> &nbsp; Import sequence from GenBank
+				value="genbank" onclick="phy.select_source('importgenbank');" /> &nbsp; Import sequence from GenBank
 		</div>
 % if ($proj->type ne "protein") {
 		<div class="con_BL_menu_box1">
@@ -73,8 +73,12 @@
 	</div>
 	<div class="con_BL_menu_box" id="import_inputs" style="">
 		<div class="con_BL_menu_box2">Please enter accession/sequence ID:</div>
-			<input class="conStylized_input3"  name="accession" id="accession" value="" disabled="disabled"/>
-		<div align="left"><input type="button" value="Import" disabled="disabled" /></div>
+		<input class="conStylized_input3"  name="accession" id="accession" value="" disabled="true"/>
+		<div id="import-error" style="display:none; color:red; font-size:0.7em;clear:both;"></div>
+		<div align="left">
+			<input type="button" value="Import" id="import_btn" disabled="true"/>
+			<img id="import-loader" style="display:none" align="top" width="20" height="20" src="/images/ajax-loader-2.gif" alt="Importing...">
+		</div>
 	</div>
 	<div id="dnalc_container" style="clear:both;"></div>
 	</form>

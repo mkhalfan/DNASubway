@@ -100,6 +100,29 @@
 	phy.select_source = function (src) {
 		if (!src)
 			return;
+			
+		if (src == 'importgenbank'){
+			$('accession').disabled=false;
+			$('import_btn').disabled=false;
+			var pid = parent.document.getElementById('pid').value;
+			$('import_btn').observe('click', function(ev) {
+					$('import-error').hide();
+					if ($('accession').value){
+						var accession = $('accession').value;
+						phy.get_genbank_data(accession, pid);
+						$('import-loader').show();
+					}
+					else{
+						$('import-error').update('Please enter an accession number');
+						$('import-error').show();
+					}
+				});
+		}
+		
+		if(src != 'importgenbank' && src != 'importbold'){
+			$('accession').disabled=true;
+			$('import_btn').disabled=true;
+		}
 
 		if (src == 'importdnalc') {
 			var pid = parent.document.getElementById('pid').value;
@@ -124,6 +147,32 @@
 			el.click();
 		}
 	};
+	
+	phy.get_genbank_data = function(accession, pid){
+			new Ajax.Request('/project/phylogenetics/tools/import_from_genbank', {
+				method:'get',	
+				parameters: {'pid': pid, 'accession': accession},
+				onSuccess: function(transport){
+					var response = transport.responseText || "{'status':'error', 'message':'No response'}";
+					var r = response.evalJSON();
+					if (r.status == 'success') {
+						$('import-loader').hide();
+						if (r.message == 'clip'){
+							alert('Large sequence trimmed at 20kb');
+						}
+						top.phy.close_window('data');
+					}
+					else {
+						$('import-loader').hide();
+						$('import-error').show();
+						$('import-error').update('Error: ' + r.message);
+					}
+				},
+				onFailure: function(){
+						alert('Something went wrong!\nAborting...');
+					}
+		});
+	}
 	
 	phy.launch = function (what, where, title) {
 		
@@ -1378,7 +1427,7 @@
 						span_to_update.addClassName('changed-base');
 					}
 					
-					// Updatet the save changes button
+					// Update the save changes button
 					phy.prepare_consensus_change();
 						
 				});
