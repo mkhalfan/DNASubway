@@ -33,10 +33,10 @@ color: #000;
 		<pre>
 % for (@files) {
 %	if ($_->has_low_q){
-<span id="low_qs_<% $_->id %>"><a href="./view_sequences.html?pid=<% $pid |html%>;fid=<% $_->id %>;show_trimmed=<% $show_trimmed %>"><img src="/images/chart_curve_error.png" border=0 alt="View Trace" style="vertical-align: middle;" /></a></span>
+<span id="low_qs_<% $_->id %>"><a href="./view_sequences.html?pid=<% $pid |html%>;fid=<% $_->id %>;show_trimmed=<% $show_trimmed %>"><img src="/images/chart_curve_error.png" border=0 alt="Low Quality Score Alert" style="vertical-align: middle;" /></a></span>
 %	}
 %	else {
-<span><a href="./view_sequences.html?pid=<% $pid |html%>;fid=<% $_->id %>;show_trimmed=<% $show_trimmed %>"><img src="/images/chart_curve.png" border=0 alt="View Trace" style="vertical-align: middle;" /></a></span>
+<span><a href="./view_sequences.html?pid=<% $pid |html%>;fid=<% $_->id %>;show_trimmed=<% $show_trimmed %>"><img src="/images/chart_curve.png" border=0 alt="View Trace" title="View Trace" style="vertical-align: middle;" /></a></span>
 %	}
 % }	
 % for (@sequences) {
@@ -63,11 +63,21 @@ color: #000;
 	<input type="hidden" id="start" value="<% $seq_obj->start_pos %>" />
 	<input type="hidden" id="end" value="<% $seq_obj->end_pos %>" />
 % 	}
-	<div style="margin-top:17px;margin-left:10px;margin-bottom:20px;border:#000 1px solid;overflow:auto;">
-		<canvas id="canvas1" height="200">
-			Your browser doesn't support this Trace Viewer.
-		</canvas>
+		<div style="margin-top:17px;margin-left:10px;margin-bottom:20px;border:#000 1px solid;overflow:auto;position:relative;">
+			<canvas id="canvas1" height="200">
+				Your browser doesn't support this Trace Viewer.
+			</canvas>
+%	if (!$show_trimmed) {
+		<div id="view-seqs-help-bubble" style="position:absolute;z-index:1;left:70px;top:25px;background:url(/images/bt-trace-question.png);display:block;width:21px;height:29px;cursor:pointer" title="What is this line?" onclick="$('view-seqs-help-message').toggle()"></div>
+		<!--<div id="view-seqs-help-x-button" style="position:absolute;z-index:1;left:86px;top:22px;background:url(/images/x.png);display:block;width:10px;height:10px;cursor:pointer;" onclick="$('view-seqs-help-message').hide(); $('view-seqs-help-bubble').hide(); $('view-seqs-help-x-button').hide()"></div>-->
+		<div id="view-seqs-help-message" style="position:absolute;z-index:1;left:70px;top:52px;background:url(/images/bg-trace-questionPanel.png) no-repeat;display:none;font-size:10px;font-family:arial;color:#2e83ac;text-transform:none;line-height:10px;height:73px;width:250px;padding:10px 15px 10px 15px;">Bars depict quality scores for each nucleotide detected or "called". The horizontal blue line marks a quality score of 20. Bars below that line indicate low quality calls. <a href='http://en.wikipedia.org/wiki/Phred_quality_score' style="color:#2e83ac;" target="blank">Learn more about quality scores</a>.</div>
+% 	}
 	</div>
+%	if ($file->has_low_q){
+	<div id="low-qs-alert-link" style="margin-top:-10px; margin-left: 10px; margin-bottom:10px; text-transform:none; background: #c2dbf3; width:195px;">
+			<img src="/images/chart_curve_error.png" border=0 alt="Low Quality Score Alert" title="Low Quality Score Alert" style="vertical-align: middle; margin:5px" /><a href="http://en.wikipedia.org/wiki/Phred_quality_score" style="font-size:11px; font-family:'Tahoma'; color:#dd5326;" target="blank" title="The average error rate for this sequence is greater than 1%. This indicates that the sequence is of low quality and may produce erroneous analysis results.">Learn more about quality scores</a><a href="#" onclick="$('low-qs-alert-link').hide();"><img src="/images/x-orange.png" border=0 alt="Close" title="Close" style="vertical-align:top;cursor:pointer;float:right; margin:2px;" /></a>
+	</div>
+%	}
 	<div style="float:left; width: 100px;padding-left:10px;"><input type="button" id="zoom_reset" value=" Reset " onclick="phy.zoomReset()" class="btn" /></div>
 	<div style="float:left; width: 200px; text-align: center;">
 		<span class="label">X: </span><input type="button" id="x_zoom_in" value="  +  " onclick="phy.zoomIn('x')" class="btn" /><input type="button" id="x_zoom_out" value="  -  " onclick="phy.zoomOut('x')" class="btn" />

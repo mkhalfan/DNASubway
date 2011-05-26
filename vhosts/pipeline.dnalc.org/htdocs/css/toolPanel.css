@@ -408,7 +408,7 @@ span.rot { -moz-transform:rotate(90deg); font-size: smaller;}
 	margin-right:1px;
 	}	
 
-/* If you modify any widths here (including padding, margins) - you must update the JS at step == 0 */
+/* If you modify any widths here (including padding, margins) - you must update the JS at step == 8 */
 #phy-pair-builder, #phy-blast {
 	width: 840px;
 	height: auto;
