@@ -53,6 +53,7 @@
 	</div>
 
 	<!-- IMPORT -->
+% if ($proj->type ne "protein") {
 	<div class="con_BL_subTitle">Import sequence</div>
 	<div class="con_BL_menu_box"> 
 		<div class="con_BL_menu_box1">
@@ -60,10 +61,11 @@
 				<% $seq_src eq "genebank" ? "checked=\"checked\"" : ""%>
 				value="genbank" onclick="phy.select_source('importgenbank');" /> &nbsp; Import sequence from GenBank
 		</div>
-% if ($proj->type ne "protein") {
+
 		<div class="con_BL_menu_box1">
-			<input class="conRadiobox_align" type="radio" name="seq_src" id="seq_src_bold" disabled="disabled"
-				value="bold" onclick="phy.select_source('import')" /> &nbsp; Import sequence from BOLD
+			<input class="conRadiobox_align" type="radio" name="seq_src" id="seq_src_bold"
+				<% $seq_src eq "bold" ? "checked=\"checked\"" : ""%>
+				value="bold" onclick="phy.select_source('importbold')" /> &nbsp; Import sequence from BOLD
 		</div>
 		<div class="con_BL_menu_box1">
 			<input class="conRadiobox_align" type="radio" name="seq_src" id="seq_src_dnalc"
