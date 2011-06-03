@@ -47,8 +47,14 @@
 		my $esearch_result_parsed = XMLin($esearch_result);
 		#print STDERR Dumper($esearch_result_parsed), $/;
 		if ($esearch_result_parsed->{Count} == 0){
-			$message = $esearch_result_parsed->{WarningList}->{OutputMessage};
+			if (ref($esearch_result_parsed->{WarningList}->{OutputMessage}) eq 'ARRAY') {
+			my $messages = $esearch_result_parsed->{WarningList}->{OutputMessage};
+			print "{'status': \"$status\", 'message': \"@$messages\"}";
+			}
+			else {
+			my $message = $esearch_result_parsed->{WarningList}->{OutputMessage};
 			print "{'status': \"$status\", 'message': \"$message\"}";
+			}
 			return;
 		}
 		

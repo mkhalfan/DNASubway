@@ -26,7 +26,7 @@
 		<div class="con_BL_menu_box1">
 			<input class="conRadiobox_align" type="radio" name="seq_src" id="seq_src_upload" 
 				<% $seq_src eq "upload" ? "checked=\"checked\"" : ""%> value="upload" onchange="phy.select_source(this.value)" />
-			Upload <a href="#">AB1</a> or <a href="http://en.wikipedia.org/wiki/FASTA_format#Format">FASTA formated</a> files
+			Upload AB1 or <a href="http://en.wikipedia.org/wiki/FASTA_format#Format">FASTA formated</a> files
 		</div>                     
 	</div>
 	<div class="con_BL_menu_box" id="upload_inputs">
@@ -59,13 +59,13 @@
 		<div class="con_BL_menu_box1">
 			<input class="conRadiobox_align" type="radio" name="seq_src" id="seq_src_genbank" 
 				<% $seq_src eq "genebank" ? "checked=\"checked\"" : ""%>
-				value="genbank" onclick="phy.select_source('importgenbank');" /> &nbsp; Import sequence from GenBank
+				value="genbank" onclick="phy.select_source('importgenbank')" /> &nbsp; Import sequence from GenBank
 		</div>
 
 		<div class="con_BL_menu_box1">
 			<input class="conRadiobox_align" type="radio" name="seq_src" id="seq_src_bold"
 				<% $seq_src eq "bold" ? "checked=\"checked\"" : ""%>
-				value="bold" onclick="phy.select_source('importbold')" /> &nbsp; Import sequence from BOLD
+				value="bold" onclick="phy.select_source('importbold')" disabled="true" /> &nbsp; Import sequence from BOLD
 		</div>
 		<div class="con_BL_menu_box1">
 			<input class="conRadiobox_align" type="radio" name="seq_src" id="seq_src_dnalc"
