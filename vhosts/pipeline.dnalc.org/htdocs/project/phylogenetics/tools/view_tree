@@ -11,6 +11,7 @@
 	<param name="treeFile" value="<% $m->comp('../../.comp/filepath_to_web', file => $tinfo->{tree_file} ) %>" />
 	<param name="embedded" value="true" />
 	<param name="showAnnotation" value="true" />
+	<param name="showTreeDistances" value="false" />
 	<param name="wrap" value="false" />
 	<param name="nojmol" value="true" />
 	<param name="windowHeight" value="500" />
