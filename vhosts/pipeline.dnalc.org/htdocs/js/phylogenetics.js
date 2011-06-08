@@ -100,49 +100,15 @@
 	phy.select_source = function (src) {
 		if (!src)
 			return;
-			
-		if (src == 'importgenbank'){
-			$('accession').disabled=false;
-			$('import_btn').disabled=false;
-			var pid = parent.document.getElementById('pid').value;
-			$('import_btn').observe('click', function(ev) {
-					$('import-error').hide();
-					$('import_btn').disabled=true;
-					if ($('accession').value){
-						var accession = $('accession').value;
-						phy.get_genbank_data(accession, pid);
-						$('import-loader').show();
-					}
-					else{
-						$('import-error').update('Please enter an accession number');
-						$('import-error').show();
-						$('import_btn').disabled=false;
-					}
-				});
+
+		
+		if(src != 'genbank' && src != 'bold'){
+			if ($('accession') && $('import_btn')){
+				$('accession').disabled=true;
+				$('import_btn').disabled=true;
+			}
 		}
 		
-		/*if (src == 'importbold'){
-			$('accession').disabled=false;
-			$('import_btn').disabled=false;
-			var pid = parent.document.getElementById('pid').value;
-			$('import_btn').observe('click', function(ev) {
-					$('import-error').hide();
-					if ($('accession').value){
-						var accession = $('accession').value;
-						phy.get_bold_data(accession, pid); //-----------------//
-						$('import-loader').show();
-					}
-					else{
-						$('import-error').update('Please enter an accession number');
-						$('import-error').show();
-					}
-				});
-		}*/
-		
-		if(src != 'importgenbank' && src != 'importbold'){
-			$('accession').disabled=true;
-			$('import_btn').disabled=true;
-		}
 
 		if (src == 'importdnalc') {
 			var pid = parent.document.getElementById('pid').value;
@@ -153,6 +119,10 @@
 				$('transferred_files').show();
 			else
 				phy.launch(null, './tools/dnalc_data?pid=new', 'Import DNALC data');
+		}			
+		else if (src == 'genbank' || src == 'bold') {
+			$('accession').disabled=false;
+			$('import_btn').disabled=false;
 		}
 		else {
 			$('dnalc_container').update();
@@ -168,58 +138,59 @@
 		}
 	};
 	
-	phy.get_genbank_data = function(accession, pid){
-			new Ajax.Request('/project/phylogenetics/tools/import_from_genbank', {
-				method:'get',	
-				parameters: {'pid': pid, 'accession': accession},
-				onSuccess: function(transport){
-					var response = transport.responseText || "{'status':'error', 'message':'No response'}";
-					var r = response.evalJSON();
-					if (r.status == 'success') {
-						$('import-loader').hide();
-						if (r.message == 'clip'){
-							alert('Large sequence trimmed at 20kb');
-						}
-						top.phy.close_window('data');
+	phy.import_request = function () {
+		var pid = parent.document.getElementById('pid').value;
+		var src = $('forma1').getInputs('radio', 'seq_src').find(
+			function(re) {return re.checked;}
+		);
+		//var src = checked.value;
+		debug(src.value);
+		//$('import_btn').observe('click', function(ev) {
+			$('import-error').hide();
+			$('import_btn').disabled=true;
+			if ($('accession').value){
+				var accession = $('accession').value;
+				phy.get_external_data(accession, pid, src.value);
+			}
+			else{
+				$('import-error').update('Please enter an accession number');
+				$('import-error').show();
+				$('import_btn').disabled=false;
+			}
+		//});
+	};
+	
+	phy.get_external_data = function(accession, pid, src) {
+		if (!src)
+			return;
+		
+		$('import-loader').show();
+
+		new Ajax.Request('/project/phylogenetics/tools/import_from_' + src, {
+			method:'get',	
+			parameters: {'pid': pid, 'accession': accession},
+			onSuccess: function(transport){
+				var response = transport.responseText || "{'status':'error', 'message':'No response'}";
+				var r = response.evalJSON();
+				if (r.status == 'success') {
+					$('import-loader').hide();
+					if (src == 'genbank' && r.message == 'clip'){
+						top.show_messages('Large sequence trimmed at 20kb');
 					}
-					else {
-						$('import-loader').hide();
-						$('import-error').show();
-						$('import-error').update('Error: ' + r.message);
-						$('import_btn').disabled=false;
-					}
-				},
-				onFailure: function(){
-						alert('Something went wrong!\nAborting...');
-					}
+					top.phy.close_window('data');
+				}
+				else {
+					$('import-loader').hide();
+					$('import-error').show();
+					$('import-error').update('Error: ' + r.message);
+					$('import_btn').disabled=false;
+				}
+			},
+			onFailure: function(){
+					alert('Something went wrong!\nAborting...');
+				}
 		});
 	}
-	
-	/*phy.get_bold_data = function(accession, pid){
-			new Ajax.Request('/project/phylogenetics/tools/import_from_bold', {  //----------------//
-				method:'get',	
-				parameters: {'pid': pid, 'accession': accession},
-				onSuccess: function(transport){
-					var response = transport.responseText || "{'status':'error', 'message':'No response'}";
-					var r = response.evalJSON();
-					if (r.status == 'success') {
-						$('import-loader').hide();
-						if (r.message == 'clip'){
-							alert('Large sequence trimmed at 20kb');
-						}
-						top.phy.close_window('data');
-					}
-					else {
-						$('import-loader').hide();
-						$('import-error').show();
-						$('import-error').update('Error: ' + r.message);
-					}
-				},
-				onFailure: function(){
-						alert('Something went wrong!\nAborting...');
-					}
-		});
-	}*/
 	
 	phy.launch = function (what, where, title) {
 		
