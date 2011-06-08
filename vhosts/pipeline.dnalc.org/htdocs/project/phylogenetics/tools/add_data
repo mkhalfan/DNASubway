@@ -58,14 +58,14 @@
 	<div class="con_BL_menu_box"> 
 		<div class="con_BL_menu_box1">
 			<input class="conRadiobox_align" type="radio" name="seq_src" id="seq_src_genbank" 
-				<% $seq_src eq "genebank" ? "checked=\"checked\"" : ""%>
-				value="genbank" onclick="phy.select_source('importgenbank')" /> &nbsp; Import sequence from GenBank
+				<% $seq_src eq "genbank" ? "checked=\"checked\"" : ""%>
+				value="genbank" onclick="phy.select_source('genbank')" /> &nbsp; Import sequence from GenBank
 		</div>
 
 		<div class="con_BL_menu_box1">
 			<input class="conRadiobox_align" type="radio" name="seq_src" id="seq_src_bold"
 				<% $seq_src eq "bold" ? "checked=\"checked\"" : ""%>
-				value="bold" onclick="phy.select_source('importbold')" disabled="true" /> &nbsp; Import sequence from BOLD
+				value="bold" onclick="phy.select_source('bold')" /> &nbsp; Import sequence from BOLD
 		</div>
 		<div class="con_BL_menu_box1">
 			<input class="conRadiobox_align" type="radio" name="seq_src" id="seq_src_dnalc"
@@ -78,7 +78,7 @@
 		<input class="conStylized_input3"  name="accession" id="accession" value="" disabled="true"/>
 		<div id="import-error" style="display:none; color:red; font-size:0.7em;clear:both;"></div>
 		<div align="left">
-			<input type="button" value="Import" id="import_btn" disabled="true"/>
+			<input type="button" value="Import" id="import_btn" disabled="true" onclick="phy.import_request()"/>
 			<img id="import-loader" style="display:none" align="top" width="20" height="20" src="/images/ajax-loader-2.gif" alt="Importing...">
 		</div>
 	</div>

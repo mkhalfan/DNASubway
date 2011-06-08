@@ -1,0 +1,67 @@
+{"status":"<% $status %>", "message":"<% $message %>"}
+<%args> 
+	$pid => 0;
+	$accession => 0
+</%args>
+<%once>
+	use DNALC::Pipeline::Utils qw(random_string);
+	use DNALC::Pipeline::Phylogenetics::DataSequence ();
+	use DNALC::Pipeline::App::Phylogenetics::ProjectManager ();
+	use DNALC::Pipeline::Miner::Bold ();
+	use Data::Dumper;
+#	use HTTP::Tiny ();   #
+#	use XML::Simple;     #
+	use URI::Escape;     
+</%once>
+<%init>
+	
+	my $status = "error";
+	my $message = "";
+	my @err;
+	my $pm = DNALC::Pipeline::App::Phylogenetics::ProjectManager->new($pid);
+	my $bold = DNALC::Pipeline::Miner::Bold->new($pm->work_dir);
+	
+	#my $cf = DNALC::Pipeline::Config->new;
+	#my $pcf = $cf->cf('PIPELINE');
+	
+	my $s = $m->session->{pipeline};
+	my $proj = $pm->project;
+	
+	unless ($proj && $s->{user_id} == $proj->user_id) {
+		$message = "Project not found!";
+		print "{'status': \"$status\" , 'message': \"$message\"}";
+		return;
+	}
+	
+	my $ids = uri_escape($accession);   #ex: ids=(WEEMX018-10) - the ids has to be of type id_type specified above
+
+	$bold->fetch($ids);
+	my $fasta = $bold->store_sequence;
+	#print $query, "\n", $fasta, "\n";
+	if ($fasta && -f $fasta){
+		# add data to database
+		my $st = $pm->add_data({
+			source => 'Bold',
+			files => [{path => $fasta, }],
+			type => 'fasta',
+			existing_project => 1, # must be set every time we add data to an existing project
+		});
+		if ($st->{errors} && @{$st->{errors}}){
+			push @err, @{$st->{errors}};
+			print STDERR "Errors = @err";
+			$message = "@err";			
+		}
+		else{
+			$status = 'success';
+		}
+	}
+	else{
+		$message = "No record found for id '$accession'" ;
+		print "{'status': \"$status\" , 'message': \"$message\"}";
+		return;
+	}
+		
+</%init>
+<%flags>
+	inherit => undef
+</%flags>
