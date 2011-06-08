@@ -45,4 +45,34 @@
 			file => '/var/www/vhosts/pipeline.dnalc.org/var/phy_samples/reference/fish_subset.fas'
 		},
 	],
+	mtDNA => [
+		{
+			id => 'Neanderthal',
+			file => '/var/www/vhosts/pipeline.dnalc.org/var/phy_samples/reference/mtDNA/neanderthal.fasta',
+		},
+		{
+			id => 'Modern Human/African',
+			file => '/var/www/vhosts/pipeline.dnalc.org/var/phy_samples/reference/mtDNA/modern/african.fasta',
+		},
+		{
+			id => 'Modern Human/African American',
+			file => '/var/www/vhosts/pipeline.dnalc.org/var/phy_samples/reference/mtDNA/modern/african_american.fasta',
+		},
+		{
+			id => 'Modern Human/Asian',
+			file => '/var/www/vhosts/pipeline.dnalc.org/var/phy_samples/reference/mtDNA/modern/asian.fasta',
+		},
+		{
+			id => 'Modern Human/Australian and Pacific Islander',
+			file => '/var/www/vhosts/pipeline.dnalc.org/var/phy_samples/reference/mtDNA/modern/australian.fasta',
+		},
+		{
+			id => 'Modern Human/European',
+			file => '/var/www/vhosts/pipeline.dnalc.org/var/phy_samples/reference/mtDNA/modern/european.fasta',
+		},
+		{
+			id => 'Modern Human/Native American',
+			file => '/var/www/vhosts/pipeline.dnalc.org/var/phy_samples/reference/mtDNA/modern/native_american.fasta',
+		},
+	],
 }
