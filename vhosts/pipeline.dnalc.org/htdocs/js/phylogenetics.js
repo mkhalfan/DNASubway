@@ -1603,15 +1603,20 @@
 	// -----------------------------------------------
 	// handlers for getting dnalc data
 	//
-	phy.get_dnalc_data = function (page, order_id) {
+	phy.get_dnalc_data = function (page, order_id, sort_by, sort_dir) {
 
 		var apiUri = "http://dnalc02.cshl.edu/genewiz/json";
 		var uri = apiUri + "?p=" + (page ? page : 1);
-		//debug("order_id: " + order_id);
 		if (order_id && /^\d+$/.test(order_id)) {
 			uri += ";o=" + order_id;
 		}
 		
+		if (sort_by) {
+			uri += ";s=" + sort_by;
+			if (sort_dir)
+				uri += ";d=" + sort_dir;
+		}
+
 		//$('dnalc_btn').disabled = true;
 		if ($('dnalc_btn'))
 			$('dnalc_btn').remove();
@@ -1626,8 +1631,6 @@
 	};
 	
 	phy.parse_dnalc_data = function(meta, data) {
-		var page = meta.p;
-		//debug(meta);
 		if (meta.t == 'l') { // list
 			phy.display_dnalc_data(meta, data);
 		}
@@ -1640,24 +1643,25 @@
 		var table = new Element('table');
 		var tr;
 		if (Object.isArray(data)) {
-			tr = phy.build_tr(["#", "Date", "Name", "Institution"], 'header');
+			tr = phy.build_tr(["Tracking #", "Date", "Name", "Institution"], 'header', meta);
 			table.insert(tr);
 			data.each(function(d) {
 				var lnk = new Element('a', {href: 'javascript:;'}).update(d.number);
-				Event.observe(lnk, 'click', function() {phy.get_dnalc_data(meta.p, d.id);});
-				//var col1 = new Element('div').update(lnk).insert(new Element('div').update(d.date));
+				Event.observe(lnk, 'click', function() {phy.get_dnalc_data(meta.p, d.id, meta.s, meta.d);});
 				tr = phy.build_tr([lnk, d.date, d.name, d.institution]);
 				table.insert(tr);
 			});
 		}
+
 		if (meta.pnum > 1) {
 			var nav = "";
+			var args = ",null,'" + meta.s + "','" +meta.d + "'";
 			if (meta.p > 1) {
-				nav += "<a href=\"javascript:phy.get_dnalc_data(" + (meta.p - 1) + ");\">«</a> ";
+				nav += "<a href=\"javascript:phy.get_dnalc_data(" + (meta.p - 1) + args + ");\">«</a> ";
 			}
 			nav += "Page " + meta.p + " of " + meta.pnum;
 			if (meta.p < meta.pnum) {
-				nav += " <a href=\"javascript:phy.get_dnalc_data(" + (meta.p + 1) + ");\">»</a> ";
+				nav += " <a href=\"javascript:phy.get_dnalc_data(" + (meta.p + 1) + args + ");\">»</a> ";
 			}
 			//tr = phy.build_tr([nav]);
 			//tr.cells[0].colspan = "3";
@@ -1668,7 +1672,7 @@
 	phy.display_dnalc_files = function(meta, data) {
 		var table = new Element('table');
 		var a = new Element('a', {href:'javascript:;'}).update('« back');
-		a.observe('click', function(){ phy.get_dnalc_data(meta.p) });
+		a.observe('click', function(){ phy.get_dnalc_data(meta.p, null, meta.s, meta.d) });
 
 		var tr = phy.build_tr([a, '']);
 		table.insert(tr);
@@ -1689,8 +1693,7 @@
 				f.insert(h2);
 				file_divs = [h1, h2	];
 			}
-			debug(file_divs);
-			debug(file_divs.length);
+			//debug(meta);
 
 			fall.observe('click', function(){ phy.select_all_dnalc_files() });
 			a.observe('click', function(){ phy.select_all_dnalc_files(true) });
@@ -1714,11 +1717,27 @@
 		$('dnalc_container').update(table);
 		$('dnalc_container').insert(new Element('input', {type: 'hidden', value: meta.o, id: 'oid'}));
 	};
-	phy.build_tr = function(data, _class) {
+	phy.build_tr = function(data, _class, meta) {
 		var tr = new Element('tr');
 		if (_class)
 			tr.addClassName(_class);
 		data.each(function(el, i) {
+			if (meta && _class == "header") {
+				var ch = el.toLowerCase().substring(0,1);
+				// unicode arrows from http://www.fileformat.info/info/unicode/block/arrows/utf8test.htm
+				if (ch == meta.s && 'a' == meta.d) {
+					el += " ⇧";
+				}
+				else if (ch != meta.s || 'a' != meta.d) {
+					el += " <a href=\"javascript:phy.get_dnalc_data(1,null,'" + ch + "','a');\">⇧</a>";
+				}
+				if (ch == meta.s && 'd' == meta.d) {
+					el += " ⇩";
+				}
+				else if (ch != meta.s || 'd' != meta.d) {
+					el += " <a href=\"javascript:phy.get_dnalc_data(1,null,'" + ch + "','d');\">⇩</a>";
+				}
+			}
 			tr.insert(new Element('td').update(el));
 		});
 		return tr;
