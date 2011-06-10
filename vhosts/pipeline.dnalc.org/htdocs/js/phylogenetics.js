@@ -47,8 +47,9 @@
 				if (t.length == 0) {
 					return false;
 				}
-				var re = /[^actugn\s\d]/i;
-				return re.test(t) == false;
+				//var re = /[^actugn\s\d]/i;
+				//return re.test(t) == false;
+				return true;
 			};
 			if (pasted_data_ok()) {
 				has_actg = true;
