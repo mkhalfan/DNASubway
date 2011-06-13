@@ -145,7 +145,6 @@
 			function(re) {return re.checked;}
 		);
 		//var src = checked.value;
-		debug(src.value);
 		//$('import_btn').observe('click', function(ev) {
 			$('import-error').hide();
 			$('import_btn').disabled=true;
@@ -154,7 +153,7 @@
 				phy.get_external_data(accession, pid, src.value);
 			}
 			else{
-				$('import-error').update('Please enter an accession number');
+				$('import-error').update('Please enter an accession/process ID');
 				$('import-error').show();
 				$('import_btn').disabled=false;
 			}
@@ -175,16 +174,18 @@
 				var r = response.evalJSON();
 				if (r.status == 'success') {
 					$('import-loader').hide();
-					if (src == 'genbank' && r.message == 'clip'){
-						top.show_messages('Large sequence trimmed at 20kb');
-					}
+					//if (src == 'genbank' && r.message == 'too-big'){
+						//top.show_messages('');
+					//}
 					top.phy.close_window('data');
 				}
 				else {
 					$('import-loader').hide();
+					$('accession').value = '';
 					$('import-error').show();
 					$('import-error').update('Error: ' + r.message);
 					$('import_btn').disabled=false;
+					
 				}
 			},
 			onFailure: function(){
@@ -671,7 +672,9 @@
 
 		// Put the data in the right format (array)
 		qval.split(',').each(function(q){
-				qualityScores.push(parseInt(q, 10));
+				var val = parseInt(q, 10);
+				if (!isNaN(val))
+					qualityScores.push(val);
 			});
 			
 		$('b_locations').value.split(',').each(function(q){
@@ -706,7 +709,7 @@
 			trace_values: traces,
 			base_locations: baseLocations
 		};
-		
+
 		phy.draw(data, 'canvas1');
 	};
 	//---------------------------------------------------------
@@ -886,12 +889,14 @@
 		var nucleotideWidth = ctx.measureText(sequence).width / sequence.length;
 		ctx.fillStyle = "rgba(0, 0, 200, 0.5)";
 
-		baseLocationsPositions.each(function(bl, i) {
-			ctx.fillRect(
-					padding + bl * xZoom, qualScoreYPos - qualityScores[i]/4, 
-					nucleotideWidth, qualityScores[i]/4
-				);
-		});
+		if (qualityScores.length) {
+			baseLocationsPositions.each(function(bl, i) {
+				ctx.fillRect(
+						padding + bl * xZoom, qualScoreYPos - qualityScores[i]/4, 
+						nucleotideWidth, qualityScores[i]/4
+					);
+			});
+		}
 		
 		// Draw lines surrounding base in question (for consensus only)
 		if (data['seq_id']){
