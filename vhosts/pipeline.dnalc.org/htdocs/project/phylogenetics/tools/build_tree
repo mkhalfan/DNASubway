@@ -5,6 +5,7 @@
 </%args>
 <%once>
 	use DNALC::Pipeline::App::Phylogenetics::ProjectManager ();
+	use DNALC::Pipeline::CacheMemcached ();
 	use DNALC::Pipeline::Config();
 	use Gearman::Client ();
 	use Storable qw/thaw nfreeze/;
@@ -14,6 +15,16 @@
 	my ($status, $msg) = ("error", "");
 	$pid =~ s/\D+//g;
 
+	my $memcached = DNALC::Pipeline::CacheMemcached->new;
+	my $mc_key = "selected-seq-$pid";
+	my $sel = $memcached->get($mc_key);
+	if ($sel) {
+		if (@$sel < 3) {
+			print "{status:'error', message:'You need to select 3 sequences to build a tree.'}";
+			return;
+		}
+	}
+	
 	my $tree_type = ($t =~ /^phy_tree_ml$/) ? 'ML' : 'NJ';
 
 	my $pcf = DNALC::Pipeline::Config->new->cf('PIPELINE');

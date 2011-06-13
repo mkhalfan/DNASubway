@@ -363,13 +363,21 @@ use Bio::Trace::ABIF ();
 				#print ">", $seq_obj->display_id, $/;
 				$out_io->write_seq($seq_obj);
 
-				# calculate the quality score average
-				my @quality_values = $ab->quality_values;
-				my $total = 0;
-				map { $total += $_ } @quality_values;
-				if ($total / @quality_values < $self->config->{Q_THRESHOLD}) {
-					$data_file->has_low_q( 1 );
-					$data_file->update;
+				eval {
+					# calculate the quality score average
+					my @quality_values = $ab->quality_values;
+					#print STDERR  '@quality_values=', "[@quality_values]", $/;
+					if (@quality_values) {
+						my $total = 0;
+						map { $total += $_ } @quality_values;
+						if ($total / @quality_values < $self->config->{Q_THRESHOLD}) {
+							$data_file->has_low_q( 1 );
+							$data_file->update;
+						}
+					}
+				};
+				if ($@) {
+					print STDERR  "Errors: ", $@, $/;
 				}
 
 				$seq_count++;

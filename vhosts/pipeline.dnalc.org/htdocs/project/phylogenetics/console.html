@@ -162,7 +162,7 @@
 		<div id="conProjectInfo_title">Project Information</div>
 		<div id="conProjectInfo_edit">
 			<div class="bt_projectInfo_edit"><a href="javascript:;" onclick="javascript:show_edit();"></a></div>
-% if (0 && ($is_owner || $is_public)) {
+% if ($is_owner || $is_public) {
 			<a href="tools/clone_project?pid=<% $proj->id %>">clone</a>
 % }
 		</div>
@@ -189,13 +189,11 @@
 			<div class="conProjectInfo_Cell3">: &nbsp;<input type="radio" name="public" id="public_no" <% $is_public ? "" : "checked=\"checked\"" %> onclick="set_public(0);" /> &nbsp; Private</div>
 			<div class="conProjectInfo_Cell3"><input type="radio" name="public" id="public_yes" <% $is_public ? "checked=\"checked\"" : "" %> onclick="set_public(1);"/> &nbsp; Public</div>
 		</div>
-		<!--
-        <div class="conProjectInfo_Row" style="display:none;">
+        <div class="conProjectInfo_Row">
 			<div class="conProjectInfo_Cell1">Clonable</div>
-			<div class="conProjectInfo_Cell3">: &nbsp;<input type="radio" > &nbsp; On</span></div>
-			<div class="conProjectInfo_Cell3"><input type="radio" > &nbsp; Off</span></div>
+			<div class="conProjectInfo_Cell3">: &nbsp;<input type="radio" name="clonable" id="clonable_no" > &nbsp; On</span></div>
+			<div class="conProjectInfo_Cell3"><input type="radio" name="clonable" id="clonable_no" > &nbsp; Off</span></div>
 		</div>
-		-->
 % }
 	</span><!--END of span conProjectInfo_column1-->
 

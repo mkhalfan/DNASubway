@@ -50,10 +50,10 @@ color: #000;
 % if ($file) {
     <input type="hidden" id="step" value="2" />
 	<input type="hidden" id="seq_data" value="<% $file->seq |html%>" />
-	<input type="hidden" id="seq_A" value="<% join ",", @{$traces->{A}} %>" />
-	<input type="hidden" id="seq_T" value="<% join ",", @{$traces->{T}} %>" />
-	<input type="hidden" id="seq_C" value="<% join ",", @{$traces->{C}} %>" />
-	<input type="hidden" id="seq_G" value="<% join ",", @{$traces->{G}} %>" />
+	<input type="hidden" id="seq_A" value="<% join ",", $traces->{A} ? @{$traces->{A}} : () %>" />
+	<input type="hidden" id="seq_T" value="<% join ",", $traces->{T} ? @{$traces->{T}} : () %>" />
+	<input type="hidden" id="seq_C" value="<% join ",", $traces->{C} ? @{$traces->{C}} : () %>" />
+	<input type="hidden" id="seq_G" value="<% join ",", $traces->{G} ? @{$traces->{G}} : () %>" />
 	<input type="hidden" id="qvalues" value="<% join ",", $file->quality_values %>" />
 	<input type="hidden" id="b_locations" value="<% join ",", $file->base_locations %>" />
 	<input type="hidden" id="seq_display_id" value="<% $file->file_name %>" />

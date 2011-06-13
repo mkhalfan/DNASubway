@@ -33,13 +33,13 @@
 	<div class="conNewPro_label">
 		<input class="conRadiobox_align" type="radio" name="seq_src" id="seq_src_upload" 
 			value="upload" <% $seq_src eq "upload" ? "checked=\"checked\"" : ""%>/>&nbsp;
-			Upload sequence(s) in <a href="#">AB1</a> or <a href="http://en.wikipedia.org/wiki/FASTA_format#Format">FASTA format</a> <small>(max <% $seq_max_len %>kb)</small>:
+			Upload AB1 trace files or sequences in <a href="http://en.wikipedia.org/wiki/FASTA_format#Format">FASTA format</a> <small>(max <% $seq_max_len %>kb)</small>:
 			<input class="conStylized_box1" type="file" type=file multiple id="seq_file" name="seq_file"  onchange="phy.set_source('upload')" onclick="phy.set_source('upload')"  />
 		</div>
 
 		<div class="conNewPro_label">
 			<input class="conRadiobox_align" type="radio" name="seq_src" id="seq_src_paste" value="paste" <% $seq_src eq "paste" ? "checked=\"checked\"" : ""%> />&nbsp; 
-			Enter a sequence in <a href="http://en.wikipedia.org/wiki/FASTA_format#Format">FASTA format</a> <small>(max <%$seq_max_len%>kb)</small>:
+			Enter sequences in <a href="http://en.wikipedia.org/wiki/FASTA_format#Format">FASTA format</a> <small>(max <%$seq_max_len%>kb)</small>:
 			<textarea class="conStylized_box2" name="seq_paste" id="seq_paste" rows="5" cols="30" onfocus="phy.set_source('paste');"><% $seq_paste |html %></textarea>
 		</div>
 % if (0) {
@@ -55,7 +55,7 @@
 		<div class="conNewPro_label">
 			<input class="conRadiobox_align" type="radio" name="seq_src" id="seq_src_dnalc"
 				<% $seq_src eq "dnalc" ? "checked=\"checked\"" : ""%>
-				value="dnalc" onclick="phy.select_source('newdnalc')" /> &nbsp; Import sequence/trace from DNALC
+				value="dnalc" onclick="phy.select_source('newdnalc')" /> &nbsp; Import trace files from DNALC
 % if ($seq_src eq "dnalc" && @d) {
 	<div id="transferred_files" style="font-size:smaller; padding-left: 40px;">
 %	for my $d (@d) {
@@ -68,7 +68,7 @@
 		</div>
 		<div class="conNewPro_label">
 			<input class="conRadiobox_align" type="radio" name="seq_src" id="seq_src_sample" value="sample" <% $seq_src eq "sample" ? "checked=\"checked\"" : ""%>/>&nbsp; 
-		Select a sample sequence:  
+		Select a set of sample sequences:
 			<select class="conStylized_box3" id="sample" name="sample" size="4" style="width: 370px;" onchange="phy.set_source('sample');">
 % for my $ss (@samples) {
 %	my $sel = $seq_src eq "sample" && $ss->id == $sample ? "selected=\"selected\"" : "";

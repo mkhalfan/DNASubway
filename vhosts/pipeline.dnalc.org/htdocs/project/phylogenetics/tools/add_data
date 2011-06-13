@@ -42,8 +42,8 @@
 		<div class="con_BL_menu_box1">
 			<input class="conRadiobox_align" type="radio" name="seq_src" id="seq_src_paste" 
 				value="paste" <% $seq_src eq "paste" ? "checked=\"checked\"" : ""%> onchange="phy.select_source(this.value)" />
-			&nbsp; Enter a new sequence in FASTA format
-		</div>                     
+			&nbsp; Enter sequences in <a href="http://en.wikipedia.org/wiki/FASTA_format#Format">FASTA format</a>
+		</div>
 	</div>
 	<div class="con_BL_menu_box" id="paste_inputs">
 		<div class="con_BL_menu_box2">Please type or copy &amp; paste your sequence(s):</div>
@@ -69,7 +69,7 @@
 		</div>
 		<div class="con_BL_menu_box1">
 			<input class="conRadiobox_align" type="radio" name="seq_src" id="seq_src_dnalc"
-				value="dnalc" onclick="phy.select_source('importdnalc')" /> &nbsp; Import sequence/trace from DNALC
+				value="dnalc" onclick="phy.select_source('importdnalc')" /> &nbsp; Import trace files from DNALC
 		</div>                     
 % }
 	</div>
