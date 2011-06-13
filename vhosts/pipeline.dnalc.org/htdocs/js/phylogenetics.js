@@ -897,6 +897,12 @@
 					);
 			});
 		}
+		else{
+			ctx.fillStyle = "black";
+			ctx.fillText("Alert: No quality scores for this trace file", 50, 43); 
+			ctx.fillStyle = "rgba(255, 255, 0, 0.2)";
+			ctx.fillRect(48, 32, 192, 14);
+		}
 		
 		// Draw lines surrounding base in question (for consensus only)
 		if (data['seq_id']){

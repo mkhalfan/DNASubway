@@ -54,7 +54,7 @@ color: #000;
 	<input type="hidden" id="seq_T" value="<% join ",", $traces->{T} ? @{$traces->{T}} : () %>" />
 	<input type="hidden" id="seq_C" value="<% join ",", $traces->{C} ? @{$traces->{C}} : () %>" />
 	<input type="hidden" id="seq_G" value="<% join ",", $traces->{G} ? @{$traces->{G}} : () %>" />
-	<input type="hidden" id="qvalues" value="<% join ",", $file->quality_values %>" />
+	<input type="hidden" id="qvalues" value="<% join ",", @qvalues %>" />
 	<input type="hidden" id="b_locations" value="<% join ",", $file->base_locations %>" />
 	<input type="hidden" id="seq_display_id" value="<% $file->file_name %>" />
 	<input type="hidden" id="show_trimmed" value="<% $show_trimmed %>" />
@@ -67,8 +67,10 @@ color: #000;
 		<canvas id="canvas1" height="200">
 			Your browser doesn't support this Trace Viewer.
 		</canvas>
+% 	if (@qvalues) {
 		<div id="view-seqs-help-bubble" title="What is this line?" onclick="$('view-seqs-help-message').toggle()"></div>
 		<div id="view-seqs-help-message" style="display:none">Bars depict quality scores for each nucleotide detected (called). The line marks a quality score of 20; bars below that line indicate low quality calls. <a href="http://en.wikipedia.org/wiki/Phred_quality_score" target="blank">More...</a></div>
+% 	}
 	</div>
 %	if ($file->has_low_q){
 	<div id="low-qs-alert-link">
@@ -130,6 +132,7 @@ color: #000;
 	my $pairs = undef;
 	
 	my @sequences = ();
+	my @qvalues = ();
 	my ($file, $traces);
 	my $display_id;
 
@@ -151,7 +154,10 @@ color: #000;
 			unless (-f $file->file_path) {
 				$file = undef;
 			}
-			$traces = $file->trace if $file;
+			if ($file) {
+				$traces = $file->trace;
+				@qvalues = $file->quality_values;
+			}
 		}
 	}
 	else {
