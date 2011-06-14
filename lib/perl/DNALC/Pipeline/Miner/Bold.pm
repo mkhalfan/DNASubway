@@ -1,13 +1,11 @@
 package DNALC::Pipeline::Miner::Bold;
 
-#use URI::Escape;
-
-use Data::Dumper;
 use HTTP::Tiny ();
 use JSON::XS ();
 use XML::Simple;
 use IO::Uncompress::Gunzip qw(gunzip $GunzipError);
 use DNALC::Pipeline::Utils qw(random_string);
+use Data::Dumper;
 
 {
 	my $base_url = "http://services.boldsystems.org/eFetch.php";
@@ -20,10 +18,11 @@ use DNALC::Pipeline::Utils qw(random_string);
 	my $query = "?id_type=$id_type&record_type=$record_type&file_type=$file_type&return_type=$return_type&ids=";
 
 	sub new {
-		my ($class, $work_dir);
+		my ($class, %args) = @_;
 		return bless {
-				work_dir => $work_dir || "/tmp",
+				work_dir => $args{work_dir} || "/tmp",
 				xml_file => undef,
+				marker =>  $args{marker},
 			}, __PACKAGE__;
 	}
 
@@ -36,6 +35,7 @@ use DNALC::Pipeline::Utils qw(random_string);
 
 	sub build_uri{
 		my ($ids) = @_;
+		my $ids = uc $ids;
 		my $uri = $base_url . $query . '(' . $ids . ')';
 		return $uri;
 	}
@@ -72,14 +72,29 @@ use DNALC::Pipeline::Utils qw(random_string);
 		my $xml = XMLin($self->{xml_file});
 		#use Data::Dumper; 
 		#print STDERR Dumper( $xml), $/;
-		if ($xml->{record}){
-			my $seq_id = $xml->{record}->{recordID};
-			if ($xml->{record}->{taxonomy}->{species}->{taxon}->{name}){
-				$seq_id = $seq_id . "|" . $xml->{record}->{taxonomy}->{species}->{taxon}->{name}
+		my $record = $xml->{record};
+		# check if it's an array
+		# extract the one we need and store it into $record
+		if ('ARRAY' eq ref $record) {
+			my $xrecord;
+			if ($self->{marker}) {
+				my $marker = $self->{marker};
+				($xrecord) = grep {lc $_->{sequences}->{sequence}->{markercode} =~ /^$marker/i} @$record;
+			}
+			unless ($xrecord) {
+				$xrecord = $record->[0];
+			}
+			$record = $xrecord;
+		}
+
+		if ($record) {
+			my $seq_id = $record->{recordID};
+			if ($record->{taxonomy}->{species}->{taxon}->{name}){
+				$seq_id = $seq_id . "|" . $record->{taxonomy}->{species}->{taxon}->{name}
 			}
 			$seq_id =~ s/\s+/_/;
 			$seq_id = $seq_id . "\n";
-			my $seq = $xml->{record}->{sequences}->{sequence}->{nucleotides};
+			my $seq = $record->{sequences}->{sequence}->{nucleotides};
 			my $fasta = File::Spec->catfile($self->{work_dir}, random_string(4,8));
 			my $fh = IO::File->new;
 			if ($fh->open($fasta, 'w' )) {
@@ -106,12 +121,12 @@ package main;
 use common::sense;
 
 sub main {
-	#my $bold = DNALC::Pipeline::Miner::Bold->new($pm->work_dir);
-	my $bold = DNALC::Pipeline::Miner::Bold->new();
+	#my $bold = DNALC::Pipeline::Miner::Bold->new(work_dir => $pm->work_dir);
+	my $bold = DNALC::Pipeline::Miner::Bold->new(marker => 'rbcL');
 #	my $tmp_xml =
 #	#$bold->fetch('?id_type=processid&ids=(WEEMX018-10)&record_type=full&file_type=gzip&return_type=xml');
 #	$bold->fetch('?id_type=processid&ids=(mk2)&record_type=full&file_type=gzip&return_type=xml');
-	$bold->fetch(1);
+	$bold->fetch('CAREX040-08');
 	#print $tmp_xml;
 	my $fasta = $bold->store_sequence;
 	print "Fasta: ", $fasta, $/;

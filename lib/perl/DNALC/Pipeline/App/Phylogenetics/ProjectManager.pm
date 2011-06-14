@@ -264,6 +264,7 @@ use Bio::Trace::ABIF ();
 
 		my $data_src = $self->project->add_to_datasources({
 				name => $params->{source},
+				accession =>  $params->{accession} ? substr( $params->{accession}, 0, 128) : '',
 			});
 		return $bail_out->() unless $data_src;
 

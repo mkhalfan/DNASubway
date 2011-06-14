@@ -8,5 +8,5 @@
 
 	# not used yet
 	MAX_SEQ_NO => 100,
-	MAX_SEQ_LEN => 2000,
+	MAX_SEQ_LEN => 10000,
 }

@@ -16,30 +16,34 @@
 		<div class="conNewPro_label" id="project_types">
 			<div class="conNewPro_label2">&nbsp;Phylogenetics:
 			<div class="conNewPro_smallContainer_blue">
-				&nbsp;<input class="conRadiobox_align" type="radio" name="type" id="gd" value="DNA" <% $type eq "DNA" ? "checked=\"checked\"" : ""%>/>&nbsp; DNA</div>
+				&nbsp;<input class="conRadiobox_align" type="radio" name="type" id="gd" value="DNA" <% $type eq "DNA" ? "checked=\"checked\"" : ""%>/><label for="gd">&nbsp; DNA</label></div>
 			<div class="conNewPro_smallContainer_blue">
-				&nbsp;<input class="conRadiobox_align" type="radio" name="type" id="gp" value="protein" <% $type eq "protein" ? "checked=\"checked\"" : ""%> />&nbsp; Protein</div>
+				&nbsp;<input class="conRadiobox_align" type="radio" name="type" id="gp" value="protein" <% $type eq "protein" ? "checked=\"checked\"" : ""%> /><label for="gp">&nbsp; Protein</label></div>
 			<div class="conNewPro_smallContainer_blue">
-				&nbsp;<input class="conRadiobox_align" type="radio" name="type" id="gm" value="mtDNA" <% $type eq "mtDNA" ? "checked=\"checked\"" : ""%>/>&nbsp; mtDNA</div>
+				&nbsp;<input class="conRadiobox_align" type="radio" name="type" id="gm" value="mtDNA" <% $type eq "mtDNA" ? "checked=\"checked\"" : ""%>/><label for="gm">&nbsp; mtDNA</label></div>
 			</div>
 			<div class="conNewPro_label2">&nbsp;Barcoding:
 				<div class="conNewPro_smallContainer_blue">
-					&nbsp;<input class="conRadiobox_align" type="radio" name="type" id="gr" value="rbcL" <% $type eq "rbcL" ? "checked=\"checked\"" : ""%>/>&nbsp; rbcL</div>
+					&nbsp;<input class="conRadiobox_align" type="radio" name="type" id="gr" value="rbcL" <% $type eq "rbcL" ? "checked=\"checked\"" : ""%>/><label for="gr">&nbsp; rbcL</label></div>
 				<div class="conNewPro_smallContainer_blue">
-					&nbsp;<input class="conRadiobox_align" type="radio" name="type" id="gc" value="COI" <% $type eq "COI" ? "checked=\"checked\"" : ""%>/>&nbsp; COI</div>
+					&nbsp;<input class="conRadiobox_align" type="radio" name="type" id="gc" value="COI" <% $type eq "COI" ? "checked=\"checked\"" : ""%>/><label for="gc">&nbsp; COI</label></div>
 			</div> 
 		</div>  
 	<div class="conNewPro_title">Select Sequence Source *</div> 
 	<div class="conNewPro_label">
 		<input class="conRadiobox_align" type="radio" name="seq_src" id="seq_src_upload" 
 			value="upload" <% $seq_src eq "upload" ? "checked=\"checked\"" : ""%>/>&nbsp;
-			Upload AB1 trace files or sequences in <a href="http://en.wikipedia.org/wiki/FASTA_format#Format">FASTA format</a> <small>(max <% $seq_max_len %>kb)</small>:
+
+			<label for="seq_src_upload">Upload AB1 trace files or sequences in <a href="http://en.wikipedia.org/wiki/FASTA_format#Format">FASTA format</a> <small>(max <% $seq_max_len %>kb)</small></label>:
+
 			<input class="conStylized_box1" type="file" type=file multiple id="seq_file" name="seq_file"  onchange="phy.set_source('upload')" onclick="phy.set_source('upload')"  />
 		</div>
 
 		<div class="conNewPro_label">
 			<input class="conRadiobox_align" type="radio" name="seq_src" id="seq_src_paste" value="paste" <% $seq_src eq "paste" ? "checked=\"checked\"" : ""%> />&nbsp; 
-			Enter sequences in <a href="http://en.wikipedia.org/wiki/FASTA_format#Format">FASTA format</a> <small>(max <%$seq_max_len%>kb)</small>:
+
+			<label for="seq_src_paste">Enter sequences in <a href="http://en.wikipedia.org/wiki/FASTA_format#Format">FASTA format</a> <small>(max <%$seq_max_len%>kb)</small></label>:
+
 			<textarea class="conStylized_box2" name="seq_paste" id="seq_paste" rows="5" cols="30" onfocus="phy.set_source('paste');"><% $seq_paste |html %></textarea>
 		</div>
 % if (0) {
@@ -55,7 +59,9 @@
 		<div class="conNewPro_label">
 			<input class="conRadiobox_align" type="radio" name="seq_src" id="seq_src_dnalc"
 				<% $seq_src eq "dnalc" ? "checked=\"checked\"" : ""%>
-				value="dnalc" onclick="phy.select_source('newdnalc')" /> &nbsp; Import trace files from DNALC
+
+				value="dnalc" onclick="phy.select_source('newdnalc')" /> <label for="seq_src_dnalc">&nbsp; Import trace files from DNALC</label>
+
 % if ($seq_src eq "dnalc" && @d) {
 	<div id="transferred_files" style="font-size:smaller; padding-left: 40px;">
 %	for my $d (@d) {
@@ -67,8 +73,10 @@
 % }
 		</div>
 		<div class="conNewPro_label">
-			<input class="conRadiobox_align" type="radio" name="seq_src" id="seq_src_sample" value="sample" <% $seq_src eq "sample" ? "checked=\"checked\"" : ""%>/>&nbsp; 
-		Select a set of sample sequences:
+
+			<input class="conRadiobox_align" type="radio" name="seq_src" id="seq_src_sample" value="sample" <% $seq_src eq "sample" ? "checked=\"checked\"" : ""%>/>
+			<label for="seq_src_sample">&nbsp; Select a set of sample sequences:</label>
+
 			<select class="conStylized_box3" id="sample" name="sample" size="4" style="width: 370px;" onchange="phy.set_source('sample');">
 % for my $ss (@samples) {
 %	my $sel = $seq_src eq "sample" && $ss->id == $sample ? "selected=\"selected\"" : "";
