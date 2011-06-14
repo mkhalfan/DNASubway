@@ -345,7 +345,7 @@ THE SOFTWARE.
 }
 
 #dnalc_container  table{
-	width: 600px;
+	width: 760px;
 }
 
 #dnalc_container tr td {
@@ -353,6 +353,15 @@ THE SOFTWARE.
 	padding: 2px;
 	/*font-size: 0.9em;*/
 }
+
+#dnalc_container tr td.forty5p {
+	width: 45%;
+}
+
+#dnalc_container tr td.twenty5p {
+	width: 25%;
+}
+
 #dnalc_container tr.ucfirst td {
 	text-transform:capitalize;	
 }
@@ -840,4 +849,14 @@ canvas {
 	background: #FFFFFF;
 }
 
-
+input.bluebtn { 
+color: #000; 
+background:#C2DBF3;
+margin-right: 2px;
+margin-top: 10px;
+} 
+	
+.label{
+font: "Arial";
+color: #000;
+}

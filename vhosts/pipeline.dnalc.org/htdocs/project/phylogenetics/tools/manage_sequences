@@ -34,7 +34,8 @@
 		</div>
 		<div style="padding:5px;color:#333">
 			Once you have selected the data you wish to use, you must save your changes.<br />
-			<input type="submit" id="save_selection" value="Save" style="background:#C2DBF3;margin-top:15px"/>
+%#			<input type="submit" id="save_selection" value="Save" style="background:#C2DBF3;margin-top:15px"/>
+			<input type="submit" id="save_selection" value="Save" class="bluebtn"/>
 		</div>
 	</div>
 	</div>    

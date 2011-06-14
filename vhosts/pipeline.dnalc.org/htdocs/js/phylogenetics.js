@@ -1615,12 +1615,28 @@
 	// -----------------------------------------------
 	// handlers for getting dnalc data
 	//
-	phy.get_dnalc_data = function (page, order_id, sort_by, sort_dir) {
-
+	phy.get_dnalc_data = function (page, order_id, sort_by, sort_dir, query) {
+		$('add_btn').hide();
 		var apiUri = "http://dnalc02.cshl.edu/genewiz/json";
 		var uri = apiUri + "?p=" + (page ? page : 1);
-		if (order_id && /^\d+$/.test(order_id)) {
-			uri += ";o=" + order_id;
+		if (order_id) {
+			if (/^\d+$/.test(order_id)) {
+				uri += ";o=" + order_id;
+				if (query) {
+					uri += ";q=" + query;
+				}
+			}
+			else {
+				if (order_id.length < 4) {
+					try {
+						top.show_messages("Search query is too short!");
+					} catch(err) {};
+					return;
+				}
+				else {
+					uri += ";q=" + order_id;
+				}
+			}
 		}
 		
 		if (sort_by) {
@@ -1629,7 +1645,6 @@
 				uri += ";d=" + sort_dir;
 		}
 
-		//$('dnalc_btn').disabled = true;
 		if ($('dnalc_btn'))
 			$('dnalc_btn').remove();
 
@@ -1656,10 +1671,13 @@
 		var tr;
 		if (Object.isArray(data)) {
 			tr = phy.build_tr(["Tracking #", "Date", "Name", "Institution"], 'header', meta);
+			// adjust cells' width
+			tr.cells[2].addClassName("twenty5p");
+			tr.cells[3].addClassName("forty5p");
 			table.insert(tr);
 			data.each(function(d) {
 				var lnk = new Element('a', {href: 'javascript:;'}).update(d.number);
-				Event.observe(lnk, 'click', function() {phy.get_dnalc_data(meta.p, d.id, meta.s, meta.d);});
+				Event.observe(lnk, 'click', function() {phy.get_dnalc_data(meta.p, d.id, meta.s, meta.d, meta.q);});
 				tr = phy.build_tr([lnk, d.date, d.name, d.institution]);
 				table.insert(tr);
 			});
@@ -1667,7 +1685,8 @@
 
 		if (meta.pnum > 1) {
 			var nav = "";
-			var args = ",null,'" + meta.s + "','" +meta.d + "'";
+			var query = meta.q ? meta.q : '';
+			var args = ",'" + query + "','" + meta.s + "','" +meta.d + "'";
 			if (meta.p > 1) {
 				nav += "<a href=\"javascript:phy.get_dnalc_data(" + (meta.p - 1) + args + ");\">«</a> ";
 			}
@@ -1679,12 +1698,26 @@
 			//tr.cells[0].colspan = "3";
 			table.insert("<tr><td colspan=\"3\">" + nav + "</td></tr>");
 		}
-		$('dnalc_container').update(table);
+		$('dnalc_container').update(
+			new Element('div').update(
+				new Element('input', {id:'q', value:meta.q, type:'search'})
+					.observe('keydown', function(ev) { // catch the ENTER hit in the input box
+						if (ev && ev.keyCode == 13) {
+							phy.get_dnalc_data(1, $('q').value, meta.s, meta.d);
+						}
+					})
+			).insert(new Element('input', {type: 'button', value:'Search', 'class': 'bluebtn'})
+				.observe('click', function(){
+					phy.get_dnalc_data(1, $('q').value, meta.s, meta.d);
+				})
+			)
+		);
+		$('dnalc_container').insert(table);
 	};
 	phy.display_dnalc_files = function(meta, data) {
 		var table = new Element('table');
 		var a = new Element('a', {href:'javascript:;'}).update('« back');
-		a.observe('click', function(){ phy.get_dnalc_data(meta.p, null, meta.s, meta.d) });
+		a.observe('click', function(){ phy.get_dnalc_data(meta.p, meta.q ? meta.q : null, meta.s, meta.d) });
 
 		var tr = phy.build_tr([a, '']);
 		table.insert(tr);
@@ -1735,19 +1768,20 @@
 			tr.addClassName(_class);
 		data.each(function(el, i) {
 			if (meta && _class == "header") {
+				var query = meta.q ? meta.q.replace(/'/g, '\'') : '';
 				var ch = el.toLowerCase().substring(0,1);
 				// unicode arrows from http://www.fileformat.info/info/unicode/block/arrows/utf8test.htm
 				if (ch == meta.s && 'a' == meta.d) {
 					el += " ⇧";
 				}
 				else if (ch != meta.s || 'a' != meta.d) {
-					el += " <a href=\"javascript:phy.get_dnalc_data(1,null,'" + ch + "','a');\">⇧</a>";
+					el += " <a href=\"javascript:phy.get_dnalc_data(1,'" + query + "','" + ch + "','a');\">⇧</a>";
 				}
 				if (ch == meta.s && 'd' == meta.d) {
 					el += " ⇩";
 				}
 				else if (ch != meta.s || 'd' != meta.d) {
-					el += " <a href=\"javascript:phy.get_dnalc_data(1,null,'" + ch + "','d');\">⇩</a>";
+					el += " <a href=\"javascript:phy.get_dnalc_data(1,'" + query + "','" + ch + "','d');\">⇩</a>";
 				}
 			}
 			tr.insert(new Element('td').update(el));
