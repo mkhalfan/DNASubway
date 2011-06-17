@@ -56,13 +56,25 @@
 		}
 
 		# TODO : check project ownership.. ;)
+		my ($chado_gbrowse, $gbrowse_confdir);
+		if (defined $pcf->{GBROWSE2_CONF_DIR} && $pcf->{GBROWSE2_CONF_DIR}) {
+			$gbrowse_confdir = $pcf->{GBROWSE2_CONF_DIR} . '/user_configs';
+			$chado_gbrowse = $pcf->{GBROWSE2_CONF_DIR} . '/gbrowse2_chado.template';
+		}
+		else {
+			$gbrowse_confdir = $pcf->{GBROWSE_CONF_DIR};
+			$chado_gbrowse = $pcf->{GBROWSE_CONF_DIR} . '/gbrowse_chado.template';
+		}
+
+		#print STDERR  "***", join(' ** ', $gbrowse_confdir, $chado_gbrowse), $/;
 
 		my $organism = join('_', split /\s+/, $proj->organism). '_' . $proj->common_name;
 		my $cutils = DNALC::Pipeline::Chado::Utils->new(
 			username => $pm->username,
 			organism_string => $organism,
-			chado_gbrowse => 'gbrowse_chado.template',
-			gbrowse_confdir  => $pcf->{GBROWSE_CONF_DIR},
+			chado_gbrowse => $chado_gbrowse,
+			gbrowse_confdir  => $gbrowse_confdir,
+			profile => $pm->chado_user_profile,
 		);
 
 		# create GBrowse conf file for this project
@@ -74,7 +86,7 @@
 			$cutils->gbrowse_chado_conf($proj->id);
 		}
 
-		$m->redirect($pcf->{GBROWSE_URL} . '/' . $pm->username . '_db_' . $proj->id . '/?nocache=1');
+		$m->redirect(($pcf->{GBROWSE2_URL} || $pcf->{GBROWSE_URL}) . '/' . $pm->username . '_db_' . $proj->id . '/');
 	}
 	
 </%init>

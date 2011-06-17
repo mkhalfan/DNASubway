@@ -11,7 +11,7 @@ my $cf = DNALC::Pipeline::Config->new->cf('PIPELINE');
 my $username = $ARGV[0];
 my $pid = $ARGV[1];
 
-my $file = File::Spec->catfile($cf->{GBROWSE2_CONF_DIR}, sprintf("%s_db_%d.conf", $username, $pid));
+my $file = File::Spec->catfile($cf->{GBROWSE2_CONF_DIR}, 'user_configs', sprintf("%s_db_%d.conf", $username, $pid));
 
 
 #print STDERR  $file, $/;

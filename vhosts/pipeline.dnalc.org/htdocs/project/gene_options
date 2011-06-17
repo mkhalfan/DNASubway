@@ -4,14 +4,19 @@
 	$start => 0
 	$end => 0
 	$id => ''
+	$gb => 1
 </%args>
 
 <%init>
 	$r->content_type("text/html");
+	unless ($ref) {
+		my $referer = $r->headers_in->get('Referer');
+		($ref) = $referer =~ /gbrowse\/(.*_db_\d+)/;
+	}
 </%init>
-
 <div><a href="/project/target/create/<%$ref%>/<% $start %>/<% $end %>" target="_parent">Send <% $name %> to TARGeT</a></div>
-<div><a href="#" onclick="var dl=document.location;var m=dl.href.match(/gbrowse\/(\w+)\//);if (m && m.length == 2) {dl.href='/cgi-bin/gbrowse_details/' + m[1] + '?name=<%$name%>;ref=<%$ref%>;start=<%$start%>;end=<%$end%>;feature_id=<%$id%>'}">Show details</a></div>
+<div><a href="#" onclick="var dl=document.location;var m=dl.href.match(/gbrowse\/(\w+)\//);if (m && m.length == 2) {dl.href='/cgi-bin/<% $gb == 2 ? "gb2/" : "" %>gbrowse_details/' + m[1] + '?name=<%$name%>;ref=<%$ref%>;start=<%$start%>;end=<%$end%>;feature_id=<%$id%>'}">Show details</a></div>
 <%flags>
 	inherit => undef
 </%flags>
+

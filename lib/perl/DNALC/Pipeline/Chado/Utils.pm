@@ -1028,7 +1028,8 @@ sub gbrowse_chado_conf {
 
     return $conffile if -f $conffile;
 
-    my $in  = IO::File->new( $confdir . '/' . $self->chado_gbrowse );
+	#$self->chado_gbrowse must be absolute
+    my $in  = IO::File->new( $self->chado_gbrowse );
     my $out = IO::File->new( "> $conffile" );
     if (defined $in && $out) {
 
@@ -1040,12 +1041,16 @@ sub gbrowse_chado_conf {
 		if ($dbname_override) {
 			$dbname = $dbname_override;
 		}
+		my $dbhost = $self->host || '';
+		my $dbuser = $self->dbuser || '';
         while (my $line = <$in> ) {
             $line =~ s/__USER__/$username/;
             $line =~ s/__ORGANISM__/$organism/;
             $line =~ s/__TRIMMED_ORGANISM__/$trimmed_organism/;
             $line =~ s/__PID__/$project_id/;
             $line =~ s/__DBNAME__/$dbname/;
+			$line =~ s/__DBHOST__/$dbhost/;
+			$line =~ s/__DBUSER__/$dbuser/;
             print $out $line;
         }
         undef $in;
@@ -1182,6 +1187,7 @@ sub create_chado_adapter {
 		<writebackXmlTemplateFile>transactionXMLTemplate.xml</writebackXmlTemplateFile>
 		<featureCV>sequence</featureCV>
 		<polypeptideType>polypeptide</polypeptideType>
+		<polypeptideTransRelationTerm>derives_from</polypeptideTransRelationTerm>
 		<relationshipCV>relationship</relationshipCV>
 		<propertyTypeCV>feature_property</propertyTypeCV>
 		<!-- default is part_of -->
