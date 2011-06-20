@@ -19,7 +19,7 @@ use Data::Dumper;
 
 	sub run_create_chado_db {
 		my $gearman = shift;
-		my $db_name = $gearman->arg;
+		my $db_name = lc $gearman->arg;
 
 		unless (defined $db_name && $db_name =~ $db_re) {
 			return "ERROR: Invalid db name!";

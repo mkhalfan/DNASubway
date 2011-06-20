@@ -727,7 +727,7 @@ sub gmod_conf_file {
 	}
 
 	my $username = $self->username;
-	my $dbname  = $username;
+	my $dbname  = lc $username;
     my $confdir = $self->confdir;
 	unless ($confdir && -w $confdir ) {
 		warn "Config dir [$confdir] is not writable.\n\n";
@@ -740,7 +740,7 @@ sub gmod_conf_file {
     }
     else {
 		if ($dbname_override) {
-			$dbname = $dbname_override;
+			$dbname = lc $dbname_override;
 		}
 		my $in  = IO::File->new( $confdir . '/' . $self->profile . '.conf' );
 		my $out = IO::File->new( "> $conffile" );
@@ -789,7 +789,6 @@ sub assign_pool_db {
 		return;
 	}
 
-	#my $query = "SELECT datname FROM pg_database WHERE datname like 'pool_%'";
 	my $query = "SELECT datname FROM pg_database WHERE datname LIKE 'pool_%' ORDER BY RANDOM() LIMIT 1";
 
 	my $sth   = $dbh->prepare($query);
@@ -801,8 +800,9 @@ sub assign_pool_db {
 
 	my $rc = undef;
 	eval {
-		print STDERR  "ALTER DATABASE $db_name RENAME TO $username", $/;
-		$rc = $dbh->do(qq{ALTER DATABASE $db_name RENAME TO "$username"});
+		my $new_db_name = lc $username;
+		print STDERR  "ALTER DATABASE $db_name RENAME TO $new_db_name", $/;
+		$rc = $dbh->do(qq{ALTER DATABASE $db_name RENAME TO "$new_db_name"});
 	};
 	if ($@)  {
 		print STDERR  "assign_pool_db: ", $@, $/;
@@ -823,7 +823,7 @@ sub check_db_exists {
 	my $query = "SELECT count(*) FROM pg_database WHERE datname = ?";
 
 	my $sth   = $dbh->prepare($query);
-	$sth->execute($db_name) or die $dbh->errstr;
+	$sth->execute(lc $db_name) or die $dbh->errstr;
 	my ($has_db) = $sth->fetchrow_array;
 	$sth->finish;
 
@@ -838,21 +838,22 @@ sub create_db {
 	#}
 	
 	my $q = $quiet ? '-q' : '';
+	my $db_name = lc $self->username;
 
 	system("createdb $q"
 			. " -U " . $self->dbuser 
 			. " -h " . $self->host
 			. " -p " . $self->port
-	       . " ". $self->username
+	       . " ". $db_name
 		) == 0 or do {
-				print STDERR "create_db: Error: Perhaps we already have a db called [", $self->username, "]\n";
+				print STDERR "create_db: Error: Perhaps we already have a db called [", $db_name, "]\n";
 				return;
 			};
 
     system("psql $q -U ".$self->dbuser
              . " -h ".$self->host
              . " -p ".$self->port
-             . " ". $self->username 
+             . " ". $db_name 
 			 . " < " . $self->dumppath
 			 . ( $quiet ? ' > /dev/null 2>&1' : '')
 		 ) == 0 or do {
@@ -864,11 +865,11 @@ sub create_db {
              . " -h " . $self->host
              . " -p " . $self->port
              . " -f -z "
-             . " ". $self->username 
+             . " ". $db_name
              . ( $quiet ? ' > /dev/null 2>&1' : '');
     #print STDERR $vacuum_cmd, $/;
     system( $vacuum_cmd ) == 0 or do {
-				print STDERR "Unable to VACUUM Chado DB [", $self->username, "].\n";
+				print STDERR "Unable to VACUUM Chado DB [", $db_name, "].\n";
 				return;
 			};
 
@@ -1037,9 +1038,9 @@ sub gbrowse_chado_conf {
 		$trimmed_organism =~ s/\s+/_/g;
 		$trimmed_organism =~ s/-/_/g;
 
-		my $dbname = $username;
+		my $dbname = lc $username;
 		if ($dbname_override) {
-			$dbname = $dbname_override;
+			$dbname = lc $dbname_override;
 		}
 		my $dbhost = $self->host || '';
 		my $dbuser = $self->dbuser || '';
