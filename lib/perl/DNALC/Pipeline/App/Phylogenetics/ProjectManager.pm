@@ -292,6 +292,9 @@ use Bio::Trace::ABIF ();
 				$stored_file = $self->store_file( $fhash );
 			}
 			my $filename = $fhash->{filename};
+			$filename =~ s/[\[\]\(\)\\\/:;]+/_/g;
+			$filename =~ s/_+/_/g;
+
 			my $f = $stored_file;
 
 			my $data_file = DataFile->create({
@@ -316,12 +319,15 @@ use Bio::Trace::ABIF ();
 				while (my $seq_obj = $seqio->next_seq) {
 					#print ">", $seq_obj->display_id, $/;
 					#print $seq_obj->seq, $/;
+					my $display_id = $seq_obj->display_id;
+					$display_id =~ s/[\[\]\(\):;]+/_/g;
+					$display_id =~ s/_+/_/g;
 					
 					my $seq = DataSequence->create({
 							project_id => $self->project,
 							source_id => $data_src,
 							file_id => $data_file ? $data_file->id : undef,
-							display_id => $seq_obj->display_id,
+							display_id => $display_id,
 							seq => $seq_obj->seq,
 						});
 					$out_io->write_seq($seq_obj);
@@ -348,6 +354,8 @@ use Bio::Trace::ABIF ();
 				$display_id =~ s/\..*?$//;
 				#remove any spaces
 				$display_id =~ s/\s+/_/g;
+				$display_id =~ s/[\[\]\(\):;]+/_/g;
+				$display_id =~ s/_+/_/g;
 
 				#print $rc, $/;
 				my $seq_obj = Bio::Seq->new(
