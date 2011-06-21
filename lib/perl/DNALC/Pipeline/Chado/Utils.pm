@@ -1188,7 +1188,7 @@ sub create_chado_adapter {
 		<writebackXmlTemplateFile>transactionXMLTemplate.xml</writebackXmlTemplateFile>
 		<featureCV>sequence</featureCV>
 		<polypeptideType>polypeptide</polypeptideType>
-		<polypeptideTransRelationTerm>derives_from</polypeptideTransRelationTerm>
+		<!-- polypeptideTransRelationTerm>derives_from</polypeptideTransRelationTerm -->
 		<relationshipCV>relationship</relationshipCV>
 		<propertyTypeCV>feature_property</propertyTypeCV>
 		<!-- default is part_of -->
