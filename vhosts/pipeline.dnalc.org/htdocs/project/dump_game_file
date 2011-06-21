@@ -31,8 +31,24 @@
 	unless ($err) {
 		#print STDERR "common-name for pid = $pid = ", $pmanager->cleaned_common_name, $/;
 		
-		my $cutil = DNALC::Pipeline::Chado::Utils->new;
-		$cutil->profile( $pmanager->chado_user_profile );
+		my $cutil = DNALC::Pipeline::Chado::Utils->new(username => $pmanager->username);
+		unless ($cutil->profile( $pmanager->chado_user_profile )) {
+			# set to default profile
+			$cutil->profile($pmanager->config->{GMOD_PROFILE});
+			my $proj = $pmanager->project;
+			$cutil->organism_string(join('_', split /\s+/, $proj->organism) . '_' . $proj->common_name);
+
+			# create the gmod conf file for this project
+			unless ($cutil->gmod_conf_file( $pid)) {
+				$err = "Unable to create GMOD conf file.";
+				print "{'status':'$status', 'message':'$err'}";
+				return;
+			}
+			else {
+				# set the new profile (for the current user/project
+				$cutil->profile( $pmanager->chado_user_profile );
+			}
+		}
 		my $conf_file = $cutil->create_chado_adapter($config->{APOLLO_USERCONF_DIR});
 
 		my $start = 1;
