@@ -45,9 +45,10 @@ sub get_dnalc_files {
 			my $pm;
 			if (@$data >= 6) {
 				$pm = new Parallel::ForkManager(3) ;
-				#$pm->run_on_finish( sub {
-				#	print STDERR sprintf "%s : Process completed: @_\n", scalar localtime, $/;
-				#});
+				$pm->run_on_finish( sub {
+					$gearman->set_status ($i++, scalar @$data);
+					#print STDERR sprintf "%s : Process completed: @_\n", $i, $/;
+				});
 			}
 
 			for (@$data) {
@@ -58,14 +59,16 @@ sub get_dnalc_files {
 				$file =~ s/^.*\///;
 				$file = $dir . '/' . $file;
 				$ht->mirror($url, $file);
-				$gearman->set_status ($i++, scalar @$data);
-				$pm->finish if $pm;
+				if ($pm) {
+					$pm->finish 
+				}
+				else {
+					$gearman->set_status ($i++, scalar @$data);
+				}
 			}
 
-			#print STDERR  "Waiting for children...", $/;
 			$pm->wait_all_children if $pm;
 
-			#print STDERR  "all children done", $/;
 			# emulate a touch
 			IO::File->new($dir . '/.done', 'w');
 		}
