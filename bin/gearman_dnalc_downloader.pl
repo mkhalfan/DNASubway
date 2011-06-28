@@ -1,6 +1,6 @@
 #!/usr/bin/perl 
 
-use strict;
+use common::sense;
 use lib ("/var/www/lib/perl", "/home/gearman/dnasubway/lib/perl");
 
 use DNALC::Pipeline::Config();
@@ -11,6 +11,7 @@ use IO::File;
 use File::Basename;
 use Gearman::Worker ();
 use Storable qw(nfreeze thaw);
+use Parallel::ForkManager ();
 
 #use Data::Dumper;
 
@@ -41,17 +42,30 @@ sub get_dnalc_files {
 			my $i = 0;
 			sleep 1;
 
+			my $pm;
+			if (@$data >= 6) {
+				$pm = new Parallel::ForkManager(3) ;
+				#$pm->run_on_finish( sub {
+				#	print STDERR sprintf "%s : Process completed: @_\n", scalar localtime, $/;
+				#});
+			}
+
 			for (@$data) {
-				#print $_->{id}, $/;
+				if ($pm) {
+					$pm->start and next;
+				}
 				my $file = my $url = $_->{file};
 				$file =~ s/^.*\///;
 				$file = $dir . '/' . $file;
-				#print $url, $/;
-				#print $file, $/;
 				$ht->mirror($url, $file);
 				$gearman->set_status ($i++, scalar @$data);
+				$pm->finish if $pm;
 			}
 
+			#print STDERR  "Waiting for children...", $/;
+			$pm->wait_all_children if $pm;
+
+			#print STDERR  "all children done", $/;
 			# emulate a touch
 			IO::File->new($dir . '/.done', 'w');
 		}
