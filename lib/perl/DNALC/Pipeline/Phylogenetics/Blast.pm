@@ -12,4 +12,12 @@ __PACKAGE__->sequence('phy_blast_blast_id_seq');
 
 #__PACKAGE__->has_a(project_id => 'DNALC::Pipeline::Phylogenetics::Project');
 
+sub clean_old_results {
+	my ($class) = @_;
+	my $blasts = $class->retrieve_from_sql(q{ created < now() - INTERVAL '90 days' });
+	while (my $blast = $blasts->next) {
+		$blast->delete;
+	}
+}
+
 1;
