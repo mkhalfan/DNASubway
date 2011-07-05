@@ -62,7 +62,8 @@
 <% $filter_suffix %>
 <& '/_pager', cur=>$page, pages => $pages, 
 	prefix => '/project/browse/',
-	suffix => "/$sort/$dir" . $filter_suffix ? "$filter_suffix" : "" &>
+	suffix => "/$sort/$dir" &>
+%#	suffix => "/$sort/$dir" . $filter_suffix ? "$filter_suffix" : ""
 
 </div>
 <div class="clear"> </div>

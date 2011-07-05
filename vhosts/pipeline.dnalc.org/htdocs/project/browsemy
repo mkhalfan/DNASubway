@@ -43,7 +43,7 @@
 %	}
 %#	<td><% $_->can("clade") ? $clades{$_->clade} : $_->type eq "d" ? "DNA" : "Protein" %></td>
 	<td><% $_->{public} ? "public" : "private" %></td>
-	<td><a href="/project/remove?id=<% $_->{master_project_id} %>" onclick="return confirm('Remove this project?')"><img src="/images/v2/Trash_Can.png" style="border: none;" alt="[remove project]"/></a></td>
+	<td><a href="/project/remove?id=<% $_->{master_project_id} %>;p=<% $page %>" onclick="return confirm('Remove this project?')"><img src="/images/v2/Trash_Can.png" style="border: none;" alt="[remove project]"/></a></td>
 </tr>
 % }
 </table>
