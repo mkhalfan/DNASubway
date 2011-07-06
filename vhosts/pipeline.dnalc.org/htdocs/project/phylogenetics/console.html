@@ -129,8 +129,9 @@
 %	} else {
 			<& '.routine', routine => 'phy_tree_ml', pmanager => $pm, is_owner => $is_owner,
 				status => $status{phy_tree_ml}, delay => 20, pid => $pid &>
-        </span>
+        
 %	}
+		</span>
         </span>
 
      </span><!--END of span conBlueline_ConColumn3-->
@@ -140,14 +141,12 @@
 <div id="conBluelineRight2">
     
 <span class="conBlueline_ConColumn5">
-<div class="con_browserBT ">
-    <span class="conIndicator_boxBrowse"><div class="conIndicatorBL_disabled"></div> </span>
-	<span class="bt_browserBlue"><a href="#">Export to<br/>BOLD</a></span>	</div>
-    
-  <div id="spacer_Runblueline">&nbsp;</div> 
-    
-    
-    </span>
+	<div class="con_browserBT ">
+		<span class="conIndicator_boxBrowse"><div class="conIndicatorBL_<%$is_owner ? "not-processed" : "disabled" %>"></div> </span>
+		<span class="bt_browserBlue"><a href="javascript:;" onclick="<%$is_owner ? "phy.launch('BOLD', '/project/phylogenetics/bold/?pid=$proj', 'Export to BOLD')" : "" %>">Export to<br/>BOLD</a></span>
+	</div>
+	<div id="spacer_Runblueline">&nbsp;</div> 
+</span>
     
 </div>
 <!--END of ID conBluelineRight2--> 
@@ -162,7 +161,7 @@
 		<div id="conProjectInfo_title">Project Information</div>
 		<div id="conProjectInfo_edit">
 			<div class="bt_projectInfo_edit"><a href="javascript:;" onclick="javascript:show_edit();"></a></div>
-% if ($is_owner || $is_public) {
+% if (0&& ($is_owner || $is_public)) {
 			<a href="tools/clone_project?pid=<% $proj->id %>">clone</a>
 % }
 		</div>
@@ -189,11 +188,13 @@
 			<div class="conProjectInfo_Cell3">: &nbsp;<input type="radio" name="public" id="public_no" <% $is_public ? "" : "checked=\"checked\"" %> onclick="set_public(0);" /> &nbsp; Private</div>
 			<div class="conProjectInfo_Cell3"><input type="radio" name="public" id="public_yes" <% $is_public ? "checked=\"checked\"" : "" %> onclick="set_public(1);"/> &nbsp; Public</div>
 		</div>
+		<!--
         <div class="conProjectInfo_Row">
 			<div class="conProjectInfo_Cell1">Clonable</div>
 			<div class="conProjectInfo_Cell3">: &nbsp;<input type="radio" name="clonable" id="clonable_no" > &nbsp; On</span></div>
 			<div class="conProjectInfo_Cell3"><input type="radio" name="clonable" id="clonable_no" > &nbsp; Off</span></div>
 		</div>
+		-->
 % }
 	</span><!--END of span conProjectInfo_column1-->
 

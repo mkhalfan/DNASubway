@@ -1920,6 +1920,7 @@
 	};
 	//----------------------------------------------------
 	
+	
 })();
 
 function debug(msg) {
@@ -2027,8 +2028,18 @@ Event.observe(window, Prototype.Browser.IE ? 'load' : 'dom:loaded', function() {
 				hideOthers: true
 			});
 		});	
+		
+		var ua = navigator.userAgent.match(/MSIE\s+(\d+)/);
+		if (ua && ua.length > 1 && parseInt(ua[1], 10) < 9) {
+			phy.zoomIn('x');
+		}
 
-		phy.prepare_draw();		
+		phy.prepare_draw();
+		
+		if (ua && ua.length > 1 && parseInt(ua[1], 10) < 9) {
+			//phy.zoomIn('x');
+			setTimeout("phy.zoomOut('x')", 100);
+		}
 		
 		// Set column widths and display columns
 		phy.setColumnWidths(795);
