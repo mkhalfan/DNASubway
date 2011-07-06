@@ -11,11 +11,6 @@
 	top.document.location.replace("/");
 </script>
 % }
-</head>
-<body>
-
-% $m->call_next;
-
 % if ($m->request_comp->attr_if_exists('js') && @{$m->request_comp->attr('js')}) {
 %	foreach my $js (@{$m->request_comp->attr('js')}) {
 %		next unless $js;
@@ -25,6 +20,11 @@
 % if ($m->request_comp->attr_if_exists('load_ie_canvas')) {
 <!--[if IE]><script type="text/javascript" src="/js/excanvas.js"></script><![endif]-->
 % }
+</head>
+<body>
+
+% $m->call_next;
+
 </body>
 </html>
 
