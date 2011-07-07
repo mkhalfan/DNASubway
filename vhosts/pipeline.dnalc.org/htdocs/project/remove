@@ -1,6 +1,7 @@
 %#--------------------------------------------------------
 <%args>
 	$id => 0
+	$p => 1
 </%args>
 %#--------------------------------------------------------
 <%once>
@@ -21,6 +22,10 @@ my $s = $m->session->{pipeline};
 unless ($s->{logged_in}) {
 	$m->comp('/_message_add', 'Your session expired. Please login again.', 'error');
 	$m->redirect('/');
+}
+
+unless ($p =~ /^\d+$/) {
+	$p = 1;
 }
 
 my ($mp) = DNALC::Pipeline::MasterProject->search(user_id => $s->{user_id}, mp_id => $id);
@@ -59,7 +64,7 @@ elsif ($mp->project_type eq "phylogenetics") {
 	}
 }
 
-$m->redirect('/project/browsemy');
+$m->redirect('/project/browsemy/' . $p);
 
 </%init>
 %#--------------------------------------------------------

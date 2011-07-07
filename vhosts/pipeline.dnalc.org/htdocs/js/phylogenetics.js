@@ -1919,7 +1919,26 @@
 		$('ref_details').update($('rd' + ref_id).innerHTML);
 	};
 	//----------------------------------------------------
-	
+	phy.prev_bold_step = function() {
+		var f = $('bform');
+		var s = 1;
+		var m = f.action.match(/\d/);
+		if (m) {
+			s = parseInt(m[0], 10);
+			if (isNaN(s))
+				return;
+			else
+				s = s - 1;
+		}
+		if (s > 0)
+			document.location.replace("./step" + s + ".html");
+	};
+
+	phy.next_bold_step = function() {
+		var f = $('bform');
+		f.submit();
+	};
+	//----------------------------------------------------
 	
 })();
 

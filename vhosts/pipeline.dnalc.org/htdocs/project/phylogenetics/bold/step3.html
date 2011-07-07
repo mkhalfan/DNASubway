@@ -1,0 +1,70 @@
+<div id="BOLDstep">Step 3 of 6</div>
+<div id="BOLDmain">
+
+<h2>Load specimen data from a DNALC Barcoding project </h2>
+<h4>(Optional)</h4>
+<& /_messages &>
+
+	<p>
+<form id="bform" method="POST">
+<input type="hidden" name="bstep" value="3" />
+	<div>
+		<input type="radio" name="ans" value="yes" <% $bs->{specid} ? "checked=\"checked\"" : "" %>/>
+		Yes, I have already collected specimen data for a DNALC Barcoding Project
+		<div>Enter specimen ID: <input type="text" name="specid" value="<% $bs->{specid} %>" /></div>
+	</div>
+	<div>&nbsp;</div>
+	<div>
+		<input type="radio" name="ans" value="no" <% $bs->{specid} eq "" ? "checked=\"checked\"" : "" %>/>
+		No, I will now enter the data
+	</div>
+</form>
+	</p>
+
+</div>
+<div id="BOLDfooter">
+	<a href="./step2.html">Back</a>&nbsp;
+	<a href="#./step4.html" onclick="phy.next_bold_step();">Continue</a>
+</div>
+
+
+<%args>
+	$bstep => undef
+	$specid => ''
+	$ans => ''
+</%args>
+<%init>
+	my $s = $m->session->{pipeline};
+	my $pid = $s->{boldpid};
+	$s->{"bold_$pid"} ||= {};
+	my $bs = $s->{"bold_$pid"};
+	
+	#print STDERR "S3. PID = ", $pid, Dumper($s), $/;
+	
+	unless ($bs->{step2} == 1) {
+		$m->comp('/_message_add', 'Step 2 is incomplete!', 'error');
+		$m->redirect("./step2.html");
+	}
+	
+	if ($r->method eq "POST") {
+		$bs->{ans} = $ans;
+		if ($ans eq "yes") {
+			$bs->{specid} = $specid;
+			if (!$specid) {
+				$m->comp('/_message_add', 'Specimen ID is missing!', 'error');
+				$m->redirect("./step3.html");
+			}
+			else {
+				$m->comp('/_message_add', 'Not implemented!', 'error');
+				$m->redirect("./step3.html");
+			}
+		}
+		else {
+			delete $bs->{specid} if (defined $bs->{specid});
+			$bs->{step3} = 1;
+			
+			#$m->comp('/_message_add', 'Not implemented!', 'error');
+			$m->redirect("./step4.html");
+		}
+	}
+</%init>

@@ -1,0 +1,63 @@
+<div id="BOLDstep">Step 2 of 6</div>
+<div id="BOLDmain">
+	<h2>Select container project</h2>
+
+<& /_messages &>
+
+	<p>
+<form id="bform" method="POST">
+<input type="hidden" name="bstep" value="2" />
+%	for (@containers) {
+		<div><input type="radio" name="container" value="<% $_|html%>" <% $bs->{container} eq $_ ? "checked=\"checked\"" : "" %>/> <% $_ |html%></div>
+%	}
+</form>
+	</p>
+</div>
+<div id="BOLDfooter">
+	<a href="./step1.html">Back</a>&nbsp;
+	<a href="#./step3.html" onclick="phy.next_bold_step();">Continue</a>
+</div>
+
+<%args>
+	$bstep => undef
+	$container => ''
+</%args>
+<%once>
+	use DNALC::Pipeline::App::Phylogenetics::ProjectManager ();
+	use DNALC::Pipeline::Utils qw/isin/;
+	use Data::Dumper;
+	
+	my @containers = (
+			"DNAS Subway", # 1st one is the default one
+			"Barcoding"
+		);
+</%once>
+<%init>
+	my $s = $m->session->{pipeline};
+	my $pid = $s->{boldpid};
+	$s->{"bold_$pid"} ||= {};
+	my $bs = $s->{"bold_$pid"};
+	
+	print STDERR "S2. PID = ", $pid, Dumper($s), $/;
+	#print STDERR "S2. container = ", $container, $/;
+	
+	unless ($bs->{step1} == 1) {
+		$m->comp('/_message_add', 'Step 1 is incomplete!', 'error');
+		$m->redirect("./step1.html");
+	}
+	
+	if ($r->method eq "POST") {
+		if ($container && isin($container, @containers)) {
+			$bs->{container} = $container;
+			$bs->{step2} = 1;
+			$m->redirect("./step3.html");
+		}
+		else {
+			$m->comp('/_message_add', 'Container project not selected!', 'error');
+			$m->redirect("./step2.html");
+		}
+	}
+	else {
+		$bs->{container} ||= $containers[0];
+	}
+</%init>

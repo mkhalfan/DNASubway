@@ -1,0 +1,99 @@
+% if ($ok) {
+<script type="text/javascript">
+top.phy.close_window('BOLD');
+top.show_messages("BOLD data stored successfully");
+</script>
+% } else {
+<div id="BOLDstep">Step 6 of 6</div>
+<div id="BOLDmain">
+
+<h2>Submit data to BOLD</h2>
+
+<& /_messages &>
+
+	<p>
+<form id="bform" method="POST">
+<input type="hidden" name="bstep" value="6" />
+	
+</form>
+	</p>
+<pre>
+	<% $js->pretty->encode($bs->{spec_data}) %>
+</pre>
+</div>
+<div id="BOLDfooter">
+	<a href="./step5.html">Back</a>&nbsp;
+% unless ($b) {
+	<a href="#./step6.html" onclick="phy.next_bold_step();">Submit</a>
+% }
+</div>
+% }
+
+<%args>
+	$ok => 0
+</%args>
+
+<%once>
+	use JSON::XS ();
+	use DNALC::Pipeline::App::Phylogenetics::ProjectManager ();
+	use DNALC::Pipeline::Phylogenetics::Bold ();
+	use Data::Dumper;
+</%once>
+
+<%init>
+	my $s = $m->session->{pipeline};
+	my $pid = $s->{boldpid};
+	$s->{"bold_$pid"} ||= {};
+	my $bs = $s->{"bold_$pid"};
+	
+	my $js = JSON::XS->new->utf8;
+
+	print STDERR "S6. PID = ", $pid, Dumper($s), $/;
+	
+	my $pm = DNALC::Pipeline::App::Phylogenetics::ProjectManager->new($pid);
+	my $proj = $pm->project;
+	unless ($proj && $proj->user_id == $s->{user_id}) {
+		$m->comp('/_message_add', 'Project not found!', 'error');
+		$m->redirect("./step6.html");
+		#print "Project not found!";
+		return;
+	}
+
+	unless ($bs->{step5} == 1) {
+		$m->comp('/_message_add', 'Step 5 is incomplete!', 'error');
+		$m->redirect("./step5.html");
+	}
+	
+	for (@{$bs->{sel_seq}}) {
+		$_ =~ s/^\D//;
+	}
+	my $b = undef;#DNALC::Pipeline::Phylogenetics::Bold->search(project_id => $proj->id);	
+	
+	if ($r->method eq "POST") {
+		unless ($b) {
+			print STDERR "Need a new table: phy_bold_sequences\n";
+			$b = DNALC::Pipeline::Phylogenetics::Bold->create({
+				project_id => $proj->id,
+				sequence_id => $bs->{sel_seq}->[0],
+				status => 'pending',
+				data => $js->pretty->encode($bs->{spec_data}),
+			});
+			if ($b) {
+				for (@{$bs->{sel_seq}}) {
+					$_ =~ s/^\D//;
+					$b->add_to_bold_sequences({
+							project_id => $proj->id,
+							sequence_id => $_,
+						});
+				}
+				
+				$m->redirect("./step6.html?ok=1");
+			}
+		}
+	}
+	elsif ($ok) {
+		delete $s->{boldpid};
+		delete $s->{"bold_$pid"};
+	}
+
+</%init>

@@ -1,0 +1,59 @@
+
+<div>
+	Description about BOLD
+	<div><a href="#">Link to protocol in the PDF format</a></div>
+</div>
+
+<& /_messages &>
+
+<p>
+<form id="bform" method="post">
+%#<input type="hidden" name="pid" value="<% $pid |html%>" />
+<input type="hidden" name="bstep" value="0" />
+% if ($bsubmissions) {
+<p>
+	<div>You have submitted to BOLD this data:</div>
+% 	while (my $b = $bsubmissions->next) {
+	<div>* <% $b %>, <% $b->specimen_id%></div>
+%	}
+</p>
+% }
+<div>
+	<a href="#" onclick="phy.next_bold_step();">New BOLD submission</a>
+</div>
+</form>
+</p>
+
+<%args>
+	$pid => 0
+	$bstep => undef
+</%args>
+
+<%once>
+	use DNALC::Pipeline::App::Phylogenetics::ProjectManager ();
+	use DNALC::Pipeline::Phylogenetics::Bold ();
+	use Data::Dumper;
+</%once>
+<%init>
+	my $s = $m->session->{pipeline};
+	my $bsubmissions;
+
+	my $pm = DNALC::Pipeline::App::Phylogenetics::ProjectManager->new($pid);
+	my $proj = $pm->project;
+	unless ($proj && $proj->user_id == $s->{user_id}) {
+		$m->comp('/_message_add', 'Project not found!', 'error');
+		#$m->redirect('/project/');
+		#print "Project not found!";
+		return;
+	}
+	elsif ($r->method eq "POST") {
+		#print STDERR "S0/POST PID = ", $pid, $/;
+		if (defined $bstep && $bstep == 0) {
+			$s->{boldpid} = $proj->id;
+			$m->redirect('./step1.html');
+		}
+	}
+	elsif ($r->method eq "GET") {
+		$bsubmissions = DNALC::Pipeline::Phylogenetics::Bold->search(project_id => $proj->id);
+	}
+</%init>

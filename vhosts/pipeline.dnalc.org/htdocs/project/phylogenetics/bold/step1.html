@@ -1,0 +1,94 @@
+<div id="BOLDstep">Step 1 of 6</div>
+<div id="BOLDmain">
+	<h2>Select sequences</h2>
+
+<& /_messages &>
+
+	<p>
+<form id="bform" method="POST">
+<input type="hidden" name="bstep" value="1" />
+		Choose some of the sequences:
+		<div>
+% if (0) { # no pairs!!!!
+%	for (@pairs) {
+%		my $name = lcs_name( map {$_->seq->display_id} $_->paired_sequences);
+		<div><input type="checkbox" name="sel_seq" id="p<% $_ |html %>" value="p<% $_->id %>" <% defined $sel_seq{"p".$_->id} ? "checked=\"checked\"" : "" %>/><% $name |html%></div>
+%	}
+% }
+%	for (@sequences) {
+		<div><input type="checkbox" name="sel_seq" id="s<% $_ |html %>" value="s<% $_->id %>" \
+		<% defined $sel_seq{"s".$_->id} ? "checked=\"checked\"" : "" %> \
+		<% defined $seq_submitted{$_->id} ? "disabled=\"disabled\"" : ""%>/><% $_->display_id |html%>\
+%	if (defined $seq_submitted{$_->id}) {
+	(<small>already submitted</small>)\
+%	}
+		</div>
+%	}
+		</div>
+</form>
+	</p>
+</div>
+<div id="BOLDfooter">
+	<a href="#" onclick="top.phy.close_window('BOLD');">Cancel</a>&nbsp;
+	<a href="#" onclick="phy.next_bold_step();">Continue</a>
+</div>
+
+
+<%args>
+	#$pid => 0
+	$bstep => undef
+	@sel_seq => ()
+</%args>
+<%once>
+	use DNALC::Pipeline::App::Phylogenetics::ProjectManager ();
+	use DNALC::Pipeline::Phylogenetics::BoldSeq ();
+	#use DNALC::Pipeline::Phylogenetics::DataSequence ();
+	#use DNALC::Pipeline::Config ();
+	use DNALC::Pipeline::Utils qw/lcs_name/;
+	use Data::Dumper;
+</%once>
+<%init>
+	my $s = $m->session->{pipeline};
+	my $pid = $s->{boldpid};
+	$s->{"bold_$pid"} ||= {};
+	my $bs = $s->{"bold_$pid"};
+	
+	#print STDERR "S1. PID = ", $pid, Dumper($s), $/;
+
+	my $pm = DNALC::Pipeline::App::Phylogenetics::ProjectManager->new($pid);
+	my $proj = $pm->project;
+	unless ($proj && $proj->user_id == $s->{user_id}) {
+		$m->comp('/_message_add', 'Project not found!', 'error');
+		$m->redirect("./?pid=$pid");
+		#print "Project not found!";
+		return;
+	}
+	my @pairs = ();#$pm->pairs;
+	
+	my %seq_submitted = map {$_->sequence_id => 1} 
+		DNALC::Pipeline::Phylogenetics::BoldSeq->search(project_id => $proj->id);
+	
+	# get non paired sequences
+	my @sequences = $pm->initial_sequences;
+	
+	my %sel_seq = ();
+
+	if ($r->method eq "POST") {
+		if (@sel_seq) {
+
+			# TODO: ckecked selected sequences
+			$bs->{sel_seq} = \@sel_seq;
+			$bs->{step1} = 1;
+
+			$m->redirect("./step2.html");
+		}
+		else {
+			$m->comp('/_message_add', 'No sequences were selected!', 'error');
+			$m->redirect("./step1.html");
+		}
+	}
+	else {
+		%sel_seq = map {$_ => 1} @{$bs->{sel_seq}};
+	}
+
+</%init>

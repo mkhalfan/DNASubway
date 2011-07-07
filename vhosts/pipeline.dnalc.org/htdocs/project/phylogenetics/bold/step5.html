@@ -1,0 +1,61 @@
+<div id="BOLDstep">Step 5 of 6</div>
+<div id="BOLDmain">
+
+<h2>Add photos</h2>
+<h4>(Optional)</h4>
+<& /_messages &>
+
+	<p>
+<form id="bform" method="POST">
+<input type="hidden" name="bstep" value="5" />
+	<div>
+		<input type="radio" name="ans" value="no" <% $bs->{has_photo} eq "no" ? "checked=\"checked\"" : "" %>/>
+		No, I don't have any photos of this specimen
+	</div>
+	<div>&nbsp;</div>
+	<div>
+		<input type="radio" name="ans" value="yes" <% $bs->{has_photo} eq "yes" ? "checked=\"checked\"" : "" %>/>
+		Yes, I have taken photos of this specimen
+		<p>
+		
+		</p>
+	</div>
+</form>
+	</p>
+
+</div>
+<div id="BOLDfooter">
+	<a href="./step4.html">Back</a>&nbsp;
+	<a href="#./step6.html" onclick="phy.next_bold_step();">Continue</a>
+</div>
+
+<%args>
+	$bstep => undef
+	$ans => ''
+</%args>
+<%init>
+	my $s = $m->session->{pipeline};
+	my $pid = $s->{boldpid};
+	$s->{"bold_$pid"} ||= {};
+	my $bs = $s->{"bold_$pid"};
+
+	#print STDERR "S5. PID = ", $pid, Dumper($s), $/;
+
+	unless ($bs->{step4} == 1) {
+		$m->comp('/_message_add', 'Step 4 is incomplete!', 'error');
+		$m->redirect("./step4.html");
+	}
+	
+	if ($r->method eq "POST") {
+		$bs->{has_photo} = $ans;
+		if ($ans eq "yes") {
+			$m->comp('/_message_add', 'To be implemented!', 'error');
+			$m->redirect("./step5.html");
+		}
+		else {
+			$bs->{step5} = 1;
+			$m->redirect("./step6.html");
+		}
+	}
+
+</%init>

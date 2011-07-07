@@ -1,6 +1,8 @@
 @charset "UTF-8";
 /* CSS Document */
 
+html,body { height:100%; }
+
 #conbody {
 	width: 650px;
 	height:450px;
@@ -859,4 +861,38 @@ margin-top: 10px;
 .label{
 font: "Arial";
 color: #000;
+}
+
+
+/* BOLD related styles */
+#BOLDbody {
+	margin: 0px;
+}
+
+#BOLDheader {
+	background-color: #564123;
+	color: #f5851f;
+	height: 25px;
+	font-size: 18px;
+	padding: 2px;
+}
+#BOLDstep {
+	background-color: #564123;
+	color: #fff;
+	font-size: 14px;
+	padding: 0px 0px 2px 10px;
+}
+
+#BOLDmain {
+	min-height:75%;
+	padding-left: 50px;
+}
+
+#BOLDfooter {
+	/*background-color: #564123;
+	color: #fff;*/
+	font-size: 16px;
+	/*position: relative; 
+	margin-top: -5em;*/
+	text-align: center;
 }
