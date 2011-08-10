@@ -45,7 +45,7 @@
 			file => '/var/www/vhosts/pipeline.dnalc.org/var/phy_samples/reference/fish_subset.fas'
 		},
 		{
-			id => 'Shark',
+			id => 'Sharks',
 			file => '/var/www/vhosts/pipeline.dnalc.org/var/phy_samples/reference/shark.fasta'
 		},
 	],
