@@ -44,6 +44,10 @@
 			id => 'Common fish',
 			file => '/var/www/vhosts/pipeline.dnalc.org/var/phy_samples/reference/fish_subset.fas'
 		},
+		{
+			id => 'Shark',
+			file => '/var/www/vhosts/pipeline.dnalc.org/var/phy_samples/reference/shark.fasta'
+		},
 	],
 	mtDNA => [
 		{
