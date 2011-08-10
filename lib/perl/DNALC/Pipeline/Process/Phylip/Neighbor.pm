@@ -3,7 +3,7 @@ package DNALC::Pipeline::Process::Phylip::Neighbor;
 use base 'DNALC::Pipeline::Process';
 use File::chdir;
 use File::Copy;
-#use Capture::Tiny qw/capture/;
+use File::Slurp qw/read_file write_file/;
 use Time::HiRes qw/gettimeofday tv_interval/;
 
 use strict;
@@ -80,22 +80,24 @@ use strict;
 			$self->{elapsed} = tv_interval($t0, [gettimeofday]);
 			$self->{exit_status} = 0;
 			print STDERR  "Tree file: ", $treefile, $/ if $debug;
+
+			# fix negative branches in the tree		
+			my $neg_len_rx = qr/:-\d+\.?\d*?/;
+
+			my $tree_data = read_file($treefile);
+			if ($tree_data && $tree_data =~ /$neg_len_rx/) {
+				# make a copy
+				my $treefile_copy = $treefile . '_copy';
+				copy $treefile, $treefile_copy;
+
+				$tree_data =~ s/$neg_len_rx/:0.0/g;
+				write_file($treefile, $tree_data);
+			}
+
 		}
 		else {
 			$self->{exit_status} = 1;
 		}
-		#my $stdout_file = 'stdout.txt';
-		#my $stderr_file = 'stderr.txt';
-	
-		#my $fh = IO::File->new;
-		#if ($stdout && $fh->open($stdout_file, 'w')) {
-		#	print $fh $stdout;
-		#	$fh->close;
-		#}
-		#if ($stderr && $fh->open($stderr_file, 'w')) {
-		#	print $fh $stderr;
-		#	$fh->close;
-		#}
 
 		return 0;
 	}
