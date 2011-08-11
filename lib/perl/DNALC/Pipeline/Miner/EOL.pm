@@ -49,6 +49,8 @@ use utf8;
 
 	sub build_uri {
 		my ($class, $type, $query) = @_;
+
+		$query =~ s/\.//g; # remove dot
 		my $uri = "$api_server/$type/$version/" . uri_escape( $query ) . ".json";
 		$uri .= "?key=$key" if $key;
 
