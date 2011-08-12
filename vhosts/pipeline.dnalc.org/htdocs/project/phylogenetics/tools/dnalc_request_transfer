@@ -12,6 +12,8 @@
 </%once>
 <%init>
 	$r->content_type("application/x-javascript; charset=utf-8");
+	$r->no_cache(1);
+
 	my $cf = DNALC::Pipeline::Config->new->cf('PHYLOGENETICS');
 	my $base_dir = $cf->{DNALC_TRANSFER_DIR} || "/tmp";
 	my $temp_dir = random_string(4, 8);

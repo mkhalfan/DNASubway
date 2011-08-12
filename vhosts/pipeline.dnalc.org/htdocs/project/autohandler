@@ -90,13 +90,6 @@
 
 </div><!--END of ID mainContainer-->
 % unless ($ENV{DEVEL_SERVER}) {
-<script type="text/javascript" src="http://include.reinvigorate.net/re_.js"></script>
-<script type="text/javascript">
-% if ($s->{username}) {
-var re_name_tag = "<% $s->{username} %>";
-% }
-try {reinvigorate.track("ktaz7-6gmi62748k");} catch(err) {}
-</script>
 <script type="text/javascript">
 var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
 document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
