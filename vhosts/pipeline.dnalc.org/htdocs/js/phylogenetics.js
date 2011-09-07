@@ -1738,7 +1738,6 @@
 				f.insert(h2);
 				file_divs = [h1, h2	];
 			}
-			//debug(meta);
 
 			fall.observe('click', function(){ phy.select_all_dnalc_files() });
 			a.observe('click', function(){ phy.select_all_dnalc_files(true) });
@@ -1751,10 +1750,20 @@
 									fall.checked = false;
 								phy.check_selection_dnalc_files();
 						});
+				var img = '';
+				if (el.qs != null) {
+					var iqs = parseInt(el.qs, 10);
+					if (!isNaN(iqs) && iqs < 20) {
+						img = new Element('img', {src :'/images/chart_curve_error.png', title: 'QScore = ' + el.qs});
+					}
+				}
+
 				file_divs[hdiv].insert(new Element('div')
 					.insert(chk )
-					.insert(new Element('span').update(' ' + el.file) )
+					.insert(new Element('span').update(' ' + el.file + ' '))
+					.insert(img)
 				);
+				
 			});
 			tr = phy.build_tr(['Files:', f], 'vtop');
 			table.insert(tr);
