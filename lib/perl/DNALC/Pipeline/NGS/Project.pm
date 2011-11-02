@@ -8,7 +8,7 @@ use DNALC::Pipeline::MasterProject ();
 
 __PACKAGE__->table('ngs_project');
 __PACKAGE__->columns(Primary => qw/id/);
-__PACKAGE__->columns(Essential => qw/user_id name organism common_name created/);
+__PACKAGE__->columns(Essential => qw/user_id name organism common_name created type/);
 __PACKAGE__->columns(Other => qw/description/);
 __PACKAGE__->sequence('ngs_project_id_seq');
 
