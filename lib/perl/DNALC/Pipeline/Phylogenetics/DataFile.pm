@@ -58,13 +58,19 @@ sub trace {
 	my ($self) = @_;
 	my $trace = ();
 	return unless ref($self) eq __PACKAGE__ || $self->file_type !~ /^trace$/i;
-	
+
 	my $max = 0;
 	my $ab = Bio::Trace::ABIF->new;
+
 	if ($ab->open_abif($self->file_path)) {
+
+		my @base_locations = $ab->base_locations();
+		my $last_base_pos = $base_locations[$#base_locations];
+
 		my $max = 0;
 		for (qw(A G T C)) {
 			my @t = $ab->trace($_);
+			@t = splice @t, 0, $last_base_pos;
 			$trace->{$_} = \@t;
 			my $local_max = max(@t);
 			$max = $local_max > $max ? $local_max : $max;
