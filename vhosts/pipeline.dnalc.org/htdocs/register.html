@@ -92,6 +92,14 @@
 </%once>
 %#-------------------------------------------------------------------
 <%init>
+
+my $cf = DNALC::Pipeline::Config->new->cf('PIPELINE');
+
+if ($cf->{LDAP_ENABLED}) {
+	$m->redirect("http://www.iplantcollaborative.org/forms/register-dna-subway/");
+	return;
+}
+
 $m->session->{pipeline_reg} ||= {};
 my $s = $m->session->{pipeline_reg};
 
@@ -123,8 +131,6 @@ if ($r->method eq "POST") {
 		$user_profile_data->{$_} = $s->{$_} if $_ =~ /^q\d+/;
 	}
 	#print STDERR "User profile data:\t", Dumper($user_profile_data), $/;
-
-	my $cf = DNALC::Pipeline::Config->new->cf('PIPELINE');
 
 	for (@$fields) {
 		my $f = $_->{id};

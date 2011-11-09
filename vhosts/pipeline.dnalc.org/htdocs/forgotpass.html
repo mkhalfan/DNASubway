@@ -55,6 +55,12 @@
 <%init>
 	my @err = ();
 	my ($u);
+	
+	my $cf = DNALC::Pipeline::Config->new->cf('PIPELINE');
+	if ($cf->{LDAP_ENABLED}) {
+		$m->redirect("https://auth.iplantcollaborative.org/account_management/request_reset.py");
+		return;
+	}
 
 	if ($r->method eq "POST") {
 	
@@ -63,12 +69,12 @@
 		}
 		else {
 			unless (Email::Valid->address($email)) {
-				push @err, "Email address is invalid!";
+				push @err, "Email address is invalid.";
 			}
 		}
 
 		unless (@err) {	
-			my $cf = DNALC::Pipeline::Config->new->cf('PIPELINE');
+			
 			my ($u) = DNALC::Pipeline::User->search( username => $username, email => $email );
 			if ($u) {
 				my $code = $u->create_reset_pwd_code;
@@ -98,12 +104,12 @@ DNALC Team";
 						$msg->send();
 					}
 				}
+				$m->redirect('/forgotpass.html?sc=1');
 			}# end u
 			else {
+				push @err, "We culd not find an account with the username AND the email you provided.";
 				print STDERR "User: $username not found!", $/;
 			}
-
-			$m->redirect('/forgotpass.html?sc=1');
 		}
 	}
 </%init>
