@@ -8,14 +8,19 @@ use DNALC::Pipeline::Phylogenetics::PairSequence;
 use DNALC::Pipeline::Phylogenetics::Pair;
 use Data::Dumper;
 
+# mismatches
 my $wrong = 0;
 my $total = 0;
+
+my $pairs_analized = 0;
+my %projects = ();
 
 my $pairs = DNALC::Pipeline::Phylogenetics::Pair->retrieve_all;
 
 while (my $pair = $pairs->next) {
+	next unless $pair->id == 3058;
 	my $muscle_alignment = $pair->alignment;
-	#my $consensus = $pair->consensus;
+	my $consensus_edited = $pair->consensus;
 	next if $muscle_alignment eq "";
 
 	my @alignment_line_1 = (split(/\s*:\s*/,(split('\n', $muscle_alignment))[0]));
@@ -25,11 +30,12 @@ while (my $pair = $pairs->next) {
 	my ($display_name_2, $seq2) = ($alignment_line_2[0], $alignment_line_2[1]); #Sequence 2
 	my ($display_name_3, $consensus) = ($alignment_line_3[0], $alignment_line_3[1]); #Consensus
 
-	next if length($seq1 ) != length($consensus);
+	next if (!$consensus || !$seq1 || !$seq2 || length($seq1 ) != length($consensus));
 
 	my @pair_seq = $pair->paired_sequences;
 	#print STDERR Dumper( \@pair_seq), $/;
 	next unless @pair_seq;
+	next if $pair_seq[0]->strand eq $pair_seq[1]->strand;
 
 	# @seq has the 2 DataSequence objects belonging to a pair
 	my @seq = map {$_->seq_id} @pair_seq;
@@ -47,19 +53,37 @@ while (my $pair = $pairs->next) {
 
 	my $df1 = DNALC::Pipeline::Phylogenetics::DataFile->retrieve($df_id_1);
 	next unless $df1 && $df1->file_type eq "trace";
+
+	my $df2 = DNALC::Pipeline::Phylogenetics::DataFile->retrieve($df_id_2);
+	next unless $df2 && $df2->file_type eq "trace";
+
+	next if ($df1->has_low_q || $df2->has_low_q);
+
 	my @qs1 = $df1->quality_values();
 	if ($df_1_strand eq "R"){
 		@qs1 = reverse @qs1;
 	}
-	my $df2 = DNALC::Pipeline::Phylogenetics::DataFile->retrieve($df_id_2);
-	next unless $df2 && $df2->file_type eq "trace";
 	my @qs2 = $df2->quality_values();
 	if ($df_2_strand eq "R"){
 		@qs2 = reverse @qs2;
 	}
 	next unless(@qs2 && @qs1);
-	print "$pair: ", length $seq1, "\t", scalar @qs1, $/;
-	print "$pair: ", length $seq1, "\t", scalar @qs2, $/;
+	#print "$pair: ", length $seq1, "\t", scalar @qs1, $/;
+	#print "$pair: ", length $seq1, "\t", scalar @qs2, $/;
+
+
+	# check if sequences were trimmed
+	if (my $trim_1 = DNALC::Pipeline::Phylogenetics::DataSequenceTrim->retrieve($ds_id_1)){
+	    @qs1 = splice(@qs1, $trim_1->start_pos, $trim_1->end_pos - $trim_1->start_pos);
+	}
+
+	if (my $trim_2 = DNALC::Pipeline::Phylogenetics::DataSequenceTrim->retrieve($ds_id_2)){
+	    @qs2 = splice(@qs2, $trim_2->start_pos, $trim_2->end_pos - $trim_2->start_pos);
+	}
+
+	#print length $seq1, ' == ', scalar @qs1, $/;
+	#print length $seq2, ' == ', scalar @qs2, $/;
+	#next;
 
 	my $x = 0;
 	foreach (split//, $seq1){
@@ -83,6 +107,8 @@ while (my $pair = $pairs->next) {
 	#print $display_name_1, ": ", join( " ", map {sprintf("%3s", $_)} split(//, $seq1)), $/;
 	#print $display_name_2, ": ", join( " ", map {sprintf("%3s", $_)} split(//, $seq2)), $/;
 
+	my @local_wrongs = ();
+
 	for (my $i = 0; $i <= length($seq1); $i++){
 		my $a = substr($seq1, $i, 1);
 		my $b = substr($seq2, $i, 1);
@@ -95,13 +121,15 @@ while (my $pair = $pairs->next) {
 					if ($qs1[$i] > $qs2[$i]){
 						if ( $a ne $c ){
 							$wrong++;
+							push @local_wrongs, $i;
 							#print "Pos: $i \nA: $a \nB: $b \nC: $c \n  ";
 							#print substr($consensus, $i-2, 5), $/;
 						}
 					}
-					else { # $qs1[i] < $qs2[i]
+					elsif($qs1[$i] < $qs2[$i]) { # $qs1[i] < $qs2[i]
 						if ($b ne $c){
-							$wrong++;	
+							$wrong++;
+							push @local_wrongs, $i;
 							#print "Pos: $i \nA: $a \nB: $b \nC: $c \n  ";
 						}
 					}
@@ -109,10 +137,22 @@ while (my $pair = $pairs->next) {
 		}
 	}
 
+	if (@local_wrongs) {
+		unshift(@local_wrongs, '*') if $consensus_edited ne $consensus;
+		push @{$projects{$pair->project_id}}, $pair->id . '['. join(',', @local_wrongs) . ']';
+	}
+	$pairs_analized++;
+
+}
+
+for (keys %projects) {
+	print $_, "\t", join (", ", @{$projects{$_}}), $/;
 }
 
 #print "\nC: ", join( " ", map {sprintf("%3s", $_)} split(//, $consensus)), $/;
-print "Wrong: $wrong \n";
 print "--------- \n";
-print "Total: $total \n\n";
-print "=", $wrong/$total, $/;
+print "\n\nWrong mismatches (by merger): $wrong \n";
+print "Total mismatches: $total \n\n";
+print "\t=", $wrong/$total, $/ if $total;
+
+print "Analized pairs: ", $pairs_analized, $/;
