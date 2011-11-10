@@ -112,42 +112,44 @@ while (my $pair = $pairs->next) {
 	my @local_wrongs = ();
 	my $local_mismatches = 0;
 
-	for (my $i = 0; $i <= length($seq1); $i++){
+	for (my $i = 0; $i <= length($seq1); $i++) {
 		my $a = substr($seq1, $i, 1);
 		my $b = substr($seq2, $i, 1);
 		my $c = substr($consensus, $i, 1);
 
-		if ($a ne "N" && $b ne "N"){
+		if ($a ne "N" && $b ne "N") {
 			next if ($a eq '-' || $b eq '-');
-				if ($a ne $b){ # there is a mismatch
-					#$total++;
-					$local_mismatches++;
-					if ($qs1[$i] > $qs2[$i]){
-						if ( $a ne $c ){
-							push @local_wrongs, $i;
-							#print "Pos: $i \nA: $a \nB: $b \nC: $c \n  ";
-							#print substr($consensus, $i-2, 5), $/;
-						}
-					}
-					elsif($qs1[$i] < $qs2[$i]) { # $qs1[i] < $qs2[i]
-						if ($b ne $c){
-							push @local_wrongs, $i;
-							#print "Pos: $i \nA: $a \nB: $b \nC: $c \n  ";
-						}
+
+			if ($a ne $b) { # there is a mismatch
+				#$total++;
+				$local_mismatches++;
+				if ($qs1[$i] > $qs2[$i]) {
+					if ( $a ne $c ){
+						push @local_wrongs, $i;
+						#print "Pos: $i \nA: $a \nB: $b \nC: $c \n  ";
+						#print substr($consensus, $i-2, 5), $/;
 					}
 				}
+				elsif($qs1[$i] < $qs2[$i]) { # $qs1[i] < $qs2[i]
+					if ($b ne $c){
+						push @local_wrongs, $i;
+						#print "Pos: $i \nA: $a \nB: $b \nC: $c \n  ";
+					}
+				}
+			}
 		}
 	}
 
 	# skip pairs w/ more than 1% of mismatches
-	#next if ($local_mismatches/length $consensus > 0.01);
+	next if (($local_mismatches/length $consensus) > 0.01);
+
+	$total += $local_mismatches;
 
 	if (@local_wrongs) {
 		# skip the alignments with more than 1% of wrong calls done my merger
 		#next if (scalar (@local_wrongs)/length $consensus > 0.01);
 
 		$wrong += @local_wrongs;
-		$total += $local_mismatches;
 
 		if ($consensus_edited ne $consensus) {
 			unshift(@local_wrongs, '*');
