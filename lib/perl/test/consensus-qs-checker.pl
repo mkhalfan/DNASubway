@@ -13,12 +13,14 @@ my $wrong = 0;
 my $total = 0;
 
 my $pairs_analized = 0;
+my $pairs_wrong = 0;
+my $pairs_with_consensus_edited = 0;
 my %projects = ();
+my %mismatches_per_pair = ();
 
 my $pairs = DNALC::Pipeline::Phylogenetics::Pair->retrieve_all;
 
 while (my $pair = $pairs->next) {
-	next unless $pair->id == 3058;
 	my $muscle_alignment = $pair->alignment;
 	my $consensus_edited = $pair->consensus;
 	next if $muscle_alignment eq "";
@@ -108,6 +110,7 @@ while (my $pair = $pairs->next) {
 	#print $display_name_2, ": ", join( " ", map {sprintf("%3s", $_)} split(//, $seq2)), $/;
 
 	my @local_wrongs = ();
+	my $local_mismatches = 0;
 
 	for (my $i = 0; $i <= length($seq1); $i++){
 		my $a = substr($seq1, $i, 1);
@@ -117,10 +120,10 @@ while (my $pair = $pairs->next) {
 		if ($a ne "N" && $b ne "N"){
 			next if ($a eq '-' || $b eq '-');
 				if ($a ne $b){ # there is a mismatch
-					$total++;
+					#$total++;
+					$local_mismatches++;
 					if ($qs1[$i] > $qs2[$i]){
 						if ( $a ne $c ){
-							$wrong++;
 							push @local_wrongs, $i;
 							#print "Pos: $i \nA: $a \nB: $b \nC: $c \n  ";
 							#print substr($consensus, $i-2, 5), $/;
@@ -128,7 +131,6 @@ while (my $pair = $pairs->next) {
 					}
 					elsif($qs1[$i] < $qs2[$i]) { # $qs1[i] < $qs2[i]
 						if ($b ne $c){
-							$wrong++;
 							push @local_wrongs, $i;
 							#print "Pos: $i \nA: $a \nB: $b \nC: $c \n  ";
 						}
@@ -137,22 +139,47 @@ while (my $pair = $pairs->next) {
 		}
 	}
 
+	# skip pairs w/ more than 1% of mismatches
+	#next if ($local_mismatches/length $consensus > 0.01);
+
 	if (@local_wrongs) {
-		unshift(@local_wrongs, '*') if $consensus_edited ne $consensus;
+		# skip the alignments with more than 1% of wrong calls done my merger
+		#next if (scalar (@local_wrongs)/length $consensus > 0.01);
+
+		$wrong += @local_wrongs;
+		$total += $local_mismatches;
+
+		if ($consensus_edited ne $consensus) {
+			unshift(@local_wrongs, '*');
+			$pairs_with_consensus_edited++;
+		}
+		else {
+			$pairs_wrong++;
+		}
 		push @{$projects{$pair->project_id}}, $pair->id . '['. join(',', @local_wrongs) . ']';
 	}
+	$mismatches_per_pair{ $local_mismatches }++;
 	$pairs_analized++;
 
 }
 
-for (keys %projects) {
-	print $_, "\t", join (", ", @{$projects{$_}}), $/;
-}
+#for (keys %projects) {
+#	print $_, "\t", join (", ", @{$projects{$_}}), $/;
+#}
 
 #print "\nC: ", join( " ", map {sprintf("%3s", $_)} split(//, $consensus)), $/;
 print "--------- \n";
-print "\n\nWrong mismatches (by merger): $wrong \n";
-print "Total mismatches: $total \n\n";
-print "\t=", $wrong/$total, $/ if $total;
+print "Analyzed pairs: ", $pairs_analized, "\n";
+print "Pairs w/ consensus that needed edited: ", $pairs_wrong, $/;
+print "Pairs w/ consensus edited: ", $pairs_with_consensus_edited, sprintf(" (%.3f%%)", $pairs_with_consensus_edited/$pairs_wrong*100) , $/ if $pairs_wrong;
 
-print "Analized pairs: ", $pairs_analized, $/;
+print "\nTotal mismatches: $total\n";
+print "Wrong mismatches (by merger): ", $wrong, sprintf(" (%.3f%%)", $wrong/$total*100), $/ if $total;
+
+print "--------- \n";
+print "--------- \n";
+
+## pairs w/ x number of mismatches/pair 
+#for (sort {$a <=> $b } keys %mismatches_per_pair) {
+#	print $_, "\t", $mismatches_per_pair{$_}, $/;
+#}
