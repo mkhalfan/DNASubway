@@ -123,27 +123,23 @@ while (my $pair = $pairs->next) {
 			if ($a ne $b) { # there is a mismatch
 				#$total++;
 				$local_mismatches++;
-				if ($qs1[$i] > $qs2[$i]) {
-					if ( $a ne $c ){
-						push @local_wrongs, $i;
-						#print "Pos: $i \nA: $a \nB: $b \nC: $c \n  ";
-						#print substr($consensus, $i-2, 5), $/;
-					}
+				if ($qs1[$i] > $qs2[$i] &&  $a ne $c ) {
+					push @local_wrongs, $i;
+					#print "Pos: $i \nA: $a \nB: $b \nC: $c \n  ";
+					#print substr($consensus, $i-2, 5), $/;
 				}
-				elsif($qs1[$i] < $qs2[$i]) { # $qs1[i] < $qs2[i]
-					if ($b ne $c){
-						push @local_wrongs, $i;
-						#print "Pos: $i \nA: $a \nB: $b \nC: $c \n  ";
-					}
+				elsif ($qs1[$i] < $qs2[$i] && $b ne $c ) {
+					push @local_wrongs, $i;
+					#print "Pos: $i \nA: $a \nB: $b \nC: $c \n  ";
 				}
 			}
 		}
 	}
 
-	# skip pairs w/ more than 1% of mismatches
-	next if (($local_mismatches/length $consensus) > 0.01);
+	#print $pair, "\t", length $consensus, "\t", $local_mismatches, "\t", scalar @local_wrongs, "\n";
+	# skip pairs w/ more than 15% of mismatches
+	next if (($local_mismatches/length $consensus) > 0.015);
 
-	$total += $local_mismatches;
 
 	if (@local_wrongs) {
 		# skip the alignments with more than 1% of wrong calls done my merger
@@ -155,11 +151,11 @@ while (my $pair = $pairs->next) {
 			unshift(@local_wrongs, '*');
 			$pairs_with_consensus_edited++;
 		}
-		else {
-			$pairs_wrong++;
-		}
+		$pairs_wrong++;
 		push @{$projects{$pair->project_id}}, $pair->id . '['. join(',', @local_wrongs) . ']';
 	}
+
+	$total += $local_mismatches;
 	$mismatches_per_pair{ $local_mismatches }++;
 	$pairs_analized++;
 
@@ -172,8 +168,8 @@ while (my $pair = $pairs->next) {
 #print "\nC: ", join( " ", map {sprintf("%3s", $_)} split(//, $consensus)), $/;
 print "--------- \n";
 print "Analyzed pairs: ", $pairs_analized, "\n";
-print "Pairs w/ consensus that needed edited: ", $pairs_wrong, $/;
-print "Pairs w/ consensus edited: ", $pairs_with_consensus_edited, sprintf(" (%.3f%%)", $pairs_with_consensus_edited/$pairs_wrong*100) , $/ if $pairs_wrong;
+print "Pairs w/ consensus that needed edited: ", $pairs_wrong, "\n";
+print "Pairs w/ consensus edited: ", $pairs_with_consensus_edited, sprintf(" (%.3f%%)", $pairs_with_consensus_edited/$pairs_wrong*100) , "\n" if $pairs_wrong;
 
 print "\nTotal mismatches: $total\n";
 print "Wrong mismatches (by merger): ", $wrong, sprintf(" (%.3f%%)", $wrong/$total*100), $/ if $total;
