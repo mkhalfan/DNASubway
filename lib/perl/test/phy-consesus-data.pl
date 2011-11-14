@@ -26,7 +26,7 @@ my $pos = 70;
 
 	my $json = JSON::XS->new->ascii;
 	my $pair = DNALC::Pipeline::Phylogenetics::Pair->retrieve($pair_id);
-	my @pseq = $pair->paired_sequences;
+	my @pseq = sort {$a->seq->display_id cmp $b->seq->display_id } $pair->paired_sequences;
 	my $data = [];
 	my $original_seq_pos;
 	my $seq_substring;
@@ -38,16 +38,20 @@ my $pos = 70;
 	
 	
 	# ------------------------------
-	# Parse the Alignemnt Data
+	# Parse the Alignment Data
 	# ------------------------------
 	my $alignment = $pair->alignment;
-	my @alignment_line_1 = (split(': ', (split('\n', $alignment))[0]));
-	my @alignment_line_2 = (split(': ', (split('\n', $alignment))[1]));
-	my ($display_name_1, $seq1) = ($alignment_line_1[0], $alignment_line_1[1]);
-	my ($display_name_2, $seq2) = ($alignment_line_2[0], $alignment_line_2[1]);
+	my @aln_lines = sort ((split('\n', $alignment))[0, 1]);
 
-	
+# 	my @alignment_line_1 = (split(': ', (split('\n', $alignment))[0]));
+# 	my @alignment_line_2 = (split(': ', (split('\n', $alignment))[1]));
+# 	my ($display_name_1, $seq1) = ($alignment_line_1[0], $alignment_line_1[1]);
+# 	my ($display_name_2, $seq2) = ($alignment_line_2[0], $alignment_line_2[1]);
+
+
 	for (0, 1) {
+		my ($display_name, $seq) = split('\s*:\s*', $aln_lines[$_]);
+
 		my $file = DNALC::Pipeline::Phylogenetics::DataFile->retrieve($pseq[$_]->seq->file_id);
 		
 		if ($file->file_type ne 'trace') {
@@ -59,15 +63,16 @@ my $pos = 70;
 		my @all_qscores = $file->quality_values;
 		my $all_traces = $file->trace;
 		my $entire_sequence =  $file->seq;
+		print $_, "{", $display_name, "} ~~ ", length $seq, ' > ', length $entire_sequence,  $/;
 		
 		# ---------------------------
 		# Calculate Position In Original Sequence
 		# ---------------------------
 		$trimmed = 0;
-		if ($pseq[$_]->seq->display_id eq trim($display_name_1)) {
+		if ($pseq[$_]->seq->display_id eq trim($display_name)) {
 			$offset = 0;
-			if ($pseq[$_]->strand eq "F"){
-				$seq_substring = substr $seq1, 0, $pos;
+			if ($pseq[$_]->strand eq "F") {
+				$seq_substring = substr $seq, 0, $pos;
 				$dash_count = ($seq_substring =~ s/-//g);
 				
 				if (my $temp = DNALC::Pipeline::Phylogenetics::DataSequenceTrim->retrieve($pseq[$_]->seq->id)){
@@ -77,52 +82,39 @@ my $pos = 70;
 				$original_seq_pos = $pos- $dash_count + $trimmed;
 				$offset = 3 - ($original_seq_pos - $trimmed)  if $original_seq_pos - $trimmed < 3;
 			}
-			elsif ($pseq[$_]->strand eq "R"){
+			elsif ($pseq[$_]->strand eq "R") {
 				$reverse_flag = 1;
-				
-				#$reversed_seq = reverse $seq1;
-				#$seq_substring = substr ($reversed_seq, 0, length($seq1) - $pos);
-				$seq_substring = substr ($seq1, 0, $pos);
-				$dash_count = ($seq_substring =~ s/-//g);
-				
-				if (my $temp = DNALC::Pipeline::Phylogenetics::DataSequenceTrim->retrieve($pseq[$_]->seq->id)){
+
+				if (my $temp = DNALC::Pipeline::Phylogenetics::DataSequenceTrim->retrieve($pseq[$_]->seq->id)) {
+					print STDERR Dumper( $temp), $/;
 					$trimmed = length ($temp->left_trim);
 				}
-				
-				$original_seq_pos = length($seq1) - ($pos + $dash_count) - 1 + $trimmed;
-			}
-			print STDERR  'seq_trimmed1: ', $trimmed, $/;
-		}
-		elsif ($pseq[$_]->seq->display_id eq trim($display_name_2)){
-			$offset = 0;
-			if ($pseq[$_]->strand eq "F"){
-				$seq_substring = substr $seq2, 0, $pos;
-				$dash_count = ($seq_substring =~ s/-//g);
-				
-				if (my $temp = DNALC::Pipeline::Phylogenetics::DataSequenceTrim->retrieve($pseq[$_]->seq->id)){
-					$trimmed = $temp->start_pos;
-				}
-				
-				$original_seq_pos = $pos - $dash_count + $trimmed;
-				$offset = 3 - ($original_seq_pos - $trimmed)  if $original_seq_pos - $trimmed < 3;
-			}
-			elsif ($pseq[$_]->strand eq "R"){
-				$reverse_flag = 1;
-			
-				#$reversed_seq = reverse $seq2;
-				#$seq_substring = substr ($reversed_seq, 0, length($seq2) - $pos);
-				$seq_substring = substr ($seq2, 0, $pos);
 
+				$reversed_seq = reverse $seq;
+				$seq_substring = substr ($reversed_seq, 0, $pos);
+				#$seq_substring = substr ($reversed_seq, length($seq) - $pos, $pos);
+			print STDERR  'X: ',  0, ' => ',  length($seq) - $pos, $/;
 				$dash_count = ($seq_substring =~ s/-//g);
+				$original_seq_pos = length($seq) - ($pos + $dash_count) - 1 + $trimmed;
+				my ($low, $high) = ($original_seq_pos - 3, $original_seq_pos + 3);
+				print STDERR  'x: ', $seq_substring, $/;
+				print STDERR  'x: ', $original_seq_pos, $/;
+				print STDERR  'x: ', $low, ' -> ', $high, $/;
 
-				if (my $temp = DNALC::Pipeline::Phylogenetics::DataSequenceTrim->retrieve($pseq[$_]->seq->id)){
-					$trimmed = length ($temp->left_trim);
-				}
-				
-				$original_seq_pos = length($seq2) - ($pos + $dash_count) - 1 + $trimmed;
+	if (1) {
+				#$seq_substring = substr ($seq, 0, $pos);
+			print STDERR  'Y: ', length($seq) - $pos, ' => ',  length($seq), $/;
+				$seq_substring = substr ($seq, length($seq) - $pos, length($seq));
+				$dash_count = ($seq_substring =~ s/-//g);
+				$original_seq_pos = length($entire_sequence) - ($pos + $dash_count) - 1 + $trimmed;
+				my ($low, $high) = ($original_seq_pos - 3, $original_seq_pos + 3);
+				print STDERR  'y: ', $seq_substring, $/;
+				print STDERR  'y: ', $original_seq_pos, $/;
+				print STDERR  'y: ', $low, ' -> ', $high, $/;
+	}
 			}
-			print STDERR  'seq_trimmed2: ', $trimmed, $/;
 		}
+	} __END__
 		# ---------------------------
 
 		my ($low, $high) = ($original_seq_pos - 3, $original_seq_pos + 3);
