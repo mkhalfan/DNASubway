@@ -1336,6 +1336,7 @@
 			//if ( (!re.test(seq1.charAt(i)) || !re.test(seq2.charAt(i))) 
 			if ((i > start && i < stop) && (seq1.charAt(i) != 'N' && seq2.charAt(i) != "N")
 					&& (consensus.charAt(i - y) != seq1.charAt(i) || consensus.charAt(i - y) != seq2.charAt(i) )
+						&& (seq1.charAt(i) != "-" && seq2.charAt(i) != "-")
 				) 
 			{
 			
