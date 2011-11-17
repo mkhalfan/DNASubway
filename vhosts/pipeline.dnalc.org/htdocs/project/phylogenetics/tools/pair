@@ -20,6 +20,12 @@ input[type="checkbox"] {
 % }
 %#pairs: <% Dumper(\@pairs) %>
 	<div id="container_data_line">&nbsp;</div>
+%	unless (@pairs) {
+	<div style="text-align: right;font-size: small;">
+		<a id="try_auto" href="#" onclick="phy.auto_pair();">Try auto pairing</a>
+		<a id="swith_manual" href="#" onclick="document.location.reload();" style="display: none;">Switch to manual pairing</a>
+	</div>
+%	}
 	<div id="seqids">
 		<pre>
 % $cnt = 0;
@@ -35,7 +41,7 @@ input[type="checkbox"] {
 % $cnt = 0;
 % for (@sequences) {
 %	my $class = $_->{type} eq "p" ? $pair_classes[$cnt++] : "";
-<div class="<% $class %>" id="<%$_->{s}%>"><% $_->{s}->seq|html %></div>\
+<div class="<% $class %>" id="<%$_->{s}%>"><% $_->{s}->seq || " "|html %></div>\
 % }
 		</pre>
 	</div>

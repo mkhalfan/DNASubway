@@ -13,7 +13,56 @@
 		this.task_states = {};
 		
 	};
-	
+
+	phy.auto_pair = function () {
+		var k = 0;
+		var divz = $$('#seqids pre div')
+		var ldivz = divz.length - 1;
+		
+		var pair_cnt = 0;
+
+		while (k < ldivz) {
+			//--
+			var a = divz[k].innerHTML;
+			var b = divz[++k].innerHTML;
+			//console.info(a + ' == ' + b);
+
+			var shortest = a.length > b.length ? b : a;
+			var lshortest = shortest.length;
+			var mism = "";
+			var i = 0;
+			for (; i < lshortest; i++) {
+				if (a.charAt(i) == b.charAt(i))
+					;//console.info(a.charAt(i) + ' ' + b.charAt(i));
+				else {
+					//console.info(a.charAt(i) + ' <> ' + b.charAt(i));
+					mism = a.charAt(i) + b.charAt(i);
+					break;
+				}
+			}
+
+			if (i > lshortest/2 && mism != "" && /[RF]/i.test(mism)) {
+				//console.info(a.substr(0, i));
+				//console.info(divz[k-1].id.replace(/^id_/, '') + ' - ' + divz[k].id.replace(/^id_/, ''));
+				phy.add_pair([ divz[k-1].id.replace(/^id_/, ''), divz[k].id.replace(/^id_/, '') ]);
+			    if (mism.charAt(1) == "R" || mism.charAt(1) == "r") {
+					$$('#opdiv_' + divz[k].id.replace(/^id_/, '') + ' a')[0].click();
+				}
+				else if (mism.charAt(0) == "R" || mism.charAt(0) == "r") {
+					$$('#opdiv_' + divz[k-1].id.replace(/^id_/, '') + ' a')[0].click();
+				}
+				pair_cnt++;
+				k++;
+			}
+
+			//--
+		}
+		if (pair_cnt) {
+			$('swith_manual').toggle();
+			$('try_auto').toggle();
+		}
+	};
+
 	phy.create_project = function () {
 
 		var ptype = '';
