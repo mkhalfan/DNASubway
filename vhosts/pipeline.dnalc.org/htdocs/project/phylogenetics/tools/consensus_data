@@ -103,7 +103,7 @@
 					$trimmed_end = $temp->end_pos;
 				}
 				
-				$original_seq_pos = length($entire_sequence) - $pos + $dash_count - 1 + $trimmed;
+				$original_seq_pos = length($entire_sequence) - $pos + $dash_count - 1 - $trimmed;
 				($low, $high) = ($original_seq_pos - 3, $original_seq_pos + 3);
 				$low = $trimmed if $low < $trimmed;
 				$high = ($trimmed_end - 1) if $temp && $high > ($trimmed_end - 1);
