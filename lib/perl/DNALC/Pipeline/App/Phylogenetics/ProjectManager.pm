@@ -645,7 +645,9 @@ use Bio::Trace::ABIF ();
 		return unless (defined $pair && ref($pair) eq 'DNALC::Pipeline::Phylogenetics::Pair');
 
 		my @pair_sequences = $pair->paired_sequences;
-		#print STDERR Dumper( \@pair_sequences), $/;
+
+		# no need for a consensus if one of the sequences is empty
+		return if grep {/^$/} map { $_->seq eq '' } @pair_sequences;
 
 		# check project directory exists
 		my $pwd = $self->work_dir;
@@ -739,7 +741,7 @@ use Bio::Trace::ABIF ();
 			    $muscle_alignment = $muscle_alignment . $seqa . "\n";
 				$consensus = $seqa;
 			}
-			print STDERR "checkpoint 0 \n";	
+
 			my @seq = map {$_->seq_id} @pair_sequences;
 			if (DataFile->retrieve($seq[0]->file_id)->file_type eq 'trace' &&
 					DataFile->retrieve($seq[1]->file_id)->file_type eq 'trace')
@@ -748,14 +750,12 @@ use Bio::Trace::ABIF ();
 				if ($fixed_consensus) {
 					$consensus = $fixed_consensus;
 				}
-				print STDERR "_fix_consensus gets called... \n";
 			}
 
 			$pair->alignment($muscle_alignment);
 			$pair->consensus($consensus);
 			$pair->update;
 		}
-		#print STDERR Dumper( $merger ), $/;
 
 		return 1;
 	}
@@ -763,7 +763,7 @@ use Bio::Trace::ABIF ();
 	#----------------------------------------------------------------------------
 	sub _fix_consensus{
 		my ( $muscle_alignment, $consensus, @pair_sequences) = @_;
-		print STDERR "now in the _fix_consensus routine \n";
+
 		my @alignment_line_1 = (split(/\s*:\s*/,(split('\n', $muscle_alignment))[0]));
 		my @alignment_line_2 = (split(/\s*:\s*/,(split('\n', $muscle_alignment))[1]));
 		my ($display_name_1, $seq1) = ($alignment_line_1[0], $alignment_line_1[1]); # Sequence 1
@@ -771,7 +771,6 @@ use Bio::Trace::ABIF ();
 
 		# @seq has the 2 DataSequence objects belonging to a pair
 		my @seq = map {$_->seq_id} @pair_sequences;
-		print STDERR "checkpoint 1 \n";
 
 		my ($ds_id_1) = map {$_ && $_->id} grep { $_->display_id eq $display_name_1 } @seq;
 		my ($ds_id_2) = map {$_ && $_->id} grep { $_->display_id eq $display_name_2 } @seq;
@@ -781,41 +780,41 @@ use Bio::Trace::ABIF ();
 
 		my ($df_1_strand) = map {$_ && $_->strand} grep { $_->seq_id eq $ds_id_1} @pair_sequences;
 		my ($df_2_strand) = map {$_ && $_->strand} grep { $_->seq_id eq $ds_id_2} @pair_sequences;
-		print STDERR "checkpoint 2 [$df_id_1] \n";
+
 		my $df1 = DNALC::Pipeline::Phylogenetics::DataFile->retrieve($df_id_1);
-		my @qs1 = $df1->quality_values();
+		my @qs1 = $df1->quality_values if $df1;
 		return unless (@qs1);
-		if ($df_1_strand eq "R"){
+		if ($df_1_strand eq "R") {
 				@qs1 = reverse @qs1;
 		}
 
 		my $df2 = DNALC::Pipeline::Phylogenetics::DataFile->retrieve($df_id_2);
-		my @qs2 = $df2->quality_values();	
+		my @qs2 = $df2->quality_values if $df2;
 		return unless (@qs2);
-		if ($df_2_strand eq "R"){
+		if ($df_2_strand eq "R") {
 				@qs2 = reverse @qs2;
 		}
-		print STDERR "checkpoint 3 \n";
+
 		my $x = 0;
-		foreach (split//, $seq1){
-			if ($_ eq "-"){
+		foreach (split//, $seq1) {
+			if ($_ eq "-") {
 				splice @qs1, $x, 0, "-1";
 			}
 			$x++;
 		}
 
 		my $y = 0;
-		foreach (split//, $seq2){
-			if ($_ eq "-"){
+		foreach (split//, $seq2) {
+			if ($_ eq "-") {
 				splice @qs2, $y, 0, "-1";
 			}
 			$y++;
 		}
-		print STDERR "checkpoint 4 \n";
-		for (my $i = 0; $i <= length($seq1); $i++){
-			if (substr($seq1, $i, 1) ne "N" && substr($seq2, $i, 1) ne "N"){
-				if (substr($seq1, $i, 1) ne substr($seq2, $i, 1)){
-					if ($qs1[$i] > $qs2[$i]){  
+
+		for (my $i = 0; $i <= length($seq1); $i++) {
+			if (substr($seq1, $i, 1) ne "N" && substr($seq2, $i, 1) ne "N") {
+				if (substr($seq1, $i, 1) ne substr($seq2, $i, 1)) {
+					if ($qs1[$i] > $qs2[$i]) {
 						substr ($consensus, $i, 1) = substr($seq1, $i, 1);
 					}
 					else {
@@ -824,7 +823,7 @@ use Bio::Trace::ABIF ();
 				}
 			}
 		}
-		print STDERR "checkpoint 5 \n";
+
 		return $consensus;
 	}
 
