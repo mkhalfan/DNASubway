@@ -44,19 +44,19 @@
 		<div id="save_changes_button_div">
 			<input type="button" id="save_changes_btn" value="Save Changes" onclick="phy.consensus_change()" style="margin-left:5px;display:none"/>
 		</div>
+
+		<input type="hidden" id="step" value="5" />		
+		<input type="hidden" id="seq1" value="<% $seq1 %>" />
+		<input type="hidden" id="seq2" value="<% $seq2 %>" />
+		<input type="hidden" id="display_name_1" value="<% $display_name_1 %>" />
+		<input type="hidden" id="display_name_2" value="<% $display_name_2 %>" />
+		<input type="hidden" id="consensus" value="<% $consensus %>" />
+		<input type="hidden" id="pair_id" value="<% $pair->id %>" />
 %	}
 	</div>
 % }
 </div>
 
-
-<input type="hidden" id="step" value="5" />		
-<input type="hidden" id="seq1" value="<% $seq1 %>" />
-<input type="hidden" id="seq2" value="<% $seq2 %>" />
-<input type="hidden" id="display_name_1" value="<% $display_name_1 %>" />
-<input type="hidden" id="display_name_2" value="<% $display_name_2 %>" />
-<input type="hidden" id="consensus" value="<% $consensus %>" />
-<input type="hidden" id="pair_id" value="<% $pair_id %>" />
 
 %#----------------------------------------------------------------------------
 <%args>
@@ -88,25 +88,32 @@
 	my $alignment;
 	my @alignment_line_1;
 	my @alignment_line_2;
-	
-	
-	
+
 	unless ($proj) {
 		$msg = "Project not found."
 	}
 	else {
 		@pairs = $pm->pairs;
-		($pair) = grep {$_->id == $pair_id} @pairs;
+		if ($pair_id) {
+			($pair) = grep {$_->id == $pair_id} @pairs;
+		}
+		else {
+			$pair = $pairs[0];
+		}
 		@seqs = $pair->paired_sequences if $pair;
 		$alignment = $pair->alignment if $pair;
-		@alignment_line_1 =(split(': ',(split('\n', $alignment))[0]));
-		@alignment_line_2 =(split(': ',(split('\n', $alignment))[1]));
-		($display_name_1, $seq1) = ($alignment_line_1[0], $alignment_line_1[1]);
-		($display_name_2, $seq2) = ($alignment_line_2[0], $alignment_line_2[1]);
-		$consensus = $pair->consensus if $pair;
-		
+		my @aln_lines = sort ((split('\n', $alignment))[0, 1]);
 
+		#@alignment_line_1 = split(': ', $aln_lines[0]);
+		#@alignment_line_2 = split(': ', $aln_lines[1]);
+		#@alignment_line_2 =(split(': ',(split('\n', $alignment))[1]));
+		#($display_name_1, $seq1) = ($alignment_line_1[0], $alignment_line_1[1]);
+		#($display_name_2, $seq2) = ($alignment_line_2[0], $alignment_line_2[1]);
+		($display_name_1, $seq1) = split(': ', $aln_lines[0]);
+		($display_name_2, $seq2) = split(': ', $aln_lines[1]);
+		$consensus = $pair->consensus if $pair;
 	}
+
 </%init>
 <%attr>
 	js => ['prototype-1.6.1.js', 'phylogenetics.js']
