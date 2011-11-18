@@ -739,6 +739,17 @@ use Bio::Trace::ABIF ();
 			    $muscle_alignment = $muscle_alignment . $seqa . "\n";
 				$consensus = $seqa;
 			}
+			print STDERR "checkpoint 0 \n";	
+			my @seq = map {$_->seq_id} @pair_sequences;
+			if (DataFile->retrieve($seq[0]->file_id)->file_type eq 'trace' &&
+					DataFile->retrieve($seq[1]->file_id)->file_type eq 'trace')
+			{
+				my $fixed_consensus = _fix_consensus($muscle_alignment, $consensus, @pair_sequences);
+				if ($fixed_consensus) {
+					$consensus = $fixed_consensus;
+				}
+				print STDERR "_fix_consensus gets called... \n";
+			}
 
 			$pair->alignment($muscle_alignment);
 			$pair->consensus($consensus);
@@ -747,6 +758,74 @@ use Bio::Trace::ABIF ();
 		#print STDERR Dumper( $merger ), $/;
 
 		return 1;
+	}
+	
+	#----------------------------------------------------------------------------
+	sub _fix_consensus{
+		my ( $muscle_alignment, $consensus, @pair_sequences) = @_;
+		print STDERR "now in the _fix_consensus routine \n";
+		my @alignment_line_1 = (split(/\s*:\s*/,(split('\n', $muscle_alignment))[0]));
+		my @alignment_line_2 = (split(/\s*:\s*/,(split('\n', $muscle_alignment))[1]));
+		my ($display_name_1, $seq1) = ($alignment_line_1[0], $alignment_line_1[1]); # Sequence 1
+		my ($display_name_2, $seq2) = ($alignment_line_2[0], $alignment_line_2[1]); # Sequence 2
+
+		# @seq has the 2 DataSequence objects belonging to a pair
+		my @seq = map {$_->seq_id} @pair_sequences;
+		print STDERR "checkpoint 1 \n";
+
+		my ($ds_id_1) = map {$_ && $_->id} grep { $_->display_id eq $display_name_1 } @seq;
+		my ($ds_id_2) = map {$_ && $_->id} grep { $_->display_id eq $display_name_2 } @seq;
+
+		my ($df_id_1) = map {$_ && $_->file_id} grep { $_->display_id eq $display_name_1 } @seq;
+		my ($df_id_2) = map {$_ && $_->file_id} grep { $_->display_id eq $display_name_2 } @seq;
+
+		my ($df_1_strand) = map {$_ && $_->strand} grep { $_->seq_id eq $ds_id_1} @pair_sequences;
+		my ($df_2_strand) = map {$_ && $_->strand} grep { $_->seq_id eq $ds_id_2} @pair_sequences;
+		print STDERR "checkpoint 2 [$df_id_1] \n";
+		my $df1 = DNALC::Pipeline::Phylogenetics::DataFile->retrieve($df_id_1);
+		my @qs1 = $df1->quality_values();
+		return unless (@qs1);
+		if ($df_1_strand eq "R"){
+				@qs1 = reverse @qs1;
+		}
+
+		my $df2 = DNALC::Pipeline::Phylogenetics::DataFile->retrieve($df_id_2);
+		my @qs2 = $df2->quality_values();	
+		return unless (@qs2);
+		if ($df_2_strand eq "R"){
+				@qs2 = reverse @qs2;
+		}
+		print STDERR "checkpoint 3 \n";
+		my $x = 0;
+		foreach (split//, $seq1){
+			if ($_ eq "-"){
+				splice @qs1, $x, 0, "-1";
+			}
+			$x++;
+		}
+
+		my $y = 0;
+		foreach (split//, $seq2){
+			if ($_ eq "-"){
+				splice @qs2, $y, 0, "-1";
+			}
+			$y++;
+		}
+		print STDERR "checkpoint 4 \n";
+		for (my $i = 0; $i <= length($seq1); $i++){
+			if (substr($seq1, $i, 1) ne "N" && substr($seq2, $i, 1) ne "N"){
+				if (substr($seq1, $i, 1) ne substr($seq2, $i, 1)){
+					if ($qs1[$i] > $qs2[$i]){  
+						substr ($consensus, $i, 1) = substr($seq1, $i, 1);
+					}
+					else {
+						substr ($consensus, $i, 1) = substr($seq2, $i, 1);
+					}
+				}
+			}
+		}
+		print STDERR "checkpoint 5 \n";
+		return $consensus;
 	}
 
 	#-----------------------------------------------------------------------------
