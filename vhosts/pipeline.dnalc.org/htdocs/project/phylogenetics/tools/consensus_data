@@ -32,6 +32,7 @@
 	my $temp;
 	my $trimmed;
 	my $trimmed_end;
+	my $trimmed_left;
 	my $reverse_flag = 0;
 	my $offset = 0;
 	my $high;
@@ -101,11 +102,13 @@
 				if ($temp = DNALC::Pipeline::Phylogenetics::DataSequenceTrim->retrieve($pseq[$_]->seq->id)){
 					$trimmed = length ($temp->right_trim);
 					$trimmed_end = $temp->end_pos;
+					$trimmed_left = length($temp->left_trim);
 				}
 				
 				$original_seq_pos = length($entire_sequence) - $pos + $dash_count - 1 - $trimmed;
 				($low, $high) = ($original_seq_pos - 3, $original_seq_pos + 3);
-				$low = $trimmed if $low < $trimmed;
+				$low = $trimmed_left if $low < $trimmed_left;
+				#$low = $trimmed if $low < $trimmed;
 				$high = ($trimmed_end - 1) if $temp && $high > ($trimmed_end - 1);
 				$offset = 3 - ($high - $original_seq_pos) if $high - $original_seq_pos < 3;
 			}
