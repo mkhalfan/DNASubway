@@ -139,7 +139,7 @@
 		#print STDERR "trace seq\n";
 		if ($fid && $fid =~ /^\d+$/) {
 			($file) = grep {$_->id == $fid } @files;
-			unless (-f $file->file_path) {
+			unless (-f $file->get_file_path) {
 				$file = undef;
 			}
 			if ($file) {

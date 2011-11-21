@@ -296,6 +296,11 @@ use Bio::Trace::ABIF ();
 			$filename =~ s/_+/_/g;
 
 			my $f = $stored_file;
+			# use relative path for the file_path
+			{
+				my $prefix = $self->config->{PROJECTS_DIR};
+				$stored_file =~ s/^$prefix\///;
+			}
 
 			my $data_file = DataFile->create({
 						project_id => $self->project,
@@ -647,7 +652,7 @@ use Bio::Trace::ABIF ();
 		my @pair_sequences = $pair->paired_sequences;
 
 		# no need for a consensus if one of the sequences is empty
-		return if grep {/^$/} map { $_->seq eq '' } @pair_sequences;
+		#return if grep {/^$/} map { $_->seq eq '' } @pair_sequences;
 
 		# check project directory exists
 		my $pwd = $self->work_dir;

@@ -5,6 +5,7 @@ use POSIX ();
 use List::Util qw/max/;
 use Bio::Trace::ABIF ();
 use DNALC::Pipeline::Phylogenetics::DataSequence();
+use DNALC::Pipeline::Config ();
 
 __PACKAGE__->table('phy_data_file');
 __PACKAGE__->columns(Primary => qw/id/);
@@ -32,10 +33,11 @@ sub seq {
 	my $seq = '';
 	return $seq unless ref($self) eq __PACKAGE__;
 
-	if (-f $self->file_path) {
+	my $file_path = $self->get_file_path;
+	if (-f $file_path) {
 		if ($self->file_type =~ /^fasta$/i) {
-			open FILE, $self->file_path or do {
-					print STDERR "Can't open file: ", $self->file_path, $/;
+			open FILE, $file_path or do {
+					print STDERR "Can't open file: ", $file_path, $/;
 					return '';
 				};
 			while (my $line = <FILE>) {
@@ -45,7 +47,7 @@ sub seq {
 		}
 		elsif ($self->file_type =~ /^trace$/i) {
 			my $ab = Bio::Trace::ABIF->new;
-			if ($ab->open_abif($self->file_path)) {
+			if ($ab->open_abif($file_path)) {
 				$seq = $ab->sequence;
 				$ab->close_abif;
 			}
@@ -62,7 +64,8 @@ sub trace {
 	my $max = 0;
 	my $ab = Bio::Trace::ABIF->new;
 
-	if ($ab->open_abif($self->file_path)) {
+	my $file_path = $self->get_file_path;
+	if ($ab->open_abif($file_path)) {
 
 		my @base_locations = $ab->base_locations();
 		my $last_base_pos = $base_locations[$#base_locations];
@@ -89,13 +92,25 @@ sub quality_values {
 	return unless ref($self) eq __PACKAGE__ || $self->file_type !~ /^trace$/i;
 	
 	my $ab = Bio::Trace::ABIF->new;
-	if ($ab->open_abif($self->file_path)) {
+	my $file_path = $self->get_file_path;
+	if ($ab->open_abif($file_path)) {
 		@q = $ab->quality_values;
 		$ab->close_abif;
 	}
 	wantarray ? @q : \@q;
 }
 
+sub get_file_path {
+	my ($self) = @_;
+	my $file_path = $self->file_path;
+	if (substr($file_path, 0, 1) eq "/") {
+		return $file_path;
+	}
+	else {
+		my $cf = DNALC::Pipeline::Config->new->cf('PHYLOGENETICS');
+		return $cf->{PROJECTS_DIR} . '/' . $file_path;
+	}
+}
 
 sub base_locations {
 	my ($self) = @_;
@@ -103,7 +118,7 @@ sub base_locations {
 	return unless ref($self) eq __PACKAGE__ || $self->file_type !~ /^trace$/i;
 	
 	my $ab = Bio::Trace::ABIF->new;
-	if ($ab->open_abif($self->file_path)) {
+	if ($ab->open_abif($self->get_file_path)) {
 		@bl = $ab->base_locations;
 		$ab->close_abif;
 	}
