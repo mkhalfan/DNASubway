@@ -16,7 +16,7 @@
 
 	phy.auto_pair = function () {
 		var k = 0;
-		var divz = $$('#seqids pre div')
+		var divz = $$('#seqids pre div');
 		var ldivz = divz.length - 1;
 		
 		var pair_cnt = 0;
@@ -32,28 +32,24 @@
 			var mism = "";
 			var i = 0;
 			for (; i < lshortest; i++) {
-				if (a.charAt(i) == b.charAt(i))
-					;//console.info(a.charAt(i) + ' ' + b.charAt(i));
-				else {
-					//console.info(a.charAt(i) + ' <> ' + b.charAt(i));
+				if (a.charAt(i) != b.charAt(i)) {
 					mism = a.charAt(i) + b.charAt(i);
 					break;
 				}
 			}
 
 			if (i > lshortest/2 && mism != "" && /[RF]/i.test(mism)) {
-				//console.info(a.substr(0, i));
-				//console.info(divz[k-1].id.replace(/^id_/, '') + ' - ' + divz[k].id.replace(/^id_/, ''));
-				phy.add_pair([ divz[k-1].id.replace(/^id_/, ''), divz[k].id.replace(/^id_/, '') ]);
+
 			    if (mism.charAt(1) == "R" || mism.charAt(1) == "r") {
-					$$('#opdiv_' + divz[k].id.replace(/^id_/, '') + ' a')[0].click();
+					phy.toggle_strand($$('#opdiv_' + divz[k].id.replace(/^id_/, '') + ' a')[0]);
 				}
 				else if (mism.charAt(0) == "R" || mism.charAt(0) == "r") {
-					$$('#opdiv_' + divz[k-1].id.replace(/^id_/, '') + ' a')[0].click();
+					phy.toggle_strand($$('#opdiv_' + divz[k-1].id.replace(/^id_/, '') + ' a')[0]);
 				}
+				phy.add_pair([ divz[k-1].id.replace(/^id_/, ''), divz[k].id.replace(/^id_/, '') ]);
 				pair_cnt++;
-				k++;
 			}
+			k++;
 
 			//--
 		}
