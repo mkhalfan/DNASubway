@@ -123,10 +123,10 @@ sub run_target {
 						my $fh = IO::File->new;
 						if ($fh->open( $file , 'w')) {
 							if ($ext eq 'nw') {
-								$content =~ s/(\d+)_([A-Z][a-z0-9_]+):0/$genomes{$2}-$1-$tpid:0/gi;
+								$content =~ s/(\d+)_([A-Z][a-z0-9_.]+):0/$genomes{$2}-$1-$tpid:0/gi;
 							}
 							elsif ($ext eq 'fasta') {
-								$content =~ s/^>(\d+)_([A-Z][a-z0-9_]+)/>$genomes{$2}-$1-$tpid/mgi;
+								$content =~ s/^>(\d+)_([A-Z][a-z0-9_.]+)/>$genomes{$2}-$1-$tpid/mgi;
 							}
 							else {
 								$fh->binmode if $ext =~ /(?:gz|jpg)/;
