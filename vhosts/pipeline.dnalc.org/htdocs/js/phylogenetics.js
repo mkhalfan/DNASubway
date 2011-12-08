@@ -39,15 +39,18 @@
 			}
 
 			if (i > lshortest/2 && mism != "" && /[RF]/i.test(mism)) {
-
-			    if (mism.charAt(1) == "R" || mism.charAt(1) == "r") {
-					phy.toggle_strand($$('#opdiv_' + divz[k].id.replace(/^id_/, '') + ' a')[0]);
+				// if already paired manually, skip it
+				var chkb = $$('#opdiv_' + divz[k].id.replace(/^id_/, '') + ' input')[0];
+				if (chkb.style.display != 'none') {
+					if (mism.charAt(1) == "R" || mism.charAt(1) == "r") {
+						phy.toggle_strand($$('#opdiv_' + divz[k].id.replace(/^id_/, '') + ' a')[0]);
+					}
+					else if (mism.charAt(0) == "R" || mism.charAt(0) == "r") {
+						phy.toggle_strand($$('#opdiv_' + divz[k-1].id.replace(/^id_/, '') + ' a')[0]);
+					}
+					phy.add_pair([ divz[k-1].id.replace(/^id_/, ''), divz[k].id.replace(/^id_/, '') ]);
+					pair_cnt++;
 				}
-				else if (mism.charAt(0) == "R" || mism.charAt(0) == "r") {
-					phy.toggle_strand($$('#opdiv_' + divz[k-1].id.replace(/^id_/, '') + ' a')[0]);
-				}
-				phy.add_pair([ divz[k-1].id.replace(/^id_/, ''), divz[k].id.replace(/^id_/, '') ]);
-				pair_cnt++;
 			}
 			k++;
 
