@@ -2,6 +2,7 @@
 % if ($ok == 1) {
 <script type="text/javascript">
 	top.phy.set_status("phy_tree", "not-processed");
+	top.phy.set_status("phy_tree_ml", "not-processed");
 	top.phy.close_window("phy_alignment");
 </script>
 % } else {

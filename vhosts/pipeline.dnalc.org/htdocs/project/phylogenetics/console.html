@@ -41,7 +41,7 @@
 			<span class="conIndicator_box">
 				<div id="phy_consensus_st" class="conIndicatorBL_<% $status{phy_pair} eq "done" ? $status{phy_consensus} eq "done" ? "done" : $status{phy_consensus} : "disabled" %>"></div>
 			</span>
-%	if ($status{phy_pair} ne "done" || !$is_owner) {
+%	if ($status{phy_pair} ne "done" || !($is_owner|| $is_admin)) {
 			<span class="bt_Runblueline">
 				<a id="phy_consensus_btn" class="conIndicatorBL_disabled" status="disabled" href="javascript:;">Consensus Builder</a>
 			</span>
@@ -161,10 +161,12 @@
 		<div id="conProjectInfo_title">Project Information</div>
 		<div id="conProjectInfo_edit">
 			<div class="bt_projectInfo_edit"><a href="javascript:;" onclick="javascript:show_edit();"></a></div>
-% if (0&& ($is_owner || $is_public)) {
-			<a href="tools/clone_project?pid=<% $proj->id %>">clone</a>
-% }
 		</div>
+% if (0 && $is_owner || $is_public) {
+		<div id="conProjectInfo_clone">
+			<div class="bt_projectInfo_clone"><a href="tools/clone_project?pid=<% $proj->id %>">&nbsp;</a></div>
+		</div>
+% }
 		<div id="conProjectInfo_projecttitle" origtitle=""><% $proj->name |html%></div>
 		<div id="conProjectInfo_projectlog">Description</div>
 	</div>
@@ -323,7 +325,8 @@ if ($status eq 'processing') {
 	$target = "";
 }
 elsif ($status eq 'done') {
-	my $url = "/project/phylogenetics/tools/view_$routine?pid=$pid;t=";
+	my $uniq = time();
+	my $url = "/project/phylogenetics/tools/view_$routine?pid=$pid;u=$uniq;t=";
 	$url =~ s/phy_//;
 	$url =~ s/tree_ml/tree/;
 	$action = qq{onclick="phy.launch('$routine', '$url} . $routine . qq{', '$routines{$routine}')"};

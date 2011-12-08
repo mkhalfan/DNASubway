@@ -557,7 +557,7 @@
 		uri = uri.replace(/tree_ml$/, "tree");
 		new Ajax.Request('/project/phylogenetics/tools/' + uri,{
 			method:'get',
-			parameters: { 't' : op, pid : p}, 
+			parameters: { 't' : op, pid : p, rnum: Math.random(2001) + Math.random(12001)}, 
 			onSuccess: function(transport){
 				var response = transport.responseText || "{'status':'error', 'message':'No response'}";
 				var r = response.evalJSON();
