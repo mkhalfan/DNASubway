@@ -3,8 +3,8 @@
 <form method="post">
 %#	<input type="hidden" id="selection_changed" value="" />
 	<div class="con_BL_subTitle">
-		<input type="checkbox" id="" title="Select all" onchange="$('selection_changed').show()" \
-		onclick="var chk=this.checked;$$('#seqs input[type=checkbox]').each(function(el) { el.checked = chk});"/> Select all
+		<input type="checkbox" id="" title="Select all" \
+		onclick="$('selection_changed').show();var chk=this.checked;$$('#seqs input[type=checkbox]').each(function(el) { el.checked = chk});"/> Select all
 	</div>
 	<div id="seqs" class="seqs">
 %# show "init" sources at the top
@@ -14,14 +14,14 @@
 %	$source_id =~ s/\W+/_/g;
 	<fieldset id="f<% $source_id %>" style="width:500px;float:left;">
 		<legend>
-			<input type="checkbox" id="s<%$source_id%>" onchange="$('selection_changed').show()" \
-			onclick="var val=this.checked;$$('#f<% $source_id %> input').each(function(i){i.checked = val;});" />
+			<input type="checkbox" id="s<%$source_id%>"
+			onclick="$('selection_changed').show();var val=this.checked;$$('#f<% $source_id %> input').each(function(i){i.checked = val;});" />
 			<& _buildSourceName, $source &>
 		</legend>
 %	for (@{$sequence_groups{$source}}) {
 	<div style="padding-left: 20px;">
 		<input type="checkbox" name="seqids" value="<% $_->{id} %>" id="seq<% $_->{s} %>" \
-		<% $selected_sequences{$_->{id}} ? "checked=\"checked\"" : "" %> onchange="$('selection_changed').show();"/>
+		<% $selected_sequences{$_->{id}} ? "checked=\"checked\"" : "" %> onclick="$('selection_changed').show();"/>
 		<span id="seq<% $_->{id} |html %>"><% $_->{name} |html%></span>
 	</div>
 %	}
@@ -34,14 +34,20 @@
 		</div>
 		<div style="padding:5px;color:#333">
 			Once you have selected the data you wish to use, you must save your changes.<br />
-%#			<input type="submit" id="save_selection" value="Save" style="background:#C2DBF3;margin-top:15px"/>
 			<input type="submit" id="save_selection" value="Save" class="bluebtn"/>
 		</div>
+% if (0) {
+		<div style="background: #C2DBF3; margin:0; padding:2px 2px 2px 5px;color: #333">
+			<img src="/images/info.png" style="vertical-align: middle;padding-right:7px;" /><strong>Download sequences</strong>
+		</div>
+		<div style="padding:5px;color:#333">
+			Once you have selected the data you wish to use, you must save your changes.<br />
+			<input type="submit" name="download_selection" id="download_selection" value="Download" class="bluebtn"/>
+		</div>
+% }
 	</div>
 	</div>    
 	<div class="list_refdata">
-%#		<input type="submit" id="save_selection" value="Save selection" />
-%#		<input type="button" id="close" value="Close" onclick="top.phy.close_window('manage_sequences');"/>
 		<input type="hidden" id="pid" value="<% $proj->id %>" />
 	</div>
 </form>
@@ -59,6 +65,7 @@
 <%args>
 	$pid => 0
 	@seqids => ()
+	$download_selection => ''
 </%args>
 <%once>
 	#use File::Slurp qw/read_file/;
