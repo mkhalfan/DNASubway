@@ -48,8 +48,9 @@
 				}
 			}
 			else {
-				$msg = join ' ', @{$st->{errors}};
+				$dsource->delete;
 			}
+			$msg = join '<br/>', (@{$st->{errors}}, @{$st->{warnings}});
 		}
 		else {
 			$msg = "This data set is already in your sequence list.";

@@ -258,9 +258,10 @@ use Bio::Trace::ABIF ();
 		my ($self, $params) = @_;
 
 		my @errors = ();
+		my @warnings = ();
 		my $seq_count = 0;
 
-		my $bail_out = sub { return {seq_count => $seq_count, errors => \@errors}};
+		my $bail_out = sub { return {seq_count => $seq_count, errors => \@errors, warnings => \@warnings}};
 
 		my $data_src = $self->project->add_to_datasources({
 				name => $params->{source},
@@ -283,6 +284,8 @@ use Bio::Trace::ABIF ();
 		my $out_io  = Bio::SeqIO->new(-fh => $fasta_fh, -format => 'Fasta', -flush  => 0);
 
 		my $ab = Bio::Trace::ABIF->new if $params->{type} =~ /trace/i;
+
+		my %seq_names = map { $_->display_id => 1} $self->sequences;
 
 		for my $fhash (@files) {
 			# store files
@@ -327,7 +330,16 @@ use Bio::Trace::ABIF ();
 					my $display_id = $seq_obj->display_id;
 					$display_id =~ s/[\[\]\(\):;]+/_/g;
 					$display_id =~ s/_+/_/g;
-					
+
+					if (defined $seq_names{$display_id}) {
+						$data_file->delete;
+						push @warnings, "Sequence '$display_id' already added to this project.";
+						next;
+					}
+					else {
+						$seq_names{$display_id} = 1;
+					}
+
 					my $seq = DataSequence->create({
 							project_id => $self->project,
 							source_id => $data_src,
@@ -362,7 +374,15 @@ use Bio::Trace::ABIF ();
 				$display_id =~ s/[\[\]\(\):;]+/_/g;
 				$display_id =~ s/_+/_/g;
 
-				#print $rc, $/;
+				if (defined $seq_names{$display_id}) {
+					$data_file->delete;
+					push @warnings, "File '$filename' already added to this project.";
+					next;
+				}
+				else {
+					$seq_names{$display_id} = 1;
+				}
+
 				my $seq_obj = Bio::Seq->new(
 						-seq => $sequence,
 						-id => $display_id,
@@ -397,6 +417,8 @@ use Bio::Trace::ABIF ();
 				$seq_count++;
 			}
 		}
+		#print STDERR "Warnings: ", Dumper( \@warnings), $/;
+
 		$ab->close_abif if $ab && $ab->is_abif_open;
 		close $fasta_fh;
 
@@ -452,9 +474,10 @@ use Bio::Trace::ABIF ();
 		my ($self, $blast_id, $selected_sequences) = @_;
 
 		my @errors = ();
+		my @warnings = ();
 		my $seq_count = 0;
 
-		my $bail_out = sub { return {seq_count => $seq_count, errors => \@errors}};
+		my $bail_out = sub { return {seq_count => $seq_count, errors => \@errors,  warnings => \@warnings}};
 
 		my $blast = Blast->retrieve($blast_id);
 		unless ($blast) {
@@ -466,6 +489,8 @@ use Bio::Trace::ABIF ();
 				name => "blast:$blast_id",
 			});
 		return $bail_out->() unless $data_src;
+
+		my %seq_names = map { $_->display_id => 1} $self->sequences;
 
 		my $fasta = $self->fasta_file;
 		open (my $fasta_fh, ">> $fasta") or do {
@@ -499,6 +524,11 @@ use Bio::Trace::ABIF ();
 					#$display_id =~ s/\|+/\|/g;
 
 					#print ">", $display_id, $/;
+					if (defined $seq_names{$display_id}) {
+						push @warnings, "Sequence '$display_id' already added to this project.";
+						next;
+					}
+					$seq_names{$display_id} = 1;
 					$seq_obj->display_id($display_id);
 				
 					my $seq = DataSequence->create({
@@ -714,12 +744,16 @@ use Bio::Trace::ABIF ();
 			#$alignment =~ s/#{3,}.*Report_file.*#{3,}\n*//ms;
 
 			# create a fasta file out of the $alignment;
-			my @alignment_line_1 =(split(': ',(split('\n', $alignment))[0]));
-			my @alignment_line_2 =(split(': ',(split('\n', $alignment))[1]));
-			my @alignment_line_3 =(split(': ',(split('\n', $alignment))[2]));
+			my @alignment_line_1 =(split(': ',(grep {!/^Consensus\s*:/} split('\n', $alignment))[0]));
+			my @alignment_line_2 =(split(': ',(grep {!/^Consensus\s*:/} split('\n', $alignment))[1]));
+			my @alignment_line_3 =(split(': ',(grep {/^Consensus\s*:/} split('\n', $alignment))[0]));
 			my ($display_name_1, $seq1) = ($alignment_line_1[0], $alignment_line_1[1]); #Sequence 1
 			my ($display_name_2, $seq2) = ($alignment_line_2[0], $alignment_line_2[1]); #Sequence 2
 			my ($display_name_3, $seq3) = ($alignment_line_3[0], $alignment_line_3[1]); #Consensus
+
+			print STDERR  "s1: ", $display_name_1, $/;
+			print STDERR  "s2: ", $display_name_2, $/;
+			print STDERR  "cc: ", $display_name_3, $/;
 
 			my $muscle_input = File::Spec->catfile($wd, "muscle-$pair.fasta");
 			open (MYFILE, ">$muscle_input");
@@ -735,6 +769,11 @@ use Bio::Trace::ABIF ();
 			my @muscle_output_array = split('>', $muscle_output);
 			shift(@muscle_output_array);
 
+
+			###
+			# FIXME TODO
+			###
+			print STDERR  "FIXMEL: ", __FILE__, ' ', __LINE__, $/;
 			my $muscle_alignment = '';
 			my $consensus;
 			# my @display_name_array = ($display_name_1, $display_name_2, $display_name_3);

@@ -7,6 +7,11 @@
 %	}
 	</div>
 % }
+% if (@messages) {
+	<script type="text/javascript">
+	top.show_messages("<% join ("<br />", @messages) %>");
+	</script>
+% }
 
 % if ($added) {
 <script type="text/javascript">
@@ -197,6 +202,9 @@
 					push @err, @{$st->{errors}};
 					print STDERR Dumper($st), $/;
 				}
+				if (@{$st->{warnings}}) {
+					push @messages, @{$st->{warnings}};
+				}
 			}
 
 			# do we have at least one sequence added?
@@ -212,7 +220,7 @@
 				}
 			}
 			else {
-				push @err, "Unable to add sequences!";
+				push @err, "No sequences were added!";
 			}
 		}
 	}
