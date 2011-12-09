@@ -23,6 +23,10 @@
 
 	$pid =~ s/\D//g;
 	$bid =~ s/\D//g;
+	
+	if (defined $selected_results && "ARRAY" ne ref $selected_results) {
+		$selected_results = [$selected_results];
+	}
 
 	my $pm = DNALC::Pipeline::App::Phylogenetics::ProjectManager->new($pid);
 	my $blast = DNALC::Pipeline::Phylogenetics::Blast->retrieve($bid);
