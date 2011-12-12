@@ -36,8 +36,7 @@
 	my $db = "Nucleotide";
 	my $report = "fasta";
 	my $query = uri_escape(clean_query($accession));
-	#my $query = '28864546';
-	
+
 	# Check if query exists in the cache #
 	my $key = 'genbank_accession_' . lc $query;
 	if (defined $m->cache->get($key)) {
@@ -133,6 +132,7 @@
 			type => 'fasta',
 			existing_project => 1,  # must be set every time we add data to an existing project
 		});
+
 		if ($st->{errors} && @{$st->{errors}}){
 			push @err, @{$st->{errors}};
 			print STDERR "Errors = @err";
@@ -140,6 +140,7 @@
 		}
 		else{
 			$status = 'success';
+			$message = join ", ", @{$st->{warnings}} if $st->{warnings};
 		}
 	}
 	

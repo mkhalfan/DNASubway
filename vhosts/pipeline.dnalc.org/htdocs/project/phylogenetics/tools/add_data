@@ -66,7 +66,6 @@
 				<% $seq_src eq "genbank" ? "checked=\"checked\"" : ""%>
 				value="genbank" onclick="phy.select_source('genbank')" /> <label for="seq_src_genbank">&nbsp; Import sequence from GenBank</label>
 		</div>
-
 		<div class="con_BL_menu_box1">
 			<input class="conRadiobox_align" type="radio" name="seq_src" id="seq_src_bold"
 				<% $seq_src eq "bold" ? "checked=\"checked\"" : ""%>
@@ -75,8 +74,7 @@
 		<div class="con_BL_menu_box1">
 			<input class="conRadiobox_align" type="radio" name="seq_src" id="seq_src_dnalc"
 				value="dnalc" onclick="phy.select_source('importdnalc')" /> <label for="seq_src_dnalc">&nbsp; Import trace files from DNALC</label>
-		</div>                     
-% }
+		</div>
 	</div>
 	<div class="con_BL_menu_box" id="import_inputs" style="">
 		<div class="con_BL_menu_box2">Please enter accession/process ID:</div>
@@ -87,6 +85,7 @@
 			<img id="import-loader" style="display:none" align="top" width="20" height="20" src="/images/ajax-loader-2.gif" alt="Importing...">
 		</div>
 	</div>
+% }
 	<div id="dnalc_container" style="clear:both;"></div>
 	</form>
 </div>

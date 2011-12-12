@@ -225,6 +225,9 @@
 					//if (src == 'genbank' && r.message == 'too-big'){
 						//top.show_messages('');
 					//}
+					if (src == 'genbank') {
+						top.show_messages(r.message);
+					}
 					top.phy.close_window('data');
 				}
 				else {
@@ -1022,6 +1025,9 @@
 				if (r && r.status == 'success') {
 					top.phy.set_status('phy_alignment', 'not-processed');
 					top.phy.close_window('blast');
+					if (r.message) {
+						top.show_messages(r.message);
+					}
 				}
 				else {
 					alert("Error: " + r.message);
