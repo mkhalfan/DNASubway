@@ -730,7 +730,7 @@ use Bio::Trace::ABIF ();
 		my $merger = DNALC::Pipeline::Process::Merger->new($wd->dirname);
 		$merger->run(%merger_args);
 		#print STDERR Dumper( $merger ), $/;
-		print STDERR "\nconsensus exit code = ", $merger->{exit_status}, $/;
+		#print STDERR "\nconsensus exit code = ", $merger->{exit_status}, $/;
 
 		if ($merger->{exit_status} == 0) { # success
 
@@ -751,10 +751,6 @@ use Bio::Trace::ABIF ();
 			my ($display_name_2, $seq2) = ($alignment_line_2[0], $alignment_line_2[1]); #Sequence 2
 			my ($display_name_3, $seq3) = ($alignment_line_3[0], $alignment_line_3[1]); #Consensus
 
-			print STDERR  "s1: ", $display_name_1, $/;
-			print STDERR  "s2: ", $display_name_2, $/;
-			print STDERR  "cc: ", $display_name_3, $/;
-
 			my $muscle_input = File::Spec->catfile($wd, "muscle-$pair.fasta");
 			open (MYFILE, ">$muscle_input");
 			print MYFILE ">$display_name_1\n$seq1\n>$display_name_2\n$seq2\n>$display_name_3\n$seq3";
@@ -762,7 +758,7 @@ use Bio::Trace::ABIF ();
 
 			# call MUSCLE 
 			my $m = DNALC::Pipeline::Process::Muscle->new($wd);
-			my $st = $m->run(pretend=>0, debug => 1, input => $muscle_input);
+			my $st = $m->run(pretend=>0, debug => 0, input => $muscle_input);
 			
 			# parse muscle output
 			my $muscle_output = slurp($wd . '/MUSCLE/output.fasta');
@@ -770,21 +766,25 @@ use Bio::Trace::ABIF ();
 			shift(@muscle_output_array);
 
 
-			###
-			# FIXME TODO
-			###
-			print STDERR  "FIXMEL: ", __FILE__, ' ', __LINE__, $/;
+			# make sure the consensus comes out on the last line
 			my $muscle_alignment = '';
 			my $consensus;
+			my @consensus = ();
 			# my @display_name_array = ($display_name_1, $display_name_2, $display_name_3);
 			for my $i (0 .. 2) {
-				my @temp = split('\n', @muscle_output_array[$i]);
-				$muscle_alignment = $muscle_alignment . @temp[0] . ': ';
-				shift (@temp);
-			    my $seqa = join('', @temp);
-			    $muscle_alignment = $muscle_alignment . $seqa . "\n";
-				$consensus = $seqa;
+				my @temp = split('\n', $muscle_output_array[$i]);
+				if ($temp[0] =~ /^Consensus/) {
+					$consensus[0] = shift(@temp);
+					$consensus[1] = $consensus = join('', @temp);
+				}
+				else {
+					$muscle_alignment .= $temp[0] . ': ';
+					shift (@temp);
+				    my $seqa = join('', @temp);
+				    $muscle_alignment .= $seqa . "\n";
+				}
 			}
+			$muscle_alignment .= join ': ', @consensus;
 
 			my @seq = map {$_->seq_id} @pair_sequences;
 			if (DataFile->retrieve($seq[0]->file_id)->file_type eq 'trace' &&
