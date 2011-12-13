@@ -521,7 +521,10 @@ use Bio::Trace::ABIF ();
 
 					my @tmp = split /\s+/, $hit->description;
 					my $display_id = $name . '|' . join '_', map {lc $_} splice @tmp, 0, 2;
-					#$display_id =~ s/\|+/\|/g;
+					$display_id =~ s/\s+/_/g;
+					$display_id =~ s/[\[\]\(\):;]+/_/g;
+					$display_id =~ s/_+/_/g;
+					$display_id =~ s/_+$//g;
 
 					#print ">", $display_id, $/;
 					if (defined $seq_names{$display_id}) {
