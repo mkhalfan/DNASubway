@@ -101,11 +101,14 @@
 	
 	my @fields = (
 
-		{id => "filed_id", type => "", label => "Field ID/Museum ID", re => qr/\w+/, len => 128, },
-		{id => "institution", type => "", label => "Institution Storing", re => qr/\w+/, len => 128, },
+		{id => "institution_storing", type => "", label => "Institution Storing", re => qr/\w+/, len => 128, },
 		{id => "tax", type => "", label => "Identified By", re => qr/\w+/, len => 128, },
 		{id => "tax_email", type => "", label => "Identifier's email", re => qr/\w+/, len => 128, },
 		{id => "", type => "label", label => "Identification", },
+		{id => "phylum", type => "", label => "Phylum", re => qr/\w+/, len => 48, },
+		{id => "class", type => "", label => "Class", re => qr/\w+/, len => 48, },
+		{id => "order", type => "", label => "Order", re => qr/\w+/, len => 48, },
+		{id => "family", type => "", label => "Family", re => qr/\w+/, len => 48, },
 		{id => "genus", type => "", label => "Genus", re => qr/\w+/, len => 48, },
 		{id => "species", type => "", label => "Species", re => qr/\w+/, len => 48, },
 		{id => "collectors", type => "textarea", label => "Collectors", re => qr/\w+/, len => 255, },

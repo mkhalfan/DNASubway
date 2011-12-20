@@ -4,7 +4,7 @@ use base qw(DNALC::Pipeline::DBI);
 
 __PACKAGE__->table('phy_bold');
 __PACKAGE__->columns(Primary => qw/id/);
-__PACKAGE__->columns(Essential => qw/project_id sequence_id specimen_id status/);
+__PACKAGE__->columns(Essential => qw/project_id sequence_id specimen_id status container process_id/);
 __PACKAGE__->columns(Other => qw/data created updated/);
 #__PACKAGE__->sequence('phy_bold_id_seq');
 

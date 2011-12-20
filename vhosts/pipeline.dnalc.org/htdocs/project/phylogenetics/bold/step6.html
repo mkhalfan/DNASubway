@@ -77,13 +77,14 @@ top.show_messages("BOLD data stored successfully");
 				sequence_id => $bs->{sel_seq}->[0],
 				status => 'pending',
 				data => $js->pretty->encode($bs->{spec_data}),
+				container => $bs->{container},
 			});
 			if ($b) {
 				for (@{$bs->{sel_seq}}) {
 					$_ =~ s/^\D//;
 					$b->add_to_bold_sequences({
+							pair_id => $_,
 							project_id => $proj->id,
-							sequence_id => $_,
 						});
 				}
 				

@@ -9,21 +9,22 @@
 <input type="hidden" name="bstep" value="1" />
 		Choose some of the sequences:
 		<div>
-% if (0) { # no pairs!!!!
+%# Don't be allowed to chose a sequence if it doesn't have a consensus AND if you're already submitted that sequence??
+
+		
+		
 %	for (@pairs) {
-%		my $name = lcs_name( map {$_->seq->display_id} $_->paired_sequences);
-		<div><input type="checkbox" name="sel_seq" id="p<% $_ |html %>" value="p<% $_->id %>" <% defined $sel_seq{"p".$_->id} ? "checked=\"checked\"" : "" %>/><% $name |html%></div>
-%	}
-% }
-%	for (@sequences) {
-		<div><input type="checkbox" name="sel_seq" id="s<% $_ |html %>" value="s<% $_->id %>" \
-		<% defined $sel_seq{"s".$_->id} ? "checked=\"checked\"" : "" %> \
-		<% defined $seq_submitted{$_->id} ? "disabled=\"disabled\"" : ""%>/><% $_->display_id |html%>\
+%		next if $_->consensus eq "";
+%		my $name = lcs_name( map {$_->seq->display_id}  $_->paired_sequences);
+		<div><input type="radio" name="sel_seq" id="p<% $_ |html %>" value="p<% $_->id %>" \
+		<% defined $sel_seq{"p".$_->id} ? "checked=\"checked\"" : "" %> \
+		<% defined $seq_submitted{$_->id} ? "disabled=\"disabled\"" : ""%> /><% $name |html%>
 %	if (defined $seq_submitted{$_->id}) {
 	(<small>already submitted</small>)\
 %	}
 		</div>
 %	}
+
 		</div>
 </form>
 	</p>
@@ -44,14 +45,18 @@
 	use DNALC::Pipeline::Phylogenetics::BoldSeq ();
 	#use DNALC::Pipeline::Phylogenetics::DataSequence ();
 	#use DNALC::Pipeline::Config ();
+	use DNALC::Pipeline::Phylogenetics::Pair ();
 	use DNALC::Pipeline::Utils qw/lcs_name/;
 	use Data::Dumper;
+	
 </%once>
 <%init>
 	my $s = $m->session->{pipeline};
 	my $pid = $s->{boldpid};
 	$s->{"bold_$pid"} ||= {};
 	my $bs = $s->{"bold_$pid"};
+	
+	#my $pair = DNALC::Pipeline::Phylogenetics::Pair->new();
 	
 	#print STDERR "S1. PID = ", $pid, Dumper($s), $/;
 
@@ -63,13 +68,14 @@
 		#print "Project not found!";
 		return;
 	}
-	my @pairs = ();#$pm->pairs;
+	#my @pairs = ();#$pm->pairs;
+	my @pairs = $pm->pairs;
 	
-	my %seq_submitted = map {$_->sequence_id => 1} 
+	my %seq_submitted = map {$_->pair_id => 1} 
 		DNALC::Pipeline::Phylogenetics::BoldSeq->search(project_id => $proj->id);
 	
 	# get non paired sequences
-	my @sequences = $pm->initial_sequences;
+	#my @sequences = $pm->initial_sequences;
 	
 	my %sel_seq = ();
 

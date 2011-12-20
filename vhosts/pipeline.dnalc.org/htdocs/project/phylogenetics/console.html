@@ -142,8 +142,8 @@
     
 <span class="conBlueline_ConColumn5">
 	<div class="con_browserBT ">
-		<span class="conIndicator_boxBrowse"><div class="conIndicatorBL_<%$is_owner ? "not-processed" : "disabled" %>"></div> </span>
-		<span class="bt_browserBlue"><a href="javascript:;" onclick="<%$is_owner ? "phy.launch('BOLD', '/project/phylogenetics/bold/?pid=$proj', 'Export to BOLD')" : "" %>">Export to<br/>BOLD</a></span>
+		<span class="conIndicator_boxBrowse"><div class="conIndicatorBL_<%$is_owner && $export_is_on ? "not-processed" : "disabled" %>"></div> </span>
+		<span class="bt_browserBlue"><a href="javascript:;" onclick="<%$is_owner && $export_is_on ? "phy.launch('BOLD', '/project/phylogenetics/bold/?pid=$proj', 'Export to BOLD')" : "" %>">Export to<br/>BOLD</a></span>
 	</div>
 	<div id="spacer_Runblueline">&nbsp;</div> 
 </span>
@@ -249,6 +249,7 @@
 	use Data::Dumper; 
 	use DNALC::Pipeline::App::Phylogenetics::ProjectManager ();
 	use DNALC::Pipeline::User ();
+	use DNALC::Pipeline::Config ();
 	use DNALC::Pipeline::UserProfile ();
 	
 	my %routines = (
@@ -301,6 +302,10 @@ for my $rt ( keys %routines ) {
 	my $status_name = $pm->get_task_status($rt)->name;
 	$status{$rt} = $status_name;
 }
+
+# turn on or off export to bold/GB button
+my $cf = DNALC::Pipeline::Config->new->cf('PHYLOGENETICS');
+my $export_is_on = $cf->{EXPORT_ON};
 
 </%init>
 %#-------------------------------------------------
