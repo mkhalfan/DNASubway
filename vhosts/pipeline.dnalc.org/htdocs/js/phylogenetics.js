@@ -42,23 +42,20 @@
 				// if already paired manually, skip it
 				var chkb = $$('#opdiv_' + divz[k].id.replace(/^id_/, '') + ' input')[0];
 				if (chkb.style.display != 'none') {
-					if (mism.charAt(1) == "R" || mism.charAt(1) == "r") {
-						phy.toggle_strand($$('#opdiv_' + divz[k].id.replace(/^id_/, '') + ' a')[0]);
+					// if A.innerHTML == R, don't reverse complement it anymore
+					var anchor1 = $$('#opdiv_' + divz[k-1].id.replace(/^id_/, '') + ' a')[0];
+					var anchor2 = $$('#opdiv_' + divz[k].id.replace(/^id_/, '') + ' a')[0];
+					if (anchor2.innerHTML !="R" && (mism.charAt(1) == "R" || mism.charAt(1) == "r")) {
+						phy.toggle_strand(anchor2);
 					}
-					else if (mism.charAt(0) == "R" || mism.charAt(0) == "r") {
-						phy.toggle_strand($$('#opdiv_' + divz[k-1].id.replace(/^id_/, '') + ' a')[0]);
+					else if (anchor1.innerHTML !="R" && (mism.charAt(0) == "R" || mism.charAt(0) == "r")) {
+						phy.toggle_strand(anchor1);
 					}
 					phy.add_pair([ divz[k-1].id.replace(/^id_/, ''), divz[k].id.replace(/^id_/, '') ]);
 					pair_cnt++;
 				}
 			}
 			k++;
-
-			//--
-		}
-		if (pair_cnt) {
-			$('swith_manual').toggle();
-			$('try_auto').toggle();
 		}
 	};
 
@@ -370,6 +367,12 @@
 			}
 			//seq2pairs[el] = pairs.length;
 		});
+		$('selection_changed').show();
+		try{
+			$('try_auto').hide();
+			$('reset').show();
+		}
+		catch(err) {};
 
 		pairs.push(pair);
 		if ($('do_pair') != null && $('do_pair').disabled) {
@@ -378,6 +381,7 @@
 	};
 	
 	phy.pop_from_pair = function(id) {
+		$('selection_changed').show();
 		var idx = current_pair.indexOf(id);
 		if ( idx != -1) {
 			debug('pop_from_pair: found in current_pair at pos: ' + idx);
@@ -2072,7 +2076,7 @@ Event.observe(window, Prototype.Browser.IE ? 'load' : 'dom:loaded', function() {
 			$('do_pair').disabled = true;
 			
 		// Set column widths and display columns
-		phy.setColumnWidths(740);
+		phy.setColumnWidths(560);
 		$('seqops').style.display = 'block';
 		$('seqops2').style.display = 'block';
 	

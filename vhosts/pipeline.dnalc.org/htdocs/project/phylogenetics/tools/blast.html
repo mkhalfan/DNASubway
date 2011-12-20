@@ -36,6 +36,9 @@
 %	if ($_->consensus) {
 <span id="blp<% $_->id %>"><a href="#" onclick="phy.do_blast('p<%$_->id%>');">blast</a></span>
 %	}
+%	else {
+
+%	}
 % }
 % for (@sequences) {
 <span id="bls<% $_->id %>"><a href="#" onclick="phy.do_blast('s<%$_->id%>');">blast</a></span>

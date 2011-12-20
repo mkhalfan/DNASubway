@@ -22,8 +22,8 @@ input[type="checkbox"] {
 	<div id="container_data_line">&nbsp;</div>
 %	unless (@pairs) {
 	<div style="text-align: right;font-size: small;">
-		<a id="try_auto" href="#" onclick="phy.auto_pair();">Try auto pairing</a>
-		<a id="swith_manual" href="#" onclick="document.location.reload();" style="display: none;">Switch to manual pairing</a>
+%#		<a id="try_auto" href="#" onclick="phy.auto_pair();">Try auto pairing</a>
+%#		<a id="swith_manual" href="#" onclick="document.location.reload();" style="display: none;">Switch to manual pairing</a>
 	</div>
 %	}
 	<div id="seqids">
@@ -62,7 +62,8 @@ input[type="checkbox"] {
 </pre>
 % }
 	</div>
-%#-----------------------------------------------------
+	
+%#-----------------------------------------------------	
 	<div id="seqops2">
 % if ($is_owner) {
 		<pre>
@@ -77,13 +78,53 @@ input[type="checkbox"] {
 % }
 </pre>
 % }
+	</div>	
+%#-----------------------------------------------------	
+	<div id="right_sidebar_container" class="right_sidebar_container">
+%#	unless (@pairs) {
+%	if (!@pairs) {
+		<div id="auto_pair_box" class="blue_sidebar_box_container" style="display:block;margin-bottom:10px;">
+			<div class="blue_sidebar_box_title">
+				<img src="/images/FR-icon.jpg" style="vertical-align: middle;padding-right:7px;" /><strong>Auto Pair</strong>
+			</div>
+			<div class="blue_sidebar_box_body">
+				<a id="try_auto" href="#" onclick="phy.auto_pair();">Try auto pairing</a>
+				<a href="#" id="switch_manual" style="display:none;" onclick="document.location.reload();">Switch to manual pairing</a>
+				<a href="#" id="reset" style="display:none;" onclick="document.location.reload();">Reset</a>
+			</div>
+		</div>
+%	}
+%	if(0) {
+		<div id="pair_builder_toolbox" class="blue_sidebar_box_container" style="display:block;margin-bottom:10px;">
+			<div class="blue_sidebar_box_title">
+				<img src="/images/FR-icon.jpg" style="vertical-align: middle;padding-right:7px;" /><strong>Pair Builder</strong>
+			</div>
+			<div class="blue_sidebar_box_body">
+				<strong>13</strong> pairs<br />
+				<strong>12</strong> unpaired sequences<br /><br />
+				<a href="#" id="switch_manual" onclick="document.location.reload();">Break All Pairs</a><br />
+				<a href="#" id="switch_manual" onclick="document.location.reload();">Close Window</a>
+			</div>
+		</div>
+%	}
+		<div id="selection_changed" class="blue_sidebar_box_container" style="display:none;">
+			<div class="blue_sidebar_box_title">
+				<img src="/images/info.png" style="vertical-align: middle;padding-right:7px;" /><strong>Save Your Pairs</strong>
+			</div>
+			<div class="blue_sidebar_box_body">
+				Once you have updated your pairs, you must save them.<br />
+				<input type="submit" id="save_selection" value="Save" class="bluebtn" onclick="javascript:phy.do_pair();"/>
+			</div>
+		</div>
 	</div>
-	<div style="clear: both;">&nbsp;</div>
+%#-----------------------------------------------------
+
+	<div style="clear: both;"></div>
 % if ($is_owner) {
 %#	if (!@pairs) {
-	<div style="text-align: center;">
-		<input type="button" id="do_pair" value="Save" onclick="javascript:phy.do_pair();"/>
-	</div>
+%#	<div style="text-align: center;">
+%#		<input type="button" id="do_pair" value="Save" onclick="javascript:phy.do_pair();"/>
+%#	</div>
 %# 	}
 	<form method="post" id="forma1">
 		<input type="hidden" id="step" value="1" />
@@ -93,7 +134,6 @@ input[type="checkbox"] {
 	</form>
 % }
 
-	<div style="clear: both;">&nbsp;</div>
 	<div id="container_data_lineBottom">&nbsp;</div>
 </div><!-- END of container_data2-->
 

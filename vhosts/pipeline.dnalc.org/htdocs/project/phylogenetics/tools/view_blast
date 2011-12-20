@@ -1,6 +1,19 @@
+<div id="add_blast_alert" class="blue_sidebar_box_container dark_blue_bg" style="position:fixed;display:none;z-index:1;width:98%;margin-top:-9px;">
+	<!--	<div id="fade" class="solid" style="background:#C2DBF3;position:fixed;padding:8px 5px;width:98%">
+			<img src="/images/info.png" style="vertical-align: middle;padding:7px 9px 5px 5px;" />Once you have made your selection you must <strong><a href="javascript:;" onclick="javascript:phy.add_blast_data('<% $blast->id |html%>')" style="color:red;">Add BLAST Hits to Project</a></strong>
+		</div> 
+	-->
+		<div id="message" style="padding:8px 5px;">
+			<img src="/images/info.png" style="vertical-align: middle;padding:7px 9px 5px 5px;" />Once you have made your selection you must <input type="button" id="add_to_project_btn" class="bluebtn" style="margin-top:0px" onclick="javascript:phy.add_blast_data('<% $blast->id |html%>')" value="Add BLAST hits to project"/>
+		</div>
+</div>
+
+
+<div style="clear:both"></div>
+<div id="blast_hits_alert_padding" style="position:fixed;top:0px;width:100%;height:56px;display:none;background:#FFF;">&nbsp;</div>
 <h4><% $display_id |html %></h4>
 % if ($blast) {
-<div class="tbl">
+<div class="tbl" style="margin-top:5px;">
 	<div class="theader">
 		<div class="tcell trownum">#</div> 
 		<div class="tcell">Name</div>
@@ -30,7 +43,7 @@
 		<div class="tcell trownum"><% $num %>(<% $hit_num%>).<a name="<% $num %>"></a></div> 
 		<div class="tcell" id="tip_<% $num %>" desc="<% $hit->description |html %>">\
 %	unless ($dsource) {
-			<input type="checkbox" name="selected_results" value="<% $name |html%>" />
+			<input type="checkbox" name="selected_results" value="<% $name |html%>" class="checkbox_listener" />
 % 	}
 			<% $name |html%>\
 		</div>
@@ -50,18 +63,28 @@
 %#	<div> &nbsp;&nbsp; <a href="javascript:void(0);" onclick="alert('will select all');">Select all</a></div>
 %	unless ($dsource) {
 <div style="text-align: center;margin: 20px">
-	<input type="button" id="add_to_project_btn" onclick="javascript:phy.add_blast_data('<% $blast->id |html%>')" value="Add BLAST hits to project"/>
+	<input type="button" id="add_to_project_btn" class="bluebtn" onclick="javascript:phy.add_blast_data('<% $blast->id |html%>')" value="Add BLAST hits to project"/>
 </div>
 <div id="content"></div>
 <input type="hidden" id="pid" value="<% $pid |html %>" />
 %	}
 % }
+
 <input type="hidden" id="step" value="3" />
 <script src="https://www.google.com/jsapi?key=ABQIAAAAoSwUiJBqXZvEx46Ti_il-xS7lxesUVAdImlxHuSb_YqL9ZAV0BTy1Vtknu258-haS18HJWNATVZZZg" type="text/javascript"></script>
+
 <script language="Javascript" type="text/javascript">
 //<![CDATA[
 google.load("search", "1");
 //]]>
+</script>
+
+<script language="Javascript" type="text/javascript">
+	$$('input.checkbox_listener').invoke('observe','click', function(e){
+		$('add_blast_alert').show();
+		$('blast_hits_alert_padding').show();
+		Element.addClassName.delay(0.25, 'add_blast_alert', 'fade');
+	});
 </script>
 %#----------------------------------------------------------------------------
 <%args>
