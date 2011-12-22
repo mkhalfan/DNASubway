@@ -53,7 +53,8 @@
 %#----------------------------------------------------------------------------
 <%once>
 	use DNALC::Pipeline::App::Phylogenetics::ProjectManager ();
-	use DNALC::Pipeline::Utils qw(random_string);
+	#use DNALC::Pipeline::Utils qw(random_string);
+	use File::Copy qw/copy/;
 
 	my %color = (
 			default => 'Clustal',
@@ -82,10 +83,13 @@
 	my $ok = 0;
 	
 	if ($r->method eq 'POST' && $is_owner) {
+		# make a copy
+		copy $algn_file, $algn_file . '_';
 		if (-f $algn_file && $fn->open(">$algn_file")) {
 			print $fn $data;
 			$fn->close;
-			
+			#$pm->_store_alignments($algn_file);
+			$pm->build_alignment(1); # realign
 			$ok = 1;
 		}
 	}

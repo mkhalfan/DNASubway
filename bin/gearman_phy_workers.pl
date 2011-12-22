@@ -34,9 +34,7 @@ sub run_build_tree {
 
 		my $tree_type = $args->{tree_type} || 'NJ';
 		my $pwd = $pm->work_dir;
-		my $input = $pm->get_alignment('phyi');
-		#print STDERR "Tree type: $tree_type\n";
-		#print STDERR "Alignment file to use: $input\n";
+		my $alignment = my $input = $pm->get_alignment('phyi');
 		my ($tree, $tb);
 
 		if (-f $input) {
@@ -62,13 +60,10 @@ sub run_build_tree {
 
 			if ($tb) {
 				$tb->run(input => $input, debug => 0, input_is_protein => $proj->type eq 'protein');
-				#print STDERR Dumper( $tb ), $/;
 				$tree = $tb->get_tree;
-				#print STDERR "Tree: ", $tree, $/;
 
-				my $stree = $pm->_store_tree($tree, $tree_type) if -f $tree;
+				my $stree = $pm->_store_tree($tree, $tree_type, $alignment) if -f $tree;
 
-				#print STDERR  "Tree = ", $stree->{tree}, "\t", $stree->{tree_file}, $/;
 				if (-s $stree->{tree_file}) {
 					if ($tree_type eq 'ML') {
 						$pm->set_task_status("phy_tree_ml", "done", $tb->{elapsed});
