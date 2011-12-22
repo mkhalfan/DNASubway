@@ -13,6 +13,7 @@ use File::Copy;
 use File::Slurp qw/slurp/;
 use Carp;
 use Digest::MD5();
+use POSIX q/strftime/;
 use Data::Dumper;
 
 #use DNALC::Pipeline::ProjectLogger ();
@@ -25,6 +26,7 @@ use aliased 'DNALC::Pipeline::Phylogenetics::DataSequence';
 use aliased 'DNALC::Pipeline::Phylogenetics::Pair';
 use aliased 'DNALC::Pipeline::Phylogenetics::PairSequence';
 use aliased 'DNALC::Pipeline::Phylogenetics::Tree';
+use aliased 'DNALC::Pipeline::Phylogenetics::Alignment';
 use aliased 'DNALC::Pipeline::Phylogenetics::Workflow';
 use aliased 'DNALC::Pipeline::Phylogenetics::Blast';
 
@@ -920,16 +922,14 @@ use Bio::Trace::ABIF ();
 		if ($output && -f $output) {
 			$phy_out = $m->convert_fasta_to_phylip;
 			$self->set_task_status("phy_alignment", "done", $m->{elapsed});
+			$self->_store_alignments($output, $phy_out);
 		}
 		else {
 			$self->set_task_status("phy_alignment", "error");
 		}
 
-		#print STDERR  "exit_status: ", $m->{exit_status}, $/;
-		#print STDERR  "elapsed: ", $m->{elapsed}, $/;
-
-		print STDERR "Fasta out: ", $output, $/;
-		print STDERR "phylip out: ", $phy_out, $/;
+		#print STDERR "Fasta out: ", $output, $/;
+		#print STDERR "phylip out: ", $phy_out, $/;
 		return $output;
 	}
 	#-----------------------------------------------------------------------------
@@ -943,12 +943,18 @@ use Bio::Trace::ABIF ();
 
 		my $pwd = $self->work_dir;
 		return unless -d $pwd;
-		my $mcf = DNALC::Pipeline::Config->new->cf('MUSCLE');
 
 		my $out_file;
+
+		my $mcf = DNALC::Pipeline::Config->new->cf('MUSCLE');
 		my ($out_type) = grep (/$format/i, keys %{$mcf->{option_output_files}});
 		if ($out_type) {
-			$out_file = File::Spec->catfile($pwd, 'MUSCLE', $mcf->{option_output_files}->{$out_type});
+
+			my $alignments_store = File::Spec->catfile($self->work_dir, 'alignments');
+			if (-d $alignments_store) {
+				($out_file)=sort {$b cmp $a } <$alignments_store/*.$format>;
+			}
+			$out_file ||= File::Spec->catfile($pwd, 'MUSCLE', $mcf->{option_output_files}->{$out_type});
 		}
 
 		return $out_file if ($out_file && -f $out_file);
@@ -1096,7 +1102,7 @@ use Bio::Trace::ABIF ();
 	#-----------------------------------------------------------------------------
 	#
 	sub _store_tree {
-		my ($self, $file, $tree_type) = @_;
+		my ($self, $file, $tree_type, $alignment) = @_;
 
 		return unless ($file && -f $file);
 
@@ -1110,6 +1116,7 @@ use Bio::Trace::ABIF ();
 			Tree->create({
 				project_id => $project,
 				tree_type => $tree_type,
+				alignment => $alignment ? basename($alignment) : '',
 			});
 		};
 		if ($@) {
@@ -1132,8 +1139,64 @@ use Bio::Trace::ABIF ();
 		return {tree => $tree, tree_file => $tree_file};
 	}
 
+	#-----------------------------------------------------------------------------
+	# stores the Muscle files on disk and into the DB 
+	#
+	sub _store_alignments {
+		my ($self, @files) = @_;
+
+		return unless (@files);
+
+		my $project = $self->project;
+		return unless $project;
+	
+		my $pwd = $self->work_dir;
+		return unless -d $pwd;
+
+		my $store = File::Spec->catfile($self->work_dir, 'alignments');
+		unless (-d $store ) {
+			unless(mkdir $store) {
+				print STDERR  "Unable to create dir for storing alignments for project: ", $self->project, $/;
+				return;
+			}
+		}
+
+		my $time = POSIX::strftime "%y%m%d.%H%M%S", localtime(+time);
+		my @stored_files;
+		for my $f (@files) {
+			unless (-f $f) {
+				push @stored_files, undef;
+				next;
+			}
+			my $new_f = $f;
+			$new_f =~ s/(.*\/).*(\.\w+)$/$time$2/;
+			$new_f = File::Spec->catfile($store, $new_f);
+			copy $f, $new_f;
+			push @stored_files, $new_f;
+
+			my ($ext) = $new_f =~ /\.(\w{2,5})$/;
+			# store in DB also
+			my $aln = eval {
+				Alignment->create({
+					project_id => $project,
+					aln_type => $ext,
+					file => $new_f ? basename($new_f) : '',
+				});
+			};
+			if ($@) {
+				print STDERR "Error storing alignment: $@", $/;	
+				return;
+			}
+			print STDERR Dumper( $aln ), $/;
+
+		}
+
+		return @stored_files;
+	}
 
 	#-----------------------------------------------------------------------------
+	# stores the sequence/trace files added to the project
+	#
 	sub store_file {
 		my ($self, $fhash) = @_;
 
