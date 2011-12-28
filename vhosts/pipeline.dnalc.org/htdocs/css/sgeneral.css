@@ -1379,3 +1379,120 @@ td.workshop a{
 td.workshop a:hover {
 	color:#8c4a9d;
 }
+
+/*//---------Workshop and DNA Barcoding up & down---------------*/
+
+/* Main menu settings */
+#centeredmenu {
+  width:1000px;
+  height: 24px;
+   clear:both;
+   float:left;
+   margin-top: 5px;
+   padding:0;
+   background: url("/images/v2/workshop_BarCD_bt.png") left no-repeat;
+   background-color: #eee;
+   border-bottom: solid 2px #8c4a9d; 
+   font-family:Arial, Verdana, Geneva, sans-serif; 
+   z-index:1000; 
+   position:relative;
+}
+
+/* Top menu items */
+#centeredmenu ul {
+   margin:0;
+   padding:0;
+   list-style:none;
+   float:left;
+   position:relative;
+}
+
+#centeredmenu ul li {
+   padding:0;
+   float:left;
+   position:relative;
+   margin-left: 40px;
+   margin-right: 12px;
+}
+
+#centeredmenu ul li a {
+   display:block;
+   margin:0;
+   padding:6px 4px 0px 4px;
+   font-size:.85em;
+   text-decoration:none;
+   color:#fff;
+   font-weight:bold;
+}
+
+#centeredmenu ul li.active a {
+  color:#fff;
+  backgournd: #000;
+}
+#centeredmenu ul li a:hover {
+ /* Top menu items background colour */
+   color: #ccc;
+}
+
+#centeredmenu ul li:hover a,
+#centeredmenu ul li.hover a { /* This line is required for IE 6 and below */
+/* Top menu items background colour */
+   color:#ccc;
+}
+
+/* Submenu items */
+#centeredmenu ul ul {
+   display:none; /* Sub menus are hiden by default */
+   position:absolute;
+   top:-70px;
+   left:0px;
+   /*right:auto; resets the right:50% on the parent ul */
+   width:1000px; /* width of the drop-down menus */
+}
+#centeredmenu ul ul li {
+   border-top: 1px solid #8c4a9d;
+   position: relative;
+   float: left;  /*resets the left:50% on the parent li */
+   margin:0; /* Reset the 1px margin from the top menu 
+   clear:right;*/
+   width:1000px;
+}
+
+#centeredmenu ul ul li a,
+#centeredmenu ul li:hover ul li a,
+#centeredmenu ul li.hover ul li a { /* This line is required for IE 6 and below */
+   font-size:.8em;
+   font-weight:bold; /* resets the bold set for the top level menu items */
+   background:#eee;
+   color:#444;
+   line-height:1.4em; /* overwrite line-height value from top menu */
+   padding-bottom: 10px;
+   padding-left: 50px;
+  
+}
+
+#centeredmenu ul ul li a:hover,
+#centeredmenu ul li:hover ul li a:hover,
+#centeredmenu ul li.hover ul li a:hover { /* This line is required for IE 6 and below */
+   color:#8c4a9d;
+   font-weight:bold; 
+}
+
+/* sub sub list  stays within the page */
+
+#centeredmenu ul ul.first{
+   position:absolute;
+   left:-40px;
+}
+
+#centeredmenu ul ul.last {
+   position:absolute;
+   left:-241px;
+}
+
+/* Make the sub menus appear on hover */
+#centeredmenu ul li:hover ul,
+#centeredmenu ul li.hover ul { /* This line is required for IE 6 and below */
+   display:block;
+  /* Show the sub menus */
+}

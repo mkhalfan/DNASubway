@@ -146,22 +146,27 @@ new Tip('tt_blue4', "Perform multiple sequence alignments using MUSCLE", {
     <div class="bt_Guide"><a href="/files/pdf/DNA_Subway_Guide.pdf" title="DNA Subway guide"></a></div>-->
 </div>
     <div id="home_intro" class="container_text">This site ties together key bioinformatics tools and databases to assemble gene models, investigate genomes, work with phylogenetic trees and analyze DNA barcodes. Roll over the "stations" on the subway map to find out more about the analysis steps. Analyze your own data or sample data provided. To start a project, select one of the "lines" (red, yellow, blue). Register and login to be able to save and share your results.</div>
-    <ul id="workshop">
-		<li>
-			<span id="bt-workshopOpen">DNA Subway Training</span>
-			<ul>
-			  <span id="bt-workshopClose">DNA Subway Training for Educators</span>
-              <table class="workshop">
-				<tr>
-				<td class="dot">&#8226; </td>
-				<td class="workshop"><a href="http://www.dnalc.org/programs/teacher_training.html#iplant"><b>January 12-13, 2012</b> San Diego State University, San Diego, CA</a></td>
-				<td class="dot"></td>
-				<td class="dot"></td>
-				</tr>
-			</table>
-		  </ul>
-	  </li>
-  </ul>
+	<!-- footer rollover (training dates, barcode 101) -->
+	<div id="centeredmenu">
+    <ul>
+      <li><a href="#">DNA Subway Training</a>
+         <ul class="first">
+            <li><a href=""><font weight="bold" color="#8c4a9d">DNA Subway Training for Educators</font></a></li>
+            <li><a href="http://www.dnalc.org/programs/teacher_training.html#iplant">&#8226;&#8195; January 12-13, 2012 San Diego State University, San Diego, CA</a></li>
+         </ul>
+      </li>
+      <!--<li class="active"><a href="#" class="active">DNA Barcoding 101</a> -->
+      <li ><a href="#">DNA Barcoding 101</a>
+         <ul class="last">
+            <li><a href="http://www.urbanbarcodeproject.org">go to DNA Barcoding 101</a></li>
+            <li><a href="#"><font weight="bold" color="#8c4a9d">Experimental method and everything else you need to generate DNA barcode sequences to analyze on the DNA Subway Blue Line. </font></a></li>
+         </ul>
+      </li>
+    </ul>
+    </div>
+	<!-- end footer rollover -->
+	
+	
 </div>
 
 % if ($s->{warn_guest}) {
