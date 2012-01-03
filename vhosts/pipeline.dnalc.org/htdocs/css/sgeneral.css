@@ -1444,7 +1444,7 @@ td.workshop a:hover {
 #centeredmenu ul ul {
    display:none; /* Sub menus are hiden by default */
    position:absolute;
-   top:-70px;
+   top:-69px;
    left:0px;
    /*right:auto; resets the right:50% on the parent ul */
    width:1000px; /* width of the drop-down menus */
@@ -1496,3 +1496,5 @@ td.workshop a:hover {
    display:block;
   /* Show the sub menus */
 }
+/*//--------- END Workshop and DNA Barcoding up & down---------------*/
+
