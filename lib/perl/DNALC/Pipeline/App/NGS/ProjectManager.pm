@@ -160,7 +160,8 @@ use iPlant::FoundationalAPI::Constants ':all';
 		my %job_arguments = %$form_arguments;
 		my $app_id = $app_id;
 		my $apps = $api_instance->apps;
-		my $app = $apps->find_by_name($app_id);
+		my ($app) = $apps->find_by_name($app_id);
+		print STDERR "APP: ", $app, $/;
 		
 		print "App ID: $app_id <br /> Annotation Field: $job_arguments{ANNOTATION} <br />";
 		
@@ -174,6 +175,7 @@ use iPlant::FoundationalAPI::Constants ':all';
 		print Dumper (%job_arguments);
 		my $job_ep = $api_instance->job;
 		my $job = $job_ep->submit_job($app, %job_arguments);
+		#print STDERR "returned from submit_job: ", %$job, $/; 
 
 	}
 
