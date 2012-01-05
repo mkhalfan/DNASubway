@@ -101,6 +101,7 @@ my $rc = $utils->load_analysis_results($FILE, $ALG);
 if ($rc >> 8 == 254 && $TRIES < 5) {
 	$TRIES++;
 	print STDERR  "*** LOADER POSTPONED: tries = $TRIES // rc = ", $rc, '==', $rc >> 8, $/;
+	sleep(10);
 
 	my $config = DNALC::Pipeline::Config->new->cf('PIPELINE');
 	my $client = Gearman::Client->new;

@@ -19,7 +19,7 @@ sub run_load_analysis_results {
 	my $args = thaw($gearman->arg);
 	my ($username, $profile, $alg, $file, $tries) = @$args;
 
-	sleep(5);
+	sleep(10);
 	
 	my $cmd = $config->{EXE_PATH} . '/load_analysis_results.pl';
 	my @args = ('--username', $username,
