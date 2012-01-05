@@ -47,7 +47,7 @@
 	<span class="bt_PublicProjects"><a href="/project/browse"></a></span>
 	<span class="bt_redStart"><a href="/project/create_project.html"></a></span>
 	<span class="bt_yellowStart"><a href="/project/target/create"></a></span>
-<!--	<span class="bt_blueStart"><a href="#" style="cursor: default;"></a></span> -->
+	<span class="bt_blueStart"><a href="/project/phylogenetics/create_project.html"></a></span>
     <span class="spacer_btGlossary"></span>
 % }
 </div><!--END of ID container_leftMenu-->
