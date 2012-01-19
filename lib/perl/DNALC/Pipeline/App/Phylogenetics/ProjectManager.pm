@@ -29,6 +29,7 @@ use aliased 'DNALC::Pipeline::Phylogenetics::Tree';
 use aliased 'DNALC::Pipeline::Phylogenetics::Alignment';
 use aliased 'DNALC::Pipeline::Phylogenetics::Workflow';
 use aliased 'DNALC::Pipeline::Phylogenetics::Blast';
+use aliased 'DNALC::Pipeline::Phylogenetics::BlastRun';
 
 use DNALC::Pipeline::Process::Phylip::DNADist ();
 use DNALC::Pipeline::Process::Phylip::Neighbor ();
@@ -1268,6 +1269,11 @@ use Bio::Trace::ABIF ();
 		# see if we already have cached such sequence
 		($blast) = Blast->search( crc => $crc );
 		if ($blast) {
+			#make a new entry for this run
+			my $blast_new = DNALC::Pipeline::Phylogenetics::BlastRun->create({
+				run_id => $args{run_id},
+				bid => $blast,
+			});
 			return {status => 'success', blast => $blast};
 		}
 		
@@ -1319,6 +1325,11 @@ use Bio::Trace::ABIF ();
 					crc => $crc,
 					output => $alignment || 'No results!',
 				});
+			my $blast_new = DNALC::Pipeline::Phylogenetics::BlastRun->create({
+				run_id => $args{run_id},
+				bid => $blast,
+			});
+			
 			$status = 'success';
 
 		}
