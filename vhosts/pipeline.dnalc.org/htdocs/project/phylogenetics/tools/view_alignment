@@ -54,8 +54,10 @@
 %#----------------------------------------------------------------------------
 <%once>
 	use DNALC::Pipeline::App::Phylogenetics::ProjectManager ();
-	#use DNALC::Pipeline::Utils qw(random_string);
+	use DNALC::Pipeline::Config ();
 	use File::Copy qw/copy/;
+	use Gearman::Client ();
+	use Storable qw/thaw nfreeze/;
 
 	my %color = (
 			#default => 'Clustal',
@@ -90,8 +92,21 @@
 		if (-f $algn_file && $fn->open(">$algn_file")) {
 			print $fn $data;
 			$fn->close;
-			#$pm->_store_alignments($algn_file);
-			$pm->build_alignment(1); # realign
+			$pm->_store_alignments($algn_file);
+			#$pm->build_alignment(1); # realign
+			
+			#--------------------------------------------------------
+			my $pcf = DNALC::Pipeline::Config->new->cf('PIPELINE');
+			my $client = Gearman::Client->new;
+			my $sx = $client->job_servers(@{$pcf->{GEARMAN_SERVERS}});
+			
+			my $params = nfreeze( {pid => $pid, user_id => $s->{user_id}, realign => 1});
+			my $rc = $client->do_task( 'phy_alignment' =>  $params);
+			$rc = thaw($$rc);
+			if ($rc && defined $rc->{status}) {
+				$ok = 1 if $rc->{status} eq 'success';
+			}
+			#--------------------------------------------------------
 			$ok = 1;
 		}
 	}
