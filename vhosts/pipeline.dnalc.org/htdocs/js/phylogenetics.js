@@ -982,10 +982,15 @@
 				if (r && r.status == 'success') {
 					
 					if (r.bid) {
-						document.location.href = '/project/phylogenetics/tools/view_blast'
+						/*document.location.href = '/project/phylogenetics/tools/view_blast'
 							+ '?bid=' + r.bid
 							+ ';pid=' + $('pid').value
-							+ ';sid=' + sid;
+							+ ';sid=' + sid; */
+							
+						$$("#seqops pre")[0].show();
+						$("seqops").removeClassName('blast_processing');
+						$(sid).update("<a href='/project/phylogenetics/tools/view_blast?bid=" + r.bid + ";pid=" + $('pid').value + ";sid=" + sid + "' style='color:red'>View</a>");
+						
 					}
 					else {
 						$$("#seqops pre")[0].show();

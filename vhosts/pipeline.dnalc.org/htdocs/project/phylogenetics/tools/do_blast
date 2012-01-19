@@ -23,6 +23,8 @@
 	my ($status, $msg, $seq, $pair, $type, $blast) = ("error", "");
 	my $pm = DNALC::Pipeline::App::Phylogenetics::ProjectManager->new($pid);
 	my $proj = $pm->project;
+	
+	my $osid = $sid;
 
 	unless ($proj && $proj->user_id == $s->{user_id}) {
 		$msg = "Project not found.\n";
@@ -54,7 +56,8 @@
 		my $st = eval {$pm->do_blast_sequence(
 					type => $type, 
 					seq => $seq, 
-					pair => $pair);
+					pair => $pair,
+					run_id => $pid . '-' . $osid,);
 				};
 		if ($@) {
 			print STDERR "ERROR blasting: ", $@, $/;

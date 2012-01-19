@@ -34,14 +34,27 @@
 		<pre>
 % for (@pairs) {
 %	if ($_->consensus) {
-<span id="blp<% $_->id %>"><a href="#" onclick="phy.do_blast('p<%$_->id%>');">blast</a></span>
+%		my ($blast_run) = BlastRun->search(run_id=>$pid . '-p' . $_->id);
+%if ($blast_run){
+<span id ='p<%$_->id%>'><a href='/project/phylogenetics/tools/view_blast?bid=<%$blast_run->bid%>;pid=<%$pid%>;sid=p<%$_->id%>'>View</a></span>
+%}
+%else{
+<span id ='p<%$_->id%>'><span id='blp<%$_->id%>'><a href='#' onclick="phy.do_blast('p<%$_->id%>');">blast</a></span></span>
+%}
 %	}
 %	else {
 
 %	}
 % }
 % for (@sequences) {
-<span id="bls<% $_->id %>"><a href="#" onclick="phy.do_blast('s<%$_->id%>');">blast</a></span>
+%	my ($blast_run) = BlastRun->search(run_id=>$pid . '-s' . $_->id);
+%if ($blast_run){
+<span id ='s<%$_->id%>'><a href='/project/phylogenetics/tools/view_blast?bid=<%$blast_run->bid%>;pid=<%$pid%>;sid=s<%$_->id%>'>View</a></span>
+%}
+%else{
+<span id ='s<%$_->id%>'><span id='blp<%$_->id%>'><a href='#' onclick="phy.do_blast('s<%$_->id%>');">blast</a></span></span>
+%}
+%#<span id="bls<% $_->id %>"><a href="#" onclick="phy.do_blast('s<%$_->id%>');">blast</a></span> <span id ="s<%$_->id%>"><% $blast_run ? "<a href='/project/phylogenetics/tools/view_blast?bid=" . $blast_run->bid . ";pid=" . $pid . ";sid=s" . $_->id . "'>View</a>" : "" %></span>
 % }
 </pre>
 <input type="hidden" id="pid" value="<% $proj->id %>" />
@@ -66,6 +79,7 @@
 	use File::Slurp qw/read_file/;
 	use DNALC::Pipeline::App::Phylogenetics::ProjectManager ();
 	use DNALC::Pipeline::Phylogenetics::DataSequence ();
+	use aliased 'DNALC::Pipeline::Phylogenetics::BlastRun';
 	use DNALC::Pipeline::Config ();
 	use DNALC::Pipeline::Utils qw/lcs_name/;
 	use Data::Dumper;
