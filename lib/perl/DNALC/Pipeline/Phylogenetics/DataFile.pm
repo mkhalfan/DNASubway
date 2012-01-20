@@ -125,4 +125,18 @@ sub base_locations {
 	wantarray ? @bl : \@bl;
 }
 
+sub basecaller {
+	my ($self) = @_;
+	my $bc = "N/A";
+
+	return $bc unless ref($self) eq __PACKAGE__ || $self->file_type !~ /^trace$/i;
+
+	my $ab = Bio::Trace::ABIF->new;
+	if ($ab->open_abif($self->get_file_path)) {
+		$bc = sprintf("%s, %s", $ab->basecaller_bcp_dll || '?', $ab->basecaller_version || '?');
+		$ab->close_abif;
+	}
+	$bc;
+}
+
 1;
