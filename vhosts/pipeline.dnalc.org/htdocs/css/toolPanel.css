@@ -431,7 +431,7 @@ span.rot { -moz-transform:rotate(90deg); font-size: smaller;}
 	}	
 	
 #phy-pair-builder #seqids, #phy-blast #seqids {
-	float:left; width: auto; max-width: 400px; font-family:arial, monospace; line-height: 1.2em;overflow-x:auto; color: #996600; 
+	float:left; width: auto; max-width: 400px; font-family:arial, monospace; line-height: 1.2em;overflow-x:auto; color: #996600; min-height:200px;
 	}
 #phy-pair-builder #seqs, #phy-blast #seqs {
 	float:left;width:1px;margin-left:15px;overflow-x:hidden;font-family:courier;line-height: 1.2em;text-transform: uppercase; display:none;
