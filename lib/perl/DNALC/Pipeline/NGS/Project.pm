@@ -12,7 +12,8 @@ __PACKAGE__->columns(Essential => qw/user_id name organism common_name created t
 __PACKAGE__->columns(Other => qw/description/);
 __PACKAGE__->sequence('ngs_project_id_seq');
 
-__PACKAGE__->has_many(jobs => 'DNALC::Pipeline::NGS::Job');
+#__PACKAGE__->has_many(datasources => 'DNALC::Pipeline::NGS::DataSource');
+#__PACKAGE__->has_many(jobs => 'DNALC::Pipeline::NGS::Job');
 
 __PACKAGE__->add_trigger(before_create => sub {
 	$_[0]->{created} ||= POSIX::strftime "%Y-%m-%d %H:%M:%S", localtime(+time);

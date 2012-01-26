@@ -1,9 +1,8 @@
 package DNALC::Pipeline::App::NGS::ProjectManager;
 
-use common::sense;
-
-use Data::Dumper;
-use JSON::XS ();
+#use common::sense;
+use strict;
+use warnings;
 
 use aliased 'DNALC::Pipeline::NGS::Job';
 use aliased 'DNALC::Pipeline::NGS::JobParam';
@@ -17,14 +16,35 @@ use DNALC::Pipeline::TaskStatus ();
 use iPlant::FoundationalAPI ();
 use iPlant::FoundationalAPI::Constants ':all';
 
+use JSON::XS ();
+use Data::Dumper;
+
 {
 	sub new {
-		my ($class, %args) = @_;
+		my ($class, $params) = @_;
 		my $self = bless {
 			api_instance => undef,
+			debug => $params->{debug} || undef,
 		}, __PACKAGE__;
 
+		my $project = $params->{project};
 
+		if ($project) {
+			if (ref $project eq '' && $project =~ /^\d+$/) {
+				my $proj = Project->retrieve($project);
+				unless ($proj) {
+					print STDERR  "Project with id=$project wasn't found!", $/;
+				}
+				else {
+					$self->project($proj);
+				}
+			}
+			else { # we assume it's an instance of a project
+				$self->project($project);
+			}
+		}
+
+		$self;
 	}
 
 	# -------------------------------------
@@ -45,10 +65,10 @@ use iPlant::FoundationalAPI::Constants ':all';
 				Project->create({
 						user_id => $user_id,
 						name => $name,
-						type => $params->{type},
-						organism => $params->{organism},
-						common_name => $params->{common_name},
-						description => $params->{description},
+						type => $params->{type} || '',
+						organism => $params->{organism} || '',
+						common_name => $params->{common_name} || '',
+						description => $params->{description} || '',
 					});
 			};
 		if ($@){
@@ -60,42 +80,65 @@ use iPlant::FoundationalAPI::Constants ':all';
 		$self->project($proj);
 
 		return {status => 'success', msg => $msg};
-
-			
 	}
 
 	#--------------------------------------
 	sub add_data {
-		my ($self, $params) = @_;
+		my ($self, $params, $options) = @_;
+
+		my (@errors, @warnings);
+
+		my $bail_out = sub { return {errors => \@errors, warnings => \@warnings}};
+
+		my $_no_remote_check = defined $options ? $options->{_no_remote_check} : 0;
+		if (!$_no_remote_check) {
+			print STDERR  "__add_data__: Checking remote site to see if files exists.", $/ if $self->debug;
+			my $io_api = $self->api_instance ? $self->api_instance->io : undef;
+			if ($io_api) {
+				my $files = $io_api->ls($params->{file_path});
+
+				# TODO - what action should be taken when the file is not in the repository?
+				unless (@$files) {
+					print STDERR  "__add_data__: File not found in the iRODS repository: ", $params->{file_path}, $/;
+				}
+			}
+		}
+		else {
+			print STDERR  "__add_data__: Not checking if file exists.", $/ if $self->debug;
+		}
+
+		my $data_src = DataSource->insert ({
+				project_id => $self->project,
+				name => $params->{source} || 'anonymous',
+				note => 'note',
+			});
+		return $bail_out->() unless $data_src;
 
 		my $data_file = DataFile->create({
 				project_id => $self->project,
-				source_id => $params->{source_id},
+				source_id => $data_src,
 				file_name => $params->{file_name},
 				file_path => $params->{file_path},
 				file_type => $params->{file_type},
 			});
-
 	}
 	
 	#--------------------------------------
 	sub auth {
 		my ($self, $user, $token) = @_;
-		print STDERR "user: $user \n token: $token \n";
+		print STDERR "user: $user \n token: $token \n" if $self->debug;
 		my $api_instance = iPlant::FoundationalAPI->new(
 			user => $user,
 			token => $token,
-			debug => 1,
+			debug => $self->debug,
 		);
 
-		die "Can't auth.." unless $api_instance->auth;
+		print STDERR "Can't auth.." unless $api_instance->auth, $/;
 		if ($api_instance->token eq kExitError) {
 			print STDERR "Can't authenticate!" , $/;
-			exit 1;
+			return kExitError;
 		}
 		$self->api_instance($api_instance);
-		#print "Token: ", $api_instance->token, "\n";
-
 	}
 
 	#--------------------------------------
@@ -158,7 +201,6 @@ use iPlant::FoundationalAPI::Constants ':all';
 		return {status => 'fail', msg => 'sub job: no api_instance object'} unless $api_instance;
 		
 		my %job_arguments = %$form_arguments;
-		my $app_id = $app_id;
 		my $apps = $api_instance->apps;
 		my ($app) = $apps->find_by_name($app_id);
 		print STDERR "APP: ", $app, $/;
@@ -186,6 +228,15 @@ use iPlant::FoundationalAPI::Constants ':all';
 	}
 
 	#---------------------------------------
+	sub debug {
+		my ($self, $debug) = @_;
+
+		if (defined $debug) {
+			$self->{debug} = $debug;
+		}
+
+		$self->{debug};
+	}	#---------------------------------------
 	sub project {
 		my ($self, $project) = @_;
 
