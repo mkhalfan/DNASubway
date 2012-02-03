@@ -23,7 +23,7 @@ input[type="checkbox"] {
 	<div id="container_data_line">&nbsp;</div>
 %	unless (@pairs) {
 	<div style="text-align: right;font-size: small;">
-%#		<a id="try_auto" href="#" onclick="phy.auto_pair();">Try auto pairing</a>
+%#		<a id="try_auto" href="#" onclick="phy.auto_pair();">Try auto pairing </a>
 %#		<a id="swith_manual" href="#" onclick="document.location.reload();" style="display: none;">Switch to manual pairing</a>
 	</div>
 %	}
@@ -89,7 +89,7 @@ input[type="checkbox"] {
 				<img src="/images/FR-icon.jpg" style="vertical-align: middle;padding-right:7px;" /><strong>Auto Pair</strong>
 			</div>
 			<div class="blue_sidebar_box_body">
-				<a id="try_auto" href="#" onclick="phy.auto_pair();">Try auto pairing</a>
+				<a id="try_auto" href="#" onclick="phy.auto_pair();">Try auto pairing</a> <img src="/images/question-icon.png" id="auto-pair-help" align="top"/>
 				<a href="#" id="switch_manual" style="display:none;" onclick="document.location.reload();">Switch to manual pairing</a>
 				<a href="#" id="reset" style="display:none;" onclick="document.location.reload();">Reset</a>
 			</div>
@@ -137,6 +137,14 @@ input[type="checkbox"] {
 
 	<div id="container_data_lineBottom">&nbsp;</div>
 </div><!-- END of container_data2-->
+
+<script type="text/javascript">
+Event.observe(window, Prototype.Browser.IE ? 'load' : 'dom:loaded', function() {
+new Tip('auto-pair-help', "Auto Pair will attempt to pair your sequences for you.<br />Please note this may not always work, in which case<br />you will need to pair your sequences manually.", {
+		className: 'blue_help',
+	});
+	});
+</script>
 
 <%args>
 	$rm_pairs => ''
