@@ -143,7 +143,7 @@
 <span class="conBlueline_ConColumn5">
 	<div class="con_browserBT ">
 		<span class="conIndicator_boxBrowse"><div class="conIndicatorBL_<%$is_owner && $export_is_on ? "not-processed" : "disabled" %>"></div> </span>
-		<span class="bt_browserBlue"><a href="javascript:;" onclick="<%$is_owner && $export_is_on ? "phy.launch('BOLD', '/project/phylogenetics/bold/?pid=$proj', 'Export to BOLD')" : "" %>">Export to<br/>BOLD</a></span>
+		<span class="bt_browserBlue"><a href="javascript:;" onclick="<%$is_owner && $export_is_on ? "phy.launch('BOLD', '/project/phylogenetics/bold/?pid=$proj', 'Export to GenBank')" : "" %>">Export to<br/>GenBank</a></span>
 	</div>
 	<div id="spacer_Runblueline">&nbsp;</div> 
 </span>
@@ -162,7 +162,7 @@
 		<div id="conProjectInfo_edit">
 			<div class="bt_projectInfo_edit"><a href="javascript:;" onclick="javascript:show_edit();"></a></div>
 		</div>
-% if (0 && $is_owner || $is_public) {
+% if (0&& ($is_owner || $is_public)) {
 		<div id="conProjectInfo_clone">
 			<div class="bt_projectInfo_clone"><a href="tools/clone_project?pid=<% $proj->id %>">&nbsp;</a></div>
 		</div>

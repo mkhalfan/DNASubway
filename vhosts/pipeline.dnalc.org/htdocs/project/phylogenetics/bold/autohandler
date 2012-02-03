@@ -4,6 +4,7 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 <title></title>
+<script type="text/javascript" src="/js/prototype-1.6.1.js"></script>
 <link type="text/css" rel="stylesheet" href="/css/toolPanel.css" />
 <link rel="stylesheet" type="text/css" href="/css/prototip.css" />
 % if ($s->{logged_in} == 0) {
@@ -11,9 +12,10 @@
 	top.document.location.replace("/");
 </script>
 % }
+
 </head>
 <body id="BOLDbody">
-<div id="BOLDheader">BOLD data submission</div>
+%#<div id="BOLDheader">GenBank data submission</div>
 
 % $m->call_next;
 
@@ -44,7 +46,7 @@
 </%init>
 %# ---------------------------------
 <%attr>
-	js => ['prototype-1.6.1.js', 'common.js', 'phylogenetics.js']
+	js => ['common.js', 'phylogenetics.js', 'prototip/prototip.js']
 </%attr>
 %# ---------------------------------
 <%flags>

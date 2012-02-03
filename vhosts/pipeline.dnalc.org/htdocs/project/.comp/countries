@@ -261,7 +261,7 @@ my $countries = [
 <select name="<%$name%>" id="<%$name%>" <% $class ? "class=\"$class\"" : ''%>>
 <option value="">Country</option>\
 % foreach my $c (@$countries) {
-%	my $sel = $c->[1] eq $country ? ' selected="selected"' : '';
-<option value="<% $c->[1] %>"<%$sel%>><% $c->[0] %></option>\
+%	my $sel = $c->[0] eq $country ? ' selected="selected"' : '';
+<option value="<% $c->[0] %>"<%$sel%>><% $c->[0] %></option>\
 % }
 </select>

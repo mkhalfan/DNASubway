@@ -2,6 +2,7 @@
 <div id="BOLDmain">
 
 <h2>Specimen info</h2>
+<div style="color:red">
 <& /_messages &>
 % if (@err) {
 	 <div class="errors">
@@ -12,13 +13,37 @@
 %	}
 	</div>
 % }
+</div>
 <p>
 	<form id="bform" method="POST">
 	<input type="hidden" name="bstep" value="4" />
 
 %#---------------------------------
-<table border="0" width="600px">
+<table border="0" width="650px">
 <tbody>
+%if (@authors) {
+%	my $ac = 0;
+%	for (@authors) {
+%		my @temp = split ("#", $_);
+		<tr class="author_row" id="row<%++$ac%>">
+		<td>Collector/Author</td>
+		<td>&nbsp;&nbsp;<input class="fb" type="text" style="width:145px" id="collector_first" name="collector_first" value="<% $temp[0] %>"  onfocus="if(this.value=='First Name'){this.value=''};" onblur="if(this.value==''){this.value='First Name'};"/>&nbsp;<input class="fb" type="text" style="width:145px" id="collector_last" name="collector_last" value="<% $temp[1] %>" onfocus="if(this.value=='Last Name'){this.value=''};" onblur="if(this.value==''){this.value='Last Name'};" /><% exists $author_errors{$ac} ? "<strong style='color: red;'> * </strong>" : "" %><span id="add_author_link<%$ac%>"></span>
+%			if ($ac > 1){
+<span><a href="javascript:;" onclick="phy.addAuthor(<%$ac%>, 'remove')" style="text-decoration:none;font-weight:bold;color:black;" /><img src="/images/minus.jpg" border=0 width="12px" height="12px" />   Remove</a></span>
+%			}
+		</td></tr>	
+%	}
+	<input type="hidden" id="step" value="30" />
+	<input type="hidden" id="num" value="<%$ac%>" />
+%} 
+%else {
+<tr class="author_row">
+<td>Collector/Author</td><td>&nbsp;&nbsp;<input class="fb" type="text" style="width:145px" id="collector_first" name="collector_first" value="First Name"  onfocus="if(this.value=='First Name'){this.value=''};" onblur="if(this.value==''){this.value='First Name'};"/>&nbsp;<input class="fb" type="text" style="width:145px" id="collector_last" name="collector_last" value="Last Name" onfocus="if(this.value=='Last Name'){this.value=''};" onblur="if(this.value==''){this.value='Last Name'};" />
+<span id="add_author_link1"><a href="javascript:;" onclick="phy.addAuthor(1);" style="text-decoration:none;font-weight:bold;color:black"><img src="/images/plus.jpg" border=0 width="12px" height="12px" /> Add Another</a></span></td>
+</tr>
+%}
+<tr id="new_row"><td></td></tr>
+
 % for my $f (@fields) {
 %	my $value = $data->{$f->{id}} || $ARGS{$f->{id}} || "";
 %	my $type = $f->{type} || "text";
@@ -39,7 +64,7 @@
 	</td>
 	<td>&nbsp;\
 %	if ($type =~ /^(?:text|password)$/) {
-		<input class="fb" type="<% $type %>" style="width: 75%" id="<% $f->{id}%>" name="<% $f->{id}%>" value="<% $value |html %>" />\
+		<input class="fb" type="<% $type %>" style="width: 300px" id="<% $f->{id}%>" name="<% $f->{id}%>" value="<% $value |html %>" />\
 %	} elsif ($type eq "select") {
 		<select id="<% $f->{id}%>" name="<% $f->{id}%>">
 		<option value="">=Select=</option>
@@ -83,7 +108,7 @@
 </div>
 <div id="BOLDfooter">
 	<a href="./step3.html">Back</a>&nbsp;
-	<a href="#./step5.html" onclick="phy.next_bold_step();">Continue</a>
+	<a href="#./step5.html" onclick="phy.collect_authors();phy.next_bold_step();">Continue</a>
 </div>
 
 
@@ -104,14 +129,14 @@
 		{id => "institution_storing", type => "", label => "Institution Storing", re => qr/\w+/, len => 128, },
 		{id => "tax", type => "", label => "Identified By", re => qr/\w+/, len => 128, },
 		{id => "tax_email", type => "", label => "Identifier's email", re => qr/\w+/, len => 128, },
-		{id => "", type => "label", label => "Identification", },
+		#{id => "", type => "label", label => "<strong>Identification</strong>", },
 		{id => "phylum", type => "", label => "Phylum", re => qr/\w+/, len => 48, },
 		{id => "class", type => "", label => "Class", re => qr/\w+/, len => 48, },
 		{id => "order", type => "", label => "Order", re => qr/\w+/, len => 48, },
 		{id => "family", type => "", label => "Family", re => qr/\w+/, len => 48, },
 		{id => "genus", type => "", label => "Genus", re => qr/\w+/, len => 48, },
 		{id => "species", type => "", label => "Species", re => qr/\w+/, len => 48, },
-		{id => "collectors", type => "textarea", label => "Collectors", re => qr/\w+/, len => 255, },
+		#{id => "collectors", type => "textarea", label => "Collectors", re => qr/\w+/, len => 255, },
 		{id => "date_collected", type => "", label => "Date collected (dd/mm/yyyy)", re => qr/^\d\d\/\d\d\/\d{4}$/,},
 		#{id => "country", type => "", label => "Country", re => qr/\w+/, len => 128, },
 		{id => "country", type => "component", label => "Country", re => qr/\w+/, len => 48,
@@ -136,6 +161,13 @@
 	$s->{"bold_$pid"} ||= {};
 	my $bs = $s->{"bold_$pid"};
 	
+	sub trim {
+		my $string = shift;
+		$string =~ s/^\s+//;
+		$string =~ s/\s+$//;
+		return $string;
+	}	
+	
 	print STDERR "S4. PID = ", $pid, Dumper($s), $/;
 	
 	unless ($bs->{step3} == 1) {
@@ -146,9 +178,16 @@
 	my @err = ();
 	
 	my $data = {};
+	
+	my @authors;
+	my %author_errors;
 
 	if ($r->method eq "POST") {
 		#my $body = "";
+		
+		# clear old data
+		$bs->{spec_data} = {};
+
 		for my $f (@fields) { 
 			my $re = $f->{re};
 			my $val = $ARGS{$f->{id}};
@@ -187,6 +226,34 @@
 
 			$data->{$f->{id}} = $val if $f->{id};
 			$bs->{spec_data}->{$f->{id}} = $val if $f->{id};
+			
+		}
+		if ($ARGS{"authors"}){
+			@authors = split ("::", $ARGS{"authors"});
+			my $x = 1;
+			for (@authors){
+				my @temp = split ("#", $_);
+				# "temp[0] = first name"
+				# "temp[1] = last name"
+				# "temp[2] = row number"
+				my $error_monitor;
+				if ($temp[0] eq "First Name" or trim($temp[0]) eq ""){
+					push @err, "Author #$temp[2] First Name Not Valid";
+					$error_monitor = 1;
+				}
+				if ($temp[1] eq "Last Name" || trim($temp[1]) eq ""){
+					push @err, "Author #$temp[2] Last Name Not Valid";
+					$error_monitor = 1;
+				}
+				if ($error_monitor){
+					$author_errors{$temp[2]} = 'true';
+				}
+				$bs->{spec_data}->{"author_first" . $x} = $temp[0];
+				$bs->{spec_data}->{"author_last" . $x} = $temp[1];
+				$data->{"author_first" . $x} = $temp[0];
+				$data->{spec_data}->{"author_last" . $x} = $temp[1];
+				$x++;
+			}
 		}
 		
 		unless (@err) {
@@ -196,5 +263,15 @@
 	}
 	else {
 		$data = $bs->{spec_data} || {};
+		
+		
+		#my @auth = ();
+        for (sort keys %$data) {
+            if ($_ =~ /author_(first|last)(\d+)$/) {
+                $authors[$2 - 1] .= $data->{$_} . "#";
+            }
+        }
+
 	}
+
 </%init>

@@ -1975,7 +1975,37 @@
 		f.insert(new Element('input', {type: 'hidden', name: 'd', value: d}));
 		f.submit();
 	};
-	
+	phy.addAuthor = function(num, action){
+		if (action == 'remove'){
+				$('row' + num).remove();
+		}
+		else{
+			num++;
+			$('new_row').replace('<tr id="row' + num + '" class="author_row"><td>Collector/Author</td><td>&nbsp;&nbsp;<input class="fb" type="text" style="width:145px" id="collector_first_" name="collector_first_" value="First Name" onfocus="if(this.value==\'First Name\'){this.value=\'\'};" onblur="if(this.value==\'\'){this.value=\'First Name\'};"/>&nbsp;<input class="fb" type="text" style="width:145px" id="collector_last_" name="collector_last_" value="Last Name" onfocus="if(this.value==\'Last Name\'){this.value=\'\'};" onblur="if(this.value==\'\'){this.value=\'Last Name\'};"/> <span><a href="javascript:;" onclick="phy.addAuthor(' + num + ', \'remove\')" style="text-decoration:none;font-weight:bold;color:black"><img src="/images/minus.jpg" border=0 width="12px" height="12px" />  Remove</a></span></td></tr><tr id="new_row"></tr>');
+			$('add_author_link1').update('<a href="javascript:;" onclick="phy.addAuthor(' + num + ');" style="text-decoration:none;font-weight:bold;color:black"> <img src="/images/plus.jpg" border=0 width="12px" height="12px" /> Add Another</a>');
+		}
+	}
+	phy.collect_authors = function(){
+		var firstNames = [];
+		var lastNames = [];
+		var fullNames = "";
+		$$('tr[class="author_row"]').each(function(e){
+			e.descendants().each(function(el){
+				if (el.id.indexOf("collector_first") == 0) {
+					//console.info(el.value);
+					firstNames.push(el.value);
+				}
+				if (el.id.indexOf("collector_last") == 0) {
+					lastNames.push(el.value);
+				}
+			});
+		});
+		for (var i = 0; i < lastNames.length; i++){
+			fullNames = fullNames + firstNames[i] + "#" + lastNames[i] + "#" + (i + 1) + "::";
+		}
+		console.info(fullNames);
+		$('new_row').update('<input type="hidden" id="authors" name="authors" value="' + fullNames + '" />');
+	}
 	//----------------------------------------------------
 	//
 	phy.setColumnWidths = function(w) {
@@ -2156,10 +2186,8 @@ Event.observe(window, Prototype.Browser.IE ? 'load' : 'dom:loaded', function() {
 	}
 	else if (step == 4) {
 		var pre = pre=$('alignment').down();
-		debug(pre.down());
 
 		var sz = parseInt($('alignment_length').value, 0);
-		debug(sz);
 		var pre=$('alignment').down();
 		var spn = new Element('span');
 		$R(0, sz, true).each(function(val) {
@@ -2204,6 +2232,15 @@ pre.insert({top:spn});
 	else if (step == 8) {
 		phy.setColumnWidths(740);
 		$('seqops').style.display = 'block';
+	}
+	
+   /*
+	* Submit to GenBank
+	*
+	*/
+	else if (step == 30){
+		var num = $('num').value;
+		$('add_author_link1').update('<a href="javascript:;" onclick="phy.addAuthor(' + num + ');" style="text-decoration:none;font-weight:bold;color:black"> <img src="/images/plus.jpg" border=0 width="12px" height="12px" /> Add Another</a>');
 	}
 	
 	

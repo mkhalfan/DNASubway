@@ -1,8 +1,5 @@
 
-<div>
-	Description about BOLD
-	<div><a href="#">Link to protocol in the PDF format</a></div>
-</div>
+
 
 <& /_messages &>
 
@@ -10,20 +7,65 @@
 <form id="bform" method="post">
 %#<input type="hidden" name="pid" value="<% $pid |html%>" />
 <input type="hidden" name="bstep" value="0" />
+<div>
+<p>To submit your sequence to Genbank, create a new submission by clicking 'New Submission' below, select a sequence and provide the required information.
+</p>
+<p>
+You will need the following to submit your sequence:
+<ul>
+<li>Collectors/Authors <img src="/images/question-icon.png" align="top" id="collectors" /></li>
+<li>Institution storing your specimen <img src="/images/question-icon.png" align="top" id="institution" /></li>
+<li>Identifier <img src="/images/question-icon.png" align="top" id="identifier" /></li>
+<li>Identifiers email address</li>
+<li>Taxonomic identification of your specimen <img src="/images/question-icon.png" align="top" id="tax" /></li>
+<li>Date specimen was collected</li>
+<li>Location your specimen was collected <img src="/images/question-icon.png" align="top" id="location" /></li>
+<li>Sex of your specimen</li>
+<li>Life stage of your specimen</li>
+<li>One or more photos of your specimen <img src="/images/question-icon.png" align="top" id="photos" /></li>
+</ul>
+Below you may review your past submissions (if you have any) or begin a new one. Please note: Only one submission per sequence per team should be made.
+</p>
+
+</div>
 % if ($bsubmissions) {
 <p>
-	<div>You have submitted to BOLD this data:</div>
-% 	while (my $b = $bsubmissions->next) {
-	<div>* <% $b %>, <% $b->specimen_id%></div>
-%	}
+	<div>You have submitted the following sequences:</div>
+	<ul>
+% 		while (my $b = $bsubmissions->next) { 
+			<li><% $b->specimen_id%> <span  style="font-size:11px">(<a href="#">view</a>)</span></li>
+%		}
+	</ul>
 </p>
 % }
+
 <div>
-	<a href="#" onclick="phy.next_bold_step();">New BOLD submission</a>
+<a href="#" onclick="phy.next_bold_step();">New submission</a><a href="#" onclick="phy.next_bold_step();"><img src="/images/arrow-circle.png" border=0 width="16px" height="16px" style="padding-left:4px;" align="top" /></a></span>
 </div>
 </form>
 </p>
-
+<script type="text/javascript">
+Event.observe(window, Prototype.Browser.IE ? 'load' : 'dom:loaded', function() {
+new Tip('collectors', "Your team members", {
+		className: 'blue_help',
+	});
+new Tip('institution', "some help here, this might be someones house or school", {
+		className: 'blue_help'
+	});
+new Tip('identifier', "Who identified your specimen as belonging to a particular taxonomic group?", {
+		className: 'blue_help'
+	});
+new Tip('tax', "The phylum, class, order, family, genus and species your specimen belongs to.", {
+		className: 'blue_help',
+	});
+new Tip('location', "You will need the country, state/province, latitude, longitude,<br />and a text description of the exact site your specimen was collected.", {
+		className: 'blue_help'
+	});
+new Tip('photos', "maybe some size/format restrictions here", {
+		className: 'blue_help'
+	});
+	});
+</script>
 <%args>
 	$pid => 0
 	$bstep => undef

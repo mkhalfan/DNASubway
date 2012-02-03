@@ -7,7 +7,7 @@ top.show_messages("BOLD data stored successfully");
 <div id="BOLDstep">Step 6 of 6</div>
 <div id="BOLDmain">
 
-<h2>Submit data to BOLD</h2>
+<h2>Verify Your Submission</h2>
 
 <& /_messages &>
 
@@ -17,9 +17,86 @@ top.show_messages("BOLD data stored successfully");
 	
 </form>
 	</p>
-<pre>
-	<% $js->pretty->encode($bs->{spec_data}) %>
-</pre>
+%#	<% $js->pretty->encode($bs->{spec_data}) %>
+%# for (%{$bs->{spec_data}}){
+%#	print $_, "<br/>";
+%# }
+<table>
+<!-- I NEED TO ADD AUTHORS HERE -->
+<tr>
+<td>Institution Storing:</td>
+<td><% $bs->{spec_data}->{institution_storing} %></td>
+</tr>
+<tr>
+<td>Identified By:</td>
+<td><% $bs->{spec_data}->{tax} %></td>
+</tr>
+<tr>
+<td>Identifier's email:</td>
+<td><% $bs->{spec_data}->{tax_email} %></td>
+</tr>
+<tr>
+<td>Phylum:</td>
+<td><% $bs->{spec_data}->{phylum} %></td>
+</tr>
+<tr>
+<td>Class:</td>
+<td><% $bs->{spec_data}->{class} %></td>
+</tr>
+<tr>
+<td>Order:</td>
+<td><% $bs->{spec_data}->{order} %></td>
+</tr>
+<tr>
+<td>Family:</td>
+<td><% $bs->{spec_data}->{family} %></td>
+</tr>
+<tr>
+<td>Genus:</td>
+<td><% $bs->{spec_data}->{genus} %></td>
+</tr>
+<tr>
+<td>Species:</td>
+<td><% $bs->{spec_data}->{species} %></td>
+</tr>
+<tr>
+<td>Date Collected:</td>
+<td><% $bs->{spec_data}->{date_collected} %></td>
+</tr>
+<tr>
+<td>Country:</td>
+<td><% $bs->{spec_data}->{country} %></td>
+</tr>
+<tr>
+<td>State:</td>
+<td><% $bs->{spec_data}->{state} %></td>
+</tr>
+<tr>
+<td>Exact Site:</td>
+<td><% $bs->{spec_data}->{site_desc} %></td>
+</tr>
+<tr>
+<td>Latitutide:</td>
+<td><% $bs->{spec_data}->{latitude} %></td>
+</tr>
+<tr>
+<td>Longitude:</td>
+<td><% $bs->{spec_data}->{longitude} %></td>
+</tr>
+<tr>
+<td>Notes:</td>
+<td><% $bs->{spec_data}->{notes} %></td>
+</tr>
+<tr>
+<td>Sex:</td>
+<td><% $bs->{spec_data}->{sex} %></td>
+</tr>
+<tr>
+<td>Life Stage:</td>
+<td><% $bs->{spec_data}->{stage} %></td>
+</tr>
+</table>
+
 </div>
 <div id="BOLDfooter">
 	<a href="./step5.html">Back</a>&nbsp;

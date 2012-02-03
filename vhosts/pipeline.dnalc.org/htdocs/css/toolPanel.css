@@ -867,19 +867,21 @@ color: #000;
 
 /* BOLD related styles */
 #BOLDbody {
-	margin: 0px;
+	margin: 20px;
+	font-family: arial, hervetica, san-serif;
+	font-size: 12px;
 }
 
 #BOLDheader {
-	background-color: #564123;
+	background-color: #3952a4;
 	color: #f5851f;
 	height: 25px;
 	font-size: 18px;
 	padding: 2px;
 }
 #BOLDstep {
-	background-color: #564123;
-	color: #fff;
+	background-color: #C2DBF3;
+	color: #123456;
 	font-size: 14px;
 	padding: 0px 0px 2px 10px;
 }

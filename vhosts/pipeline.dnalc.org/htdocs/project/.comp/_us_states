@@ -71,7 +71,7 @@ my $states = [
 <select name="<%$name%>" id="<%$name%>">
 <option value="">State</option>\
 % foreach my $c (@$states) {
-%	my $sel = $c->[1] eq $state ? ' selected="selected"' : '';
-<option value="<% $c->[1] %>"<%$sel%>><% $c->[0] %></option>\
+%	my $sel = $c->[0] eq $state ? ' selected="selected"' : '';
+<option value="<% $c->[0] %>"<%$sel%>><% $c->[0] %></option>\
 % }
 </select>
