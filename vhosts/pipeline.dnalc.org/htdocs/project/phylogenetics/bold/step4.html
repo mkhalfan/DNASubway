@@ -26,7 +26,7 @@
 %	for (@authors) {
 %		my @temp = split ("#", $_);
 		<tr class="author_row" id="row<%++$ac%>">
-		<td>Collector/Author</td>
+		<td>Collector/Author <% $ac == 1 ? "<img src='/images/question-icon.png' align='top' id='collectors' />" : "" %></td>
 		<td>&nbsp;&nbsp;<input class="fb" type="text" style="width:145px" id="collector_first" name="collector_first" value="<% $temp[0] %>"  onfocus="if(this.value=='First Name'){this.value=''};" onblur="if(this.value==''){this.value='First Name'};"/>&nbsp;<input class="fb" type="text" style="width:145px" id="collector_last" name="collector_last" value="<% $temp[1] %>" onfocus="if(this.value=='Last Name'){this.value=''};" onblur="if(this.value==''){this.value='Last Name'};" /><% exists $author_errors{$ac} ? "<strong style='color: red;'> * </strong>" : "" %><span id="add_author_link<%$ac%>"></span>
 %			if ($ac > 1){
 <span><a href="javascript:;" onclick="phy.addAuthor(<%$ac%>, 'remove')" style="text-decoration:none;font-weight:bold;color:black;" /><img src="/images/minus.jpg" border=0 width="12px" height="12px" />   Remove</a></span>
@@ -38,7 +38,7 @@
 %} 
 %else {
 <tr class="author_row">
-<td>Collector/Author</td><td>&nbsp;&nbsp;<input class="fb" type="text" style="width:145px" id="collector_first" name="collector_first" value="First Name"  onfocus="if(this.value=='First Name'){this.value=''};" onblur="if(this.value==''){this.value='First Name'};"/>&nbsp;<input class="fb" type="text" style="width:145px" id="collector_last" name="collector_last" value="Last Name" onfocus="if(this.value=='Last Name'){this.value=''};" onblur="if(this.value==''){this.value='Last Name'};" />
+<td>Collector/Author <img src='/images/question-icon.png' align='top' id='collectors' /></td><td>&nbsp;&nbsp;<input class="fb" type="text" style="width:145px" id="collector_first" name="collector_first" value="First Name"  onfocus="if(this.value=='First Name'){this.value=''};" onblur="if(this.value==''){this.value='First Name'};"/>&nbsp;<input class="fb" type="text" style="width:145px" id="collector_last" name="collector_last" value="Last Name" onfocus="if(this.value=='Last Name'){this.value=''};" onblur="if(this.value==''){this.value='Last Name'};" />
 <span id="add_author_link1"><a href="javascript:;" onclick="phy.addAuthor(1);" style="text-decoration:none;font-weight:bold;color:black"><img src="/images/plus.jpg" border=0 width="12px" height="12px" /> Add Another</a></span></td>
 </tr>
 %}
@@ -55,11 +55,11 @@
 %	}
 	<tr height="28" id="<% $f->{id} %>_tr" <% $style %>>
 %	if ($type eq "label") {
-	<td colspan="2" class="fb-lbl"><% $f->{label} %>:</td>
+	<td colspan="2" class="fb-lbl"><% $f->{label} %></td>
 % 	} else {
 	<td width="200" class="fb-lbl">
 %		if ($f->{label}) {
-		<label for=""><% $f->{label} %></label>:\
+		<label for=""><% $f->{label} %></label>\
 %		}
 	</td>
 	<td>&nbsp;\
@@ -111,7 +111,25 @@
 	<a href="#./step5.html" onclick="phy.collect_authors();phy.next_bold_step();">Continue</a>
 </div>
 
-
+<script type="text/javascript">
+Event.observe(window, Prototype.Browser.IE ? 'load' : 'dom:loaded', function() {
+new Tip('collectors', "Enter your team members here. One author per row.", {
+		className: 'blue_help',
+	});
+new Tip('institution', "some help here, this might be someones house or school", {
+		className: 'blue_help'
+	});
+new Tip('identifier', "Who identified your specimen as belonging to a particular taxonomic group?", {
+		className: 'blue_help'
+	});
+new Tip('exact_site_help', "some help here", {
+		className: 'blue_help',
+	});
+new Tip('notes_help', "some help here", {
+		className: 'blue_help'
+	});
+	});
+</script>
 
 <%args>
 	$bstep => undef
@@ -126,8 +144,8 @@
 	
 	my @fields = (
 
-		{id => "institution_storing", type => "", label => "Institution Storing", re => qr/\w+/, len => 128, },
-		{id => "tax", type => "", label => "Identified By", re => qr/\w+/, len => 128, },
+		{id => "institution_storing", type => "", label => "Institution Storing <img src='/images/question-icon.png' align='top' id='institution' />", re => qr/\w+/, len => 128, },
+		{id => "tax", type => "", label => "Identified By <img src='/images/question-icon.png' align='top' id='identifier' />", re => qr/\w+/, len => 128, },
 		{id => "tax_email", type => "", label => "Identifier's email", re => qr/\w+/, len => 128, },
 		#{id => "", type => "label", label => "<strong>Identification</strong>", },
 		{id => "phylum", type => "", label => "Phylum", re => qr/\w+/, len => 48, },
@@ -144,10 +162,10 @@
 		{id => "state", type => "component", label => "State/Province", re => qr/\w+/, len => 48,
 			component => '../../.comp/_us_states'},
 		#{id => "state", type => "", label => "State/Province", re => qr/\w+/, len => 128, },
-		{id => "site_desc", type => "", label => "Exact Site", re => qr/\w+/, len => 128, },
+		{id => "site_desc", type => "", label => "Exact Site <img src='/images/question-icon.png' align='top' id='exact_site_help' />", re => qr/\w+/, len => 128, },
 		{id => "latitude", type => "", label => "Latitude", re => qr/$RE{num}{real}/, len => 16, },
 		{id => "longitude", type => "", label => "Longitude", re => qr/$RE{num}{real}/, len => 16, },
-		{id => "notes", type => "textarea", label => "Notes", re => qr/\w*/, len => 255, },
+		{id => "notes", type => "textarea", label => "Notes <img src='/images/question-icon.png' align='top' id='notes_help' />", re => qr/\w*/, len => 255, },
 		{id => "sex", type => "radio", label => "Sex of Specimen", values => ['Male', 'Female', 'Hermaphrodite']},
 		{id => "stage", type => "radio", label => "Life Stage", re => qr/(?:adult|immature)?/i, len => 8,
 			values => ['Adult', 'Immature']},

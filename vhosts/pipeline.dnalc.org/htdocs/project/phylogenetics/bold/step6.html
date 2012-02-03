@@ -23,6 +23,14 @@ top.show_messages("BOLD data stored successfully");
 %# }
 <table>
 <!-- I NEED TO ADD AUTHORS HERE -->
+% my $ac = 1;
+% while (exists $bs->{spec_data}->{"author_first$ac"}){
+<tr>
+<td width="150">Author/Collector <% $ac %>:</td>
+<td><%$bs->{spec_data}->{"author_first$ac"}%> <%$bs->{spec_data}->{"author_last$ac"}%></td>
+</tr>
+% $ac++;
+%}
 <tr>
 <td>Institution Storing:</td>
 <td><% $bs->{spec_data}->{institution_storing} %></td>
