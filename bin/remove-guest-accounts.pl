@@ -179,8 +179,12 @@ sub remove_phy_projects {
 	for my $p (@projects) {
 		my $pm = DNALC::Pipeline::App::Phylogenetics::ProjectManager->new($p);
 		my $dir = $pm->work_dir;
-		print STDERR  "Phy rm $p: dir => ", $dir, $/;
-		$p->delete;
+		#print STDERR  "Phy rm $p: dir => ", $dir, $/;
+		$p->name($u->username . '|' . $p->name);
+		$p->user_id($the_guest->id);
+		$p->update;
+
+		#$p->delete;
 		DNALC::Pipeline::App::Utils->remove_dir($dir);
 	}
 }
