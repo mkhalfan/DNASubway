@@ -1,5 +1,5 @@
 
-<table>
+<table style="float: left">
 	<tr>
 		<td></td>
 		<td></td>
@@ -28,8 +28,25 @@
 	</tr>
 %	}
 % }
+<tr><td colspan="2"><em><sup>*</sup> Sucessful tasks only</em><td></tr>
 </table>
-<div><em><sup>*</sup> Sucessful tasks only</em></div>
+
+<table style="float: left; background-color: #eee;">
+<tr><td colspan="3">Blue line project by the user type<td></tr>
+	<tr>
+		<th>Month</th>
+		<th>Registered</th>
+		<th>Guest</th>
+	</tr>
+% for (@bl_prjcount) {
+	<tr>
+		<td><% $_->{month} %></td>
+		<td><% $_->{registered} || "-" %></td>
+		<td><% $_->{guest} || "-" %></td>
+	</tr>
+% }
+</table>
+<div style="clear: both">&nbsp;</div>
 
 <%args>
 </%args>
@@ -42,4 +59,6 @@
 	my $reg_users_cnt = DNALC::Pipeline::Statistics->count_registered_users;
 	my @task_cnt_registered_users = DNALC::Pipeline::Statistics->count_task_registered_users;
 	my @task_cnt_guest_users = DNALC::Pipeline::Statistics->count_task_guest_users;
+	
+	my @bl_prjcount = DNALC::Pipeline::Statistics->get_bl_project_count_by_user_type;
 </%init>

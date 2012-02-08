@@ -112,5 +112,39 @@ __PACKAGE__->set_sql( group_by_institution_country => q{
         GROUP BY a1.a_value, a2.a_value
         ORDER BY num desc
 	});
+
+__PACKAGE__->set_sql( bl_projects_by_user_type => q{
+		select count(*) AS num,  to_char(p.created, 'yyyy-MM') AS mon,
+			case when u.username = 'guest' then 'guest' else 'registered' end AS user_type
+		from phy_project p
+		join users u on u.user_id = p.user_id
+		where p.created between current_date - interval '13 month' and current_date
+		group by mon, user_type
+	});
+
+# returns an array of hashrefs with this structure: 
+# {
+#	month => '2012-02',
+#	registered => 100,
+#	guest => 1000
+# }
+sub get_bl_project_count_by_user_type {
+	my ($class) = @_;
+	my $bl_proj = $class->search_bl_projects_by_user_type;
+
+	my %data = ();
+	my @data = ();
+	while (my $row = $bl_proj->next) {
+		$data{$row->{mon}}->{$row->{user_type}} = $row->{num};
+	}
+
+	for my $mon (sort {$b cmp $a}  keys %data) {
+		push @data, {month => $mon, registered => $data{$mon}->{registered}, guest => $data{$mon}->{guest}};
+	}
+
+	wantarray ? @data : \@data;
+}
+
 1;
+
 
