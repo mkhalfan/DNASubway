@@ -45,16 +45,16 @@ it under the same terms as Perl itself.
 =cut
 
 my %algorithm_params = (
-    AUGUSTUS            => '-a --noexon',
-    BLASTN              => '-a',
-    BLASTN_USER         => '-a',
-    BLASTX              => '-a',
-    BLASTX_USER         => '-a',
-    FGENESH             => '-a --noexon',
-    REPEAT_MASKER       => '-a',
-    REPEAT_MASKER2      => '-a',
-    SNAP                => '-a --noexon',
-    TRNA_SCAN           => '-a',
+    AUGUSTUS            => '--analysis --noexon',
+    BLASTN              => '--analysis',
+    BLASTN_USER         => '--analysis',
+    BLASTX              => '--analysis',
+    BLASTX_USER         => '--analysis',
+    FGENESH             => '--analysis --noexon',
+    REPEAT_MASKER       => '--analysis',
+    REPEAT_MASKER2      => '--analysis',
+    SNAP                => '--analysis --noexon',
+    TRNA_SCAN           => '--analysis',
 );
 
 
@@ -840,11 +840,12 @@ sub create_db {
 	my $q = $quiet ? '-q' : '';
 	my $db_name = lc $self->username;
 
-	system("createdb $q"
+	system("createdb "
 			. " -U " . $self->dbuser 
 			. " -h " . $self->host
 			. " -p " . $self->port
-	       . " ". $db_name
+			. " ". $db_name
+			. ( $quiet ? ' > /dev/null 2>&1' : '')
 		) == 0 or do {
 				print STDERR "create_db: Error: Perhaps we already have a db called [", $db_name, "]\n";
 				return;
@@ -933,7 +934,7 @@ sub load_analysis_results {
 	my $command = "/usr/local/bin/gmod_bulk_load_gff3.pl $param --dbprof $profile -g $file";
 	print STDERR "command = $command\n";
 	print STDERR  "--------------------------------------------------", $/;
-    my $rc = system($command);
+    	my $rc = system($command);
 
 	if ($? == -1) {
 		print STDERR "failed to execute: $!\n";
