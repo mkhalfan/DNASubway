@@ -58,7 +58,7 @@
 	
 	my $cf = DNALC::Pipeline::Config->new->cf('PIPELINE');
 	if ($cf->{LDAP_ENABLED}) {
-		$m->redirect("https://auth.iplantcollaborative.org/account_management/request_reset.py");
+		$m->redirect("https://user.iplantcollaborative.org/reset/request");
 		return;
 	}
 
