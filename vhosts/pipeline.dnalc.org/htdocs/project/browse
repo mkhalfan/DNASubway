@@ -19,17 +19,16 @@
     <th width="200" scope="col">Organism/Type</th>
     <th width="124" scope="col"><a href="<& /_realurl &>/1/owner/<% $sort eq "owner" && $dir eq "asc" ? "desc" : "asc" %>?<%$filter_suffix%>">Owner</a></th>
   </tr>
-% if (0) {
   <tr id="filters">
-    <th scope="col"><a href="#" onclick="$('filters').toggle();">hide filters</a></th>
+    <th scope="col"><a href="#" onclick="$('filters').toggle();">x</a></th>
     <th scope="col">&nbsp;</th>
     <th scope="col"><input type="text" value="<% $ftitle |html %>" id="ftitle" name="ftitle" size="10" maxlength="32"/></th>
 	<th scope="col">&nbsp;</th>
     <th scope="col"><input type="text" value="<% $forg |html %>" id="forg" name="forg" size="10" maxlength="32"/></th>
     <th scope="col"><input type="text" value="<% $fowner |html %>" id="fowner" name="fowner" size="10" maxlength="32"/>&nbsp;
-		<a href="javascript:;" onclick="$('form1').submit()">GO</a></th>
+		<a href="javascript:;" onclick="$('form1').submit()">»</a></th>
   </tr>
-% }
+
 % for (@projects) {
 %	my $created = DNALC::Pipeline::App::Utils->format_datetime($_->created, undef, "%m/%d/%Y");
 %	my $color = "#c1272d";
@@ -52,18 +51,17 @@
 %	} else {
 	<td><% $_->{organism} %>, <% $_->{common_name} %></td>
 %	}
-%#	<td><% $_->organism %>, <% $_->common_name %></td>
 	<td><% $_->{full_name} %></td>
-	<!--<td><% $_->user_id %></td>-->
 </tr>
 % }
 </table>
 	</form>
-<% $filter_suffix %>
+
+%#	suffix => "/$sort/$dir"
 <& '/_pager', cur=>$page, pages => $pages, 
 	prefix => '/project/browse/',
-	suffix => "/$sort/$dir" &>
-%#	suffix => "/$sort/$dir" . $filter_suffix ? "$filter_suffix" : ""
+	suffix => "/$sort/$dir" . $filter_suffix ? "/$sort/$dir?$filter_suffix" : "" 
+&>
 
 </div>
 <div class="clear"> </div>

@@ -63,6 +63,7 @@ sub get_public_sorted {
 			$where_str .= "AND CASE mp.project_type "
 						. "  WHEN 'annotation' THEN lower(p.organism) "
 						. "  WHEN 'target' THEN lower(tp.organism) "
+						. "  WHEN 'phylogenetics' THEN lower(pp.type) "
 						. "END like ? ";
 			push @params,  '%' . $args->{where}->{organism} . '%';
 		}
@@ -71,6 +72,7 @@ sub get_public_sorted {
 			$where_str .= "AND CASE mp.project_type "
 						. "  WHEN 'annotation' THEN lower(p.name) "
 						. "  WHEN 'target' THEN lower(tp.name) "
+						. "  WHEN 'phylogenetics' THEN lower(pp.name) "
 						. "END like ? ";
 			push @params,  '%' . $args->{where}->{title} . '%';
 		}
