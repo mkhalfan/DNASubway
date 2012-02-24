@@ -1384,8 +1384,8 @@ td.workshop a:hover {
 
 /* Main menu settings */
 #centeredmenu {
-  width:1000px;
-  height: 24px;
+   width:1000px;
+   height: 24px;
    clear:both;
    float:left;
    margin-top: 5px;
@@ -1418,7 +1418,7 @@ td.workshop a:hover {
 #centeredmenu ul li a {
    display:block;
    margin:0;
-   padding:3px 4px 0px 20px;
+   padding:5px 4px 0px 20px;
    font-size:.85em;
    text-decoration:none;
    color:#fff;
@@ -1444,7 +1444,7 @@ td.workshop a:hover {
 #centeredmenu ul ul {
    display:none; /* Sub menus are hiden by default */
    position:absolute;
-   bottom:20px;
+   bottom:22px;
    left:0px;
    /*right:auto; resets the right:50% on the parent ul */
    width:1100px; /* width of the drop-down menus */
@@ -1462,6 +1462,10 @@ td.workshop a:hover {
    float:left;
    width: 550px;
 }
+#centeredmenu ul ul li a img {
+	border:0px;
+}
+
 #centeredmenu ul ul li.title {
 	border-top:1px solid #8c4a9d;
 	border-bottom:1px solid #8c4a9d;
