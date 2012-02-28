@@ -1394,7 +1394,7 @@ td.workshop a:hover {
    background-color: #eee;
    border-bottom: solid 2px #8c4a9d; 
    font-family:Arial, Verdana, Geneva, sans-serif; 
-   z-index:1000; 
+   /*z-index:1000;*/
    position:relative;
 }
 
