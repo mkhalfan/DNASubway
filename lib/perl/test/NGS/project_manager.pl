@@ -23,13 +23,18 @@ sub DEBUG {1};
 #7 poll for job status
 
 
+unless ($ENV{iPLANT_USER} && $ENV{iPLANT_TOKEN}) {
+	print STDERR  "\nError: iPLANT_USER and iPLANT_TOKEN haven't been set.\n";
+	exit 1;
+}
+
 #1 authenticate
 my $api_instance;
 if (1) {
 	$api_instance = iPlant::FoundationalAPI->new(
 		debug => DEBUG,
-		user => 'ghiban',
-		token => '358fbc1fc404051f24eed5f9490c6a1c',
+		user => $ENV{iPLANT_USER},
+		token => $ENV{iPLANT_TOKEN},
 	);
 	#print STDERR Dumper( $api_instance), $/;
 	#$api_instance->debug(1);
@@ -59,20 +64,20 @@ if (0){
 	}
 }
 else {
-	$pm = DNALC::Pipeline::App::NGS::ProjectManager->new({project => 3, debug => DEBUG});
+	$pm = DNALC::Pipeline::App::NGS::ProjectManager->new({project => 4, debug => DEBUG});
 }
 
 unless ($pm->project) {
 	print STDERR  "Can't find project!", $/;
 	die;
 }
-
+#print STDERR Dumper( $pm ), $/;
+#__END__
 
 $pm->api_instance($api_instance) if $api_instance;
 print STDERR  "\n***\n Working on project: ", $pm->project->name, "\n***\n";
 
 #3 add data
-
 my $file = "/ghiban/SRX030194_slimer.fastq";
 
 $pm->add_data({
@@ -83,11 +88,6 @@ $pm->add_data({
 	},
 	{_no_remote_check => 0}	
 );
-
-__END__
-
-#$pm->auth();
-#$pm->app('wc-0.11');
 
 
 

@@ -1,0 +1,148 @@
+
+<input type="hidden" id="pid" value="<% $pid |html%>"/>
+%#<input type="hidden" id="isowner" value="<% $is_owner %>"/>
+
+% if (exists $m->session->{messages}) {
+<div style="display:none" id="error_list">	
+	<& "/_messages" &>
+</div>
+% }
+
+%#------------------------------------------
+<div class="colmask threecol">
+	<div class="colmid">
+		<div class="colleft">
+			<div class="col1">
+				<!-- Column 1 start -->
+				<h2>TH + CL</h2>
+				<!-- Column 1 end -->
+				<div style="float:left; width: 50%;"><a href="#">Tophat</a></div>
+				<div style="float:left; width: 50%;">
+					<a href="#">Cufflinks</a>
+					<a href="#">Cuffldiff</a>
+				</div>
+			</div>
+			<div class="col2">
+				<!-- Column 2 start -->
+				<h2>Data management</h2>
+				<div>
+					<a href="#" onclick="javascript:ngs.launch('data');">Manage data</a>
+				</div>
+				<!-- Column 2 end -->
+			</div>
+			<div class="col3">
+				<!-- Column 3 start -->
+				<h2>View??</h2>
+				
+				<!-- Column 3 end -->
+			</div>
+		</div>
+	</div>
+</div>
+%#------------------------------------------
+
+
+<div id="conProjectInfo">
+	<div id="conProjectInfo_header">
+		<div id="conProjectInfo_title">Project Information</div>
+% if ($is_owner) {
+		<div id="conProjectInfo_edit">
+	        <div class="bt_projectInfo_edit"><a href="javascript:;" onclick="javascript:show_edit();"></a></div>
+		</div>
+% }
+		<div id="conProjectInfo_projecttitle" origtitle="">\
+%#	<!--<small><% $proj->id %>.</small>-->
+			<% $proj->name |html%>
+		</div>
+		<div id="conProjectInfo_projectlog">Description</div>
+	</div>
+
+	<span class="conProjectInfo_column1">
+%#		<div class="conProjectInfo_Row">
+%#			<span class="conProjectInfo_Cell1">Project ID</span>
+%#			<span class="conProjectInfo_Cell2">: <% $proj->id %></span>
+%#		</div>
+		<div class="conProjectInfo_Row">
+			<span class="conProjectInfo_Cell1">User</span>
+			<span class="conProjectInfo_Cell2">: <% $user ? $user->full_name : "" |html%></span>
+		</div>
+		<div class="conProjectInfo_Row">
+			<span class="conProjectInfo_Cell1">Affiliation</span>
+			<span class="conProjectInfo_Cell2">: <% $institution |html %></span>
+		</div>
+% if ($is_owner) {
+        <div class="conProjectInfo_Row">
+			<div class="conProjectInfo_Cell1">Status</div>
+			<div class="conProjectInfo_Cell3">: &nbsp;<span onclick="set_public(0);" style="cursor: pointer;"><input type="radio" name="public" id="public_no" <% $is_public ? "" : "checked=\"checked\"" %> onclick="set_public(0);" />&nbsp; Private</span></div>
+			<div class="conProjectInfo_Cell3"><span onclick="set_public(1);" style="cursor: pointer;"><input type="radio" name="public" id="public_yes" <% $is_public ? "checked=\"checked\"" : "" %> onclick="set_public(1);" />&nbsp; Public</span></div>
+		</div>
+% }
+	</span><!--END of span conProjectInfo_column1-->
+
+	<span class="conProjectInfo_column2">
+		<div class="conProjectInfo_Row">
+			<span class="conProjectInfo_Cell1">Organism</span>
+			<span class="conProjectInfo_Cell2">: <% $proj->organism %></span>
+		</div>
+		<div class="conProjectInfo_Row">
+			<span class="conProjectInfo_Cell1">Classification</span>
+			<span class="conProjectInfo_Cell2">: ??</span>
+		</div>
+		<div class="conProjectInfo_Row">
+			<span class="conProjectInfo_Cell1">A</span>
+			<span class="conProjectInfo_Cell2">: B</span>
+		</div>
+	</span><!--END of span conProjectInfo_column2-->
+
+	 <span class="conProjectInfo_column3">
+		<div id="desc_limit_label" class="conNewPro_label" style="display: none;">Total characters (max.140): &nbsp;<span id="desc_len"><% length $proj->description %></span></div>
+		<div id="description_container" origdesc="" class="conProjectInfo_description"><% $proj->description |html %></div>
+	</span> <!--END of span conProjectInfo_column3-->
+</div><!--END of ID conProjectInfo-->
+
+%#-----------------------------------------------------------------
+<%args>
+	$pid => 0
+</%args>
+<%once>
+	use Data::Dumper;
+	use DNALC::Pipeline::Utils qw(clean_query);
+	use DNALC::Pipeline::Config ();
+	use DNALC::Pipeline::App::NGS::ProjectManager ();
+	#use iPlant::FoundationalAPI ();
+	#use iPlant::FoundationalAPI::Constants ':all';
+	use DNALC::Pipeline::User ();
+	
+	my %clades = ();
+</%once>
+<%init>
+
+	$m->session->{pipeline} ||= {};
+	my $s = $m->session->{pipeline};
+
+	if ($r->path_info =~ m|/(\d+)/?|) {
+		$pid = $1;
+	}
+	#print STDERR $pid, $/;
+	my %status = ();
+	my ($history, $rm_status, $trimmed_common_name, $institution, $sample, $is_public);
+
+	#my $pcf = DNALC::Pipeline::Config->new->cf("PIPELINE");
+	my $pm = DNALC::Pipeline::App::NGS::ProjectManager->new({project => $pid, debug => 0});
+	
+	#print STDERR Dumper($pm), $/;
+	my $proj = $pm->project;
+	
+	unless ($proj) {
+		$m->comp('/_message_add', 'Project not found!', 'error');
+		$m->redirect('/project/browsemy');
+	}
+
+	# project`s owner
+	my $user = DNALC::Pipeline::User->retrieve($proj->user_id) if $proj;
+	my $is_owner = $s->{user_id} == $user->user_id if $proj;
+</%init>
+
+<%method title>
+Project panel
+</%method>

@@ -1,0 +1,133 @@
+New Project
+
+% if (@err) {
+<div style="display:none" id="error_list">
+%	foreach (@err) {
+<div><% $_ %></div>
+%	}
+</div>
+% }
+
+<form method="post" id="forma1">
+	<div id="conRedlineLeft1">
+		<div id="conProject_newLeft"> 
+
+		<div class="conNewPro_title">Select Project Type*</div>
+
+		<div class="conNewPro_label" id="project_types">
+			<div style="padding-left: 20px;">
+				<div><input class="" type="radio" name="type" id="gd" value="type1" <% $type eq "type1" ? "checked=\"checked\"" : ""%> /><label for="gd">&nbsp; transcript quantification</label></div>
+				<div><input class="" type="radio" name="type" id="gp" value="type2" <% $type eq "type2" ? "checked=\"checked\"" : ""%> /><label for="gp">&nbsp; differential expression</label></div>
+				<div><input class="" type="radio" name="type" id="gm" value="type3" <% $type eq "type3" ? "checked=\"checked\"" : ""%> /><label for="gm">&nbsp; transcriptome assembly</label></div>
+				<div><input class="" type="radio" name="type" id="gx" value="type4" <% $type eq "type4" ? "checked=\"checked\"" : ""%> /><label for="gx">&nbsp; variant detection</label></div>
+			</div>
+		</div>  
+
+		<div style="clear: both;">&nbsp;</div> 
+        <div class="conNewPro_title">Description</div>
+        <div class="conNewPro_label">Total characters (max.140): &nbsp;<span id="desc_len"><% length $description %></span></div>
+		<div>
+			<textarea id="description" name="description" cols="40" class="conStylized_box5" onkeyup="check_description_length(event);"
+				style="width:300px; margin-left: 0px"><% $description |html %></textarea>
+		</div>
+		
+        <div style="clear: both;">&nbsp;</div>
+		<div id="con_star"><b>*</b> Required information</div>
+              <div style="clear: both;">&nbsp;</div>
+		</div>
+	</div>
+	<div id="conRedlineRight1">
+	<div id="conProject_newRight"> 
+		<div class="conNewPro_title">Name Your Project *</div>   
+		<div class="conNewPro_label1">
+			<label>Project title:</label>
+			<input class="conStylized_box4" type="text" name="name" id="name" value="<% $name|html%>" maxlength="40" />
+		</div>
+		<div style="clear: both;">&nbsp;</div>
+		<div class="conNewPro_title">Organism *</div>   
+		<div class="conNewPro_label1">
+			<label>Scientific name (genus species):</label>
+			<& .select_genomes, genomes => $genomes, selected => $organism &>
+		</div>        
+		<div style="clear: both;">&nbsp;</div> <div style="clear: both;">&nbsp;</div> 
+		<div class="conBT_continue"><a id="step_one_btn" href="javascript:void(0);" onclick="javascript:$('forma1').submit();"></a></div>
+		<div style="clear: both;">&nbsp;</div>
+	</div><!--END of ID conProject_newRight-->
+	</div>
+
+</form>
+
+%#-----------------------------------------------------------------
+<%args>
+	$name => ''
+	$organism => ''
+	#$common_name => ''
+	$description => ''
+	$type => ''
+</%args>
+<%once>
+	use Data::Dumper;
+	use DNALC::Pipeline::Utils qw(clean_query);
+	use DNALC::Pipeline::Config ();
+	use DNALC::Pipeline::App::NGS::ProjectManager ();
+	use iPlant::FoundationalAPI ();
+	#use iPlant::FoundationalAPI::Constants ':all';
+</%once>
+<%init>
+	$m->session->{pipeline} ||= { username => "", logged_in => 0};
+	my $s = $m->session->{pipeline};
+	my $cf = DNALC::Pipeline::Config->new;
+	my $genomes = $cf->cf('NGS_GENOMES');
+	#my $pcf = $cf->cf('PIPELINE');
+	my @err;
+
+	if ($r->method eq "POST") {
+		$name = clean_query($name);
+		if ($type eq "") {
+			push @err, "Project Type is missing";
+		}
+		if ($name eq "") {
+			push @err, "Name is missing";
+		}
+		if ($organism eq "") {
+			push @err, "Organism is missing";
+		}
+		
+		unless (@err) {
+			my $pm = DNALC::Pipeline::App::NGS::ProjectManager->new({debug => 1});
+			my $st = $pm->create_project({
+				user_id => $s->{user_id},
+				name => $name,
+				type => $type,
+				organism => $organism,
+				common_name => '',
+				description => clean_query($description),
+			});
+
+			if ($st->{status} eq 'fail') {
+				push @err, $st->{status} . " : " . $st->{msg};
+			}
+			else {
+				$m->redirect("/project/ngs/panel/" . $pm->project->id);
+			}
+		}
+	}
+</%init>
+
+<%method title>
+Create new project \
+</%method>
+<%def .select_genomes>
+<%args>
+	$genomes => {}
+	$selected => ''
+</%args>
+<select name="organism" id="organism">
+	<option value=""> -= choose organism =-</option>
+% for my $species (sort keys %$genomes) {
+% 	my $name = ucfirst $species; $name =~ s/_+/ /g;
+%	my $sel = $selected && $selected eq $species ? q{selected="selected"} : "";
+	<option value="<% $species %>" $sel><% $name %></option>
+% }
+</select>
+</%def>

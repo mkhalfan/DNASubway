@@ -25,21 +25,19 @@ __PACKAGE__->set_sql(get_sorted => q{
 			WHEN 'annotation' THEN p.name
 			WHEN 'target' THEN tp.name
 			WHEN 'phylogenetics' THEN pp.name
-		END AS name,
-		CASE mp.project_type
-			WHEN 'annotation' THEN p.organism
-			WHEN 'target' THEN tp.organism
-			WHEN 'phylogenetics' THEN pp.name
-		END AS organism
+			WHEN 'NGS' THEN np.name
+		END AS name
 	FROM master_project mp
 	LEFT JOIN project p ON mp.project_id = p.project_id
 	LEFT JOIN target_project tp ON mp.project_id = tp.tpid
 	LEFT JOIN phy_project pp ON mp.project_id = pp.id
+	LEFT JOIN ngs_project np ON mp.project_id = np.id
 	LEFT JOIN users u ON mp.user_id = u.user_id
 	WHERE CASE mp.project_type 
 		WHEN 'annotation' THEN p.project_id 
 		WHEN 'target' THEN tp.tpid 
 		WHEN 'phylogenetics' THEN pp.id
+		WHEN 'NGS' THEN np.id
 	END IS NOT NULL 
 		%s
 	ORDER BY %s
@@ -64,6 +62,7 @@ sub get_public_sorted {
 						. "  WHEN 'annotation' THEN lower(p.organism) "
 						. "  WHEN 'target' THEN lower(tp.organism) "
 						. "  WHEN 'phylogenetics' THEN lower(pp.type) "
+						. "  WHEN 'NGS' THEN lower(np.organism) "
 						. "END like ? ";
 			push @params,  '%' . $args->{where}->{organism} . '%';
 		}
@@ -73,6 +72,7 @@ sub get_public_sorted {
 						. "  WHEN 'annotation' THEN lower(p.name) "
 						. "  WHEN 'target' THEN lower(tp.name) "
 						. "  WHEN 'phylogenetics' THEN lower(pp.name) "
+						. "  WHEN 'NGS' THEN lower(np.name) "
 						. "END like ? ";
 			push @params,  '%' . $args->{where}->{title} . '%';
 		}

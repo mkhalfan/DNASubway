@@ -1,0 +1,17 @@
+<div id="container_rightContent">
+	<div id="container_pageTitle"><& SELF:title &></div>
+	<br clear="all" />
+	<div id="content" style="">
+% $m->call_next;
+	</div>
+</div>
+
+<%init>
+	$r->content_type("text/html");
+</%init>
+<%method title>
+</%method>
+
+<%attr>
+	js => ['ngs.js']
+</%attr>

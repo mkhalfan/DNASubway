@@ -1,0 +1,182 @@
+<div id="content">
+% if ($app) {
+<div>New job using application <strong><% $app %></strong>:</div>
+	<p>
+		<dl id="job_details" style="display:none;">
+			<dt>Name</dt><dd><% $app->name %></dd>
+			<dt>Version</dt><dd><% $app->{version}%></dd>
+			<dt>Short desc</dt><dd><% $app->{shortDescription} %></dd>
+			<dt>Input(s)</dt><dd>
+% 	for my $i (@{$app->inputs}) {
+%#				<pre><% (i) %></pre>
+				<div>- <% $i->{id} %> - <b>type=<% $i->{type} %>/fileTypes=<%$i->{fileTypes}%></b> - (<% $i->{label} %>)</div>
+%	}
+			</dd>
+			<dt>Parameter(s)</dt><dd>
+% 	for my $p (@{$app->parameters}) {
+				<div>- <% $p->{id} %> - <b><% $p->{type} %></b> - (<% $p->{label} %>)</div>
+%	}
+			</dd>
+		</dl>
+		<div>
+			<a href="#" onclick="$('job_details').toggle();" id="hs_details">show/hide app details</a>
+		</div>
+		
+		<form method="post">
+		<table>
+			<tbody id="app_info">
+				<tr>
+					<td colspan="2" style="font-weight:bold;background-color: #eee;">Job options</td>
+				</tr>
+				<tr>
+					<td><sup>*</sup>Job name:</td>
+					<td><input type="text" id="jobName" name="jobName" value="<% $form->{jobName} |html %>" /></td>
+				</tr>
+				<tr style="background: #ccc;">
+					<td>Requested time:</td>
+					<td><input type="text" id="requestedTime" name="requestedTime" value="<% $form->{requestedTime} || q{0:15:00}|html %>" /></td>
+				</tr>
+				<tr style="background: #ccc;">
+					<td>Memory:</td>
+					<td><input type="text" id="memory" name="Memory" value="<% $form->{memory} || q{1G}|html %>" /></td>
+				</tr>
+				<tr style="background: #ccc;">
+					<td><sup>*</sup>Processors:</td>
+					<td>
+						<select id="processors" name="processors">
+%					for my $p (1, 2, 4, 8, 16) {
+						<option value="<% $p |html %>" <% $p == $form->{processors} ? q{selected="selected"} : q{}%>><% $p %></option>
+%					}
+						</select>
+					</td>
+				</tr>
+			</tbody>
+				<tr>
+					<td colspan="2" style="font-weight:bold;background-color: #eee;">Input(s)</td>
+				</tr>
+			<tbody id="app_inputs">
+				<tr>
+					<td></td>
+					<td></td>
+				</tr>
+% 		for my $i (@{$app->inputs}) {
+%				next if $i->{hidden};
+				<tr>
+					<td><% $i->{required} ? "<sup>*</sup>" : "&nbsp;" %><% $i->{label} %></td>
+					<td>
+%					if ($i->{id} eq q{genome} ) {
+%#						<% INCLUDE _genomes.tt, name="genome", options=genomes, value=form.genome %>
+						include genomes - <% $form->{genome} || $i->{value} |html%>
+%					} elsif ($i->{fileTypes}) {
+						<input type="hidden" id="<% $i->{id} %>" name="<% $i->{id} %>" value="<% $form->{$i->{id}} || $i->{value} %>" />
+						<span id="<% $i->{id} %>_sf"><% $form->{$i->{id}} || $i->{value} %></span>
+						<span id="<% $i->{id} %>_cnt"><a href="javascript:;" onclick="javascript:bf('<%$i->{id}%>', 'file')">browse</a></span>
+						<div>
+							<div id="fsmain_<%$i->{id}%>"></div>
+							<div id="fselected_<%$i->{id}%>" class="x-toolbar x-toolbar-layout-ct x-panel-body" style="display:none;">
+								<div id="ok_bt_<%$i->{id}%>"></div>
+							</div>
+						</div>
+%					} else {
+						<input type="text" id="<% $i->{id} %>" name="<% $i->{id} %>" req="<% $i->{required} %>" value="<% $form->{$i->{id}} || $i->{value} |html%>"/></td>
+%					}
+				</tr>
+%		}
+			</tbody>
+				<tr>
+					<td colspan="2" style="font-weight:bold;background-color: #eee;">Parameters</td>
+				</tr>
+			<tbody id="app_parameters">
+% 		for my $p (@{$app->parameters}) {
+%				next if $p->{hidden};
+				<tr>
+					<td title="<% $p->{type} %>"><% $p->{required} ? "<sup>*</sup>" : "&nbsp;" %><% $p->{label} |html%></td>
+					<td><input type="text" id="<% $p->{id} %>" name="<% $p->{id} %>" req="<% $p->{required}%>" value="<% $form->{$p->{id}} || $p->{defaultValue} |html%>"/></td>
+				</tr>
+%		}
+			</tbody>
+			<tr>
+					<td></td>
+					<td><input type="submit" value="Submit" /></td>
+				</tr>
+		</table>
+		</form>
+	</p>
+	<pre style="float:left">
+		<% Dumper($form) %>
+	</pre>
+% } else {
+	No application found for conf file: '<% $app_cf_file |html %>'.
+% }
+</div>
+%#-----------------------------------------------------------------
+<%args>
+	$pid => 0
+</%args>
+<%once>
+	use Data::Dumper;
+	use DNALC::Pipeline::Utils qw(clean_query);
+	use DNALC::Pipeline::App::NGS::ProjectManager ();
+
+	use DNALC::Pipeline::User ();
+
+</%once>
+<%init>
+
+	$m->session->{pipeline} ||= {};
+	my $s = $m->session->{pipeline};
+
+	#my $path_info = $r->path_info;
+	#if ($r->path_info =~ /\/(\d+)$/) {
+	#	$pid = $1;
+	#}
+
+	my $apif = iPlant::FoundationalAPI->new(
+			user => $s->{username},
+			token => $s->{api_token},
+		);
+	my $pm = DNALC::Pipeline::App::NGS::ProjectManager->new({project => $pid, debug => 1});
+	$pm->api_instance($apif) if $apif;
+	my $proj = $pm->project;
+
+	# project's owner
+	my $is_owner = $s->{user_id} == $proj->user_id if $proj;
+
+	my $app;
+	#my $app_id = "tophat-ranger-1.3.1"; #"tophat";
+	my $app_cf_file = "NGS_TH";
+	my $st = $pm->app($app_cf_file);
+
+	if ($st->{status} eq "success") {
+		$app = $st->{app};
+	}
+	else {
+		print STDERR $st->{status}, " ", $st->{msg}, $/;
+	}
+
+	#my $app_inputs = $app->inputs if $app;
+	#my $app_params = $app->parameters if $app;
+
+	my $form = {};
+	if ($r->method eq "POST") {
+		$form = \%ARGS;
+		
+		for my $p (@{$app->parameters}) {
+			unless (defined $form->{$p->{id}}) {
+				$form->{$p->{id}} = $p->{value};
+			}
+		}
+
+		#HACK
+		$form->{genome} = "/shared/iplantcollaborative/genomeservices/legacy/0.30/genomes/arabidopsis_thaliana/col-0/v10/genome.fas";
+
+
+		unless (defined $form->{archive}) {
+            $form->{archive} = "true";
+        }
+		my $job_ep = $apif->job;
+		my $job = $job_ep->submit_job($app, %$form);
+		
+		print STDERR "JOB = ", Dumper( $job ), $/;
+	}
+</%init>

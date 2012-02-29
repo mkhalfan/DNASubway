@@ -1,0 +1,14 @@
+hi
+
+<pre>
+	<% Dumper($s) %>
+</pre>
+
+<%once>
+	use Data::Dumper;
+</%once>
+<%init>
+	$m->session->{pipeline} ||= { username => "", logged_in => 0};
+	my $s = $m->session->{pipeline};
+	
+</%init>

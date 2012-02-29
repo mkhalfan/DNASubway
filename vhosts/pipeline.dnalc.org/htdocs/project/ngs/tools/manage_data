@@ -1,0 +1,44 @@
+
+<a href="./add_data?pid=<% $proj->id %>">add data</a>
+
+%#data = <% ref($data)%>
+
+% while (my $f = $data->next) {
+	<div title="<% $f-> file_path |html %>"><% $f->file_name |html%></div>
+% }
+
+%#-----------------------------------------------------------------
+<%args>
+	$pid => 0
+</%args>
+<%once>
+	use Data::Dumper;
+	use DNALC::Pipeline::Utils qw(clean_query);
+	use DNALC::Pipeline::App::NGS::ProjectManager ();
+	#use DNALC::Pipeline::Config ();
+	#use iPlant::FoundationalAPI ();
+	#use iPlant::FoundationalAPI::Constants ':all';
+	use DNALC::Pipeline::User ();
+	
+	my %clades = ();
+</%once>
+<%init>
+
+	$m->session->{pipeline} ||= {};
+	my $s = $m->session->{pipeline};
+
+	#my $path_info = $r->path_info;
+	if ($r->path_info =~ /\/(\d+)$/) {
+		$pid = $1;
+	}
+
+	my $pm = DNALC::Pipeline::App::NGS::ProjectManager->new({project => $pid, debug => 0});
+	
+	#print STDERR Dumper($pm), $/;
+	my $proj = $pm->project;
+
+	# project's owner
+	my $is_owner = $s->{user_id} == $proj->user_id if $proj;
+	my $data = $pm->data;
+	
+</%init>
