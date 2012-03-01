@@ -10,6 +10,7 @@ use aliased 'DNALC::Pipeline::NGS::Project';
 use aliased 'DNALC::Pipeline::NGS::DataFile';
 use aliased 'DNALC::Pipeline::NGS::DataSource';
 
+use DNALC::Pipeline::Config ();
 use DNALC::Pipeline::Task ();
 use DNALC::Pipeline::TaskStatus ();
 
@@ -264,7 +265,7 @@ use Data::Dumper;
 		my ($app) = $apps->find_by_name($app_id);
 		print STDERR "APP: ", $app, $/;
 		
-		print "App ID: $app_id <br /> Annotation Field: $job_arguments{ANNOTATION} <br />";
+		print STDERR "App ID: $app_id <br /> Annotation Field: $job_arguments{ANNOTATION} <br />";
 		
 		# adding additional 'hidden' arguments
 		$job_arguments{jobName} = $app_id . '-DNAS-' . int(rand(100));
@@ -273,7 +274,7 @@ use Data::Dumper;
 		$job_arguments{requested_time} = '11:11:11';
 		$job_arguments{softwareName} = $app_id;
 		
-		print Dumper (%job_arguments);
+		print STDERR Dumper (%job_arguments);
 		my $job_ep = $api_instance->job;
 		my $job = $job_ep->submit_job($app, %job_arguments);
 		#print STDERR "returned from submit_job: ", %$job, $/; 
@@ -295,7 +296,8 @@ use Data::Dumper;
 		}
 
 		$self->{debug};
-	}	#---------------------------------------
+	}
+	#---------------------------------------
 	sub project {
 		my ($self, $project) = @_;
 
@@ -306,6 +308,29 @@ use Data::Dumper;
 		$self->{project};
 	}
 
+	#---------------------------------------
+	sub project_genome_path {
+		my ($self) = @_;
+
+		my $org = $self->project->organism;
+
+		my $genomes = DNALC::Pipeline::Config->new->cf('NGS_GENOMES');
+		my $genome_data = $genomes->{genomes}->{$org};
+		my $path = $genomes->{store} . '/' . $org . '/' . $genome_data->{sub_part} 
+			. '/' . $genome_data->{versions}->[0] . '/genome.fas';
+
+		return $path;
+	}
+
+	#---------------------------------------
+	sub project_annotation_path {
+		my ($self) = @_;
+
+		my $annotaion = $self->project_genome_path;
+		$annotaion =~ s/genome\.fas$/annotation.gtf/;
+
+		return $annotaion;
+	}
 	#--------------------------------------
 	sub api_instance {
 		my ($self, $api_instance) = @_;

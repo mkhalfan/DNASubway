@@ -57,6 +57,7 @@ New Project
 
 </form>
 
+
 %#-----------------------------------------------------------------
 <%args>
 	$name => ''
@@ -77,7 +78,7 @@ New Project
 	$m->session->{pipeline} ||= { username => "", logged_in => 0};
 	my $s = $m->session->{pipeline};
 	my $cf = DNALC::Pipeline::Config->new;
-	my $genomes = $cf->cf('NGS_GENOMES');
+	my $genomes = $cf->cf('NGS_GENOMES')->{genomes};
 	#my $pcf = $cf->cf('PIPELINE');
 	my @err;
 

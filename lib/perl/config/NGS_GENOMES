@@ -1,0 +1,46 @@
+{
+	store => '/shared/iplantcollaborative/genomeservices/legacy/0.30/genomes',
+	genomes => {
+		arabidopsis_lyrata => {
+			sub_part => 'araly1',
+			versions => [qw/v1.0/],
+		},
+		arabidopsis_thaliana => {
+			sub_part => 'col-0',
+			versions => [qw/v10 v9/],
+		},
+		brachypodium_distachyon => {
+			sub_part => 'bd21',
+			versions => [qw/v1.0/],
+		},
+		oryza_indica => {
+			sub_part => 'bgi05',
+			versions => [qw/v1.0/],
+		},
+		oryza_japonica => {
+			sub_part => 'nipponbare',
+			versions => [qw/v6/],
+		},
+		physcomitrella_patens => {
+			sub_part => 'phypa1',
+			versions => [qw/v1.1/],
+		},
+		populus_trichocarpa => {
+			sub_part => 'nisqually1',
+			versions => [qw/v2.0/],
+		},
+		sorghum_bicolor => {
+			sub_part => 'bt623',
+			versions => [qw/v1/],
+		},
+		vitis_vinifera => {
+			sub_part => 'pn40024',
+			versions => [qw/v12x/],
+		},
+		zea_mays => {
+			sub_part => 'b73',
+			versions => [qw/v5a v2 v1/],
+		}
+	}
+};
+

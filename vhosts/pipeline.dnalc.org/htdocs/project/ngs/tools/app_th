@@ -2,6 +2,9 @@
 % if ($app) {
 <div>New job using application <strong><% $app %></strong>:</div>
 	<p>
+		<div>
+			<a href="#" onclick="$('job_details').toggle();" id="hs_details">show/hide app details</a>
+		</div>
 		<dl id="job_details" style="display:none;">
 			<dt>Name</dt><dd><% $app->name %></dd>
 			<dt>Version</dt><dd><% $app->{version}%></dd>
@@ -18,9 +21,6 @@
 %	}
 			</dd>
 		</dl>
-		<div>
-			<a href="#" onclick="$('job_details').toggle();" id="hs_details">show/hide app details</a>
-		</div>
 		
 		<form method="post">
 		<table>
@@ -67,19 +67,14 @@
 %					if ($i->{id} eq q{genome} ) {
 %#						<% INCLUDE _genomes.tt, name="genome", options=genomes, value=form.genome %>
 						include genomes - <% $form->{genome} || $i->{value} |html%>
-%					} elsif ($i->{fileTypes}) {
-						<input type="hidden" id="<% $i->{id} %>" name="<% $i->{id} %>" value="<% $form->{$i->{id}} || $i->{value} %>" />
-						<span id="<% $i->{id} %>_sf"><% $form->{$i->{id}} || $i->{value} %></span>
-						<span id="<% $i->{id} %>_cnt"><a href="javascript:;" onclick="javascript:bf('<%$i->{id}%>', 'file')">browse</a></span>
-						<div>
-							<div id="fsmain_<%$i->{id}%>"></div>
-							<div id="fselected_<%$i->{id}%>" class="x-toolbar x-toolbar-layout-ct x-panel-body" style="display:none;">
-								<div id="ok_bt_<%$i->{id}%>"></div>
-							</div>
-						</div>
+%					} elsif ($i->{display_type}) {
+%#						<span id="<% $i->{id} %>_sf"><% $form->{$i->{id}} || $i->{value} %></span>
+						<div><& "./.comp/" . $i->{display_type}, pm => $pm,  element => $i, user_value => $form->{$i->{id}} || $i->{value} &></div>
 %					} else {
-						<input type="text" id="<% $i->{id} %>" name="<% $i->{id} %>" req="<% $i->{required} %>" value="<% $form->{$i->{id}} || $i->{value} |html%>"/></td>
+						<input type="text" id="<% $i->{id} %>" name="<% $i->{id} %>" req="<% $i->{required} %>" value="<% $form->{$i->{id}} || $i->{value} |html%>"/>
+						[<% $i->{display_type} %>]
 %					}
+					</td>\
 				</tr>
 %		}
 			</tbody>
@@ -91,7 +86,9 @@
 %				next if $p->{hidden};
 				<tr>
 					<td title="<% $p->{type} %>"><% $p->{required} ? "<sup>*</sup>" : "&nbsp;" %><% $p->{label} |html%></td>
-					<td><input type="text" id="<% $p->{id} %>" name="<% $p->{id} %>" req="<% $p->{required}%>" value="<% $form->{$p->{id}} || $p->{defaultValue} |html%>"/></td>
+					<td><input type="text" id="<% $p->{id} %>" name="<% $p->{id} %>" req="<% $p->{required}%>" value="<% $form->{$p->{id}} || $p->{defaultValue} |html%>"/>
+					[<% $p->{display_type}%>]
+					</td>
 				</tr>
 %		}
 			</tbody>
@@ -166,10 +163,18 @@
 				$form->{$p->{id}} = $p->{value};
 			}
 		}
+		
+		for my $p (@{$app->inputs}) {
+			unless (defined $form->{$p->{id}}) {
+				#$form->{$p->{id}} = $p->{value};
+			}
+		}
 
 		#HACK
-		$form->{genome} = "/shared/iplantcollaborative/genomeservices/legacy/0.30/genomes/arabidopsis_thaliana/col-0/v10/genome.fas";
-
+		#$form->{genome} ||= "/shared/iplantcollaborative/genomeservices/legacy/0.30/genomes/arabidopsis_thaliana/col-0/v10/genome.fas";
+		$form->{genome} = $pm->project_genome_path;
+		$form->{annotation} = $pm->project_genome_path;
+		#print STDERR $pm->project_annotation_path, $/;
 
 		unless (defined $form->{archive}) {
             $form->{archive} = "true";

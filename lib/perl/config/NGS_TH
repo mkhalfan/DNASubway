@@ -1,0 +1,24 @@
+{
+	id => 'tophat-ranger-1.3.1',
+	name => 'tophat',
+	inputs => [
+		{ id => 'query1', display_type => 'show_files', label => 'File to process'},
+		{ id => 'query2', hidden => 1, },
+		{ id => 'genome', display_type => 'genome', hidden => 1},
+		{ id => 'annotation', hidden => 1 },
+	],
+	parameters => [
+		{ id => 'library_type',			hidden => 1, value => 'fr-unstranded', label => 'Library type', },
+		{ id => 'mate_inner_dist',		hidden => 0, value => '200', label => 'Mate inner distance', },
+		{ id => 'mate_std_dev',			hidden => 0, value => '20', label => 'Mate distance stdev', },
+		{ id => 'max_deletion_length',	hidden => 0, value => '0', label => '', },
+		{ id => 'max_insertion_length', hidden => 0, value => '0', label => 'AAA', },
+		{ id => 'max_intron_length',	hidden => 0, value => '0', label => 'BBB', },
+		{ id => 'max_multihits',		hidden => 0, value => '20', label => 'Maxium multiple hits to genome', },
+		{ id => 'min_anchor_length',	hidden => 0, value => '8', label => 'Minimum anchor length', },
+		{ id => 'min_intron_length',	hidden => 0, value => '70', label => 'Minimum intron length', },
+		{ id => 'min_isoform_fraction', hidden => 0, value => '0.15', label => 'Minimum isoform fraction', },
+		{ id => 'segment_length',		hidden => 0, value => '25', label => 'Segment length', },
+		{ id => 'splice_mismatches',	hidden => 0, value => '0', label => 'Mate distance stdev', },
+	],
+}

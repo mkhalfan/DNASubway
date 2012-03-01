@@ -38,7 +38,10 @@
 %		$color = "#fdba3e"; #blue = "#3953A4"
 %	} elsif ($_->{project_type} eq "phylogenetics") {
 %		$uri = "/project/phylogenetics/console.html?pid=" . $_->id;
-%		$color = "#3953A4"
+%		$color = "#3953A4";
+%	} elsif ($_->{project_type} eq "NGS") {
+%		$uri = "/project/ngs/panel/" . $_->id;
+%		$color = "green";
 %	}
 %	my $description = break_long_text($_->description, 35);
 <tr>
@@ -81,6 +84,7 @@
 	use DNALC::Pipeline::Project ();
 	use DNALC::Pipeline::TargetProject ();
 	use DNALC::Pipeline::Phylogenetics::Project ();
+	use DNALC::Pipeline::NGS::Project ();
 	use DNALC::Pipeline::User ();
 	use DNALC::Pipeline::Config ();
 	use DNALC::Pipeline::Utils qw(random_string);
@@ -160,6 +164,9 @@ my @projects = grep { defined $_ } map {
 				}
 				elsif ($_->project_type eq 'phylogenetics') {
 					$pclass = 'DNALC::Pipeline::Phylogenetics::Project';
+				}
+				elsif ($_->project_type eq 'NGS') {
+					$pclass = 'DNALC::Pipeline::NGS::Project';
 				}
 				
 				my $p = $pclass->retrieve($pid);
