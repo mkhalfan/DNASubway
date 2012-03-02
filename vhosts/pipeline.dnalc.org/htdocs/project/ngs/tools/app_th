@@ -38,7 +38,7 @@
 				</tr>
 				<tr style="background: #ccc;">
 					<td>Memory:</td>
-					<td><input type="text" id="memory" name="Memory" value="<% $form->{memory} || q{1G}|html %>" /></td>
+					<td><input type="text" id="memory" name="memory" value="<% $form->{memory} || q{1G}|html %>" /></td>
 				</tr>
 				<tr style="background: #ccc;">
 					<td><sup>*</sup>Processors:</td>
@@ -51,47 +51,7 @@
 					</td>
 				</tr>
 			</tbody>
-				<tr>
-					<td colspan="2" style="font-weight:bold;background-color: #eee;">Input(s)</td>
-				</tr>
-			<tbody id="app_inputs">
-				<tr>
-					<td></td>
-					<td></td>
-				</tr>
-% 		for my $i (@{$app->inputs}) {
-%				next if $i->{hidden};
-				<tr>
-					<td><% $i->{required} ? "<sup>*</sup>" : "&nbsp;" %><% $i->{label} %></td>
-					<td>
-%					if ($i->{id} eq q{genome} ) {
-%#						<% INCLUDE _genomes.tt, name="genome", options=genomes, value=form.genome %>
-						include genomes - <% $form->{genome} || $i->{value} |html%>
-%					} elsif ($i->{display_type}) {
-%#						<span id="<% $i->{id} %>_sf"><% $form->{$i->{id}} || $i->{value} %></span>
-						<div><& "./.comp/" . $i->{display_type}, pm => $pm,  element => $i, user_value => $form->{$i->{id}} || $i->{value} &></div>
-%					} else {
-						<input type="text" id="<% $i->{id} %>" name="<% $i->{id} %>" req="<% $i->{required} %>" value="<% $form->{$i->{id}} || $i->{value} |html%>"/>
-						[<% $i->{display_type} %>]
-%					}
-					</td>\
-				</tr>
-%		}
-			</tbody>
-				<tr>
-					<td colspan="2" style="font-weight:bold;background-color: #eee;">Parameters</td>
-				</tr>
-			<tbody id="app_parameters">
-% 		for my $p (@{$app->parameters}) {
-%				next if $p->{hidden};
-				<tr>
-					<td title="<% $p->{type} %>"><% $p->{required} ? "<sup>*</sup>" : "&nbsp;" %><% $p->{label} |html%></td>
-					<td><input type="text" id="<% $p->{id} %>" name="<% $p->{id} %>" req="<% $p->{required}%>" value="<% $form->{$p->{id}} || $p->{defaultValue} |html%>"/>
-					[<% $p->{display_type}%>]
-					</td>
-				</tr>
-%		}
-			</tbody>
+				<& ./.comp/build_app_form, pm => $pm, app => $app, form => $form &>
 			<tr>
 					<td></td>
 					<td><input type="submit" value="Submit" /></td>
@@ -100,6 +60,7 @@
 		</form>
 	</p>
 	<pre style="float:left">
+		<div>status: <% $st->{status} %> <% $st->{message} ? " » " . $st->{message} : "" %></div>
 		<% Dumper($form) %>
 	</pre>
 % } else {
@@ -148,7 +109,7 @@
 		$app = $st->{app};
 	}
 	else {
-		print STDERR $st->{status}, " ", $st->{msg}, $/;
+		print STDERR $st->{status}, " ", $st->{message}, $/;
 	}
 
 	#my $app_inputs = $app->inputs if $app;
@@ -164,24 +125,28 @@
 			}
 		}
 		
-		for my $p (@{$app->inputs}) {
-			unless (defined $form->{$p->{id}}) {
-				#$form->{$p->{id}} = $p->{value};
-			}
-		}
+		# TODO - default input files should not be set?!
+		#for my $p (@{$app->inputs}) {
+		#	unless (defined $form->{$p->{id}}) {
+		#		$form->{$p->{id}} = $p->{value};
+		#	}
+		#}
 
 		#HACK
 		#$form->{genome} ||= "/shared/iplantcollaborative/genomeservices/legacy/0.30/genomes/arabidopsis_thaliana/col-0/v10/genome.fas";
+		
+		# what do we do when we don`t get the paths?!
 		$form->{genome} = $pm->project_genome_path;
 		$form->{annotation} = $pm->project_genome_path;
-		#print STDERR $pm->project_annotation_path, $/;
 
 		unless (defined $form->{archive}) {
             $form->{archive} = "true";
         }
-		my $job_ep = $apif->job;
-		my $job = $job_ep->submit_job($app, %$form);
 		
-		print STDERR "JOB = ", Dumper( $job ), $/;
+		#my $job_ep = $apif->job;
+		#my $job = $job_ep->submit_job($app, %$form);
+		
+		$st = $pm->submit_job($app, $form);
+		print STDERR "app_th: JOB status = ", Dumper( $st ), $/;
 	}
 </%init>

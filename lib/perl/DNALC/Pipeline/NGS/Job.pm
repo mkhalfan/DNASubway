@@ -12,7 +12,7 @@ __PACKAGE__->sequence('ngs_job_id_seq');
 
 __PACKAGE__->has_a(project_id => 'DNALC::Pipeline::NGS::Project');
 
-__PACKAGE__->has_many(ngs_job_params => 'DNALC::Pipeline::NGS::JobParam');
+__PACKAGE__->has_many(job_params => 'DNALC::Pipeline::NGS::JobParam');
 
 #__PACKAGE__->add_trigger('before_create' => sub {
 #my $self = shift;

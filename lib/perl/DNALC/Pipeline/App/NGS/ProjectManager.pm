@@ -163,12 +163,12 @@ use Data::Dumper;
 		my ($self, $app_conf_file) = @_;
 
 		unless ($app_conf_file) {
-			return {status => 'fail', msg => 'sub app: config file is missong the app id'};
+			return {status => 'fail', message => 'sub app: config file is missong the app id'};
 		}
 
 		my $app_cf = DNALC::Pipeline::Config->new->cf($app_conf_file);
 		unless ($app_cf && $app_cf->{id}) {
-			return {status => 'fail', msg => 'sub app: config file is missong the app id'};
+			return {status => 'fail', message => 'sub app: config file is missong the app id'};
 		}
 
 		my $app_name = $app_cf->{name};
@@ -179,9 +179,8 @@ use Data::Dumper;
 
 		print STDERR  'app_name = ', $app_name, $/;
 
-
 		my $api_instance = $self->api_instance;
-		return {status => 'fail', msg => 'sub app: no api_instance object'} unless $api_instance;
+		return {status => 'fail', message => 'sub app: no api_instance object'} unless $api_instance;
 
 		my $app;
 
@@ -192,20 +191,19 @@ use Data::Dumper;
 			$app ||= $apps->[0];
 
 			# TODO : find a better name for the next method
-			$self->apply_app_configuration($app, $app_cf);
+			$self->apply_app_setting($app, $app_cf);
 
 			return {status => 'success', app => $app };
-
 		}
 
 		# else ..
 		print  STDERR "App $app_name not found sorry \n";
-		return {status => 'fail', msg => "App $app_name not found"};
+		return {status => 'fail', message => "Application $app_name not found"};
 	}
 	
 	# apply our own configuration file for the app
 	#	supply our own default values, or field labels, hide some of the fields
-	sub apply_app_configuration {
+	sub apply_app_setting {
 		my ($self, $app, $app_cf) = @_;
 
 
@@ -278,7 +276,68 @@ use Data::Dumper;
 		my $job_ep = $api_instance->job;
 		my $job = $job_ep->submit_job($app, %job_arguments);
 		#print STDERR "returned from submit_job: ", %$job, $/; 
+	}
 
+	sub submit_job {
+		my ($self, $app, $params) = @_;
+
+		my $apif = $self->api_instance;
+		unless ($apif) {
+			return _error('API instance not set.');
+		}
+
+		my $jobdb; #
+
+		my $job_ep = $apif->job;
+		my $job_st = $job_ep->submit_job($app, %$params);
+		print STDERR  "ProjectManager::submit_job: ", Dumper($job_st), $/;
+		if ($job_st && $job_st->{status} eq "success") {
+			my $api_job = $job_st->{data};
+
+			$jobdb = eval {DNALC::Pipeline::NGS::Job->create({
+						api_job_id => $api_job->{id},
+						project_id => 6,
+						user_id => 90,
+						task_id => 32,  # ngs_tophat
+						status_id => 4, # processing/pending
+					});
+				};
+			if ($@) {
+				my $msg = $@;
+				print STDERR  "Error: ", $msg, $/;
+				return _error($msg);
+			}
+			else {
+				print STDERR  "dbjob = ", $jobdb, $/;
+				# add job parameters
+				my @params = ();
+				for my $type (qw/inputs parameters/) {
+					my $sg_type = $type; $sg_type =~ s/s$//;
+					for (@{$api_job->{$type}}) {
+						my ($name, $value) = each %$_;
+						eval {
+							$jobdb->add_to_job_params({type => $sg_type, name => $name, value => $value || ''});
+						};
+					}
+				}
+
+				# add the rest of the job parameters
+				for my $name (sort keys %$api_job) {
+					next if $name =~ /^(?:inputs|parameters)$/;
+
+					my $value = $api_job->{$name} || '';
+					if (ref($value) eq 'ARRAY') {
+						next if ref($value->[0]); # can't handle all situations
+						$value = join ":", @$value;
+					}
+					$jobdb->add_to_job_params({type => '', name => $name, value => $value});
+				}
+			}
+			return {status => 'success', job => $jobdb};
+		}
+		else {
+			_error($job_st->{message} || 'Could not submit job.', data => $job_st->{data});
+		}
 	}
 
 	#--------------------------------------
@@ -340,6 +399,15 @@ use Data::Dumper;
 		}
 
 		$self->{api_instance};
+	}
+
+	sub _error {
+		my ($self, $msg) = @_;
+		if (!defined $msg && !ref($self)) {
+			$msg = $self;
+		}
+
+		return {status => 'fail', msg => $msg || 'Unspecified error.'};
 	}
 }
 

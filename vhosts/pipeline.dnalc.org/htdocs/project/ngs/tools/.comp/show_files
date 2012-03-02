@@ -1,0 +1,23 @@
+<select class="<% $class %>" id="<% $element->{id} %>" name="<% $element->{id} %>">
+<option value="">-= Choose file =-</option>
+% for (@files) {
+%	my $sel = $user_value && $user_value eq $_->file_path ? q{selected="selected"} : "";
+	<option value="<% $_->file_path %>" <% $sel %>><% $_->file_name |html%></option>
+% }
+</select>
+<%args>
+	$pm => undef
+	$element => undef
+	$user_value => undef
+	$class => ''
+</%args>
+<%once>
+	use Data::Dumper;
+</%once>
+<%init>
+	return unless $pm && $element;
+	
+	my @files = $pm->data;
+	
+	#print STDERR Dumper($user_value);
+</%init>
