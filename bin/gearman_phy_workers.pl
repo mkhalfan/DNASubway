@@ -7,6 +7,7 @@ use Gearman::Worker ();
 use Storable qw(nfreeze thaw);
 
 use DNALC::Pipeline::App::Phylogenetics::ProjectManager ();
+use DNALC::Pipeline::App::Phylogenetics::GBManager ();
 use DNALC::Pipeline::Process::Phylip::SeqBoot ();
 use DNALC::Pipeline::Process::Phylip::DNADist ();
 use DNALC::Pipeline::Process::Phylip::ProtDist ();
@@ -189,6 +190,89 @@ sub run_muscle {
    return nfreeze({status => $status, msg => $msg});
 }
 
+sub run_gb_submit {
+    my $gearman = shift;
+    my $args = thaw( $gearman->arg );
+    my $id = $args->{id};
+
+    #my ($status, $msg) = ('error', '');
+    my $bail_out = sub { return nfreeze {status => 'error', 'message' => shift } };
+
+    my $gbm = DNALC::Pipeline::App::Phylogenetics::GBManager->new;
+
+    # Run create_dir (doesn't return anything)
+    $gbm->create_dir($id);
+
+    # Run create_fasta
+    my $st = $gbm->create_fasta($id);
+
+    # Run create_smt
+    if ($st->{status} eq 'success'){
+        $st = $gbm->create_smt($id);
+    }
+    else {
+        return $bail_out->("ID: $id ERROR: $st->{message}");
+    }
+
+    # Run make_template
+    if ($st->{status} eq 'success'){
+        $st = $gbm->make_template($id);
+    }
+    else {
+        return $bail_out->("ID: $id ERROR: $st->{message}");
+    }
+ # Run run_tbl2asn
+    if ($st->{status} eq 'success'){
+        $st = $gbm->run_tbl2asn($id);
+    }
+    else {
+        return $bail_out->("ID: $id ERROR: $st->{message}");
+    }
+
+    # Run prep_trace_file
+    if ($st->{status} eq 'success'){
+        $st = $gbm->prep_trace_file($id);
+    }
+    else {
+        return $bail_out->("ID: $id ERROR: $st->{message}");
+    }
+
+    # Run prep_submission_file
+    if ($st->{status} eq 'success'){
+        $st = $gbm->prep_submission_file($id);
+    }
+    else {
+        return $bail_out->("ID: $id ERROR: $st->{message}");
+    }
+
+    # Run submit
+     if ($st->{status} eq 'success'){
+        $st = $gbm->submit($id);
+    }
+    else {
+        return $bail_out->("ID: $id ERROR: $st->{message}");
+    }
+ # Run validate_submission
+    if ($st->{status} eq 'success'){
+        $st = $gbm->validate_submission($id);
+    }
+    else {
+        return $bail_out->("ID: $id ERROR: $st->{message}");
+    }
+
+    # This is the sequence
+    #$gmb->create_dir($id);
+    #$gbm->create_fasta($id);
+    #$gbm->create_smt($id);
+    #$gbm->make_template($id);
+    #$gbm->run_tbl2asn($id);
+    #$gbm->prep_trace_file($id);
+    #$gbm->prep_submission_file($id);
+    #$gbm->submit($id);
+    #$gbm->validate_submission($id);
+
+    return nfreeze({status => $st->{status}, message => $st->{message}});
+}
 
 sub run_merger {
 	my $gearman = shift;
@@ -250,6 +334,7 @@ $worker->register_function("phy_alignment", \&run_muscle);
 #$worker->register_function("phy_tree", \&run_phylip);
 $worker->register_function("phy_tree", \&run_build_tree);
 $worker->register_function("phy_consensus", \&run_merger);
+$worker->register_function("phy_gb_submit", \&run_gb_submit);
 $worker->register_function("${script_name}_exit" => sub { 
 	$work_exit = 1; 
 });
