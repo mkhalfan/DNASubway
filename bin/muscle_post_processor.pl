@@ -46,10 +46,11 @@ $numgap = int(@seq/2+0.5) unless defined $numgap;
 my $slice = auto_flush(\%seqs,\%rseqs,$aln);
 $slice->match;
 
-my $style = '<link rel="stylesheet" href="/css/phy_alignment_viewer.css" />';
-my $script = '<script type="text/javascript" src="http://dnasubway.iplantcollaborative.org/js/prototype-1.6.1.js"></script>' . "\n";
+my $style = '<link rel="stylesheet" href="/css/alignment_viewer.css" />';
+my $script = '<script type="text/javascript" src="/js/prototype-1.6.1.js"></script>' . "\n";
 $script .= '<script type="text/javascript" src="/js/alignment_viewer.js"></script>';
-my $buttons = '<div><input type="image" id="barcode_but" onclick="barcodeView()" src="/images/barcode_but.png"/> <input type="image" id="zoom_out" onclick="zoomOut()" src="/images/zoom_out_but.png" /><input type="image" id="zoom_in" onclick="zoomIn()" src="/images/zoom_in_but.+png"/> <input type="image" id="sequence_but" onclick="seqView()" src="/images/sequence_but.png+" /></div>';
+my $buttons = '<div><input type="image" id="barcode_but" onclick="barcodeView()" src="/images/barcode_but.png"/> <input type="image" id="zoom_out" onclick="zoomOut()" src="/images/zoom_out_but.png" /><input type="image" id="zoom_in" onclick="zoomIn()" src="/images/zoom_in_but.png"/> <input type="image" id="sequence_but" onclick="seqView()" src="/images/sequence_but.png" /></div>';
+my $body_tag = '<body onload="resizeFrame(parent.window.document.getElementById(\'aframe\'))">';
 
 my $dec = decorate_alignment($slice);
 my $retval = $dec->{retval};
@@ -57,7 +58,7 @@ my $barcode = $dec->{barcode};
 my $labels = $dec->{labels};
 
 if ($html_out->open($htmlout, "w")){
-	print $html_out "<html>", "\n", "<head>", "\n", $style, "\n", $script, "\n", "</head>", "\n", "<body>", "\n";
+	print $html_out "<html>", "\n", "<head>", "\n", $style, "\n", $script, "\n", "</head>", "\n", $body_tag, "\n";
 	print $html_out $buttons, "\n";
 	print $html_out '<div id="viewport" class="viewport">', "\n";
 	print $html_out '<div id="labels">', "\n", $labels, '</div>', "\n";
@@ -185,11 +186,19 @@ sub decorate_alignment {
 		$retval .= '<div class="row">';
 		$barcode .= '<div class="row">';
 		my @row = map {shift @$_} @columns;
-		for my $col (@row) {
+		my $x = 0;
+		for my $col (@row) {	
 			my $n;	
 			$n = ($col eq '.' ? "&nbsp;" : $col);  
 			$retval .= "<div class='$col'>$n</div>";
-			$barcode .= "<div class='$col'>&nbsp;</div>";
+			if ($fractions[$x] != 1){
+				$barcode .= "<div class='$col'>&nbsp;</div>";
+			}
+			else {
+				$barcode .= "<div class='grey'>&nbsp;</div>";
+			}
+			$x++;
+
 		}
 		$retval .= "</div><!--end row-->\n";
 		$barcode .= "</div><!--end row-->\n";
