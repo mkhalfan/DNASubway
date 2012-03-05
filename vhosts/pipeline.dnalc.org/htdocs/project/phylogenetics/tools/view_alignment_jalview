@@ -1,0 +1,133 @@
+<div id="conbodyx">
+% if ($ok == 1) {
+<script type="text/javascript">
+	top.phy.set_status("phy_tree", "not-processed");
+	top.phy.set_status("phy_tree_ml", "not-processed");
+	top.phy.close_window("phy_alignment");
+</script>
+% } else {
+% unless ($proj) {
+	Error: can't open project "<% $pid|html%>".
+% } else {
+	<div>
+<applet archive="/files/jalview/jalviewApplet.jar" name="Jalview" mayscript
+	code="jalview.bin.JalviewLite" height="400" width="100%">
+	<param name="cache_option" value="No" />
+	<param name="file" value="<% $m->comp('../../.comp/filepath_to_web', file => $algn_file ) %>" />
+	<param name="embedded" value="true" />
+	<param name="showAnnotation" value="true" />
+	<param name="wrap" value="false" />
+	<param name="nojmol" value="true" />
+	<param name="windowHeight" value="800" />
+	<param name="windowWidth" value="750" />
+	<param name="showFullId" value="false" />
+	<param name="defaultColour" value="<%  defined $color{lc $proj->type} ? $color{lc $proj->type} : $color{default} %>" />
+	<param name="linkLabel_1" value="Details" />
+	<param name="linkUrl_1" value="null" />
+	<param name="showbutton" value="false" />
+	<param name="debug" value="true" />
+	<param name="showUnconserved" value="true" />
+</applet>
+
+% if ($is_owner) {
+<form id="forma1" method="post">
+	<div style="text-align:center">
+		<input type="hidden" id="data" name="data" value="" />
+		<input type="hidden" id="aln_length" value="<% $aln_length %>" />
+		<input type="hidden" id="pid" value="<% $proj->id %>" />
+		<input type="button" id="submit_trimmed" value="Submit trimmed alignment" onclick="phy.submit_trimmed_alignment();" />
+%#		<a href="./trim_alignment?pid=<% $pid |html %>">Trim alignment</a>
+	</div>
+</form>
+%#	<% $m->comp('../../.comp/filepath_to_web', file => $algn_file ) %>?<% rand(1000) %>
+%#	<% $algn_file %>
+% }
+	</div>
+% }
+% } # end if_else $ok
+</div>
+%#----------------------------------------------------------------------------
+<%args>
+	$pid => 0
+	$data => undef
+</%args>
+%#----------------------------------------------------------------------------
+<%once>
+	use DNALC::Pipeline::App::Phylogenetics::ProjectManager ();
+	use DNALC::Pipeline::Config ();
+	use File::Copy qw/copy/;
+	use Gearman::Client ();
+	use Storable qw/thaw nfreeze/;
+
+	my %color = (
+			#default => 'Clustal',
+			default => '% Identity',
+			mtdna => '% Identity',
+			protein => 'Zappo',
+		);
+</%once>
+%#----------------------------------------------------------------------------
+<%init>
+	$r->content_type("text/html");
+	$r->no_cache(1);
+
+	my $s = $m->session->{pipeline};
+	my $pcf = DNALC::Pipeline::Config->new->cf('PIPELINE');
+	$pid =~ s/\D+//g;
+
+	my $pm = DNALC::Pipeline::App::Phylogenetics::ProjectManager->new($pid);
+	my $proj = $pm->project;
+	my $algn_file = $pm->get_alignment;
+
+	my $is_owner = $s->{user_id} == $proj->user_id;
+
+	my $aln_length = undef;
+	my $fn = IO::File->new;
+	
+	my $ok = 0;
+	
+	if ($r->method eq 'POST' && $is_owner) {
+		# make a copy
+		copy $algn_file, $algn_file . '_';
+		if (-f $algn_file && $fn->open(">$algn_file")) {
+			print $fn $data;
+			$fn->close;
+			$pm->_store_alignments($algn_file);
+			#$pm->build_alignment(1); # realign
+			
+			#--------------------------------------------------------
+			my $pcf = DNALC::Pipeline::Config->new->cf('PIPELINE');
+			my $client = Gearman::Client->new;
+			my $sx = $client->job_servers(@{$pcf->{GEARMAN_SERVERS}});
+			
+			my $params = nfreeze( {pid => $pid, user_id => $s->{user_id}, realign => 1});
+			my $rc = $client->do_task( 'phy_alignment' =>  $params);
+			$rc = thaw($$rc);
+			if ($rc && defined $rc->{status}) {
+				$ok = 1 if $rc->{status} eq 'success';
+			}
+			#--------------------------------------------------------
+			$ok = 1;
+		}
+	}
+	
+	if (-f $algn_file && $fn->open($algn_file)) {
+		my $first_seq = 0;
+		$aln_length = 0;
+		while(my $txt = <$fn>) {
+			if ($txt =~ /^>/) {
+				last if $first_seq;
+				 $first_seq = 1;
+				 next;
+			}
+			$txt =~ s/[\n\r]//g;
+			$aln_length += length $txt;
+		}
+		$fn->close;
+	}
+	
+</%init>
+%#----------------------------------------------------------------------------
+<%attr>
+	js => ['prototype-1.6.1.js', 'phylogenetics.js']
+</%attr>
