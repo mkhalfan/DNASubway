@@ -3,6 +3,7 @@ package DNALC::Pipeline::Process::Muscle;
 use base q(DNALC::Pipeline::Process);
 use File::Spec ();
 use Bio::AlignIO ();
+use File::Basename;
 
 {
 	sub new {
@@ -16,6 +17,31 @@ use Bio::AlignIO ();
 		}
 
 		return $self;
+	}
+
+	sub do_postprocessing {
+		my ($self, $m_output) = @_;
+		print STDERR "got here!";
+
+		if (defined $self->{conf}->{post_processing_cmd} && -x $self->{conf}->{post_processing_cmd}) {
+			my $html_output = my $trimmed_output = $m_output;
+
+			$trimmed_output =~ s/\.fasta$/_trimmed.fasta/;
+			$html_output =~ s/\.fasta$/.html/;
+
+			print STDERR  "** new file: ", $trimmed_output, $/;
+			print STDERR  "** new file: ", $html_output, $/;
+
+			my @args = (
+					'-i', $m_output,      # -i input file, muscle output
+					'-h', $html_output,   # -h the html output file
+					'-o', $trimmed_output # -o trimmed alignment, output
+				);
+			if (system($self->{conf}->{post_processing_cmd}, @args) == 0) {
+				print STDERR  'postprocessing exit status = ', $?, $/;
+				return {html_output => $html_output, trimmed_output => $trimmed_output};
+			}
+		}
 	}
 
 	sub get_output {
@@ -39,6 +65,12 @@ use Bio::AlignIO ();
 		my $outputfilename = $self->get_output('phyi');
 
 		return unless -f $inputfilename;
+
+		my $trimmed_inputfilename = $inputfilename;
+		$trimmed_inputfilename =~ s/\.fasta$/_trimmed.fasta/;
+		if (-f $trimmed_inputfilename) {
+			$inputfilename = $trimmed_inputfilename;
+		}
 
 		my $in  = Bio::AlignIO->new(-file   => $inputfilename ,
 								 -format => 'fasta');

@@ -921,9 +921,26 @@ use Bio::Trace::ABIF ();
 		}
 		
 		if ($output && -f $output) {
+
 			$phy_out = $m->convert_fasta_to_phylip;
+			$self->_store_alignments($phy_out);
+
+			print STDERR $output;
+			my $st = $m->do_postprocessing($output);
+
+			my $html_output = $st->{html_output} if $st;
+			my $trimmed_alignment = $st->{trimmed_output} if $st;
+			if (defined $html_output && -f $html_output) {
+				print STDERR "html_output: ", $html_output;
+				$self->_store_alignments($html_output);
+			}
+			
+			if (defined $trimmed_alignment && -f $trimmed_alignment) {
+				print STDERR "trimmed_alignments: ", $trimmed_alignment;
+				$self->_store_alignments($trimmed_alignment);
+			}
+
 			$self->set_task_status("phy_alignment", "done", $m->{elapsed});
-			$self->_store_alignments($output, $phy_out);
 		}
 		else {
 			$self->set_task_status("phy_alignment", "error");

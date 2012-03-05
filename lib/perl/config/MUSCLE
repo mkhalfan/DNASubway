@@ -3,11 +3,11 @@
 	options => ['-quiet',
 				'-in'],
 	option_output_files => {
-			'-fastaout' => 'output.fasta',
-			#'-htmlout' => 'output.html',
+			'-htmlout' => 'output.html',
 			'-phyiout' => 'output.phyi',
+			'-fastaout' => 'output.fasta',
 			#'-physout' => 'output.phys',
 		},
 	phylip_id_length => 30,
-	
+	post_processing_cmd => '/var/www/bin/muscle_post_processor.pl',
 }
