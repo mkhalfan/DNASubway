@@ -8,6 +8,15 @@
 	var xZoom = 1;
 	var yZoom = 1;
 	var yLimit = 80; // max y a trace can have, so the graph stays in the canvas
+	var titles = {
+		phy_pair : "Pair Builder",
+		phy_trim : "Sequence Trimmer",
+		phy_consensus : "Consensus Editor",
+		phy_alignment : "DNA Subway Alignment Viewer",
+		phy_tree : "PHYLIP NJ",
+		phy_tree_ml : "PHYLIP ML",
+	};
+	
 
 	phy = function() {
 		this.task_states = {};
@@ -501,7 +510,7 @@
 		var p = $('pid').value;
 		var b = $(op + '_btn');
 		var ind = $(op + '_st');
-		
+		var title = titles[op];
 		ind.removeClassName(ind.className);
 
 		if (status == 'processing') {
@@ -516,7 +525,7 @@
 			uri = uri.replace(/phy_/, "view_");
 			uri = uri.replace(/tree_ml$/, "tree");
 			b.onclick = function(){
-					phy.launch(op, '/project/phylogenetics/tools/' + uri + '?pid=' + p + ';t=' + op, '');
+					phy.launch(op, '/project/phylogenetics/tools/' + uri + '?pid=' + p + ';t=' + op, title);
 				};
 		}
 		else if (status == 'not-processed') {
@@ -982,14 +991,14 @@
 				if (r && r.status == 'success') {
 					
 					if (r.bid) {
-						/*document.location.href = '/project/phylogenetics/tools/view_blast'
+						document.location.href = '/project/phylogenetics/tools/view_blast'
 							+ '?bid=' + r.bid
 							+ ';pid=' + $('pid').value
-							+ ';sid=' + sid; */
+							+ ';sid=' + sid; 
 							
-						$$("#seqops pre")[0].show();
+						/*$$("#seqops pre")[0].show();
 						$("seqops").removeClassName('blast_processing');
-						$(sid).update("<a href='/project/phylogenetics/tools/view_blast?bid=" + r.bid + ";pid=" + $('pid').value + ";sid=" + sid + "' style='color:red'>View</a>");
+						$(sid).update("<a href='/project/phylogenetics/tools/view_blast?bid=" + r.bid + ";pid=" + $('pid').value + ";sid=" + sid + "' style='color:red'>View</a>");*/
 						
 					}
 					else {
@@ -2006,6 +2015,12 @@
 		console.info(fullNames);
 		$('new_row').update('<input type="hidden" id="authors" name="authors" value="' + fullNames + '" />');
 	}
+	
+	phy.collect_primer_data = function() {
+		var f_primer = $('f_primer').value;
+		var r_primer = $('r_primer').value;
+		$('new_row').insert('<input type="hidden" id="r_primer_set" name="r_primer_set" value="' + r_primer + '" /><input type="hidden" id="f_primer_set" name="f_primer_set" value="' + f_primer + '" />');
+	}
 	//----------------------------------------------------
 	//
 	phy.setColumnWidths = function(w) {
@@ -2230,12 +2245,12 @@ pre.insert({top:spn});
 		phy.get_dnalc_data();
 	}
 	else if (step == 8) {
-		phy.setColumnWidths(740);
+		phy.setColumnWidths(700);
 		$('seqops').style.display = 'block';
 	}
 	
    /*
-	* Submit to GenBank
+	* Submit to GenBank steps below
 	*
 	*/
 	else if (step == 30){
