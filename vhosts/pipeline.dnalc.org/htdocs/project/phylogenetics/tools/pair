@@ -89,7 +89,7 @@ input[type="checkbox"] {
 				<img src="/images/FR-icon.jpg" style="vertical-align: middle;padding-right:7px;" /><strong>Auto Pair</strong>
 			</div>
 			<div class="blue_sidebar_box_body">
-				<a id="try_auto" href="#" onclick="phy.auto_pair();">Try auto pairing</a> <img src="/images/question-icon.png" id="auto-pair-help" align="top"/>
+				<span id="try_auto"><a href="#" onclick="phy.auto_pair();">Try auto pairing</a> <img src="/images/question-icon.png" id="auto-pair-help" align="top"/></span>
 				<a href="#" id="switch_manual" style="display:none;" onclick="document.location.reload();">Switch to manual pairing</a>
 				<a href="#" id="reset" style="display:none;" onclick="document.location.reload();">Reset</a>
 			</div>

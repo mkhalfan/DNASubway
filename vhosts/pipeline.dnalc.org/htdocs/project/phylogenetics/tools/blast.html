@@ -36,7 +36,7 @@
 %	if ($_->consensus) {
 %		my ($blast_run) = BlastRun->search(run_id=>$pid . '-p' . $_->id);
 %if ($blast_run){
-<span id ='p<%$_->id%>'><a href='/project/phylogenetics/tools/view_blast?bid=<%$blast_run->bid%>;pid=<%$pid%>;sid=p<%$_->id%>'>View</a></span>
+<span id ='p<%$_->id%>'><a href='/project/phylogenetics/tools/view_blast?bid=<%$blast_run->bid%>;pid=<%$pid%>;sid=p<%$_->id%>'>View Results</a></span>
 %}
 %else{
 <span id ='p<%$_->id%>'><span id='blp<%$_->id%>'><a href='#' onclick="phy.do_blast('p<%$_->id%>');">blast</a></span></span>
@@ -49,12 +49,12 @@
 % for (@sequences) {
 %	my ($blast_run) = BlastRun->search(run_id=>$pid . '-s' . $_->id);
 %if ($blast_run){
-<span id ='s<%$_->id%>'><a href='/project/phylogenetics/tools/view_blast?bid=<%$blast_run->bid%>;pid=<%$pid%>;sid=s<%$_->id%>'>View</a></span>
+<span id ='s<%$_->id%>'><a href='/project/phylogenetics/tools/view_blast?bid=<%$blast_run->bid%>;pid=<%$pid%>;sid=s<%$_->id%>'>View Results</a></span>
 %}
 %else{
 <span id ='s<%$_->id%>'><span id='blp<%$_->id%>'><a href='#' onclick="phy.do_blast('s<%$_->id%>');">blast</a></span></span>
 %}
-%#<span id="bls<% $_->id %>"><a href="#" onclick="phy.do_blast('s<%$_->id%>');">blast</a></span> <span id ="s<%$_->id%>"><% $blast_run ? "<a href='/project/phylogenetics/tools/view_blast?bid=" . $blast_run->bid . ";pid=" . $pid . ";sid=s" . $_->id . "'>View</a>" : "" %></span>
+%#<span id="bls<% $_->id %>"><a href="#" onclick="phy.do_blast('s<%$_->id%>');">blast</a></span> <span id ="s<%$_->id%>"><% $blast_run ? "<a href='/project/phylogenetics/tools/view_blast?bid=" . $blast_run->bid . ";pid=" . $pid . ";sid=s" . $_->id . "'>View Results</a>" : "" %></span>
 % }
 </pre>
 <input type="hidden" id="pid" value="<% $proj->id %>" />
