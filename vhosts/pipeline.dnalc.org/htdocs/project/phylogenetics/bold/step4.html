@@ -97,9 +97,65 @@
 %	}
 	</tr>
 % }
-
+<tr>
+<td><h2>Sequence Primer Info</h2></td>
+</tr>
+<tr>
+<td>Forward Primer: </td>
+<td>
+<select name="f_primer" id="f_primer">
+	<option value="">Select</option>
+% for my $i (@{$primers->{forward}}){
+% 	for my $key (keys %$i){
+		<optgroup label="<% $key %>">
+% 		for my $x (keys %{$i->{$key}}){
+%#			print $x, ": ", $i->{$key}->{$x}, "<br>";
+			<option value="<% $x %>" id="<% $x %>"><% $x %></option>
+% 		}
+		</optgroup>
+% 	}
+% }
+</select>
+<% $f_primer_err ? "<strong style='color: red;'> * </strong>" : "" %>
+</td>
+</tr>
+<tr>
+<td>Reverse Primer: </td>
+<td>
+<select name="r_primer" id="r_primer">
+	<option value="">Select</option>
+% for my $i (@{$primers->{reverse}}){
+% 	for my $key (keys %$i){
+		<optgroup label="<% $key %>">
+% 		for my $x (keys %{$i->{$key}}){
+%#			print $x, ": ", $i->{$key}->{$x}, "<br>";
+			<option value="<% $x %>" id="<% $x %>"><% $x %></option>
+% 		}
+		</optgroup>
+% 	}
+% }
+</select>
+<% $r_primer_err == 1 ? "<strong style='color: red;'> * </strong>" : "" %>
+</td>
+</tr>
+	
 </tbody>
 </table>
+% if ($data->{"f_primer"}){
+	<script type="text/javascript">
+		$('<% $data->{"f_primer"} %>').selected = true;
+	</script>	
+% }
+% if ($data->{"r_primer"}){
+	<script type="text/javascript">
+		$('<% $data->{"r_primer"} %>').selected = true;
+	</script>	
+% }
+
+
+
+
+
 %#--------------------
 
 	</form>
@@ -137,37 +193,39 @@ new Tip('notes_help', "some help here", {
 </%args>
 
 <%once>
+	use DNALC::Pipeline::Config ();
 	use Email::Valid ();
 	use Regexp::Common;
 	use DNALC::Pipeline::Utils qw(clean_query);
 	use Data::Dumper;
 	
+	my $cf = DNALC::Pipeline::Config->new;
+	my $primers = $cf->cf("PRIMERS");
+	
 	my @fields = (
 
-		{id => "institution_storing", type => "", label => "Institution Storing <img src='/images/question-icon.png' align='top' id='institution' />", re => qr/\w+/, len => 128, },
-		{id => "tax", type => "", label => "Identified By <img src='/images/question-icon.png' align='top' id='identifier' />", re => qr/\w+/, len => 128, },
-		{id => "tax_email", type => "", label => "Identifier's email", re => qr/\w+/, len => 128, },
+		{id => "institution_storing", type => "", err_msg => "Institution Storing", label => "Institution Storing <img src='/images/question-icon.png' align='top' id='institution' />", re => qr/\w+/, len => 128, },
+		{id => "tax", type => "", err_msg => "Identified By", label => "Identified By <img src='/images/question-icon.png' align='top' id='identifier' />", re => qr/\w+/, len => 128, },
+		{id => "tax_email", type => "", err_msg => "Identifier's email", label => "Identifier's email", re => qr/\w+/, len => 128, },
 		#{id => "", type => "label", label => "<strong>Identification</strong>", },
-		{id => "phylum", type => "", label => "Phylum", re => qr/\w+/, len => 48, },
-		{id => "class", type => "", label => "Class", re => qr/\w+/, len => 48, },
-		{id => "order", type => "", label => "Order", re => qr/\w+/, len => 48, },
-		{id => "family", type => "", label => "Family", re => qr/\w+/, len => 48, },
-		{id => "genus", type => "", label => "Genus", re => qr/\w+/, len => 48, },
-		{id => "species", type => "", label => "Species", re => qr/\w+/, len => 48, },
-		#{id => "collectors", type => "textarea", label => "Collectors", re => qr/\w+/, len => 255, },
-		{id => "date_collected", type => "", label => "Date collected (dd/mm/yyyy)", re => qr/^\d\d\/\d\d\/\d{4}$/,},
-		#{id => "country", type => "", label => "Country", re => qr/\w+/, len => 128, },
-		{id => "country", type => "component", label => "Country", re => qr/\w+/, len => 48,
+		{id => "phylum", type => "", err_msg => "Phylum", label => "Phylum", re => qr/\w+/, len => 48, },
+		{id => "class", type => "", err_msg => "Class", label => "Class", re => qr/\w+/, len => 48, },
+		{id => "order", type => "", err_msg => "Order", label => "Order", re => qr/\w+/, len => 48, },
+		{id => "family", type => "", err_msg => "Family", label => "Family", re => qr/\w+/, len => 48, },
+		{id => "genus", type => "", err_msg => "Genus", label => "Genus", re => qr/\w+/, len => 48, },
+		{id => "species", type => "", err_msg => "Species", label => "Species", re => qr/\w+/, len => 48, },
+		#{id => "collectors", type => "textarea", err_msg => "Collectors", label => "Collectors", re => qr/\w+/, len => 255, },
+		{id => "date_collected", type => "", err_msg => "Date collected", label => "Date collected (dd/mm/yyyy)", re => qr/^\d\d\/\d\d\/\d{4}$/,},
+		{id => "country", type => "component", err_msg => "Country", label => "Country", re => qr/\w+/, len => 48,
 			component => '../../.comp/countries'},
-		{id => "state", type => "component", label => "State/Province", re => qr/\w+/, len => 48,
+		{id => "state", type => "component", err_msg => "State/Province", label => "State/Province", re => qr/\w+/, len => 48,
 			component => '../../.comp/_us_states'},
-		#{id => "state", type => "", label => "State/Province", re => qr/\w+/, len => 128, },
-		{id => "site_desc", type => "", label => "Exact Site <img src='/images/question-icon.png' align='top' id='exact_site_help' />", re => qr/\w+/, len => 128, },
-		{id => "latitude", type => "", label => "Latitude", re => qr/$RE{num}{real}/, len => 16, },
-		{id => "longitude", type => "", label => "Longitude", re => qr/$RE{num}{real}/, len => 16, },
-		{id => "notes", type => "textarea", label => "Notes <img src='/images/question-icon.png' align='top' id='notes_help' />", re => qr/\w*/, len => 255, },
-		{id => "sex", type => "radio", label => "Sex of Specimen", values => ['Male', 'Female', 'Hermaphrodite']},
-		{id => "stage", type => "radio", label => "Life Stage", re => qr/(?:adult|immature)?/i, len => 8,
+		{id => "site_desc", type => "", err_msg => "Exact Site", label => "Exact Site <img src='/images/question-icon.png' align='top' id='exact_site_help' />", re => qr/\w+/, len => 128, },
+		{id => "latitude", type => "", err_msg => "Latitude", label => "Latitude", re => qr/$RE{num}{real}/, len => 16, },
+		{id => "longitude", type => "", err_msg => "Longitude", label => "Longitude", re => qr/$RE{num}{real}/, len => 16, },
+		{id => "notes", type => "textarea", err_msg => "Notes ", label => "Notes <img src='/images/question-icon.png' align='top' id='notes_help' />", re => qr/\w*/, len => 255, },
+		{id => "sex", type => "radio", err_msg => "Sex of Specimen", label => "Sex of Specimen", values => ['Male', 'Female', 'Hermaphrodite']},
+		{id => "stage", type => "radio", err_msg => "Life Stage", label => "Life Stage", re => qr/(?:adult|immature)?/i, len => 8,
 			values => ['Adult', 'Immature']},
 	);
 	
@@ -199,12 +257,42 @@ new Tip('notes_help', "some help here", {
 	
 	my @authors;
 	my %author_errors;
+	
+	my $f_primer_err;
+	my $r_primer_err;
 
 	if ($r->method eq "POST") {
-		#my $body = "";
 		
 		# clear old data
 		$bs->{spec_data} = {};
+		
+		if ($ARGS{"authors"}){
+			@authors = split ("::", $ARGS{"authors"});
+			my $x = 1;
+			for (@authors){
+				my @temp = split ("#", $_);
+				# "temp[0] = first name"
+				# "temp[1] = last name"
+				# "temp[2] = row number"
+				my $error_monitor;
+				if ($temp[0] eq "First Name" or trim($temp[0]) eq ""){
+					push @err, "Author #$temp[2] first name not valid";
+					$error_monitor = 1;
+				}
+				if ($temp[1] eq "Last Name" || trim($temp[1]) eq ""){
+					push @err, "Author #$temp[2] last name not valid";
+					$error_monitor = 1;
+				}
+				if ($error_monitor){
+					$author_errors{$temp[2]} = 'true';
+				}
+				$bs->{spec_data}->{"author_first" . $x} = $temp[0];
+				$bs->{spec_data}->{"author_last" . $x} = $temp[1];
+				$data->{"author_first" . $x} = $temp[0];
+				$data->{spec_data}->{"author_last" . $x} = $temp[1];
+				$x++;
+			}
+		}
 
 		for my $f (@fields) { 
 			my $re = $f->{re};
@@ -215,8 +303,8 @@ new Tip('notes_help', "some help here", {
 						: "";
 			#print STDERR $f->{id}, "\t", $val, $/ if $f->{id};
 			if ( defined $re && $val !~ /$re/) {
-				push @err, $f->{label} 
-						? $f->{message} || $f->{label} . " is missing"
+				push @err, $f->{err_msg} 
+						? $f->{message} || $f->{err_msg} . " is missing or invalid"
 						: $f->{message};
 				$f->{err} = 1;
 			}
@@ -232,10 +320,13 @@ new Tip('notes_help', "some help here", {
 			}
 			if ($f->{id} eq "date_collected" && $val ne "") {
 				my ($d, $m, $y) = split '/', $val;
-
 				unless ($m > 0 && $m < 13) {
-					push @err, "The month must be a number between 1 and 12.";
+					push @err, "Date Collected is invalid: the month must be a number between 1 and 12.";
 				}
+				unless ($d > 0 && $d < 32) {
+					push @err, "Date Collected is invalid: The day must be a number between 1 and 31.";
+				}
+
 			}
 			if ($f->{id} eq "tax_email" && $val ne "" && !Email::Valid->address($val)) {
 				push @err, "Identifier's email is not valid";
@@ -246,33 +337,25 @@ new Tip('notes_help', "some help here", {
 			$bs->{spec_data}->{$f->{id}} = $val if $f->{id};
 			
 		}
-		if ($ARGS{"authors"}){
-			@authors = split ("::", $ARGS{"authors"});
-			my $x = 1;
-			for (@authors){
-				my @temp = split ("#", $_);
-				# "temp[0] = first name"
-				# "temp[1] = last name"
-				# "temp[2] = row number"
-				my $error_monitor;
-				if ($temp[0] eq "First Name" or trim($temp[0]) eq ""){
-					push @err, "Author #$temp[2] First Name Not Valid";
-					$error_monitor = 1;
-				}
-				if ($temp[1] eq "Last Name" || trim($temp[1]) eq ""){
-					push @err, "Author #$temp[2] Last Name Not Valid";
-					$error_monitor = 1;
-				}
-				if ($error_monitor){
-					$author_errors{$temp[2]} = 'true';
-				}
-				$bs->{spec_data}->{"author_first" . $x} = $temp[0];
-				$bs->{spec_data}->{"author_last" . $x} = $temp[1];
-				$data->{"author_first" . $x} = $temp[0];
-				$data->{spec_data}->{"author_last" . $x} = $temp[1];
-				$x++;
+		
+		if (defined $ARGS{"r_primer"}){
+			if ($ARGS{"r_primer"} eq ""){
+				push @err, "Reverse primer missing";
+				$r_primer_err = 1;
 			}
+			$bs->{spec_data}->{"r_primer"} = $ARGS{"r_primer"};
+			$data->{"r_primer"} = $ARGS{"r_primer"};
 		}
+
+		if (defined $ARGS{"f_primer"}){
+			if ($ARGS{"f_primer"} eq ""){
+				push @err, "Forward primer missing";
+				$f_primer_err = 1;
+			}
+			$bs->{spec_data}->{"f_primer"} = $ARGS{"f_primer"};
+			$data->{"f_primer"} = $ARGS{"f_primer"};
+		}
+		
 		
 		unless (@err) {
 			$bs->{step4} = 1;

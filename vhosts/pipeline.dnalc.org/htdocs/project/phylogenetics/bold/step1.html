@@ -10,20 +10,30 @@
 		Select a sequence to submit:
 		<div>
 %# Don't be allowed to chose a sequence if it doesn't have a consensus AND if you're already submitted that sequence??
+%# And on selecting a sequence to submit, we then check to ensure it has been paired correctly. 
 
 		
-		
+%if (@pairs){
 %	for (@pairs) {
-%		next if $_->consensus eq "";
 %		my $name = lcs_name( map {$_->seq->display_id}  $_->paired_sequences);
-		<div><input type="radio" name="sel_seq" id="p<% $_ |html %>" value="p<% $_->id %>" \
-		<% defined $sel_seq{"p".$_->id} ? "checked=\"checked\"" : "" %> \
-		<% defined $seq_submitted{$_->id} ? "disabled=\"disabled\"" : ""%> /><% $name |html%>
-%	if (defined $seq_submitted{$_->id}) {
-	(<small>already submitted</small>)\
-%	}
+%#		next if $_->consensus eq "";
+%		if ($_->consensus eq ""){
+			<div style="color:#888;font-style:italic"><input type="radio" disabled><% $name |html%> - No consensus built for this pair</div>
+%		}
+%		else{
+			<div><input type="radio" name="sel_seq" id="p<% $_ |html %>" value="p<% $_->id %>" \
+			<% defined $sel_seq{"p".$_->id} ? "checked=\"checked\"" : "" %> \
+			<% defined $seq_submitted{$_->id} ? "disabled=\"disabled\"" : ""%> /><% $name |html%>
+%			if (defined $seq_submitted{$_->id}) {
+				(<small>already submitted</small>)\
+%			}
 		</div>
+%		}
 %	}
+%}
+%else{
+<p style="color:red">You have no pairs or you have not built your consensus sequence. You must pair your sequences and build your consensus sequence in order for them to appear here.</p>
+%}
 
 		</div>
 </form>
@@ -33,7 +43,6 @@
 	<a href="#" onclick="top.phy.close_window('BOLD');">Cancel</a>&nbsp;
 	<a href="#" onclick="phy.next_bold_step();">Continue</a>
 </div>
-
 
 <%args>
 	#$pid => 0
@@ -46,6 +55,7 @@
 	#use DNALC::Pipeline::Phylogenetics::DataSequence ();
 	#use DNALC::Pipeline::Config ();
 	use DNALC::Pipeline::Phylogenetics::Pair ();
+	use DNALC::Pipeline::Phylogenetics::PairSequence();
 	use DNALC::Pipeline::Utils qw/lcs_name/;
 	use Data::Dumper;
 	
@@ -80,9 +90,18 @@
 	my %sel_seq = ();
 
 	if ($r->method eq "POST") {
+		
 		if (@sel_seq) {
-
-			# TODO: ckecked selected sequences
+			## check to make sure the sequence is paired correctly here
+			my $pair_id = $sel_seq[0];
+			$pair_id =~ s/p//;
+			my @pair_seqs = DNALC::Pipeline::Phylogenetics::PairSequence->search(pair_id => $pair_id);
+			print STDERR "1) ", $pair_seqs[0]->strand, "; 2) ", $pair_seqs[1]->strand, $/;
+			if (!(($pair_seqs[0]->strand eq "F" && $pair_seqs[1]->strand eq "R") || ($pair_seqs[0]->strand eq "R" && $pair_seqs[1]->strand eq "F"))){
+				$m->comp('/_message_add', 'Please double check this pair, it does not appear to be paired correctly. You must ensure your pair is comprised of <strong>one forward</strong> read <br />and <strong>one reverse</strong> read. After rebuilding your pair, be sure to rebuild the consensus sequence as well.', 'error');
+				$m->redirect("./step1.html");
+			}
+			# TODO: ckecked selected sequences (? - this was a note from cornel)
 			$bs->{sel_seq} = \@sel_seq;
 			$bs->{step1} = 1;
 

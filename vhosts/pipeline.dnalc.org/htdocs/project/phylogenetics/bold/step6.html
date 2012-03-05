@@ -1,9 +1,18 @@
 % if ($ok) {
 <script type="text/javascript">
 top.phy.close_window('BOLD');
-top.show_messages("BOLD data stored successfully");
+top.show_messages("GenBank submission processed successfully. Your ID for this submission is <% $id %>. Please keep this for future reference. You should be receiving an email confirming your submission momentarily.");
 </script>
-% } else {
+% } 
+% elsif ($error) {
+<div class="color:red">
+<h2>Error</h2>
+
+<& /_messages &>
+<p><a href="javascript:;" onclick="top.phy.close_window('BOLD');">Close</a></p>
+</div>
+% }
+% else {
 <div id="BOLDstep">Step 6 of 6</div>
 <div id="BOLDmain">
 
@@ -22,7 +31,6 @@ top.show_messages("BOLD data stored successfully");
 %#	print $_, "<br/>";
 %# }
 <table>
-<!-- I NEED TO ADD AUTHORS HERE -->
 % my $ac = 1;
 % while (exists $bs->{spec_data}->{"author_first$ac"}){
 <tr>
@@ -103,6 +111,14 @@ top.show_messages("BOLD data stored successfully");
 <td>Life Stage:</td>
 <td><% $bs->{spec_data}->{stage} %></td>
 </tr>
+<tr>
+<td>Forward Primer:</td>
+<td><% $bs->{spec_data}->{f_primer} %></td>
+</tr>
+<tr>
+<td>Reverse Primer</td>
+<td><% $bs->{spec_data}->{r_primer} %></td>
+</tr>
 </table>
 
 </div>
@@ -116,12 +132,18 @@ top.show_messages("BOLD data stored successfully");
 
 <%args>
 	$ok => 0
+	$error => 0
+	$id => ''
 </%args>
 
 <%once>
 	use JSON::XS ();
 	use DNALC::Pipeline::App::Phylogenetics::ProjectManager ();
 	use DNALC::Pipeline::Phylogenetics::Bold ();
+	use DNALC::Pipeline::Phylogenetics::Pair();
+	use DNALC::Pipeline::Config();
+	use Gearman::Client ();
+	use Storable qw/thaw nfreeze/;
 	use Data::Dumper;
 </%once>
 
@@ -156,24 +178,65 @@ top.show_messages("BOLD data stored successfully");
 	
 	if ($r->method eq "POST") {
 		unless ($b) {
-			print STDERR "Need a new table: phy_bold_sequences\n";
-			$b = DNALC::Pipeline::Phylogenetics::Bold->create({
-				project_id => $proj->id,
-				sequence_id => $bs->{sel_seq}->[0],
-				status => 'pending',
-				data => $js->pretty->encode($bs->{spec_data}),
-				container => $bs->{container},
-			});
-			if ($b) {
+			#print STDERR "Need a new table: phy_bold_sequences\n";
+			
+			if (1) {
 				for (@{$bs->{sel_seq}}) {
 					$_ =~ s/^\D//;
-					$b->add_to_bold_sequences({
-							pair_id => $_,
+					# check if pair still exists here before creating database entry
+					# then process submission immediately
+					# user gets emailed from GBManager upon successful validation		
+					# upon successfull reponse from gearman, close window and
+					# give them confirmation message
+					if (DNALC::Pipeline::Phylogenetics::Pair->retrieve($_)) {
+						$b = DNALC::Pipeline::Phylogenetics::Bold->create({
 							project_id => $proj->id,
+							sequence_id => $bs->{sel_seq}->[0],
+							status => 'pending',
+							data => $js->pretty->encode($bs->{spec_data}),
+							container => $bs->{container},
 						});
+						$b->add_to_bold_sequences({
+								pair_id => $_,
+								project_id => $proj->id,
+						});
+						# PROCESS SUBMISSION HERE IMMEDIATELY, and redirect accordingly
+						my $pcf = DNALC::Pipeline::Config->new->cf('PIPELINE');
+						my $client = Gearman::Client->new;
+						my $sx = $client->job_servers(@{$pcf->{GEARMAN_SERVERS}});
+						
+						my $status;
+						my $msg;
+						my $params = nfreeze( {id => $b} );
+						my $rc = $client->do_task( 'phy_gb_submit' =>  $params, {timeout => 10});
+						print STDERR "1st: ", Dumper ($rc);
+						$rc = thaw($$rc);
+						print STDERR "2nd: ", Dumper ($rc);
+						if ($rc && defined $rc->{status}) {
+							$status = $rc->{status};
+							$msg = $rc->{message};
+							if ($status eq "success"){
+								$m->redirect("./step6.html?ok=1&id=". $b->specimen_id);
+							}
+							else {
+								$m->comp('/_message_add', '1 Something went wrong in the submission process. We have all your data. We will be in touch.', 'error');
+								$m->redirect("./step6.html?error=1");
+								$b->status("FAILED: " . $msg);
+								$b->update;
+							}
+						}
+						else {
+								$m->comp('/_message_add', '2 Something went wrong in the submission process. We have all your data. We will be in touch.', 'error');
+								$m->redirect("./step6.html?error=1");
+								$b->status("FAILED: Gearman failed");
+								$b->update;
+						}	
+					}
+					else{
+						$m->comp('/_message_add', 'Something went wrong, we can not find the pair you are trying to submit. Please rebuild your pair and consensus, and try submitting again.', 'error');
+						$m->redirect("./step6.html?error=1");		
+					}
 				}
-				
-				$m->redirect("./step6.html?ok=1");
 			}
 		}
 	}

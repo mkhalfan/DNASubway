@@ -1,0 +1,143 @@
+% if ($bs) {
+
+<h2>Veiwing Submission <% $bs->specimen_id %></h2>
+
+<table>
+<tr>
+<td>Submitted on:</td>
+<td><% $created  %></td>
+</tr>
+% my $ac = 1;
+% while (exists $data->{"author_first$ac"}){
+	<tr>
+	<td width="150">Author/Collector <% $ac %>:</td>
+	<td><% $data->{"author_first$ac"}%> <% $data->{"author_last$ac"} %></td>
+	</tr>
+% $ac++;
+%}
+<tr>
+<td>Institution Storing:</td>
+<td><% $data->{institution_storing} %></td>
+</tr>
+<tr>
+<td>Identified By:</td>
+<td><% $data->{tax} %></td>
+</tr>
+<tr>
+<td>Identifier's email:</td>
+<td><% $data->{tax_email} %></td>
+</tr>
+<tr>
+<td>Phylum:</td>
+<td><% $data->{phylum} %></td>
+</tr>
+<tr>
+<td>Class:</td>
+<td><% $data->{class} %></td>
+</tr>
+<tr>
+<td>Order:</td>
+<td><% $data->{order} %></td>
+</tr>
+<tr>
+<td>Family:</td>
+<td><% $data->{family} %></td>
+</tr>
+<tr>
+<td>Genus:</td>
+<td><% $data->{genus} %></td>
+</tr>
+<tr>
+<td>Species:</td>
+<td><% $data->{species} %></td>
+</tr>
+<tr>
+<td>Date Collected:</td>
+<td><% $data->{date_collected} %></td>
+</tr>
+<tr>
+<td>Country:</td>
+<td><% $data->{country} %></td>
+</tr>
+<tr>
+<td>State:</td>
+<td><% $data->{state} %></td>
+</tr>
+<tr>
+<td>Exact Site:</td>
+<td><% $data->{site_desc} %></td>
+</tr>
+<tr>
+<td>Latitutide:</td>
+<td><% $data->{latitude} %></td>
+</tr>
+<tr>
+<td>Longitude:</td>
+<td><% $data->{longitude} %></td>
+</tr>
+<tr>
+<td>Notes:</td>
+<td><% $data->{notes} %></td>
+</tr>
+<tr>
+<td>Sex:</td>
+<td><% $data->{sex} %></td>
+</tr>
+<tr>
+<td>Life Stage:</td>
+<td><% $data->{stage} %></td>
+</tr>
+<tr>
+<td>Forward Primer:</td>
+<td><% $data->{f_primer} %></td>
+</tr>
+<tr>
+<td>Reverse Primer</td>
+<td><% $data->{r_primer} %></td>
+</tr>
+</table>
+% }
+% else{
+<p style="color:red">Error: No such submission found</p>
+% }
+
+<div id="BOLDfooter">
+	<a href="./index.html?pid=<%$pid%>">Back</a>&nbsp;
+</div>
+
+<%args>
+	$id => 0
+</%args>
+
+<%once>
+	use DNALC::Pipeline::App::Phylogenetics::ProjectManager ();
+	use DNALC::Pipeline::Phylogenetics::Bold ();
+	use Data::Dumper;
+</%once>
+
+<%init>
+	my $s = $m->session->{pipeline};
+	my $pid = $s->{boldpid};
+	$s->{"bold_$pid"} ||= {};
+	
+	my $js = JSON::XS->new->utf8;
+	
+	#my $pm = DNALC::Pipeline::App::Phylogenetics::ProjectManager->new($pid);
+	#my $proj = $pm->project;
+	#unless ($proj && $proj->user_id == $s->{user_id}) {
+	#	$m->comp('/_message_add', 'Project not found!', 'error');
+	#	$m->redirect("./step6.html");
+	#	#print "Project not found!";
+	#	return;
+	#}
+	
+	my $bs = DNALC::Pipeline::Phylogenetics::Bold->retrieve($id);
+	my $data;
+	my $created;
+	if ($bs){
+		$data = $js->decode($bs->data);
+		$created = (split (" ", $bs->created))[0];
+	}
+	
+
+</%init>
