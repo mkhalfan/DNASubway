@@ -35,7 +35,8 @@ use File::Basename;
 			my @args = (
 					'-i', $m_output,      # -i input file, muscle output
 					'-h', $html_output,   # -h the html output file
-					'-o', $trimmed_output # -o trimmed alignment, output
+					'-o', $trimmed_output,# -o trimmed alignment, output
+					'-n', "0"             # -n number of sequences w/ terminal gaps allowed 
 				);
 			if (system($self->{conf}->{post_processing_cmd}, @args) == 0) {
 				print STDERR  'postprocessing exit status = ', $?, $/;
