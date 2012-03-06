@@ -23,9 +23,9 @@
 #barcode div div.C{
   background-color:blue;
 }
-#barcode div div.N {
- color:grey;
- background-color:grey;
+#barcode div div.x {
+ color:#999;
+ background-color:#999;
 }
 #sequence div{
   white-space: nowrap;
@@ -55,9 +55,9 @@
  color:blue;
  background-color:blue;
 }
-.fingerprint div div.N {
- color:grey;
- background-color:grey;
+.fingerprint div div.x {
+ color:#999;
+ background-color:#999;
 }
 .bases div div.A {
  color:green;
@@ -75,7 +75,7 @@
  color:blue;
  background-color:#F0F0F0;
 }
-.bases div div.N {
+.bases div div.x{
  color:grey;
  background-color:#F0F0F0;
 }
@@ -111,6 +111,11 @@ max-width:300px
 	position:relative;
 	height:21px
 }
+
+#sequence div div[class*='cons_']{
+	background-color:#999;
+}
+
 #sequence div div.cons_cons{
 	background-color:#777;
 	height:100%;
@@ -130,6 +135,8 @@ max-width:300px
 #sequence div div.cons_G{
 	background-color:black;
 }
+
+
 .cons_hundred{
 	height:100%;
 	z-index:2;
@@ -169,4 +176,14 @@ max-width:300px
 	position:absolute;
 	bottom:0;
 	background:#777;
+	border-top:1px solid black;
 }
+input.controls{
+	cursor:pointer;
+}
+input.disabled{
+	opacity:0.3;
+	filter:alpha(opacity=30); /* For IE8 and earlier */
+	cursor:default;
+}
+

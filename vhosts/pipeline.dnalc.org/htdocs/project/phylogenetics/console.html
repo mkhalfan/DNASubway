@@ -143,7 +143,7 @@
 <span class="conBlueline_ConColumn5">
 	<div class="con_browserBT ">
 		<span class="conIndicator_boxBrowse"><div class="conIndicatorBL_<%$is_owner && $export_is_on ? "not-processed" : "disabled" %>"></div> </span>
-		<span class="bt_browserBlue"><a href="javascript:;" onclick="<%$is_owner && $export_is_on ? "phy.launch('BOLD', '/project/phylogenetics/bold/?pid=$proj', 'Export to GenBank')" : "" %>">Export to<br/>GenBank</a></span>
+		<span class="bt_browserBlue"><a href="javascript:;" onclick="<%$is_owner && $export_is_on? "phy.launch('BOLD', '/project/phylogenetics/bold/?pid=$proj', 'Export to GenBank')" : "" %>">Export to<br/>GenBank</a></span>
 	</div>
 	<div id="spacer_Runblueline">&nbsp;</div> 
 </span>
@@ -251,6 +251,7 @@
 	use DNALC::Pipeline::User ();
 	use DNALC::Pipeline::Config ();
 	use DNALC::Pipeline::UserProfile ();
+	use DNALC::Pipeline::Phylogenetics::DataSequence();
 	
 	my %routines = (
 			phy_pair => "Pair",
@@ -334,7 +335,11 @@ elsif ($status eq 'done') {
 	my $url = "/project/phylogenetics/tools/view_$routine?pid=$pid;u=$uniq;t=";
 	$url =~ s/phy_//;
 	$url =~ s/tree_ml/tree/;
-	$action = qq{onclick="phy.launch('$routine', '$url} . $routine . qq{', '$routines{$routine}')"};
+	my $win_title = $routines{$routine};
+	if ($win_title eq 'MUSCLE') {
+		$win_title = "Alignment Viewer";
+	}
+	$action = qq{onclick="phy.launch('$routine', '$url} . $routine . qq{', '$win_title')"};
 	$target = '';
 	$class = '';
 } 
@@ -349,6 +354,8 @@ else {
 	}
 	$target = "";
 }
+
+
 </%init>
 <span class="bt_Runblueline"><a id="<% $routine %>_btn" href="<% $link %>" class="<% $class %>" <% $target %> \
 % if ($is_owner) {

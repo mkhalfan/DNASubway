@@ -12,7 +12,7 @@
 		phy_pair : "Pair Builder",
 		phy_trim : "Sequence Trimmer",
 		phy_consensus : "Consensus Editor",
-		phy_alignment : "DNA Subway Alignment Viewer",
+		phy_alignment : "Alignment Viewer",
 		phy_tree : "PHYLIP NJ",
 		phy_tree_ml : "PHYLIP ML",
 	};

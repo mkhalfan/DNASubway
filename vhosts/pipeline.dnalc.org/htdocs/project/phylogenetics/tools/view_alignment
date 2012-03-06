@@ -21,8 +21,9 @@
 		<iframe src="<% $alignment_url %>" style="width:98%;" frameborder=0 border=0 id="aframe" scrolling="no"></iframe>
 		<div class="alignment_links" style="font-size:10px;font-family:arial">
 
-			<div style="float:left;"><a href="get_trimmed_alignment?pid=<% $pid %>"><img src="/images/download.png"></a></div> 
+			<div style="float:left;"><a href="get_trimmed_alignment?pid=<% $pid %>"><img src="/images/download.png" border=0></a></div> 
 			<div style="float:left;padding: 2px 0px 0px 2px;"><a href="get_trimmed_alignment?pid=<% $pid %>" style="color:grey">Download trimmed alignment</a></div>
+			<div style="float:right;padding-right:25px;margin-top:2px;color:#666;cursor:default;">DNASubway Alignment Viewer</div>
 		</div>
 % 	}
 % } # end if_else $ok
