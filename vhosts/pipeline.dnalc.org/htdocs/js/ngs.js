@@ -13,7 +13,7 @@ NGS.prototype.launch = function(what, where, title) {
 			pair: ['/project/phylogenetics/tools/pair?pid=', 'Pair Builder'],
 			blast: ['/project/phylogenetics/tools/blast.html?pid=', 'BLASTN'],
 			data: ['/project/ngs/tools/manage_data?pid=', 'Manage data'],
-			ref: ['/project/phylogenetics/tools/add_ref?pid=', 'Reference Data'],
+			th: ['/project/ngs/tools/app_th?pid=', 'TopHat'],
 			manage_sequences: ['/project/phylogenetics/tools/manage_sequences?pid=', 'Select Data']
 		};
 

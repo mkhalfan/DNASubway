@@ -106,7 +106,7 @@ New Project
 			});
 
 			if ($st->{status} eq 'fail') {
-				push @err, $st->{status} . " : " . $st->{msg};
+				push @err, $st->{status} . " : " . $st->{message};
 			}
 			else {
 				$m->redirect("/project/ngs/panel/" . $pm->project->id);

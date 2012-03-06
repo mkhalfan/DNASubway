@@ -58,7 +58,7 @@ use Data::Dumper;
 			
 		my $proj = $self->search(user_id => $user_id, name => $name);
 		if ($proj){
-			return {status => 'fail', msg => "There is already a project named \"$name\"."};
+			return {status => 'fail', message => "There is already a project named \"$name\"."};
 			print STDERR $msg, $/;
 		}
 			
@@ -75,12 +75,12 @@ use Data::Dumper;
 		if ($@){
 			$msg = "Error creating the project: $@";
 			print STDERR $msg, $/;
-			return {status => 'fail', msg => $msg};
+			return {status => 'fail', message => $msg};
 		}
 
 		$self->project($proj);
 
-		return {status => 'success', msg => $msg};
+		return {status => 'success', message => $msg};
 	}
 
 	#--------------------------------------
@@ -156,7 +156,7 @@ use Data::Dumper;
 	}
 
 	#--------------------------------------
-	# returns an hash { status => '[fail|success]', msg => '', app => $app},
+	# returns an hash { status => '[fail|success]', message => '', app => $app},
 	#	where $app is an instance of iPlant::FoundationalAPI::Object::Application
 	#
 	sub app {
@@ -256,7 +256,7 @@ use Data::Dumper;
 		my ($self, $app_id, $form_arguments) = @_;
 		
 		my $api_instance = $self->api_instance;
-		return {status => 'fail', msg => 'sub job: no api_instance object'} unless $api_instance;
+		return {status => 'fail', message => 'sub job: no api_instance object'} unless $api_instance;
 		
 		my %job_arguments = %$form_arguments;
 		my $apps = $api_instance->apps;
@@ -290,7 +290,8 @@ use Data::Dumper;
 
 		my $job_ep = $apif->job;
 		my $job_st = $job_ep->submit_job($app, %$params);
-		print STDERR  "ProjectManager::submit_job: ", Dumper($job_st), $/;
+
+		#print STDERR  "ProjectManager::submit_job: ", Dumper($job_st), $/;
 		if ($job_st && $job_st->{status} eq "success") {
 			my $api_job = $job_st->{data};
 
@@ -308,7 +309,6 @@ use Data::Dumper;
 				return _error($msg);
 			}
 			else {
-				print STDERR  "dbjob = ", $jobdb, $/;
 				# add job parameters
 				my @params = ();
 				for my $type (qw/inputs parameters/) {
@@ -333,10 +333,10 @@ use Data::Dumper;
 					$jobdb->add_to_job_params({type => '', name => $name, value => $value});
 				}
 			}
-			return {status => 'success', job => $jobdb};
+			return {status => 'success', data => $jobdb};
 		}
 		else {
-			_error($job_st->{message} || 'Could not submit job.', data => $job_st->{data});
+			_error($job_st ? $job_st->{message} : 'Could not submit job.', $job_st ? $job_st->{data} : undef);
 		}
 	}
 
@@ -356,6 +356,7 @@ use Data::Dumper;
 
 		$self->{debug};
 	}
+
 	#---------------------------------------
 	sub project {
 		my ($self, $project) = @_;
@@ -402,12 +403,13 @@ use Data::Dumper;
 	}
 
 	sub _error {
-		my ($self, $msg) = @_;
-		if (!defined $msg && !ref($self)) {
+		my ($self, $msg, $data) = @_;
+		if (!ref($self)) {
+			$data = $msg;
 			$msg = $self;
 		}
 
-		return {status => 'fail', msg => $msg || 'Unspecified error.'};
+		return {status => 'error', message => $msg || 'Unspecified error.', data => $data};
 	}
 }
 
