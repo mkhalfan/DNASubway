@@ -49,7 +49,7 @@ $slice->match;
 my $style = '<link rel="stylesheet" href="/css/alignment_viewer.css" />';
 my $script = '<script type="text/javascript" src="/js/prototype-1.6.1.js"></script>' . "\n";
 $script .= '<script type="text/javascript" src="/js/alignment_viewer.js"></script>';
-my $buttons = '<div><input type="image" id="barcode_but" onclick="barcodeView()" src="/images/barcode_but.png"/> <input type="image" id="zoom_out" onclick="zoomOut()" src="/images/zoom_out_but.png" /><input type="image" id="zoom_in" onclick="zoomIn()" src="/images/zoom_in_but.png"/> <input type="image" id="sequence_but" onclick="seqView()" src="/images/sequence_but.png" /></div>';
+my $buttons = '<div><input type="image" class="controls" id="barcode_but" onclick="barcodeView()" src="/images/barcode_but.png"/> <input type="image" class="controls" id="zoom_out" onclick="zoomOut()" src="/images/zoom_out_but.png" /><input type="image" class="controls" id="zoom_in" onclick="zoomIn()" src="/images/zoom_in_but.png"/> <input type="image" class="controls" id="sequence_but" onclick="seqView()" src="/images/sequence_but.png" /></div>';
 my $body_tag = '<body onload="resizeFrame(parent.window.document.getElementById(\'aframe\'))">';
 
 my $dec = decorate_alignment($slice);
@@ -121,7 +121,7 @@ sub decorate_alignment {
 		## quantities.
 		my $mismatches = [];
 		for my $x (@$col){
-			if (($x ne @$col[0]) && ($x ne '.') && ($x ne '-') && ($x ne 'N') && (!("@$mismatches" =~ /$x/))){
+			if (($x ne @$col[0]) && ($x eq 'A' || $x eq 'T' || $x eq 'C' || $x eq 'G') && (!("@$mismatches" =~ /$x/))){
 				push @$mismatches, $x;
 			}
 		}
@@ -129,14 +129,22 @@ sub decorate_alignment {
 		
 		## Create the @fractions array here
 		my $top = shift @$col;
-		my $match = grep {$top eq $_ || $_ eq '.'} @$col;
+		
+		#my $match = grep {$top eq $_ || $_ eq '.'} @$col;	
+		#my $match = grep {$top eq $_ || $_ eq '.' || $_ eq '-' || $_ eq 'N' || $_ eq 'W' || $_ eq 'R'} @$col;
+		my $match = grep {$top eq $_ || $_ !~ /[ACTG]/} @$col;
+
 		my $fraction = $match ? $match/@$col : 0;
 		push @fractions, $fraction;
 		unshift @$col, $top;
 		#unshift @$col, int($fraction*255 + 0.5);
-		push @columns, $col; 
-	}
-
+		push @columns, $col;
+	} 
+	#my $cc = 0;
+	#for (@columns){
+	#	print @$_, " $fractions[$cc]", $/;
+	#	$cc++;
+	#}
 
 	## Making the 'stacked column' style sequence conservation here
 	## store it in retval bc this is only shown in sequence view
@@ -189,10 +197,12 @@ sub decorate_alignment {
 		my $x = 0;
 		for my $col (@row) {	
 			my $n;	
-			$n = ($col eq '.' ? "&nbsp;" : $col);  
-			$retval .= "<div class='$col'>$n</div>";
+			my $class;
+			$n = ($col eq '.' ? "&nbsp;" : $col); 
+			$class = ($col ne '.' && $col ne 'A' && $col ne 'T' && $col ne 'C' && $col ne 'G' ? 'x' : $col); 
+			$retval .= "<div class='$class'>$n</div>";
 			if ($fractions[$x] != 1){
-				$barcode .= "<div class='$col'>&nbsp;</div>";
+				$barcode .= "<div class='$class'>&nbsp;</div>";
 			}
 			else {
 				$barcode .= "<div class='grey'>&nbsp;</div>";
