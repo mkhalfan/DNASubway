@@ -93,19 +93,33 @@ sub decorate_alignment {
 	}
 	my @labels = map {$_->display_id} @seq;
 
-	## The @positions array will contain $mismatch arrayrefs which 
-	## will hold the variations which exist at that position
-	## in the alignment. The element number in the @positions
-	## array corresponds to the position in the alignment.
-	## The $mismatch arrayref holds the variants themselves and 
-	## only stores which variants are present, NOT their 
+	## The @positions array will contain $mismatch arrayrefs which will 
+	## hold the variations which exist at that position in the alignment. 
+	## The element number in the @positions array corresponds to the 
+	## position in the alignment. The $mismatch arrayref holds the variants
+	## themselves and only stores which variants are present, NOT their 
 	## abundance
 	my @positions;
 
-	## The @fractions array will hold the fraction of conservation
+	## The @histogram_data array will hold the fraction of conservation
 	## at each position in the alignment. Position in the array
-	## corresponds to position in the alignment.
-	my @fractions; 
+	## corresponds to position in the alignment. We only look at
+	## standard bases (ACTG) when calculating conservation (ie. an 'N' 
+	## or '-' or other ambiguous char would not count as an unconserved 
+	## base, we don't want to indicate these in the histogram as unconserved
+	## regions). The @histogram_data array is used to produce the histogram.
+	my @histogram_data; 
+
+	## The @fractions array will hold the fraction of conservation in
+	## each position in the alignment. The difference between @fractions
+	## and @histogram_data is that in the @fractions array, we ARE 
+	## considering ambigous bases as being unconserved regions (this is
+	## in contrast to @histogram_data which ignores ambiguous bases).
+	## This array will be used to determine whether a particular base 
+	## position should be displayed in the 'barcode'(since we only want
+	## to display variant positions, we do not want to display conserved
+	## regions).
+	my @fractions;
 
 	my @columns;
 	for (1..$aln->length) {
@@ -127,15 +141,24 @@ sub decorate_alignment {
 		}
 		push @positions, $mismatches;
 		
-		## Create the @fractions array here
 		my $top = shift @$col;
 		
-		#my $match = grep {$top eq $_ || $_ eq '.'} @$col;	
-		#my $match = grep {$top eq $_ || $_ eq '.' || $_ eq '-' || $_ eq 'N' || $_ eq 'W' || $_ eq 'R'} @$col;
+		## $match is used to calculate $conservation which is pushed to
+		## the @histogram_data array, which is then used to generate
+		## the histogram. Note: For this case, we are only looking
+		## for ACTG mismatches, we are not considering N's, -'s
+		## or other ambiguous bases
 		my $match = grep {$top eq $_ || $_ !~ /[ACTG]/} @$col;
+		my $conservation = $match ? $match/@$col : 0;
+		push @histogram_data, $conservation;
 
-		my $fraction = $match ? $match/@$col : 0;
+		## $match2 is used to calculate $fraction which is pushed to
+		## the @fractions array. Note: For this case, we are looking
+		## at all possible mismatches including ambiguous bases.
+		my $match2 = grep {$top eq $_ || $_ eq '.'} @$col;
+		my $fraction = $match2 ? $match2/@$col : 0;
 		push @fractions, $fraction;
+
 		unshift @$col, $top;
 		#unshift @$col, int($fraction*255 + 0.5);
 		push @columns, $col;
@@ -179,8 +202,8 @@ sub decorate_alignment {
 	## store it in barcode because the histogram
 	## will be displayed in barcode mode
 	$barcode .= '<div class="row">';
-	for my $fraction (@fractions){
-	   my $height = ($fraction*100);
+	for my $h (@histogram_data){
+	   my $height = ($h*100);
 	   $barcode .= "<div class='bar'><div class='hgram' style='height:$height%'>&nbsp;</div></div>";
 	}
 	$barcode .= '</div><!--end row-->';
@@ -205,6 +228,7 @@ sub decorate_alignment {
 				$barcode .= "<div class='$class'>&nbsp;</div>";
 			}
 			else {
+				
 				$barcode .= "<div class='grey'>&nbsp;</div>";
 			}
 			$x++;
