@@ -18,7 +18,7 @@ GetOptions	(
 );
 
 my $usage = <<END;
-./alignment_viewer.pl -i infile [-o outfile, -n numgap]
+./alignment_viewer.pl -i infile -h htmloutfile [-o outfile, -n numgap]
    n = 0-N, where N = num sequences; default = int(N/2 + 0.5)
 END
 ;
@@ -44,6 +44,7 @@ for my $seq (@seq) {
 @seq = map {$_->display_id} @seq;
 $numgap = int(@seq/2+0.5) unless defined $numgap;
 my $slice = auto_flush(\%seqs,\%rseqs,$aln);
+$out->write_aln($slice) if $outfile; #this creates the new *trimmed* alignment output file
 $slice->match;
 
 my $style = '<link rel="stylesheet" href="/css/alignment_viewer.css" />';
@@ -79,9 +80,6 @@ if ($html_out->open($htmlout, "w")){
 else{
 	print STDERR "Could not open html out file to write \n";
 }
-
-# This creates the new *trimmed* alignment file #
-$out->write_aln($aln) if $outfile; 
 
 sub decorate_alignment {
 	my $aln = shift;
@@ -162,7 +160,7 @@ sub decorate_alignment {
 		unshift @$col, $top;
 		#unshift @$col, int($fraction*255 + 0.5);
 		push @columns, $col;
-	} 
+	}
 	#my $cc = 0;
 	#for (@columns){
 	#	print @$_, " $fractions[$cc]", $/;
