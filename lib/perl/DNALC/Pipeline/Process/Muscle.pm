@@ -21,16 +21,12 @@ use File::Basename;
 
 	sub do_postprocessing {
 		my ($self, $m_output) = @_;
-		print STDERR "got here!";
 
 		if (defined $self->{conf}->{post_processing_cmd} && -x $self->{conf}->{post_processing_cmd}) {
 			my $html_output = my $trimmed_output = $m_output;
 
 			$trimmed_output =~ s/\.fasta$/_trimmed.fasta/;
 			$html_output =~ s/\.fasta$/.html/;
-
-			print STDERR  "** new file: ", $trimmed_output, $/;
-			print STDERR  "** new file: ", $html_output, $/;
 
 			my @args = (
 					'-i', $m_output,      # -i input file, muscle output
@@ -39,7 +35,6 @@ use File::Basename;
 					'-n', "0"             # -n number of sequences w/ terminal gaps allowed 
 				);
 			if (system($self->{conf}->{post_processing_cmd}, @args) == 0) {
-				print STDERR  'postprocessing exit status = ', $?, $/;
 				return {html_output => $html_output, trimmed_output => $trimmed_output};
 			}
 		}
