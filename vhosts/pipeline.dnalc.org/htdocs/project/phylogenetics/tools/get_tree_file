@@ -1,0 +1,34 @@
+%#----------------------------------------------------------------------------
+<%args>
+	$pid => 0
+	$tree_type => ''
+</%args>
+%#----------------------------------------------------------------------------
+<%once>
+	use DNALC::Pipeline::App::Phylogenetics::ProjectManager ();
+</%once>
+%#----------------------------------------------------------------------------
+<%init>
+	
+	$r->content_type("biotree/newick");
+	$r->headers_out->{'Content-Disposition'} = "attachment;filename=tree-$tree_type.nw";
+	$r->no_cache(1);
+
+	$m->session->{pipeline} ||= {};
+	
+	$pid =~ s/\D+//g;
+
+	my $pm = DNALC::Pipeline::App::Phylogenetics::ProjectManager->new($pid);
+	my $proj = $pm->project;
+	
+	my $tree = $pm->get_tree($tree_type)->{tree_file};
+	
+	$r->sendfile($tree);
+	
+</%init>
+%#----------------------------------------------------------------------------
+<%flags>
+	inherit => undef
+</%flags>
+%#----------------------------------------------------------------------------
+

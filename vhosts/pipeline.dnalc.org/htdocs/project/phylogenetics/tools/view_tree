@@ -2,33 +2,22 @@
 % unless ($proj) {
 	Error: can't open project "<% $pid|html%>".
 % } else {
-	<div>
-<applet archive="/files/jalview/jalviewApplet.jar" name="Jalview" 
-	codebase="/" 
-	code="jalview.bin.JalviewLite" height="450" width="100%">
-	<param name="cache_option" value="No" />
-	<param name="file" value="<% $m->comp('../../.comp/filepath_to_web', file => $pm->get_alignment ) %>" />
-	<param name="treeFile" value="<% $m->comp('../../.comp/filepath_to_web', file => $tinfo->{tree_file} ) %>" />
-	<param name="embedded" value="true" />
-	<param name="showAnnotation" value="true" />
-	<param name="showTreeDistances" value="false" />
-	<param name="wrap" value="false" />
-	<param name="nojmol" value="true" />
-	<param name="windowHeight" value="500" />
-	<param name="windowWidth" value="750" />
-	<param name="showFullId" value="false" />
-	<param name="defaultColour" value="<%  defined $color{lc $proj->type} ? $color{lc $proj->type} : $color{default} %>" />
-%#	<param name="linkLabel_1" value="Details" />
-%#	<param name="linkUrl_1" value="<% $pcf->{PROJECT_HOME} %>/project/target/details?hn=$SEQUENCE_ID$" />
-	<param name="showbutton" value="false" />
-	<param name="debug" value="true" />
-</applet>
-
-	<pre>
-	1: <% $m->comp('../../.comp/filepath_to_web', file => $pm->get_alignment )%>
-	2: <% $m->comp('../../.comp/filepath_to_web', file => $tinfo->{tree_file} ) %>
-	3: tt= <% $tinfo->{tree}->tree_type %>
-	</pre>
+<script type="text/javascript">
+	document.observe("dom:loaded", function() {
+		if (!document.implementation.hasFeature("http://www.w3.org/TR/SVG11/feature#BasicStructure", "1.1")){
+			$('tree_div').update('<img src="<% $m->comp("../../.comp/filepath_to_web", file => "$tree_id.png" ) %>">');
+		}
+	});
+</script>
+	
+	<div id="tree_div"><% $svg_contents %></div>
+	<div class="tree_links" style="font-size:10px;font-family:arial">
+		<div style="float:left;">
+			<a href="get_tree_file?pid=<% $pid %>&tree_type=<% $tree_type %>"><img src="/images/download.png" border=0></a>
+		</div> 
+		<div style="float:left;padding: 2px 0px 0px 2px;">
+			<a href="get_tree_file?pid=<% $pid %>&tree_type=<% $tree_type %>" style="color:grey">Download tree file</a>
+		</div>	
 	</div>
 % }
 </div>
@@ -41,12 +30,7 @@
 %#----------------------------------------------------------------------------
 <%once>
 	use DNALC::Pipeline::App::Phylogenetics::ProjectManager ();
-	my %color = (
-			default => 'Clustal',
-			mtdna => '% Identity',
-			protein => 'Zappo',
-		);
-</%once>
+	</%once>
 %#----------------------------------------------------------------------------
 <%init>
 	$r->content_type("text/html");
@@ -58,5 +42,21 @@
 	my $pm = DNALC::Pipeline::App::Phylogenetics::ProjectManager->new($pid);
 	my $proj = $pm->project;
 	my $tinfo = $proj ? $pm->get_tree($tree_type) : {};
+	
+	my $tree_id = $pm->get_tree($tree_type)->{tree_file};
+	$tree_id =~ s/\.nw$//;
+	
+	my $svg_contents;
+	open FILE, "$tree_id.svg" or die "Could not open tree file svg: $!";
+	while (<FILE>){
+		$svg_contents .= $_;
+	}
+	close FILE;
+	$svg_contents =~ s/onload="startup\(evt\)"//;
+	$svg_contents =~ s/\.\.\/scripts\/tree.css//;
+	
 </%init>
 %#----------------------------------------------------------------------------
+<%attr>
+	js => ['prototype-1.6.1.js', 'phylogenetics.js']
+</%attr>
