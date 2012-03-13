@@ -36,7 +36,7 @@
 			Once you have selected the data you wish to use, you must save your changes.<br />
 			<input type="submit" id="save_selection" value="Save" class="bluebtn"/>
 		</div>
-% if (0) {
+
 		<div style="background: #C2DBF3; margin:0; padding:2px 2px 2px 5px;color: #333">
 			<img src="/images/info.png" style="vertical-align: middle;padding-right:7px;" /><strong>Download sequences</strong>
 		</div>
@@ -44,7 +44,7 @@
 			Once you have selected the data you wish to use, you must save your changes.<br />
 			<input type="submit" name="download_selection" id="download_selection" value="Download" class="bluebtn"/>
 		</div>
-% }
+
 	</div>
 	</div>    
 	<div class="list_refdata">
@@ -119,8 +119,15 @@
 			$selected_sequences{$seq_id} = 1 
 				if (exists $available_sequences{$seq_id});
 		}
-		#print STDERR "selected: ", Dumper(\%selected_sequences);
+
 		$memcached->set($mc_key, [ keys %selected_sequences ]);
+
+		if ($download_selection) {
+		
+			$m->redirect("./download_sequences?pid=" . $proj->id);
+			return;
+		}
+
 		if (keys %selected_sequences) {
 			$pm->set_task_status("phy_alignment", "not-processed");
 			$ok = 1;
