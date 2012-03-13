@@ -18,6 +18,8 @@ use DNALC::Pipeline::Process::Phylip::Consense ();
 use DNALC::Pipeline::Config();
 use File::Basename;
 use Data::Dumper;
+use Image::LibRSVG;
+
 
 sub run_build_tree {
 	my $gearman = shift;
@@ -74,6 +76,26 @@ sub run_build_tree {
 					}
 					$status = "success";
 				}
+				
+				## Get current nw tree and store the name of this file (to create a svg and png of the same name)
+				## (we are actually saving the complete file path minus the .nw extension in this variable, we'll
+				## need the full path anyways)
+				my $tree_id = $pm->get_tree($tree_type)->{tree_file};
+				$tree_id =~ s/\.nw$//; 
+
+				## Make the tree in SVG format			
+				if ($status eq 'success'){
+					if (system("java -jar /usr/local/TreeVector/source/TreeVector.jar " . $pm->get_tree($tree_type)->{tree_file} . " -out $tree_id.svg") == 0){
+						## Convert the SVG to a PNG
+						my $rsvg = new Image::LibRSVG();
+						$rsvg->convert("$tree_id.svg", "$tree_id.png");
+					}
+					else {
+						$status = "error";
+						$msg = "TreeVector Failed";
+					}
+				}	
+				
 			}
 		}
 	}
