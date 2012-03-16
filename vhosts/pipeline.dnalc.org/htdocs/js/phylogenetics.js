@@ -1688,7 +1688,7 @@
 	// -----------------------------------------------
 	// handlers for getting dnalc data
 	//
-	phy.get_dnalc_data = function (page, order_id, sort_by, sort_dir, query) {
+	phy.get_dnalc_data = function (page, order_id, sort_by, sort_dir, query, get_all_data) {
 		$('add_btn').hide();
 		var apiUri = "http://dnalc02.cshl.edu/genewiz/json";
 		var uri = apiUri + "?p=" + (page ? page : 1);
@@ -1716,6 +1716,19 @@
 			uri += ";s=" + sort_by;
 			if (sort_dir)
 				uri += ";d=" + sort_dir;
+		}
+
+		// by default apply the filters, unless otherwise specified
+		if (!get_all_data) {
+			if (top.$('ptype') && top.$('ptype').value) {
+				uri += ";f=" + top.$('ptype').value;
+			}
+			else {
+				var f = top.$$('div#project_types input[type=radio]').collect(function(v){return v.checked ? v.value: ''}).join('');
+				if (f) {
+					uri += ";f=" + f;
+				}
+			}
 		}
 
 		if ($('dnalc_btn'))
@@ -1750,7 +1763,7 @@
 			table.insert(tr);
 			data.each(function(d) {
 				var lnk = new Element('a', {href: 'javascript:;'}).update(d.number);
-				Event.observe(lnk, 'click', function() {phy.get_dnalc_data(meta.p, d.id, meta.s, meta.d, meta.q);});
+				Event.observe(lnk, 'click', function() {phy.get_dnalc_data(meta.p, d.id, meta.s, meta.d, meta.q, meta.f ? '' : '1');});
 				tr = phy.build_tr([lnk, d.date, d.name, d.institution]);
 				table.insert(tr);
 			});
@@ -1759,7 +1772,7 @@
 		if (meta.pnum > 1) {
 			var nav = "";
 			var query = meta.q ? meta.q : '';
-			var args = ",'" + query + "','" + meta.s + "','" +meta.d + "'";
+			var args = ",'" + query + "','" + meta.s + "','" +meta.d + "',null,'" + (meta.f ? '' : '1') + "'";
 			if (meta.p > 1) {
 				nav += "<a href=\"javascript:phy.get_dnalc_data(" + (meta.p - 1) + args + ");\">«</a> ";
 			}
@@ -1771,17 +1784,27 @@
 			//tr.cells[0].colspan = "3";
 			table.insert("<tr><td colspan=\"3\">" + nav + "</td></tr>");
 		}
+		
+		var filters = 	meta.f  
+				? "<div id=\"filters\" style=\"float:right\">"
+					+   "Showing orders containing <b>" + meta.f.toUpperCase() + "</b> samples. "
+					+   "<a onclick=\"javascript:phy.get_dnalc_data(null, null, null, null, null, 1);this.hide();\""
+					+     " href=\"javascript:;\">show all</a>"
+					+ "</div>"
+				: "";
 		$('dnalc_container').update(
-			new Element('div').update(
+			new Element('div', {style: 'width: 760px'}).update(
+				filters
+			).insert(
 				new Element('input', {id:'q', value:meta.q, type:'search'})
 					.observe('keydown', function(ev) { // catch the ENTER hit in the input box
 						if (ev && ev.keyCode == 13) {
-							phy.get_dnalc_data(1, $('q').value, meta.s, meta.d);
+							phy.get_dnalc_data(1, $('q').value, meta.s, meta.d, null, 1);
 						}
 					})
 			).insert(new Element('input', {type: 'button', value:'Search', 'class': 'bluebtn'})
 				.observe('click', function(){
-					phy.get_dnalc_data(1, $('q').value, meta.s, meta.d);
+					phy.get_dnalc_data(1, $('q').value, meta.s, meta.d, null, 1);
 				})
 			)
 		);
@@ -1790,7 +1813,7 @@
 	phy.display_dnalc_files = function(meta, data) {
 		var table = new Element('table');
 		var a = new Element('a', {href:'javascript:;'}).update('« back');
-		a.observe('click', function(){ phy.get_dnalc_data(meta.p, meta.q ? meta.q : null, meta.s, meta.d) });
+		a.observe('click', function(){ phy.get_dnalc_data(meta.p, meta.q ? meta.q : null, meta.s, meta.d, null, meta.f ? null : '1') });
 
 		var tr = phy.build_tr([a, '']);
 		table.insert(tr);
@@ -1857,13 +1880,13 @@
 					el += " ⇧";
 				}
 				else if (ch != meta.s || 'a' != meta.d) {
-					el += " <a href=\"javascript:phy.get_dnalc_data(1,'" + query + "','" + ch + "','a');\">⇧</a>";
+					el += " <a href=\"javascript:phy.get_dnalc_data(1,'" + query + "','" + ch + "','a',null," + (meta.f ? 'null' : '1') + ");\">⇧</a>";
 				}
 				if (ch == meta.s && 'd' == meta.d) {
 					el += " ⇩";
 				}
 				else if (ch != meta.s || 'd' != meta.d) {
-					el += " <a href=\"javascript:phy.get_dnalc_data(1,'" + query + "','" + ch + "','d');\">⇩</a>";
+					el += " <a href=\"javascript:phy.get_dnalc_data(1,'" + query + "','" + ch + "','d',null," + (meta.f ? 'null' : '1') + ");\">⇩</a>";
 				}
 			}
 			tr.insert(new Element('td').update(el));
@@ -2012,7 +2035,7 @@
 		for (var i = 0; i < lastNames.length; i++){
 			fullNames = fullNames + firstNames[i] + "#" + lastNames[i] + "#" + (i + 1) + "::";
 		}
-		console.info(fullNames);
+		//console.info(fullNames);
 		$('new_row').update('<input type="hidden" id="authors" name="authors" value="' + fullNames + '" />');
 	}
 	

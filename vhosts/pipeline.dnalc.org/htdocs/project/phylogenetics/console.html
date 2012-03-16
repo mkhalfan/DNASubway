@@ -1,5 +1,6 @@
 <div id="container_rightContent">
 <input type="hidden" id="pid" value="<% $pid %>"/>
+<input type="hidden" id="ptype" value="<% $proj->type %>"/>
 <input type="hidden" id="isowner" value="<% $is_owner %>"/>
 %	if (exists $m->session->{messages}) {
 <div style="display:none" id="error_list">	
@@ -232,6 +233,16 @@
 
 		<div id="desc_limit_label" class="conNewPro_label" style="display: none;">Total characters (max.140): &nbsp;<span id="desc_len">0</span></div>
 		<div id="description_container" origdesc="" class="conProjectInfo_description"><% $proj->description |html%></div>
+% if (0) {
+		<div>
+			Trees + alignments
+			<select>
+% for (@trees) {
+			<option <% basename($_)%>><% basename($_) %>
+% }
+			</select>
+		</div>
+% }
 	</span> <!--END of span conProjectInfo_column3-->
     
 </div><!--END of ID conProjectInfo-->
@@ -246,7 +257,9 @@
 %#-------------------------------------------------
 
 <%once>
-	use Data::Dumper; 
+	use Data::Dumper;
+	use File::Spec ();
+	use File::Basename qw/basename/;
 	use DNALC::Pipeline::App::Phylogenetics::ProjectManager ();
 	use DNALC::Pipeline::User ();
 	use DNALC::Pipeline::Config ();
@@ -308,6 +321,8 @@ for my $rt ( keys %routines ) {
 my $cf = DNALC::Pipeline::Config->new->cf('PHYLOGENETICS');
 my $export_is_on = $cf->{EXPORT_ON};
 
+my $tree_store = File::Spec->catfile($pm->work_dir, "trees");
+my @trees = sort {$b cmp $a} <$tree_store/*.nw>;
 </%init>
 %#-------------------------------------------------
 <%def .routine>
