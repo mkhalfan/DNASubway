@@ -423,6 +423,7 @@ use Bio::Trace::ABIF ();
 		#print STDERR "Warnings: ", Dumper( \@warnings), $/;
 
 		$ab->close_abif if $ab && $ab->is_abif_open;
+		flock $fasta_fh, LOCK_UN;
 		close $fasta_fh;
 
 		if ($params->{type} ne 'reference') {
