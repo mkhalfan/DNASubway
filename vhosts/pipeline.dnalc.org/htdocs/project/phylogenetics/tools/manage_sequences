@@ -28,23 +28,25 @@
 		</fieldset>
 %	delete $sequence_groups{ $source } if $source eq "init";
 % }
-	<div id="selection_changed" style="display:none;width:200px;border:1px solid #C2DBF3;background: #F8FAFC;margin-left:550px;position:fixed;top:85px;">
-		<div style="background: #C2DBF3; margin:0; padding:2px 0 2px 5px;color: #333">
-			<img src="/images/info.png" style="vertical-align: middle;padding-right:7px;" /><strong>Save Your Changes</strong>
+	<div id="selection_changed" style="display:none;width:200px;margin-left:550px;position:fixed;top:85px;">
+		<div style="border:1px solid #C2DBF3;background: #F8FAFC;">
+			<div style="background: #C2DBF3; margin:0; padding:2px 0 2px 5px;color: #333">
+				<img src="/images/info.png" style="vertical-align: middle;padding-right:7px;" /><strong>Save Your Changes</strong>
+			</div>
+			<div style="padding:5px;color:#333;">
+				Once you have selected the sequences you wish to align, you must click save below.<br />
+				<input type="submit" id="save_selection" value="Save Selection" class="bluebtn"/>
+			</div>
 		</div>
-		<div style="padding:5px;color:#333">
-			Once you have selected the data you wish to use, you must save your changes.<br />
-			<input type="submit" id="save_selection" value="Save" class="bluebtn"/>
+		<div style="border:1px solid #C2DBF3;background: #F8FAFC;margin-top:5px;">
+			<div style="background: #C2DBF3; margin:0; padding:2px 2px 2px 5px;color: #333;">
+				<img src="/images/info.png" style="vertical-align: middle;padding-right:7px;" /><strong>Download sequences</strong>
+			</div>
+			<div style="padding:5px;color:#333">
+				Click below to download selected sequences in FASTA format.<br />
+				<input type="submit" name="download_selection" id="download_selection" value="Download" class="bluebtn"/>
+			</div>
 		</div>
-
-		<div style="background: #C2DBF3; margin:0; padding:2px 2px 2px 5px;color: #333">
-			<img src="/images/info.png" style="vertical-align: middle;padding-right:7px;" /><strong>Download sequences</strong>
-		</div>
-		<div style="padding:5px;color:#333">
-			Once you have selected the data you wish to use, you must save your changes.<br />
-			<input type="submit" name="download_selection" id="download_selection" value="Download" class="bluebtn"/>
-		</div>
-
 	</div>
 	</div>    
 	<div class="list_refdata">
