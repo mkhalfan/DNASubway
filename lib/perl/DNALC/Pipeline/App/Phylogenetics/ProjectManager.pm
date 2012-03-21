@@ -926,18 +926,21 @@ use Bio::Trace::ABIF ();
 			$phy_out = $m->convert_fasta_to_phylip;
 			$self->_store_alignments($phy_out);
 
-			print STDERR $output;
-			my $st = $m->do_postprocessing($output);
+			# get the project type
+			my $project_type = $self->project->type;
+
+			# send the --is_amino switch if it's a protein trype project
+			my $is_amino = ($project_type eq "protein" ? "--is_amino" : '');
+
+			my $st = $m->do_postprocessing($output, $is_amino);
 
 			my $html_output = $st->{html_output} if $st;
 			my $trimmed_alignment = $st->{trimmed_output} if $st;
 			if (defined $html_output && -f $html_output) {
-				print STDERR "html_output: ", $html_output;
 				$self->_store_alignments($html_output);
 			}
 			
 			if (defined $trimmed_alignment && -f $trimmed_alignment) {
-				print STDERR "trimmed_alignments: ", $trimmed_alignment;
 				$self->_store_alignments($trimmed_alignment);
 			}
 
