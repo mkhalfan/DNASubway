@@ -9,19 +9,23 @@ use IO::File ();
 #use CGI qw/:standard start_table end_table start_row end_row/;
 
 my ($infile, $htmlout, $numgap, $outfile);
+my $is_amino = '';
 GetOptions	(
 	    "infile|i=s"  => \$infile,    # input alignment (required)
 		"htmlout|h=s" => \$htmlout,	  # html output file (required)
-	    "outfile|o:s" => \$outfile,   # output file (optional -- print to STDOUT otherwise
+	    "outfile|o:s" => \$outfile,   # output file (optional -- print to STDOUT otherwise)
+		"is_amino"	  => \$is_amino,  # flag to indicate protein sequences
 	    "numgap|n:i"  => \$numgap,    # number of sequences with terminal gaps allowed (optional) 
                                       # 0-N, where N = num sequences; default = int(N/2 + 0.5)
 );
 
 my $usage = <<END;
-./alignment_viewer.pl -i infile -h htmloutfile [-o outfile, -n numgap]
+./alignment_viewer.pl -i infile -h htmloutfile [-o outfile, -n numgap --is_amino]
    n = 0-N, where N = num sequences; default = int(N/2 + 0.5)
+   --is_amino is the switch to include if it's protein sequences
 END
 ;
+
 
 ($infile && $htmlout) or die $usage;
 my $in = Bio::AlignIO->new( -file => $infile );
@@ -47,7 +51,8 @@ my $slice = auto_flush(\%seqs,\%rseqs,$aln);
 $out->write_aln($slice) if $outfile; #this creates the new *trimmed* alignment output file
 $slice->match;
 
-my $style = '<link rel="stylesheet" href="/css/alignment_viewer.css" />';
+my $style = ($is_amino ? '<link rel="stylesheet" href="/css/alignment_viewer_amino.css" />' : '<link rel="stylesheet" href="/css/alignment_viewer.css" />');
+#my $style = '<link rel="stylesheet" href="/css/alignment_viewer_amino.css" />';
 my $script = '<script type="text/javascript" src="/js/prototype-1.6.1.js"></script>' . "\n";
 $script .= '<script type="text/javascript" src="/js/alignment_viewer.js"></script>';
 my $buttons = '<div><input type="image" class="controls" id="barcode_but" onclick="barcodeView()" src="/images/barcode_but.png"/> <input type="image" class="controls" id="zoom_out" onclick="zoomOut()" src="/images/zoom_out_but.png" /><input type="image" class="controls" id="zoom_in" onclick="zoomIn()" src="/images/zoom_in_but.png"/> <input type="image" class="controls" id="sequence_but" onclick="seqView()" src="/images/sequence_but.png" /></div>';
@@ -131,28 +136,41 @@ sub decorate_alignment {
 		## to create the 'stacked column' style sequence conservation,
 		## we only want to know what variants are present, not their
 		## quantities.
+		## NEW: We only do this step if the sequence is not an amino
+		## acid sequence. If it is an amino acid sequence, we just
+		## use the histogram (calculated in the next step).
 		my $mismatches = [];
-		for my $x (@$col){
-			if (($x ne @$col[0]) && ($x eq 'A' || $x eq 'T' || $x eq 'C' || $x eq 'G') && (!("@$mismatches" =~ /$x/))){
-				push @$mismatches, $x;
+		if (!$is_amino){
+			for my $x (@$col){
+				if (($x ne @$col[0]) && ($x eq 'A' || $x eq 'T' || $x eq 'C' || $x eq 'G') && (!("@$mismatches" =~ /$x/))){
+					push @$mismatches, $x;
+				}
 			}
+			push @positions, $mismatches;
 		}
-		push @positions, $mismatches;
 		
 		my $top = shift @$col;
 		
 		## $match is used to calculate $conservation which is pushed to
 		## the @histogram_data array, which is then used to generate
-		## the histogram. Note: For this case, we are only looking
-		## for ACTG mismatches, we are not considering N's, -'s
-		## or other ambiguous bases
-		my $match = grep {$top eq $_ || $_ !~ /[ACTG]/} @$col;
+		## the histogram. Note: For this case, we are NOT looking at
+		## ambiguous bases (ie. they do not count as a mismatch with 
+		## regards to the histogram).
+		my $match;
+		if ($is_amino){
+			$match = grep {$top eq $_ || $_ !~ /[ARNDCEQGHILKMFPSTWYV]/} @$col;
+		}
+		else {
+			$match = grep {$top eq $_ || $_ !~ /[ACTG]/} @$col;
+		}
 		my $conservation = $match ? $match/@$col : 0;
 		push @histogram_data, $conservation;
 
 		## $match2 is used to calculate $fraction which is pushed to
 		## the @fractions array. Note: For this case, we are looking
-		## at all possible mismatches including ambiguous bases.
+		## at all possible mismatches including ambiguous bases. We
+		## use this variable to determine what columns to show in
+		## our display as having mismatches (any).
 		my $match2 = grep {$top eq $_ || $_ eq '.'} @$col;
 		my $fraction = $match2 ? $match2/@$col : 0;
 		push @fractions, $fraction;
@@ -167,34 +185,46 @@ sub decorate_alignment {
 	#	$cc++;
 	#}
 
-	## Making the 'stacked column' style sequence conservation here
-	## store it in retval bc this is only shown in sequence view
-	$retval .= '<div class="row">';
-	for my $mms (@positions){
-		my $num_mm = @$mms;
-
-		$retval .= '<div class="bar">';	
-		if ($num_mm == 0){
-			$retval .= "<div class='hbar cons_cons'>&nbsp;</div>";
+	## if it's an amino acid sequence, make a histogram here, otherwise
+	## make the stacked column style sequence conservation row.
+	if ($is_amino){
+		$retval .= '<div class="row">';
+		for my $h (@histogram_data){
+			my $height = ($h*100);
+			$retval .= "<div class='bar'><div class='hgram' style='height:$height%'>&nbsp;</div></div>";
 		}
-		elsif ($num_mm == 1){
-			$retval .= "<div class='hbar cons_" . @$mms[0] ." cons_hundred'>&nbsp;</div>";
-		}
-		elsif ($num_mm == 2){
-			$retval .= "<div class='hbar cons_" . @$mms[0] . " cons_hundred'>&nbsp;</div>";
-			$retval .= "<div class='hbar cons_" . @$mms[1] . " cons_fifty'>&nbsp;</div>";
-		}
-		elsif ($num_mm == 3){
-			$retval .= "<div class='hbar cons_" . @$mms[0] . " cons_hundred'>&nbsp;</div>";
-			$retval .= "<div class='hbar cons_" . @$mms[1] . " cons_sixtysix'>&nbsp;</div>";
-			$retval .= "<div class='hbar cons_" . @$mms[2] . " cons_thirtythree'>&nbsp;</div>";
-		}
-		else{
-			$retval .= "<div class='hbar cons_err'>&nbsp;</div>";
-		}
-		$retval .= '</div>'; #end div bar#
+		$retval .= '</div><!--end row-->';
 	}
-	$retval .= '</div><!--end row-->';
+	else{
+		## Making the 'stacked column' style sequence conservation here
+		## store it in retval bc this is only shown in sequence view
+		$retval .= '<div class="row">';
+		for my $mms (@positions){
+			my $num_mm = @$mms;
+
+			$retval .= '<div class="bar">';	
+			if ($num_mm == 0){
+				$retval .= "<div class='hbar cons_cons'>&nbsp;</div>";
+			}
+			elsif ($num_mm == 1){
+				$retval .= "<div class='hbar cons_" . @$mms[0] ." cons_hundred'>&nbsp;</div>";
+			}
+			elsif ($num_mm == 2){
+				$retval .= "<div class='hbar cons_" . @$mms[0] . " cons_hundred'>&nbsp;</div>";
+				$retval .= "<div class='hbar cons_" . @$mms[1] . " cons_fifty'>&nbsp;</div>";
+			}
+			elsif ($num_mm == 3){
+				$retval .= "<div class='hbar cons_" . @$mms[0] . " cons_hundred'>&nbsp;</div>";
+				$retval .= "<div class='hbar cons_" . @$mms[1] . " cons_sixtysix'>&nbsp;</div>";
+				$retval .= "<div class='hbar cons_" . @$mms[2] . " cons_thirtythree'>&nbsp;</div>";
+			}
+			else{
+				$retval .= "<div class='hbar cons_err'>&nbsp;</div>";
+			}
+			$retval .= '</div>'; #end div bar#
+		}
+		$retval .= '</div><!--end row-->';
+	}
 
 	## Making the histogram here 
 	## store it in barcode because the histogram
@@ -220,7 +250,8 @@ sub decorate_alignment {
 			my $n;	
 			my $class;
 			$n = ($col eq '.' ? "&nbsp;" : $col); 
-			$class = ($col ne '.' && $col ne 'A' && $col ne 'T' && $col ne 'C' && $col ne 'G' ? 'x' : $col); 
+			#$class = ($col ne '.' && $col ne 'A' && $col ne 'T' && $col ne 'C' && $col ne 'G' ? 'x' : $col); 
+			$class = ($col eq '-' ? 'dash' : $col);
 			$retval .= "<div class='$class'>$n</div>";
 			if ($fractions[$x] != 1){
 				$barcode .= "<div class='$class'>&nbsp;</div>";

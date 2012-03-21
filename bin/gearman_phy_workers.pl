@@ -81,11 +81,20 @@ sub run_build_tree {
 				## (we are actually saving the complete file path minus the .nw extension in this variable, we'll
 				## need the full path anyways)
 				my $tree_id = $pm->get_tree($tree_type)->{tree_file};
-				$tree_id =~ s/\.nw$//; 
+				$tree_id =~ s/\.nw$//;
+
+				## Determine number of sequences in tree so you can calculate an appropriate tree height
+				open (FILE, $alignment) || die "Error: Unable to open alignment.phyi file: $!\n";
+				my $first_line = <FILE>;
+				close FILE;
+				my $num_sequences = (split(' ', $first_line))[0];
+				my $INDIVIDUAL_HEIGHT = 40;
+				my $tree_height = $INDIVIDUAL_HEIGHT * $num_sequences;
+				$tree_height = 200 if ($tree_height < 200);
 
 				## Make the tree in SVG format			
 				if ($status eq 'success'){
-					if (system("java -jar /usr/local/TreeVector/source/TreeVector.jar " . $pm->get_tree($tree_type)->{tree_file} . " -out $tree_id.svg") == 0){
+					if (system("java -jar /usr/local/TreeVector/source/TreeVector.jar " . $pm->get_tree($tree_type)->{tree_file} . " -out $tree_id.svg -size 760 $tree_height") == 0){
 						## Convert the SVG to a PNG
 						my $rsvg = new Image::LibRSVG();
 						$rsvg->convert("$tree_id.svg", "$tree_id.png");
