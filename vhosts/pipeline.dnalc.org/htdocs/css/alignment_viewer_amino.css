@@ -1,0 +1,359 @@
+#alignment{
+  overflow:auto;
+  font-family:Courier,monospace;
+}
+#barcode div{
+  white-space: nowrap;
+}
+#barcode div div{
+  width:1px;
+  margin:0px 0px;
+  display: inline-block;
+  background-color:#f0f0f0;
+}
+#barcode div div.A{
+  background-color:#8CFF8C;
+}
+#barcode div div.R{
+  background-color:#00007C;
+}
+#barcode div div.N{
+  background-color:#FF7C70;
+}
+#barcode div div.D{
+  background-color:#A00042;
+}
+#barcode div div.C{
+  background-color:#FFFF70;
+}
+#barcode div div.E{
+  background-color:#660000;
+}
+#barcode div div.Q{
+  background-color:#FF4C4C;
+}
+#barcode div div.G{
+  background-color:#FFFFFF;
+}
+#barcode div div.H{
+  background-color:#7070FF;
+}
+#barcode div div.I{
+  background-color:#004C00;
+}
+#barcode div div.L{
+  background-color:#455E45;
+}
+#barcode div div.K{
+  background-color:#4747B8;
+}
+#barcode div div.M{
+  background-color:#B8A042;
+}
+#barcode div div.F{
+  background-color:#534C52;
+}
+#barcode div div.P{
+  background-color:#525252;
+}
+#barcode div div.S{
+  background-color:#FF7042;
+}
+#barcode div div.T{
+  background-color:#B84C00;
+}
+#barcode div div.W{
+  background-color:#4F4600;
+}
+#barcode div div.Y{
+  background-color:#8C704C;
+}
+#barcode div div.V{
+ background-color:#FF8CFF;
+}
+
+#sequence div{
+  white-space: nowrap;
+}
+#sequence div div{
+  width:12px;
+  margin:0px 0px;
+  display: inline-block;
+}
+.fingerprint div div{
+  background-color:#f0f0f0;
+  color:#f0f0f0;
+}.fingerprint div div.A{
+  background-color:#8CFF8C;
+  color:#8CFF8C;
+}
+.fingerprint div div.R{
+  background-color:#00007C;
+  color:#00007C;
+}
+.fingerprint div div.N{
+  background-color:#FF7C70;
+  color:#FF7C70;
+}
+.fingerprint div div.D{
+  background-color:#A00042;
+  color:#A00042;
+}
+.fingerprint div div.C{
+  background-color:#FFFF70;
+  color:#FFFF70;
+}
+.fingerprint div div.E{
+  background-color:#660000;
+  color:#660000;
+}
+.fingerprint div div.Q{
+  background-color:#FF4C4C;
+  color:#FF4C4C;
+}
+.fingerprint div div.G{
+  background-color:#FFFFFF;
+  color:#FFFFFF;
+}
+.fingerprint div div.H{
+  background-color:#7070FF;
+  color:#7070FF;
+}
+.fingerprint div div.I{
+  background-color:#004C00;
+  color:#004C00;
+}
+.fingerprint div div.L{
+  background-color:#455E45;
+  color:#455E45;
+}
+.fingerprint div div.K{
+  background-color:#4747B8;
+  color:#4747B8;
+}
+.fingerprint div div.M{
+  background-color:#B8A042;
+  color:#B8A042;
+}
+.fingerprint div div.F{
+  background-color:#534C52;
+  color:#534C52;
+}
+.fingerprint div div.P{
+  background-color:#525252;
+  color:#525252;
+}
+.fingerprint div div.S{
+  background-color:#FF7042;
+  color:#FF7042;
+}
+.fingerprint div div.T{
+  background-color:#B84C00;
+  color:#B84C00;
+}
+.fingerprint div div.W{
+  background-color:#4F4600;
+  color:#4F4600;
+}
+.fingerprint div div.Y{
+  background-color:#8C704C;
+  color:#8C704C;
+}
+.fingerprint div div.V{
+ background-color:#FF8CFF;
+ color:#FF8CFF;
+}
+.bases div div.A{
+  background-color:#F0F0F0;
+  color:#8CFF8C;
+}
+.bases div div.R{
+  background-color:#F0F0F0;
+  color:#00007C;
+}
+.bases div div.N{
+  background-color:#F0F0F0;
+  color:#FF7C70;
+}
+.bases div div.D{
+  background-color:#F0F0F0;
+  color:#A00042;
+}
+.bases div div.C{
+  background-color:#F0F0F0;
+  color:#FFFF70;
+}
+.bases div div.E{
+  background-color:#F0F0F0;
+  color:#660000;
+}
+.bases div div.Q{
+  background-color:#F0F0F0;
+  color:#FF4C4C;
+}
+.bases div div.G{
+  background-color:#F0F0F0;
+  color:#FFFFFF;
+}
+.bases div div.H{
+  background-color:#F0F0F0;
+  color:#7070FF;
+}
+.bases div div.I{
+  background-color:#F0F0F0;
+  color:#004C00;
+}
+.bases div div.L{
+  background-color:#F0F0F0;
+  color:#455E45;
+}
+.bases div div.K{
+  background-color:#F0F0F0;
+  color:#4747B8;
+}
+.bases div div.M{
+  background-color:#F0F0F0;
+  color:#B8A042;
+}
+.bases div div.F{
+  background-color:#F0F0F0;
+  color:#534C52;
+}
+.bases div div.P{
+  background-color:#F0F0F0;
+  color:#525252;
+}
+.bases div div.S{
+  background-color:#F0F0F0;
+  color:#FF7042;
+}
+.bases div div.T{
+  background-color:#F0F0F0;
+  color:#B84C00;
+}
+.bases div div.W{
+  background-color:#F0F0F0;
+  color:#4F4600;
+}
+.bases div div.Y{
+  background-color:#F0F0F0;
+  color:#8C704C;
+}
+.bases div div.V{
+ background-color:#F0F0F0;
+ color:#FF8CFF;
+}
+.row{
+ line-height:20px;
+ margin:2px 0px;
+ /*display:inline-block;*/
+}
+/*.row:hover{
+ border: 1px solid black;
+ margin-left:-1px;
+ margin-bottom:-2px;
+}*/
+div.viewport {
+ top:1px;
+ left:1px;
+ width:100%;
+ padding:3px;
+}
+#labels{
+ float:left;
+ margin-right:5px;
+ max-width:300px;
+ overflow-x:auto; 
+ white-space:nowrap;
+}
+.labels{
+max-width:300px
+}
+.bar{
+	width:12px;
+	display:inline-block;
+	position:relative;
+	height:21px
+}
+
+#sequence div div[class*='cons_']{
+	background-color:#999;
+}
+
+#sequence div div.cons_cons{
+	background-color:#777;
+	height:100%;
+	z-index:1;
+	position:absolute;
+	bottom:0;
+}
+#sequence div div.cons_A{
+	background-color:green;
+}
+#sequence div div.cons_C{
+	background-color:blue;
+}
+#sequence div div.cons_T{
+	background-color:red;
+}
+#sequence div div.cons_G{
+	background-color:black;
+}
+
+
+.cons_hundred{
+	height:100%;
+	z-index:2;
+	position:absolute;
+	bottom:0;
+	border-left: 1px solid white;
+	border-right: 1px solid white;
+}
+.cons_sixtysix{
+	height:66%;
+	z-index:2;
+	position:absolute;
+	bottom:0;
+	border-left: 1px solid white;
+	border-right: 1px solid white;
+	border-top: 1px solid white;
+}
+.cons_fifty{
+	height:50%;
+	z-index:2;
+	position:absolute;
+	bottom:0;
+	border-left: 1px solid white;
+	border-right: 1px solid white;
+	border-top: 1px solid white;
+}
+.cons_thirtythree{
+	height:33%;
+	z-index:2;
+	position:absolute;
+	bottom:0;
+	border-left: 1px solid white;
+	border-right: 1px solid white;
+	border-top: 1px solid white;
+}
+#barcode div div.hgram{
+	position:absolute;
+	bottom:0;
+	background:#777;
+	border-top:1px solid black;
+}
+#sequence div div.hgram{
+	position:absolute;
+	bottom:0;
+	background:#777;
+	border-top:1px solid black;
+}
+input.controls{
+	cursor:pointer;
+}
+input.disabled{
+	opacity:0.3;
+	filter:alpha(opacity=30); /* For IE8 and earlier */
+	cursor:default;
+}
+

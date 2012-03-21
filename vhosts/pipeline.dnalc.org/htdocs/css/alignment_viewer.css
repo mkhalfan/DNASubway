@@ -23,7 +23,8 @@
 #barcode div div.C{
   background-color:blue;
 }
-#barcode div div.x {
+#barcode div div.M, #barcode div div.R, #barcode div div.W, #barcode div div.S, #barcode div div.Y, #barcode div div.K, #barcode div div.V, #barcode div div.H, #barcode div div.D, #barcode div div.B, #barcode div div.X, #barcode div div.N, #barcode div div.dash
+{
  color:#999;
  background-color:#999;
 }
@@ -55,7 +56,8 @@
  color:blue;
  background-color:blue;
 }
-.fingerprint div div.x {
+.fingerprint div div.M, .fingerprint div div.R, .fingerprint div div.W, .fingerprint div div.S, .fingerprint div div.Y, .fingerprint div div.K, .fingerprint div div.V, .fingerprint div div.H, .fingerprint div div.D, .fingerprint div div.B, .fingerprint div div.X, .fingerprint div div.N, .fingerprint div div.dash
+{
  color:#999;
  background-color:#999;
 }
@@ -75,7 +77,8 @@
  color:blue;
  background-color:#F0F0F0;
 }
-.bases div div.x{
+.bases div div.M, .bases div div.R, .bases div div.W, .bases div div.S, .bases div div.Y, .bases div div.K, .bases div div.V, .bases div div.H, .bases div div.D, .bases div div.B, .bases div div.X, .bases div div.N, .bases div div.dash
+{
  color:grey;
  background-color:#F0F0F0;
 }
