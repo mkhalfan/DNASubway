@@ -18,7 +18,8 @@ use DNALC::Pipeline::Process::Phylip::Consense ();
 use DNALC::Pipeline::Config();
 use File::Basename;
 use Data::Dumper;
-use Image::LibRSVG;
+use Image::LibRSVG ();
+use File::chdir;
 
 
 sub run_build_tree {
@@ -93,8 +94,16 @@ sub run_build_tree {
 				$tree_height = 200 if ($tree_height < 200);
 
 				## Make the tree in SVG format			
-				if ($status eq 'success'){
-					if (system("java -jar /usr/local/TreeVector/source/TreeVector.jar " . $pm->get_tree($tree_type)->{tree_file} . " -out $tree_id.svg -size 760 $tree_height") == 0){
+				if ($status eq 'success') {
+					unless (-e "/usr/local/TreeVector/source/TreeVector.jar") {
+						$msg = "TreeVector file(s) are missing.";
+						print STDERR "__FILE__: ", $msg;
+						return nfreeze({status => 'error', msg => $msg});
+					}
+
+					if (system("java -jar /usr/local/TreeVector/source/TreeVector.jar " 
+						. $pm->get_tree($tree_type)->{tree_file} . " -out $tree_id.svg") == 0) 
+					{
 						## Convert the SVG to a PNG
 						my $rsvg = new Image::LibRSVG();
 						$rsvg->convert("$tree_id.svg", "$tree_id.png");
@@ -109,7 +118,7 @@ sub run_build_tree {
 		}
 	}
 
-   return nfreeze({status => $status, msg => $msg});
+	return nfreeze({status => $status, msg => $msg});
 }
 
 sub run_build_tree_save {
@@ -358,6 +367,7 @@ my $stop_if = sub {
 
 #-------------------------------------------------
 
+$CWD = "/";
 my $pcf = DNALC::Pipeline::Config->new->cf('PIPELINE');
 my $worker = Gearman::Worker->new;
 $worker->job_servers(@{$pcf->{GEARMAN_SERVERS}});
