@@ -20,7 +20,7 @@ use File::Basename;
 	}
 
 	sub do_postprocessing {
-		my ($self, $m_output) = @_;
+		my ($self, $m_output, $is_amino) = @_;
 
 		if (defined $self->{conf}->{post_processing_cmd} && -x $self->{conf}->{post_processing_cmd}) {
 			my $html_output = my $trimmed_output = $m_output;
@@ -32,7 +32,8 @@ use File::Basename;
 					'-i', $m_output,      # -i input file, muscle output
 					'-h', $html_output,   # -h the html output file
 					'-o', $trimmed_output,# -o trimmed alignment, output
-					'-n', "0"             # -n number of sequences w/ terminal gaps allowed 
+					'-n', "0",            # -n number of sequences w/ terminal gaps allowed 
+					$is_amino			  # will pass --is_amino if the project type is protein
 				);
 			if (system($self->{conf}->{post_processing_cmd}, @args) == 0) {
 				return {html_output => $html_output, trimmed_output => $trimmed_output};
