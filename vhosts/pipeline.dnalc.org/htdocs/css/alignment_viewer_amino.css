@@ -243,6 +243,10 @@
  background-color:#F0F0F0;
  color:#FF8CFF;
 }
+.bases div div.dash{
+ background-color:#F0F0F0;
+ color:#666666;
+}
 .row{
  line-height:20px;
  margin:2px 0px;
