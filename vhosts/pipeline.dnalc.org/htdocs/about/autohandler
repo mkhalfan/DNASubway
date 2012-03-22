@@ -50,6 +50,7 @@
 	<span class="bt_blueStart"><a href="/project/phylogenetics/create_project.html"></a></span>
     <span class="spacer_btGlossary"></span>
 % }
+	<div style="padding-left: 20px;"><a href="./changelog">Changelog</a></div>
 </div><!--END of ID container_leftMenu-->
 <!-- end header -->
 
