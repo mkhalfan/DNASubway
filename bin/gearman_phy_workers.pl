@@ -102,7 +102,7 @@ sub run_build_tree {
 					}
 
 					if (system("java -jar /usr/local/TreeVector/source/TreeVector.jar " 
-						. $pm->get_tree($tree_type)->{tree_file} . " -out $tree_id.svg") == 0) 
+						. $pm->get_tree($tree_type)->{tree_file} . " -out $tree_id.svg -size 760 $tree_height") == 0) 
 					{
 						## Convert the SVG to a PNG
 						my $rsvg = new Image::LibRSVG();
