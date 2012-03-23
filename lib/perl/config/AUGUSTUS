@@ -15,6 +15,7 @@
 		d => '--species=arabidopsis',
 		m => '--species=maize',
 		h => '--species=human',
+		a => '--species=human',
 		default => '--species=arabidopsis',
 	},
 

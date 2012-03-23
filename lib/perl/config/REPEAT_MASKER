@@ -21,6 +21,7 @@
 		m => [qw/-species monocotyledons/],
 		default => [qw/-species viridiplantae/],
 		h => [qw/-species human/],
+		a => [qw/-species bilateria/],
 	},
 }
 

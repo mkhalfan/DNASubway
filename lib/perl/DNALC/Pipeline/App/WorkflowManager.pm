@@ -500,7 +500,7 @@ use Carp;
 			}
 		}
 
-		my $blastn = DNALC::Pipeline::Process::Blast->new( $pm->work_dir, 'blastn' );
+		my $blastn = DNALC::Pipeline::Process::Blast->new( $pm->work_dir, 'blastn', $proj->clade );
 		if ($blastn) {
 
 			my $input_file = $pm->fasta_masked_xsmall;
@@ -543,7 +543,7 @@ use Carp;
 			}
 		}
 
-		my $blastx = DNALC::Pipeline::Process::Blast->new( $pm->work_dir, 'blastx' );
+		my $blastx = DNALC::Pipeline::Process::Blast->new( $pm->work_dir, 'blastx', $proj->clade );
 		if ($blastx) {
 
 			my $input_file = $pm->fasta_masked_xsmall;

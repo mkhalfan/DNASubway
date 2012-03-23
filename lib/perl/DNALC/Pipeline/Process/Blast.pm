@@ -8,7 +8,7 @@ use strict;
 
 {
 	sub new {
-		my ($class, $project_dir, $prog) = @_;
+		my ($class, $project_dir, $prog, $clade) = @_;
 
 		$prog ||= 'blastn';
 		my $self = __PACKAGE__->SUPER::new(uc($prog), $project_dir);
@@ -24,7 +24,21 @@ use strict;
 		}
 		else {
 			$ENV{BLASTDB} = $self->{conf}{blastdb};
+
+			my $species_map = $self->{conf}->{species_map};
+			if (defined $species_map && %$species_map) {
+				unless ($clade && $clade =~ /^(?:a|f)$/) {
+					$clade = 'default';
+				}
+				$self->{clade} = $clade;
+				if (defined $species_map->{$clade}) {
+					my $db =  $species_map->{$clade};
+					push @{ $self->{work_options} }, ('-d', $db, '-i');
+				}
+			}
+
 		}
+
 		$ENV{BLASTMAT}=$self->{conf}{blastmat};
 
 		return $self;

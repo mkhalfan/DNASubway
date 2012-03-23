@@ -14,6 +14,7 @@
 		d => [qw/-species eudicotyledons/], #must be ARRAY ref
 		m => [qw/-species monocotyledons/],
 		default => [qw/-species viridiplantae/],
+		a => [qw/-species bilateria/],
 	},
 }
 

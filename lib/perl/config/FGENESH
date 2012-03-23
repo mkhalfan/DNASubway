@@ -11,6 +11,8 @@
 	species_map => {
 		d => '/usr/local/fgenesh/Dicots',
 		m => '/usr/local/fgenesh/Monocots',
+		h => '/usr/local/fgenesh/Human',
+		a => '/usr/local/fgenesh/Human',
 		default => '/usr/local/fgenesh/Dicots',
 	},
 	RUN_LIMIT_PER_DAY => 20,

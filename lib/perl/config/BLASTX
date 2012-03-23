@@ -9,14 +9,14 @@
 		'-v',	250,
 		'-e',	'1e-5',
 		'-p',	'blastx',
-		'-d', 	'uniprot_viridiplantae_sprot',
+		#'-d', 	'uniprot_viridiplantae_sprot',
 		'-F',	'"m"',
 		'-U',
 		'-K',	40,
 		'-W',	3,
 		'-P',	0,
 		'-I',	'T',
-		'-i',
+		#'-i',
 	],
 	file_to_parse => qr/stdout\.txt$/,
 	parser_program => '/var/www/bin/bp_search2gff_revised.pl',
@@ -30,4 +30,9 @@
 		'--bits', '30',
 	],
 	gff3_file => 'output.gff',
+	species_map => {
+		default => 'uniprot_viridiplantae_sprot',
+		a => 'uniprot.bilateria',
+	},
+
 }

@@ -237,6 +237,21 @@ sub get_organisms {
 	return @data;
 }
 
+sub get_by_type {
+	my ($self, @clades) = @_;
+
+	return unless @clades;
+
+	my $clades = join ',', map {"'$_'"} @clades;
+	__PACKAGE__->retrieve_from_sql(qq{
+			active = 'T'
+			AND clade IN ($clades)
+			ORDER BY organism, segment, start
+		});
+}
+
+
+
 1;
 
 
