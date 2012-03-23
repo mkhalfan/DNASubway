@@ -31,7 +31,8 @@
 	my $pm = DNALC::Pipeline::App::Phylogenetics::ProjectManager->new($pid);
 	my $blast = DNALC::Pipeline::Phylogenetics::Blast->retrieve($bid);
 
-	if ($pm->project && $pm->project->user_id != $s->{user_id}) {
+	my $proj = $pm->project;
+	if (!$proj || $proj->user_id != $s->{user_id}) {
 		$msg = "Project not found or you don't own the project.";
 	}
 	elsif ($blast && $pm) {

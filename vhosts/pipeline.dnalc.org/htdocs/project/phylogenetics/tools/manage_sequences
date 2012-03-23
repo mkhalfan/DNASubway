@@ -86,11 +86,13 @@
 	my %sequence_groups = ();
 	my %selected_sequences = ();
 	my %available_sequences = ();
+	
+	my $s = $m->session->{pipeline};
 
 	my $memcached = DNALC::Pipeline::CacheMemcached->new;
 	my $pm = DNALC::Pipeline::App::Phylogenetics::ProjectManager->new($pid);
 	my $proj = $pm->project;
-	unless ($proj) {
+	unless ($proj && $proj->user_id == $s->{user_id}) {
 		print "Project not found!";
 		return;
 	}

@@ -121,7 +121,8 @@
 	
 	my $pm = DNALC::Pipeline::App::Phylogenetics::ProjectManager->new($pid);
 	my $proj = $pm->project;
-	unless ($proj || $s->{user_id} != $proj->user_id) {
+
+	unless ($proj && $s->{user_id} == $proj->user_id) {
 		push @err, "Project not found!";
 	}
 	

@@ -6,7 +6,7 @@
 	use DNALC::Pipeline::App::Phylogenetics::ProjectManager ();
 </%once>
 <%init>
-	$r->content_type("text/javascript");
+	$r->content_type("text/plain");
 	my $s = $m->session->{pipeline};
 	
 	my $pm = DNALC::Pipeline::App::Phylogenetics::ProjectManager->new($pid);
@@ -16,7 +16,6 @@
 		my $mc_key = "selected-seq-$pid";
 
 		my $fasta = $pm->alignable_sequences;
-		$r->content_type("text/plain");
 		$r->headers_out->add("Content-Disposition" => "attachment;filename=$mc_key.fasta");
 		$r->headers_out->add("Content-Length" => length $fasta);
 		$r->headers_out->add("Cache-Control" => "max-age=0");
@@ -24,7 +23,6 @@
 		return;
 	}
 	else {
-		$r->content_type("text/javascript");
 		print "Error\n";
 	}
 </%init>
