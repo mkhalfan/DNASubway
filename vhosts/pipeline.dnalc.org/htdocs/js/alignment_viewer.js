@@ -19,7 +19,7 @@ function zoomIn() {
 	else{
 		$$('#barcode div div').each(function(el) {
 			el.setStyle({
-				width: 2*width + 'px',
+				width: 2*width + 'px'
 			});
 		});
 		$('div_width').value=2*width;
@@ -43,7 +43,7 @@ function zoomOut() {
 		$('barcode').show();
 		$$('#barcode div div').each(function(el) {
 			el.setStyle({
-				width: '8px',
+				width: '8px'
 			});
 		});			
 		$('div_width').value='8';
@@ -51,7 +51,7 @@ function zoomOut() {
 	else {
 		$$('#barcode div div').each(function(el) {
 			el.setStyle({
-				width: width/2 + 'px',
+				width: width/2 + 'px'
 			});
 		});
 		var new_width = width/2
@@ -74,7 +74,7 @@ function barcodeView() {
 		$('barcode').show();	
 		$$('#barcode div div').each(function(el) {
 			el.setStyle({
-				width: '1px',
+				width: '1px'
 			});
 		});
 		$('div_width').value='1';
