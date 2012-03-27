@@ -64,7 +64,12 @@ my $barcode = $dec->{barcode};
 my $labels = $dec->{labels};
 
 if ($html_out->open($htmlout, "w")){
-	print $html_out "<html>", "\n", "<head>", "\n", $style, "\n", $script, "\n", "</head>", "\n", $body_tag, "\n";
+	print $html_out '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">', "\n";
+	print $html_out '<html xmlns="http://www.w3.org/1999/xhtml">';
+	print $html_out '<head>';
+	print $html_out '<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />';
+	print $html_out '<title>Alignment Viewer</title>';
+	print $html_out $style, "\n", $script, "\n", "</head>", "\n", $body_tag, "\n";
 	print $html_out $buttons, "\n";
 	print $html_out '<div id="viewport" class="viewport">', "\n";
 	print $html_out '<div id="labels">', "\n", $labels, '</div>', "\n";
@@ -77,7 +82,7 @@ if ($html_out->open($htmlout, "w")){
 	print $html_out '</div><!--end barcode div-->', "\n";
 	print $html_out '</div><!--end alignment div-->', "\n";
 	print $html_out '</div><!--end viewport div-->', "\n";
-	print $html_out '<input type="hidden" id="div_width" value="1">', "\n";
+	print $html_out '<input type="hidden" id="div_width" value="1" />', "\n";
 	print $html_out '</body>', "\n", '</html>';
 
 	undef $html_out
