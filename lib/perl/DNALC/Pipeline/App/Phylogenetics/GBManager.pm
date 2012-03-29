@@ -12,8 +12,9 @@ use XML::Simple;
 use File::Basename;
 use Archive::Tar;
 use Cwd;
-use Net::FTP;
-use MIME::Lite;
+use Net::FTP ();
+use MIME::Lite ();
+use Bio::Trace::ABIF ();
 
 use DNALC::Pipeline::App::Phylogenetics::ProjectManager();
 use DNALC::Pipeline::Phylogenetics::Bold ();
@@ -108,7 +109,7 @@ use DNALC::Pipeline::Utils qw(random_string);
 		my $fasta_file = $self->{work_dir} . "/$seq_id/$id.fsa";
 		my $outfile = IO::File->new;
 		if ($outfile->open($fasta_file, "w")){
-			print $outfile ">", $id, " [organism=$organism]", "\n";
+			print $outfile ">", $id, " [tech=barcode] [organism=$organism]", "\n";
 			print $outfile $seq;
 			undef $outfile;
 			print STDERR "Fasta file created: ", $self->{work_dir}, "/$seq_id/$id.fsa\n";
@@ -139,6 +140,29 @@ use DNALC::Pipeline::Utils qw(random_string);
 
 		# Get the JSON data from the DB and parse it in order to populate the SMT
 		my $data = $self->_parse_json($record->data);
+		my %data_hash = %$data;
+		my $names = {};
+
+		# Create a hashref of hashrefs which contain author names
+        # Ex: %$data_hash->{1}->{first} = "Mohammed"
+        # {1} indicates author number (1 is always present, after 1
+        # these numbers are not sequential or continuous, but they
+        # are unique. Ex: 1, 5, 3). {first} indicates first name.
+        # Keys here are either {first} or {last}
+        for (keys %data_hash) {
+            if ($_ =~ /author_(first|last)(\d+)$/) {
+                $names->{$2}->{$1} = $data_hash{$_};
+            }
+        }
+
+		# create the names entry for populating the SMT
+        # using the information collected above in %data_hash
+        my $names_new = "";
+        for my $person_id (sort keys %$names){
+            my $first = $names->{$person_id}->{first};
+            my $last = $names->{$person_id}->{"last"};
+            $names_new = $names_new . "$first $last, ";
+        }
 
 		# Get the primer sequences corresponding to the primer names
 		my $f_primer_name = $data->{f_primer};
@@ -164,8 +188,8 @@ use DNALC::Pipeline::Utils qw(random_string);
 		my ($d, $m, $y) = split '/', $data->{date_collected};
 		my $date_collected = "$d-$months{$m}-$y";
 
-		# Populate the SMT file with the data
-		my @column_data_array = ($id, $id, $data->{tax}, $data->{collectors}, 
+		# Populate the SMT file with the data gathered above
+		my @column_data_array = ($id, $id, $data->{tax}, $names_new, 
 			$date_collected, $data->{country}, 
 			$data->{latitude} . " " . $data->{longitude}, 
 			$data->{notes}, $data->{sex}, $data->{stage}, $f_primer_name,
@@ -281,10 +305,10 @@ use DNALC::Pipeline::Utils qw(random_string);
 		my $id = $record->specimen_id;
 		my $work_dir = $self->{work_dir} . "/$seq_id";
 		my $template = $self->{work_dir} . "/$seq_id/template.sbt";
-		print STDERR "tbl2asn command: /usr/local/bin/linux.tbl2asn", "-t", $template, "-p", $work_dir, "-o", "$work_dir/genbank.asn\n";	
-		my $status = system("/usr/local/bin/linux.tbl2asn", "-t", $template, "-p", $work_dir, "-o", "$work_dir/genbank.asn");
+		print STDERR "tbl2asn command: /usr/local/bin/linux.tbl2asn", "-t", $template, "-p", $work_dir, "-o", "$work_dir/genbank.asn -V c\n";	
+		my $status = system("/usr/local/bin/linux.tbl2asn", "-t", $template, "-p", $work_dir, "-o", "$work_dir/genbank.asn", "-V", "c");
 		if (($status >>=8) != 0) {
-			print STDERR "FAILED: tbl2asn";	
+			print STDERR "FAILED: tbl2asn\n";	
 			_email_admin($record, "FAILED: tbl2asn");
 			return {status => 'error', 'message' => "FAILED: tbl2asn" };
 		}
@@ -303,6 +327,7 @@ use DNALC::Pipeline::Utils qw(random_string);
 	sub prep_trace_file {
 		my ($self, $record) = @_;
 		my $seq_id = $record->sequence_id;
+		my $specimen_id = $record->specimen_id;
 		my $work_dir = $self->{work_dir} . "/$seq_id";
 		
 		my $tar = Archive::Tar->new;
@@ -338,7 +363,16 @@ use DNALC::Pipeline::Utils qw(random_string);
 
 			# Create .tar.gz archive with both trace files (forward and reverse)
 			if (-f $f_file_name && -f $r_file_name){
-				$tar->add_files($f_file_name, $r_file_name);
+				my $tfile = Archive::Tar::File->new( file => $f_file_name );
+				$tfile->rename('trace_f.ab1');
+				$tar->add_files($tfile);
+				
+				$tfile = Archive::Tar::File->new( file => $r_file_name );
+				$tfile->rename('trace_r.ab1');
+				$tar->add_files($tfile);
+
+				#$tar->add_data("trace_f.ab1", $f_file_name, {type => 'file'});
+				#$tar->add_data("trace_r.ab1", $r_file_name, {type => 'file'});
 				if ($tar->write("$work_dir/trace-data.tar.gz", COMPRESS_GZIP)){
 					print  STDERR "tar file of trace files created: $work_dir/trace-data.tar.gz", $/;
 				}
@@ -356,7 +390,6 @@ use DNALC::Pipeline::Utils qw(random_string);
 			
 			# Get Base Caller info for both trace files (forward and reverse)
 			# We need this for the trace metadata file (created next)
-            use Bio::Trace::ABIF;
             my $abif = Bio::Trace::ABIF->new();
             my $bcf = "";
             my $bcr = "";
@@ -385,8 +418,8 @@ use DNALC::Pipeline::Utils qw(random_string);
 			my $outfile = IO::File->new;
 			if ($outfile->open($trace_info, "w")){
 				print $outfile $column_headers, "\n";
-				print $outfile $seq_id, "\t", $f_file_name, "\t", "ABI\t", "DNAS\t", "$bcf\t", "F\t\n";
-				print $outfile $seq_id, "\t", $r_file_name, "\t", "ABI\t", "DNAS\t", "$bcr\t", "R\t\n";
+				print $outfile $specimen_id, "\t", "trace_f.ab1", "\t", "ABI\t", "DNAS\t", "$bcf\t", "F\n";
+				print $outfile $specimen_id, "\t", "trace_r.ab1", "\t", "ABI\t", "DNAS\t", "$bcr\t", "R";
 				undef $outfile;
 				print STDERR "trace-info.txt created: $work_dir/trace-info.txt\n";
 				return {status => 'success'}
@@ -419,8 +452,8 @@ use DNALC::Pipeline::Utils qw(random_string);
 		my $tar = Archive::Tar->new;
 
 		chdir $work_dir;
-		if (-f "genbank.asn" && -f "trace-data.tar.gz"){
-			$tar->add_files("genbank.asn", "trace-data.tar.gz", "trace-info.txt");
+		if (-f "genbank.asn" && -f "trace-data.tar.gz" && -f "trace-info.txt"){
+			$tar->add_files("genbank.asn", "trace-info.txt", "trace-data.tar.gz");
 			if ($tar->write("$specimen_id.tar")){
 				chdir $self->{pwd};
 				print STDERR "Final tar file created: $work_dir/$specimen_id.tar", $/;
@@ -447,27 +480,30 @@ use DNALC::Pipeline::Utils qw(random_string);
 		my $user = $self->{ftp_user},
 		my $pw = $self->{ftp_pw},
 		
-		my $ftp = Net::FTP->new("ftp-private.ncbi.nlm.nih.gov", Debug=>0)
-			#or die "Cannot connect to: ftp-private.ncbi.nlm.nih.gov: $@";
+		my $ftp = Net::FTP->new("ftp-private.ncbi.nlm.nih.gov", Debug=>0, Passive => 0)
 			or do {
 				_email_admin($record, "Cannot connect to: ftp-private.ncbi.nlm.nih.gov: $@");
 				return {status => 'error', 'message' => "Cannot connect to: ftp-private.ncbi.nlm.nih.gov: $@" };
 			};
 
 		$ftp->login($user, $pw)
-			#or die "Cannot login ", $ftp->message;
 			or do {
 				_email_admin($record, "Cannot login (ftp): " . $ftp->message);
 				return {status => 'error', 'message' => "Cannot login (ftp): " . $ftp->message };
 			};
 
+		$ftp->binary;
+
 		$ftp->put("$work_dir/$specimen_id.tar")
-			#or die "put failed ", $ftp->message;
 			or do {
 					$ftp->quit;
 					_email_admin($record, "ftp put failed: " . $ftp->message);
 					return {status => 'error', 'message' => "ftp put failed: " . $ftp->message };
 			};
+		my $fname = "$specimen_id.tar";
+
+		my ($info) = grep /$fname/, $ftp->dir;
+		print STDERR '**: ', $info, $/;
 
 		$ftp->quit;			
 		return {status => 'success'};
@@ -482,7 +518,7 @@ use DNALC::Pipeline::Utils qw(random_string);
 		
 		my $ht = HTTP::Tiny->new(timeout => 30);
 		my $response = $ht->get("http://www.ncbi.nlm.nih.gov/WebSub/api/?user=$user&file=$specimen_id.tar");
-		print STDERR "Validation URL: http://www.ncbi.nlm.nih.gov/WebSub/api/?user=$user&file=$specimen_id.tar";
+		print STDERR "Validation URL: http://www.ncbi.nlm.nih.gov/WebSub/api/?user=$user&file=$specimen_id.tar\n";
 		my $parsed_response;
 
 		if ($response->{success} && length $response->{content}) {
@@ -504,10 +540,24 @@ use DNALC::Pipeline::Utils qw(random_string);
 					return {status => 'error', 'message' => "FAILED Validation - check email" };
         		}
     		}
+			elsif ($parsed_response->{response}->{code} eq "PASS_WITH_WARNINGS") {
+				print STDERR "PASSED WITH WARNINGS\n";
+				return {status => 'success'};
+				# email user
+				# change status
+				# waiting to finalize this elsif
+
+			}
 			elsif ($parsed_response->{response}->{code} eq "PASS"){
 				_change_status($record);
 				_email_user($record);
 				return {status => 'success'};
+			}
+			else {
+				# email user
+				# change status
+				# waiting to finalize this elsif
+				return {status => 'error', message => "Unencountered response code: " . $parsed_response->{response}->{code}};
 			}
 		}
 	}
