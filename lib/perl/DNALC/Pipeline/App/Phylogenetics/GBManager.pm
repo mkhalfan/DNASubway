@@ -26,6 +26,7 @@ use DNALC::Pipeline::Phylogenetics::Project();
 use DNALC::Pipeline::User ();
 use DNALC::Pipeline::Config ();
 use DNALC::Pipeline::Utils qw(random_string);
+use DNALC::Pipeline::App::Utils ();
 
 
 {
@@ -109,7 +110,7 @@ use DNALC::Pipeline::Utils qw(random_string);
 		my $fasta_file = $self->{work_dir} . "/$seq_id/$id.fsa";
 		my $outfile = IO::File->new;
 		if ($outfile->open($fasta_file, "w")){
-			print $outfile ">", $id, " [tech=barcode] [organism=$organism]", "\n";
+			print $outfile ">", $id, " [BioProject=PRJNAXXXXXX] [tech=barcode] [organism=$organism]", "\n";
 			print $outfile $seq;
 			undef $outfile;
 			print STDERR "Fasta file created: ", $self->{work_dir}, "/$seq_id/$id.fsa\n";
@@ -117,7 +118,7 @@ use DNALC::Pipeline::Utils qw(random_string);
 		}
 		else {
 			print STDERR "FAILED to create fasta file: ", $!, "\n";
-			_email_admin($record, "FAILED to create fasta file: $!");
+			$self->_email_admin($record, "FAILED to create fasta file: $!");
 			return {status => 'error', 'message' => "FAILED to create fasta file: $!" }
 		}
 	}
@@ -132,7 +133,7 @@ use DNALC::Pipeline::Utils qw(random_string);
 		my $seq_id = $record->sequence_id;
 
 		# Create column headers which is needed for the SMT file
-		my @column_headers_array = ("Sequence_ID",  "Specimen_voucer", 
+		my @column_headers_array = ("Sequence_ID",  "Isolate", "Isolation_source", 
 			"Identified_by", "Collected_by", "Collection_date", "Country", 
 			"Lat_Lon", "Note", "Sex", "Dev_stage", "Fwd_primer_name", 
 			"Fwd_primer_seq", "Rev_primer_name", "Rev_primer_seq");
@@ -189,8 +190,8 @@ use DNALC::Pipeline::Utils qw(random_string);
 		my $date_collected = "$d-$months{$m}-$y";
 
 		# Populate the SMT file with the data gathered above
-		my @column_data_array = ($id, $id, $data->{tax}, $names_new, 
-			$date_collected, $data->{country}, 
+		my @column_data_array = ($id, $id, $data->{isolation_source}, $data->{tax}, $names_new, 
+			$date_collected, "$data->{country}: $data->{state}, $data->{city}, $data->{site_desc}", 
 			$data->{latitude} . " " . $data->{longitude}, 
 			$data->{notes}, $data->{sex}, $data->{stage}, $f_primer_name,
 			$f_primer_seq, $r_primer_name, $r_primer_seq);
@@ -208,7 +209,7 @@ use DNALC::Pipeline::Utils qw(random_string);
 		}
 		else {
 			print STDERR "FAILED to create smt file: ", $!, "\n";
-			_email_admin($record, "FAILED to create smt file: $!");
+			$self->_email_admin($record, "FAILED to create smt file: $!");
 			return {status => 'error', 'message' =>  "FAILED to create smt file: $!" };
 		}
 	}
@@ -291,7 +292,7 @@ use DNALC::Pipeline::Utils qw(random_string);
 		}
 		else {
 			print STDERR "FAILED to create sbt template file: ", $!, "\n";
-			_email_admin($record, "FAILED to create sbt template file: $!");
+			$self->_email_admin($record, "FAILED to create sbt template file: $!");
 			return {status => 'error', 'message' => "FAILED to create sbt template file: $!" };
 		}
 	}
@@ -309,7 +310,7 @@ use DNALC::Pipeline::Utils qw(random_string);
 		my $status = system("/usr/local/bin/linux.tbl2asn", "-t", $template, "-p", $work_dir, "-o", "$work_dir/genbank.asn", "-V", "c");
 		if (($status >>=8) != 0) {
 			print STDERR "FAILED: tbl2asn\n";	
-			_email_admin($record, "FAILED: tbl2asn");
+			$self->_email_admin($record, "FAILED: tbl2asn");
 			return {status => 'error', 'message' => "FAILED: tbl2asn" };
 		}
 		else{
@@ -377,14 +378,14 @@ use DNALC::Pipeline::Utils qw(random_string);
 					print  STDERR "tar file of trace files created: $work_dir/trace-data.tar.gz", $/;
 				}
 				else{
-					_email_admin($record, "FAILED to create trace-data.tar.gz: $!");
+					$self->_email_admin($record, "FAILED to create trace-data.tar.gz: $!");
 					print STDERR "FAILED to create trace-data.tar.gz: ", $!, "\n";
 					return {status => 'error', 'message' => "FAILED to create trace-data.tar.gz: $!" };
 				}
 			}
 			else {
 				print STDERR "FAILED: \$f_file_name: $f_file_name and/or \$r_file_name: $r_file_name not found in dir $file_dir", $/;
-				_email_admin($record, "FAILED: \$f_file_name: [$f_file_name] and/or \$r_file_name: [$r_file_name] not found in dir $file_dir");
+				$self->_email_admin($record, "FAILED: \$f_file_name: [$f_file_name] and/or \$r_file_name: [$r_file_name] not found in dir $file_dir");
 				return {status => 'error', 'message' => "FAILED: \$f_file_name: [$f_file_name] and/or \$r_file_name: [$r_file_name] not found in dir $file_dir" };
 			}		
 			
@@ -426,14 +427,14 @@ use DNALC::Pipeline::Utils qw(random_string);
 			}
 			else {
 				print STDERR "FAILED to create file trace-info.txt: ", $!, "\n";
-				_email_admin($record, "FAILED to create file trace-info.txt: $!");
+				$self->_email_admin($record, "FAILED to create file trace-info.txt: $!");
 				return {status => 'error', 'message' => "FAILED to create file trace-info.txt: $!" };
 			}
 			
         }
 		else {
 			print STDERR "FAILED at prep_trace_files, \$forward: [$forward] & \$reverse: [$reverse] not there...";
-			_email_admin($record, "FAILED at prep_trace_files, \$forward: [$forward] & \$reverse: [$reverse] not there...");
+			$self->_email_admin($record, "FAILED at prep_trace_files, \$forward: [$forward] & \$reverse: [$reverse] not there...");
 			return {status => 'error', 'message' => "FAILED at prep_trace_files, \$forward: [$forward] & \$reverse: [$reverse] not there..." };
 		}
 
@@ -462,7 +463,7 @@ use DNALC::Pipeline::Utils qw(random_string);
 			else {
 				chdir $self->{pwd};
 				print STDERR "FAILED to create final tar file for submission: ", $!, $/;
-				_email_admin($record, "FAILED to create final tar file for submission: $!");
+				$self->_email_admin($record, "FAILED to create final tar file for submission: $!");
 				return {status => 'error', 'message' => "FAILED to create final tar file for submission: $!" };
 			}
 		}
@@ -482,13 +483,13 @@ use DNALC::Pipeline::Utils qw(random_string);
 		
 		my $ftp = Net::FTP->new("ftp-private.ncbi.nlm.nih.gov", Debug=>0, Passive => 0)
 			or do {
-				_email_admin($record, "Cannot connect to: ftp-private.ncbi.nlm.nih.gov: $@");
+				$self->_email_admin($record, "Cannot connect to: ftp-private.ncbi.nlm.nih.gov: $@");
 				return {status => 'error', 'message' => "Cannot connect to: ftp-private.ncbi.nlm.nih.gov: $@" };
 			};
 
 		$ftp->login($user, $pw)
 			or do {
-				_email_admin($record, "Cannot login (ftp): " . $ftp->message);
+				$self->_email_admin($record, "Cannot login (ftp): " . $ftp->message);
 				return {status => 'error', 'message' => "Cannot login (ftp): " . $ftp->message };
 			};
 
@@ -497,7 +498,7 @@ use DNALC::Pipeline::Utils qw(random_string);
 		$ftp->put("$work_dir/$specimen_id.tar")
 			or do {
 					$ftp->quit;
-					_email_admin($record, "ftp put failed: " . $ftp->message);
+					$self->_email_admin($record, "ftp put failed: " . $ftp->message);
 					return {status => 'error', 'message' => "ftp put failed: " . $ftp->message };
 			};
 		my $fname = "$specimen_id.tar";
@@ -526,37 +527,35 @@ use DNALC::Pipeline::Utils qw(random_string);
 			if ($parsed_response->{response}->{code} eq "FAIL"){
 				print STDERR "FAILED VALIDATION", $/;
         		print STDERR "CODE: ", $parsed_response->{response}->{code}, $/;
-				#print "Messages: ", $parsed_response->{response}->{message}, $/;
-        		if (ref($parsed_response->{response}->{message}) eq 'ARRAY'){
+				#if (ref($parsed_response->{response}->{message}) eq 'ARRAY'){
 					#print "array! \n";
-            		my $message = "";
-            		for my $m (@{$parsed_response->{response}->{message}}){
-                		for (keys %$m) {
-                    		$message .= $_ . " = ". $m->{$_} . "\n";
-                		}
-            		}
-            		print STDERR $message, $/;
-					_email_admin($record, $message);
-					return {status => 'error', 'message' => "FAILED Validation - check email" };
-        		}
+					#my $message = "";
+					#for my $m (@{$parsed_response->{response}->{message}}){
+						#for (keys %$m) {
+							#$message .= $_ . " = ". $m->{$_} . "\n";
+						#}
+					#}
+					#print STDERR $message, $/;
+				$self->_email_admin($record, 'FAILED Validation - check email');
+				return {status => 'error', 'message' => "FAILED Validation - check email" };
+				#}
     		}
 			elsif ($parsed_response->{response}->{code} eq "PASS_WITH_WARNINGS") {
 				print STDERR "PASSED WITH WARNINGS\n";
+				#$self->_email_admin($record, 'Passed With Warnings - check email');
+				$self->_change_status($record, "Passed With Warnings");
+				$self->_email_user($record);
 				return {status => 'success'};
-				# email user
-				# change status
-				# waiting to finalize this elsif
-
 			}
 			elsif ($parsed_response->{response}->{code} eq "PASS"){
-				_change_status($record);
-				_email_user($record);
+				print STDERR "PASSED VALIDATION! \n";
+				$self->_change_status($record, "Passed validation");
+				$self->_email_user($record);
 				return {status => 'success'};
 			}
 			else {
-				# email user
-				# change status
-				# waiting to finalize this elsif
+				print STDERR "UNENCOUNTERED RESPONSE CODE FROM VALIDATION: ", $parsed_response->{response}->{code};
+				$self->_email_admin($record, "Unencountered response code: " . $parsed_response->{response}->{code} . ' - check email');
 				return {status => 'error', message => "Unencountered response code: " . $parsed_response->{response}->{code}};
 			}
 		}
@@ -567,18 +566,13 @@ use DNALC::Pipeline::Utils qw(random_string);
 	# where submission files are located
 	#
 	sub _change_status{
-		my ($self, $record) = @_;
-		$record->status("Submitted. Dir: " . $record->sequence_id);
-		if ($record->update){
-			print STDERR "GB Entry ", $_->id, " status updated. \n";
-		}
+		my ($self, $record, $status) = @_;
+		$record->status($status);
+		$record->update;
 	}
 
 	# ---------------------------------------
 	# Email the user on (successful) submission.
-	# We can probably combine the _email_user
-	# routine with the _email_admin routine
-	# below.
 	#
 	sub _email_user {
 		my ($self, $record) = @_;
@@ -588,34 +582,11 @@ use DNALC::Pipeline::Utils qw(random_string);
 
 		my $message = "Thank you for submitting your sequence. This email is to confirm that your submission has been processed successfully. Please note however this does not mean your sequence has been successfully accepted and published to GenBank. GenBank will review all submissions, typically within 48 hours, at which point you will receive another confirmation email. Your DNA Subway submission ID is ". $record->{specimen_id} . ". Please keep this for future reference.\n\nThank you,\nThe DNA Subway Team";
 		
-		my $cf = DNALC::Pipeline::Config->new->cf('PIPELINE');
-        my $msg = MIME::Lite->new (
-            From => '"DNASubway Admin" <dnalcadmin@cshl.edu>',
-            To => $user_email,
-            Subject => "Your DNA Subway Submission to GenBank",
-            Type => 'multipart/mixed',
-        );
-        $msg->attach (
-            Type => 'text/plain',
-            Data => $message,
-        );
-		
-		my $sent;
-
-		eval {
-            if (defined $cf->{SMTP_SERVER} && $cf->{SMTP_SERVER} ne "") {
-                $sent = $msg->send("smtp", $cf->{SMTP_SERVER}, Timeout=>30);
-            }
-            else {
-				$sent = $msg->send;
-            }
-        };
-        if ($@) {
-            print STDERR "Error: " . $@ . "\n";
-            $sent = $msg->send;
-        }
-        return $sent;
-		
+		DNALC::Pipeline::App::Utils->send_email({
+                To => $user_email,
+                Message => $message,
+                Subject => 'Your DNA Subway Submission to GenBank',
+            });
 	}
 
 	
@@ -623,36 +594,16 @@ use DNALC::Pipeline::Utils qw(random_string);
 	# Email the admin on failed submission attempt
 	#
 	sub _email_admin{
-		my ($record, $message) = @_;
+		my ($self, $record, $message) = @_;
 		my $specimen_id = $record->specimen_id;
-		$message = "ID: $record\nSpecimen ID: $specimen_id \nMessage: $message";
-		my $cf = DNALC::Pipeline::Config->new->cf('PIPELINE');
-        my $msg = MIME::Lite->new (
-            From => '"DNASubway Admin" <dnalcadmin@cshl.edu>',
-            To => 'mkhalfan@cshl.edu',
-            Subject => "FAILED GB Submission",
-            Type => 'multipart/mixed',
-        );
-        $msg->attach (
-            Type => 'text/plain',
-            Data => $message,
-        );
 		
-		my $sent;
+		$message = "ID: $record\nSpecimen ID: $specimen_id \nMessage:\n$message";
 
-		eval {
-            if (defined $cf->{SMTP_SERVER} && $cf->{SMTP_SERVER} ne "") {
-                $sent = $msg->send("smtp", $cf->{SMTP_SERVER}, Timeout=>30);
-            }
-            else {
-				$sent = $msg->send;
-            }
-        };
-        if ($@) {
-            print STDERR "Error: " . $@ . "\n";
-            $sent = $msg->send;
-        }
-        return $sent;
+		DNALC::Pipeline::App::Utils->send_email({
+				To => 'mkhalfan@cshl.edu, ghiban@cshl.edu',
+				Message => $message,
+				Subject => 'FAILED GB Submission',
+			});
 	}
 }
 

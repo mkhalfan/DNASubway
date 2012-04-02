@@ -13,6 +13,7 @@ use DNALC::Pipeline::Config ();
 use DNALC::Pipeline::Utils qw(random_string);
 use Digest::MD5 ();
 use Time::Piece ();
+use MIME::Lite ();
 use Carp;
 
 use Data::Dumper;
@@ -357,6 +358,41 @@ sub remove_dir {
 		}
 		rmdir $dir unless $keep_root;
 	}
+}
+
+
+sub send_email {
+
+	my ($class, $params) = @_;
+	unless ($params->{Message}){
+		print STDERR "No message sent to the send_email routine, cannot send an empty email, dying...";
+		return;
+	}
+
+	my $cf = DNALC::Pipeline::Config->new->cf('PIPELINE');
+	my $msg = MIME::Lite->new (
+		From => '"DNASubway Admin" <dnalcadmin@cshl.edu>',
+		To => $params->{To} || '<dnalcadmin@cshl.edu>',
+		Subject => $params->{Subject} || "Message from DNA Subway",
+		Type => $params->{Type} || 'text/plain',
+		Data => $params->{Message},
+	);
+	
+	my $sent;
+
+	eval {
+		if (defined $cf->{SMTP_SERVER} && $cf->{SMTP_SERVER} ne "") {
+			$sent = $msg->send("smtp", $cf->{SMTP_SERVER}, Timeout=>20);
+		}
+		else {
+			$sent = $msg->send;
+		}
+	};
+	if ($@) {
+		print STDERR "Error: " . $@ . "\n";
+		$sent = $msg->send;
+	}
+	return $sent;
 }
 
 1;

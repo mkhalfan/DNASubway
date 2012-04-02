@@ -8,7 +8,11 @@
 	BOLD_SUBMISSION_DIR => '/var/www/vhosts/pipeline.dnalc.org/var/projects/phylogenetics/bold_submissions',
 	GB_SUBMISSION_DIR => '/var/www/vhosts/pipeline.dnalc.org/var/projects/phylogenetics/gb_submissions',
 	GB_TBL2ASN_TEMPLATE_PATH => '/var/www/vhosts/pipeline.dnalc.org/var/templates/tbl2asn/template.sbt',
-	EXPORT_ON => 0,
+	GB_FTP_HOST => 'ftp-private.ncbi.nlm.nih.gov',
+	GB_FTP_USER => 'test_dnasubway',
+	GB_VALIDATION_USER => 'test_dnasubway_bankit',
+	GB_FTP_PW => '',
+	EXPORT_ON => 1,
 	
 
 	# not used yet
