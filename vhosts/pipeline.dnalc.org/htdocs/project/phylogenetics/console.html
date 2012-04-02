@@ -143,8 +143,8 @@
     
 <span class="conBlueline_ConColumn5">
 	<div class="con_browserBT ">
-		<span class="conIndicator_boxBrowse"><div class="conIndicatorBL_<%$is_owner && $export_is_on ? "not-processed" : "disabled" %>"></div> </span>
-		<span class="bt_browserBlue"><a href="javascript:;" onclick="<%$is_owner && $export_is_on? "phy.launch('BOLD', '/project/phylogenetics/bold/?pid=$proj', 'Export to GenBank')" : "" %>">Export to<br/>GenBank</a></span>
+		<span class="conIndicator_boxBrowse"><div class="conIndicatorBL_<%$is_owner && $export_is_on && $is_barcoding ? "not-processed" : "disabled" %>"></div> </span>
+		<span class="bt_browserBlue"><a href="javascript:;" onclick="<%$is_owner && $export_is_on && $is_barcoding ? "phy.launch('BOLD', '/project/phylogenetics/bold/?pid=$proj', 'Export to GenBank')" : "" %>">Export to<br/>GenBank</a></span>
 	</div>
 	<div id="spacer_Runblueline">&nbsp;</div> 
 </span>
@@ -323,6 +323,10 @@ my $export_is_on = $cf->{EXPORT_ON};
 
 my $tree_store = File::Spec->catfile($pm->work_dir, "trees");
 my @trees = sort {$b cmp $a} <$tree_store/*.nw>;
+
+#check if project is of type rbcL or COI, true if it is
+my $is_barcoding = ($proj->type eq "rbcL" or $proj->type eq "COI" ? 1 : 0);
+
 </%init>
 %#-------------------------------------------------
 <%def .routine>

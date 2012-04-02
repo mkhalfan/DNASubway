@@ -66,7 +66,7 @@
 	new Tip('photos', "maybe some size/format restrictions here", {
 			className: 'blue_help'
 		});
-	new Tip('primers', "These are the actual PCR primers you used to amplified the barcoding<br/>locus (e.g. rbcL or COI)", {
+	new Tip('primers', "These are the actual PCR primers you used to amplify the barcoding<br/>locus (e.g. rbcL or COI)", {
 			className: 'blue_help'
 		});
 		});
@@ -77,8 +77,10 @@
 In order to export sequences to GenBank, you must:
 </p>
 <ul style="font-weight:bold;">
+<li>be working with an rbcL or COI project</li>
 <li>have at least 2 trace files in your project</li>
 <li>not have started your project using a sample data set</li>
+<li>ensure your sequences have been trimmed</li>
 </ul>
 
 %}
@@ -116,12 +118,21 @@ In order to export sequences to GenBank, you must:
 		$bsubmissions = DNALC::Pipeline::Phylogenetics::Bold->search(project_id => $proj->id);
 	}
 	
-	## Enable export to genbank if you have trace files in your project and they are not sample sequences
+	## Enable export to genbank if you have trace files in your project and they are not sample sequences 
+	## and they are trimmed and the project type is rbcL or COI
 	my $enable_export = 0;
 
 	## trace_seqs = the number of trace files in the project (we want more than 1 to enable export - so you can have a pair)
 	my $trace_seqs = DNALC::Pipeline::Phylogenetics::DataSequence->search_initial_trace_sequences($proj);
+	
+	## get trimmed status 
+	## 1 = not done
+	## 2 = done
+	my $trimmed = $pm->get_task_status('phy_trim');
+	
+	## get project type, true if it is rbcL or COI
+	my $is_barcoding = ($proj->type eq "rbcL" or $proj->type eq "COI" ? 1 : 0);
 
 	## proj->sample is false if the project was not created with a sample data set, true if it was
-	$enable_export = 1 if ($trace_seqs->count > 1) && ($proj->sample == 0);
+	$enable_export = 1 if ($trace_seqs->count > 1) && ($proj->sample == 0) && ($trimmed == 2) && ($is_barcoding);
 </%init>

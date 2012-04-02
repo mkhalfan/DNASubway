@@ -152,10 +152,6 @@
 	</script>	
 % }
 
-
-
-
-
 %#--------------------
 
 	</form>
@@ -184,6 +180,9 @@ new Tip('exact_site_help', "some help here", {
 new Tip('notes_help', "some help here", {
 		className: 'blue_help'
 	});
+new Tip('isolation_source_help', "some help here", {
+		className: 'blue_help'
+	});
 	});
 </script>
 
@@ -198,6 +197,7 @@ new Tip('notes_help', "some help here", {
 	use Regexp::Common;
 	use DNALC::Pipeline::Utils qw(clean_query);
 	use Data::Dumper;
+	use Scalar::Util qw(looks_like_number);
 	
 	my $cf = DNALC::Pipeline::Config->new;
 	my $primers = $cf->cf("PRIMERS");
@@ -220,13 +220,19 @@ new Tip('notes_help', "some help here", {
 			component => '../../.comp/countries'},
 		{id => "state", type => "component", err_msg => "State/Province", label => "State/Province", re => qr/\w+/, len => 48,
 			component => '../../.comp/_us_states'},
+		{id => "city", type=> "", err_msg => "City", label => "City", re => qr/\w+/, len => 48,},
 		{id => "site_desc", type => "", err_msg => "Exact Site", label => "Exact Site <img src='/images/question-icon.png' align='top' id='exact_site_help' />", re => qr/\w+/, len => 128, },
-		{id => "latitude", type => "", err_msg => "Latitude", label => "Latitude", re => qr/$RE{num}{real}/, len => 16, },
-		{id => "longitude", type => "", err_msg => "Longitude", label => "Longitude", re => qr/$RE{num}{real}/, len => 16, },
-		{id => "notes", type => "textarea", err_msg => "Notes ", label => "Notes <img src='/images/question-icon.png' align='top' id='notes_help' />", re => qr/\w*/, len => 255, },
-		{id => "sex", type => "radio", err_msg => "Sex of Specimen", label => "Sex of Specimen", values => ['Male', 'Female', 'Hermaphrodite']},
-		{id => "stage", type => "radio", err_msg => "Life Stage", label => "Life Stage", re => qr/(?:adult|immature)?/i, len => 8,
-			values => ['Adult', 'Immature']},
+		{id => "isolation_source", type => "", err_msg => "Isolation Source", label => "Isolation Source (optional) <img src='/images/question-icon.png' align='top' id='isolation_source_help' />", re => qr/\w*/, len => 128, },
+		{id => "latitude", type => "", err_msg => "Latitude", label => "Latitude (ex: 40.77 N)", re => qr/^$RE{num}{real}\s*[NSns]$/, len => 16, },
+		{id => "longitude", type => "", err_msg => "Longitude", label => "Longitude (ex: 73.98 W)", re => qr/^$RE{num}{real}\s*[EWew]$/, len => 16, },
+
+		#{id => "latitude", type => "component", err_msg => "Latitude", label => "Latitude", component => 'latitude'},
+		#{id => "longitude", type => "component", err_msg => "Logintude", label => "Longitude", component => 'longitude'},
+
+		{id => "notes", type => "textarea", err_msg => "Notes ", label => "Notes (optional) <img src='/images/question-icon.png' align='top' id='notes_help' />", re => qr/\w*/, len => 255, },
+		{id => "sex", type => "radio", err_msg => "Sex of Specimen", label => "Sex of Specimen (optional)", values => ['male', 'female', 'hermaphrodite']},
+		{id => "stage", type => "radio", err_msg => "Life Stage", label => "Life Stage (optional)", re => qr/(?:adult|immature)?/i, len => 8,
+			values => ['adult', 'immature']},
 	);
 	
 </%once>
@@ -316,7 +322,13 @@ new Tip('notes_help', "some help here", {
 					$f->{err} = 1;
 					push @err, $f->{message};
 				}
+				else {
+					$f->{err} = 0;
+				}
 
+			}
+			else {
+				$f->{err} = 0;
 			}
 			if ($f->{id} eq "date_collected" && $val ne "") {
 				my ($d, $m, $y) = split '/', $val;
@@ -328,8 +340,26 @@ new Tip('notes_help', "some help here", {
 				}
 
 			}
+			
+			if ($f->{id} eq "latitude" && $val ne "") {
+				my ($num, $dir) = $val =~ qr/^($RE{num}{real})\s*([NSns])$/;
+				unless ($num >= 0 && $num <= 90) {
+					push @err, "Latitude must be between 0 and 90.";
+				}
+				$dir = uc($dir);
+				$val = $num . $dir;
+			}
+			if ($f->{id} eq "longitude" && $val ne "") {
+				my ($num, $dir) = $val =~ qr/^($RE{num}{real})\s*([EWew])$/;
+				unless ($num >= 0 && $num <= 180) {
+					push @err, "Longitude must be between 0 and 180.";
+				}
+				$dir = uc($dir);
+				$val = $num . $dir;
+			}
+			
 			if ($f->{id} eq "tax_email" && $val ne "" && !Email::Valid->address($val)) {
-				push @err, "Identifier's email is not valid";
+				push @err, "Identifier's email is not valid.";
 				$f->{err} = 1;
 			}
 
