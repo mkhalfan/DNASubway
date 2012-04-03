@@ -1,0 +1,66 @@
+{
+	forward =>	[
+		{
+			'rbcL' => {
+				'rbcLaf-M13' => "TGTAAAACGACGGCCAGTATGTCACCACAAACAGAGACTAAAGC",
+			}
+		},		
+		{
+			'COI - fish' =>	{
+				'VF2_t1' => "TGTAAAACGACGGCCAGTCAACCAACCACAAAGACATTGGCAC",
+				'FishF2_t1' => "TGTAAAACGACGGCCAGTCGACTAATCATAAAGATATCGGCAC",
+			}
+		},		
+		{
+			'COI - mammals and insects' => {
+				'LepF1_t1' => "GTAAAACGACGGCCAGTATTCAACCAATCATAAAGATATTGG",
+				'VF1_t1' => "TGTAAAACGACGGCCAGTTCTCAACCAACCACAAAGACATTGG",
+				'VF1d_t1' => "TGTAAAACGACGGCCAGTTCTCAACCAACCACAARGAYATYGG",
+				'VF1i_t1' => "TGTAAAACGACGGCCAGTTCTCAACCAACCA<I>AA<I>GA<I>AT<I>GG",
+			}
+		},
+		{
+			'COI - metazoans' => {
+				'LC01490' => "ggtcaacaaatcataaagatattgg",
+			}
+		},
+		{
+			'ITS - Fungus' => {
+				'ITS1' => "TCCGTAGGTGAACCTGCGG",
+				'ITS 1F' => "CTTGGTCATTTAGAGGAAGTAA"
+			}
+		},
+	],
+	reverse =>	[
+		{
+			'rbcL' => {
+				'rbcLa-revM13' => "CAGGAAACAGCTATGACGTAAAATCAAGTCCACCRCG",
+			}
+		},		
+		{
+			'COI - fish' =>	{
+				'FishR2_t1' => "CAGGAAACAGCTATGACACTTCAGGGTGACCGAAGAATCAGAA",
+				'FR1d_t1' => "CAGGAAACAGCTATGACACCTCAGGGTGTCCGAARAAYCARAA",
+			}
+		},		
+		{
+			'COI - mammals and insects' => {
+				'LepR1_t1' => "CAGGAAACAGCTATGACTAAACTTCTGGATGTCCAAAAAATCA",
+				'VR1d_t1' => "CAGGAAACAGCTATGACTAGACTTCTGGGTGGCCRAARAAYCA",
+				'VR1_t1' => "CAGGAAACAGCTATGACTAGACTTCTGGGTGGCCAAAGAATCA",
+				'VR1i_t1' => "CAGGAAACAGCTATGACTAGACTTCTGGGTG<I>CC<I>AA<I>AA<I>CA",
+			}
+		},
+		{
+			'COI - metazoans' => {
+				'HC02198' => "taaacttcagggtgaccaaaaaatca",
+			}
+		},
+		{
+			'ITS - Fungus' => {
+				'rb' => "TCCTCCGCTTATTGATATGC",
+			}
+		},	
+	]	
+					
+}
