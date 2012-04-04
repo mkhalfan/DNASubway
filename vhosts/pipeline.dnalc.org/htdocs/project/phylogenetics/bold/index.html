@@ -42,7 +42,7 @@
 	
 
 	<div>
-	<a href="#" onclick="phy.next_bold_step();">New submission</a><a href="#" onclick="phy.next_bold_step();"><img src="/images/arrow-circle.png" border=0 width="16px" height="16px" style="padding-left:4px;" align="top" /></a></span>
+	<a href="javascript:;" onclick="phy.next_bold_step();">New submission</a><a href="javascript:;" onclick="phy.next_bold_step();"><img src="/images/arrow-circle.png" border=0 width="16px" height="16px" style="padding-left:4px;" align="top" /></a></span>
 	</div>
 	</form>
 	</p>
@@ -123,7 +123,7 @@ In order to export sequences to GenBank, you must:
 	my $enable_export = 0;
 
 	## trace_seqs = the number of trace files in the project (we want more than 1 to enable export - so you can have a pair)
-	my $trace_seqs = DNALC::Pipeline::Phylogenetics::DataSequence->search_initial_trace_sequences($proj);
+	my $trace_seqs = DNALC::Pipeline::Phylogenetics::DataSequence->search_trace_sequences($proj);
 	
 	## get trimmed status 
 	## 1 = not done
