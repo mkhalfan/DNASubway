@@ -605,6 +605,79 @@ use DNALC::Pipeline::App::Utils ();
 				Subject => 'FAILED GB Submission',
 			});
 	}
+
+	# ----------------------------------------
+	# Run Everything From Here
+	#
+	sub run {
+		my ($self, $id) = @_;
+
+		my $bail_out = sub { return {status => 'error', 'message' => shift} };		
+
+		# Run create_dir (doesn't return anything)
+    	$self->create_dir($id);
+
+    	# Run create_fasta
+    	my $st = $self->create_fasta($id);
+
+    	# Run create_smt
+    	if ($st->{status} eq 'success'){
+        	$st = $self->create_smt($id);
+    	}
+    	else {
+        	return $bail_out->("ID: $id ERROR: $st->{message}");
+    	}
+
+    	# Run make_template
+   		if ($st->{status} eq 'success'){
+        	$st = $self->make_template($id);
+    	}
+    	else {
+        	return $bail_out->("ID: $id ERROR: $st->{message}");
+   	 	}
+
+ 		# Run run_tbl2asn
+    	if ($st->{status} eq 'success'){
+        	$st = $self->run_tbl2asn($id);
+    	}
+    	else {
+        	return $bail_out->("ID: $id ERROR: $st->{message}");
+    	}
+
+    	# Run prep_trace_file
+    	if ($st->{status} eq 'success'){
+        	$st = $self->prep_trace_file($id);
+    	}
+    	else {
+        	return $bail_out->("ID: $id ERROR: $st->{message}");
+    	}
+
+    	# Run prep_submission_file
+    	if ($st->{status} eq 'success'){
+        	$st = $self->prep_submission_file($id);
+    	}
+    	else {
+        	return $bail_out->("ID: $id ERROR: $st->{message}");
+    	}
+		
+		# Run submit
+     	if ($st->{status} eq 'success'){
+        	$st = $self->submit($id);
+    	}
+    	else {
+        	return $bail_out->("ID: $id ERROR: $st->{message}");
+    	}
+ 		# Run validate_submission
+    	if ($st->{status} eq 'success'){
+        	$st = $self->validate_submission($id);
+    	}
+    	else {
+        	return $bail_out->("ID: $id ERROR: $st->{message}");
+    	}
+
+		return {status => $st->{status}, message => $st->{message}};
+		
+	}
 }
 
 1;
