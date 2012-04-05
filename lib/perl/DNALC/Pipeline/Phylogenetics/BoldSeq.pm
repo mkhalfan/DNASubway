@@ -8,3 +8,5 @@ __PACKAGE__->columns(Essential => qw/bold_id/);
 
 __PACKAGE__->has_a(bold_id => DNALC::Pipeline::Phylogenetics::Bold);
 
+1;
+

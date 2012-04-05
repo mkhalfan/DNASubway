@@ -4,11 +4,11 @@ use base qw(DNALC::Pipeline::DBI);
 
 __PACKAGE__->table('phy_bold');
 __PACKAGE__->columns(Primary => qw/id/);
-__PACKAGE__->columns(Essential => qw/project_id sequence_id specimen_id status container process_id/);
+__PACKAGE__->columns(Essential => qw/project_id sequence_id specimen_id status container/);
 __PACKAGE__->columns(Other => qw/data created updated/);
-#__PACKAGE__->sequence('phy_bold_id_seq');
 
 __PACKAGE__->has_many(bold_sequences => 'DNALC::Pipeline::Phylogenetics::BoldSeq');
+__PACKAGE__->has_many(photos => 'DNALC::Pipeline::Phylogenetics::BoldPhoto');
 
 __PACKAGE__->add_trigger('before_create' => sub {
 			my $self = shift;
@@ -22,16 +22,5 @@ sub _get_next_id {
 	my $class = shift;
 	$class->sql_next_id->select_val;
 }
-
-__END__
-package main;
-my $b = DNALC::Pipeline::Phylogenetics::Bold->create({
-			
-			project_id => 388,
-			sequence_id => 56025,
-			status => 'pending',
-			data => '{}',
-
-		});
 
 1;

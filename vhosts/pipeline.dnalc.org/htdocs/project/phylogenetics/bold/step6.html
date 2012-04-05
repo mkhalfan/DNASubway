@@ -126,11 +126,24 @@ top.show_messages("GenBank submission processed successfully. Your ID for this s
 </tr>
 </table>
 
+<div id="bimage_list_uploaded">
+	<ul>
+% if ($bs->{photos}) {
+%  my $index = 0;
+%  for my $ph (@{$bs->{photos}}) {
+%	next unless $ph->{"th-path"};
+	<li><img src="<% $m->comp("../../.comp/filepath_to_web", file => $ph->{"th-path"}, just_return => 1) |html %>" /></li>
+%  }
+	</ul>
+% }
+</div>
+<br style="clear:both" />
+
 </div>
 <div id="BOLDfooter">
 	<a href="./step5.html">Back</a>&nbsp;
 % unless ($b) {
-	<a href="#./step6.html" onclick="phy.next_bold_step();$('details').hide();$('loader').show();$('frame_title').update('Processing');$('BOLDfooter').hide();">Submit</a>
+	<a href="#./step6.html" onclick="$('bimage_list_uploaded').hide();phy.next_bold_step();$('details').hide();$('loader').show();$('frame_title').update('Processing');$('BOLDfooter').hide();">Submit</a>
 % }
 </div>
 % }
@@ -150,6 +163,7 @@ top.show_messages("GenBank submission processed successfully. Your ID for this s
 	use DNALC::Pipeline::App::Utils ();
 	use Gearman::Client ();
 	use Storable qw/thaw nfreeze/;
+	use File::Basename qw/basename/;
 	use Data::Dumper;
 </%once>
 
@@ -161,7 +175,7 @@ top.show_messages("GenBank submission processed successfully. Your ID for this s
 	
 	my $js = JSON::XS->new->utf8;
 
-	print STDERR "S6. PID = ", $pid, Dumper($s), $/;
+	#print STDERR "S6. PID = ", $pid, Dumper($s), $/;
 	
 	my $pm = DNALC::Pipeline::App::Phylogenetics::ProjectManager->new($pid);
 	my $proj = $pm->project;
@@ -206,6 +220,17 @@ top.show_messages("GenBank submission processed successfully. Your ID for this s
 								pair_id => $_,
 								project_id => $proj->id,
 						});
+						
+						if ($bs->{photos}) {
+							for my $ph (@{$bs->{photos}}) {
+								$b->add_to_photos({
+									project_id => $proj->id,
+									photo => basename($ph->{path}),
+									photo_thumb => basename($ph->{"th-path"}),
+								});
+							}
+						}
+
 						# PROCESS SUBMISSION HERE IMMEDIATELY, and redirect accordingly
 						my $pcf = DNALC::Pipeline::Config->new->cf('PIPELINE');
 						my $client = Gearman::Client->new;

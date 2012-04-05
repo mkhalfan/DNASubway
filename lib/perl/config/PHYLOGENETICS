@@ -5,6 +5,7 @@
 	BOOTSTRAPS => 100,
 	MAX_BLAST_RESULTS => 20,
 	DNALC_TRANSFER_DIR => '/var/tmp',
+	PHOTO_SUBMISSION_DIR => '/var/www/vhosts/pipeline.dnalc.org/var/projects/phylogenetics/photo_submissions',
 	BOLD_SUBMISSION_DIR => '/var/www/vhosts/pipeline.dnalc.org/var/projects/phylogenetics/bold_submissions',
 	GB_SUBMISSION_DIR => '/var/www/vhosts/pipeline.dnalc.org/var/projects/phylogenetics/gb_submissions',
 	GB_TBL2ASN_TEMPLATE_PATH => '/var/www/vhosts/pipeline.dnalc.org/var/templates/tbl2asn/template.sbt',

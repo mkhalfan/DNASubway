@@ -900,6 +900,49 @@ color: #000;
 	text-align: center;
 }
 
+table#details {
+	float:left;
+}
+
+#bimage_upload {
+	padding-left: 30px;
+	width: 400px;
+	min-height: 200px;
+	float:left;
+}
+#bimage_list_uploaded {
+	padding-left: 20px;
+	width: 400px;
+	float:left;
+}
+
+#bimage_list_uploaded ul
+{
+	list-style: none;
+	padding: 0;
+	margin: 0;
+} 
+
+#bimage_list_uploaded li {
+	float: left;
+	margin: 0 0.15em;
+	width: 102px;
+	text-align: center;
+}
+
+
+p#message {
+	font-weight: bold;
+}
+
+p#message.error {
+	color: red;
+}
+
+p.info {
+	color: green;
+}
+
 .right_sidebar_container{
 	display:block;
 	width:200px;
@@ -932,6 +975,8 @@ background-color: yellow;
 }
 
 .fade {
+  -transition-property: background-color;  
+  -transition-duration: 2s; 
   -moz-transition-property: background-color;  
   -moz-transition-duration: 2s; 
   -webkit-transition-property: background-color;  
