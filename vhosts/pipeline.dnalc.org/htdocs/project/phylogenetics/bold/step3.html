@@ -24,7 +24,7 @@
 </div>
 <div id="BOLDfooter">
 	<a href="./step2.html">Back</a>&nbsp;
-	<a href="#./step4.html" onclick="phy.next_bold_step();">Continue</a>
+	<a href="javascript:;" onclick="phy.next_bold_step();">Continue</a>
 </div>
 
 
@@ -33,14 +33,24 @@
 	$specid => ''
 	$ans => ''
 </%args>
+%#----------------------------------------------------------------------------
+<%once>
+	use LWP::Simple qw/get/;
+	use JSON::XS ();
+	use Data::Dumper;
+	
+	my $bc_ws = "http://dnalc03.cshl.edu/urbanbarcoding/barcoding/bcws/getsample/";
+	
+	my %sexes   = (m => "male", f => "female", h => "hermaphrodite");
+	my %lstages = (a => "adult", i => "immature");
+</%once>
+%#----------------------------------------------------------------------------
 <%init>
 	my $s = $m->session->{pipeline};
 	my $pid = $s->{boldpid};
 	$s->{"bold_$pid"} ||= {};
 	my $bs = $s->{"bold_$pid"};
-	
-	#print STDERR "S3. PID = ", $pid, Dumper($s), $/;
-	
+
 	unless ($bs->{step2} == 1) {
 		$m->comp('/_message_add', 'Step 2 is incomplete!', 'error');
 		$m->redirect("./step2.html");
@@ -50,20 +60,67 @@
 		$bs->{ans} = $ans;
 		if ($ans eq "yes") {
 			$bs->{specid} = $specid;
+			my @errors = ();
+			my $data;
 			if (!$specid) {
-				$m->comp('/_message_add', 'Specimen ID is missing!', 'error');
+				push @errors, 'Specimen ID is missing!';
+			}
+			else {
+				my $content = eval { get(sprintf("%s/%s", $bc_ws, $specid)); };
+				#print STDERR "\n", $content, $/;
+				if ($content && $content =~ /"sample"/) {
+					my $json = JSON::XS->new->utf8;
+					$data = eval {$json->decode($content);};
+				}
+				
+				unless ($data && ref($data->{sample}) && $data->{sample}->{short_id} eq $specid) {
+					push @errors, "Sample not found";
+				}
+			}
+			
+			if (@errors) {
+				$m->comp('/_message_add', $_, 'error') for @errors;
+				
 				$m->redirect("./step3.html");
 			}
 			else {
-				$m->comp('/_message_add', 'Not implemented!', 'error');
-				$m->redirect("./step3.html");
+				#print STDERR Dumper($data), $/;
+				my $smpl = $data->{sample};
+				
+				for (keys %$smpl) {
+					$smpl->{$_} = "" if (!defined $smpl->{$_} || $smpl->{$_} eq "None");
+				}
+
+				$bs->{spec_data} = {
+					institution_storing => $smpl->{institution},
+					author_first1 => $smpl->{collector},
+					date_collected => join ("/", reverse split ("-", $smpl->{date_collected})),
+					site_desc => $smpl->{exact_site},
+					latitude => $smpl->{latitude} ? sprintf("%.2f %s", abs($smpl->{latitude}), $smpl->{latitude} > 0 ? "N" : "S" ) : "",
+					longitude => $smpl->{longitude} ? sprintf("%.2f %s", abs($smpl->{longitude}), $smpl->{longitude} > 0 ? "E" : "W" ) : "",
+					notes => $smpl->{notes},
+					sex => $smpl->{sex} ? $sexes{$smpl->{sex}} : "",
+					stage => $smpl->{life_stage} ? $lstages{$smpl->{life_stage}} : "",
+				};
+				if ($smpl->{full_taxonomy}) {
+					my @taxo = split /\s+/, $smpl->{full_taxonomy};
+					$bs->{spec_data}->{genus} = $taxo[0];
+					$bs->{spec_data}->{species} = $taxo[1];
+				}
+				if ($smpl->{country} =~ /^US\s*$/) {
+					$bs->{spec_data}->{country} = "UNITED STATES";
+				}
+				if ($smpl->{state_province} =~ /^NY\s*$/ || $smpl->{state_province} =~ /new york/i) {
+					$bs->{spec_data}->{state} = "NEW YORK";
+				}
+				
+				$m->redirect("./step4.html");
 			}
 		}
 		else {
 			delete $bs->{specid} if (defined $bs->{specid});
 			$bs->{step3} = 1;
-			
-			#$m->comp('/_message_add', 'Not implemented!', 'error');
+
 			$m->redirect("./step4.html");
 		}
 	}
