@@ -131,8 +131,8 @@ top.show_messages("GenBank submission processed successfully. Your ID for this s
 % if ($bs->{photos}) {
 %  my $index = 0;
 %  for my $ph (@{$bs->{photos}}) {
-%	next unless $ph->{"th-path"};
-	<li><img src="<% $m->comp("../../.comp/filepath_to_web", file => $ph->{"th-path"}, just_return => 1) |html %>" /></li>
+%	next unless $ph->{"th_path"};
+	<li><img src="<% $m->comp("../../.comp/filepath_to_web", file => $ph->{"th_path"}, just_return => 1) |html %>" /></li>
 %  }
 	</ul>
 % }
@@ -164,6 +164,7 @@ top.show_messages("GenBank submission processed successfully. Your ID for this s
 	use Gearman::Client ();
 	use Storable qw/thaw nfreeze/;
 	use File::Basename qw/basename/;
+	use File::Copy qw/move/;
 	use Data::Dumper;
 </%once>
 
@@ -222,12 +223,16 @@ top.show_messages("GenBank submission processed successfully. Your ID for this s
 						});
 						
 						if ($bs->{photos}) {
+							my $phy_cfg = DNALC::Pipeline::Config->new->cf("PHYLOGENETICS");
+							my $photo_dir = $phy_cfg->{PHOTO_SUBMISSION_DIR};
 							for my $ph (@{$bs->{photos}}) {
 								$b->add_to_photos({
 									project_id => $proj->id,
 									photo => basename($ph->{path}),
-									photo_thumb => basename($ph->{"th-path"}),
+									photo_thumb => basename($ph->{"th_path"}),
 								});
+								move($ph->{path}, $photo_dir);
+								move($ph->{"th_path"}, $photo_dir);
 							}
 						}
 

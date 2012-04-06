@@ -912,7 +912,7 @@ table#details {
 }
 #bimage_list_uploaded {
 	padding-left: 20px;
-	width: 400px;
+	/*width: 400px;*/
 	float:left;
 }
 

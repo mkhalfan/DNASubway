@@ -2,7 +2,7 @@
 
 <h2>Veiwing Submission <% $bs->specimen_id %></h2>
 
-<table>
+<table id="details">
 <tr>
 <td>Submitted on:</td>
 <td><% $created  %></td>
@@ -96,13 +96,29 @@
 <td><% $data->{r_primer} %></td>
 </tr>
 </table>
+
+<div id="bimage_list_uploaded">
+	<ul>
+% if ($bs->photos) {
+%  my $index = 0;
+%  for my $ph ($bs->photos) {
+%	next unless $ph->photo_thumb;
+%	my $thumb = File::Spec->catfile($photo_dir, $ph->photo_thumb);
+	<li><img src="<% $m->comp("../../.comp/filepath_to_web", file => $thumb, just_return => 1) |html %>" /></li>
+%  }
+	</ul>
+% }
+</div>
+<br style="clear:both" />
+
+
 % }
 % else{
 <p style="color:red">Error: No such submission found</p>
 % }
 
 <div id="BOLDfooter">
-	<a href="./index.html?pid=<%$pid%>">Back</a>&nbsp;
+	<a href="./index.html?pid=<% $bs ? $bs->project_id : 0 |html %>">Back</a>&nbsp;
 </div>
 
 <%args>
@@ -112,6 +128,7 @@
 <%once>
 	use DNALC::Pipeline::App::Phylogenetics::ProjectManager ();
 	use DNALC::Pipeline::Phylogenetics::Bold ();
+	use DNALC::Pipeline::Config();
 	use Data::Dumper;
 </%once>
 
@@ -121,6 +138,13 @@
 	$s->{"bold_$pid"} ||= {};
 	
 	my $js = JSON::XS->new->utf8;
+	
+	my $phy_cfg = DNALC::Pipeline::Config->new->cf("PHYLOGENETICS");
+	my $photo_dir = $phy_cfg->{PHOTO_SUBMISSION_DIR};
+	
+	#
+	# TODO - check ownership, unless they are all public
+	#
 	
 	#my $pm = DNALC::Pipeline::App::Phylogenetics::ProjectManager->new($pid);
 	#my $proj = $pm->project;

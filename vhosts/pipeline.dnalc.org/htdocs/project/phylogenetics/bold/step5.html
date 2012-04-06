@@ -24,9 +24,11 @@
 		<p>
 			Add up to three images. File size of the image should not exeed <strong>1 MB</strong>.
 		</p>
+%	if (0) {
 		<div>
 			Name: <input type="text" name="photo_name" value="<% $bs->{_photo_name} |html%>" />
 		</div>
+%	}
 		<div>
 			Image: <input type="file" name="photo" />
 		</div>
@@ -41,9 +43,9 @@
 % if ($bs->{photos}) {
 %  my $index = 0;
 %  for my $ph (@{$bs->{photos}}) {
-%	next unless $ph->{"th-path"};
-	<li><img src="<% $m->comp("../../.comp/filepath_to_web", file => $ph->{"th-path"}, just_return => 1) |html %>" />\
-	<a href="#" onclick="rm_photo(<% $index++ %>)">remove</a>\
+%	next unless $ph->{"th_path"};
+	<li><img src="<% $m->comp("../../.comp/filepath_to_web", file => $ph->{"th_path"}, just_return => 1) |html %>" />\
+	<a href="javascript:;" onclick="rm_photo(<% $index++ %>)">remove</a>\
 	</li>
 %  }
 	</ul>
@@ -96,7 +98,7 @@ function toggle_add_photos(st) {
 
 	my @photo_sizes = (
 			{ size => 1024, prefix => ""},   # for regular images
-			{ size => 100, prefix => "th-"}, # for thumbnails
+			{ size => 100, prefix => "th_"}, # for thumbnails
 		);
 </%once>
 <%args>
@@ -147,11 +149,11 @@ function toggle_add_photos(st) {
 				}
 			}
 			elsif ($ARGS{"add_img"}) {
-				$bs->{_photo_name} = clean_query($ARGS{"photo_name"});
-				
-				unless ($bs->{_photo_name}) {
-					$m->comp("/_message_add", "Name of the image is missing.", "error");
-				}
+				#$bs->{_photo_name} = clean_query($ARGS{"photo_name"});
+				#
+				#unless ($bs->{_photo_name}) {
+				#	$m->comp("/_message_add", "Name of the image is missing.", "error");
+				#}
 
 				if ($ARGS{"photo"}) {
 
@@ -202,11 +204,11 @@ function toggle_add_photos(st) {
 								}
 							}
 							
-							$img_to_add->{name} = delete $bs->{_photo_name};
+							#$img_to_add->{name} = delete $bs->{_photo_name};
 							push @{$bs->{photos}}, $img_to_add;
 							undef $gd;
 							
-							#print STDERR Dumper($bs->{photos}), $/;
+							print STDERR Dumper($bs->{photos}), $/;
 							
 							$m->comp("/_message_add", "Image stored successfully!");
 							
