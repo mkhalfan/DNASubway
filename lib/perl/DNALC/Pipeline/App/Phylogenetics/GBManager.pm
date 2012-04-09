@@ -223,15 +223,13 @@ use DNALC::Pipeline::App::Utils ();
 		my $cf = DNALC::Pipeline::Config->new;
 		my $primers = $cf->cf('PRIMERS');
 
-		my ($primer_seq) = map { $_->{$primer_id}}
-    	grep { grep {/$primer_id/} keys %$_;}
-    	map {
-        	my ($k, $v) = each %$_;
-        	$v;
-    	} @{$primers->{$strand}};
+		my ($primer_seq) = 
+				map { $_->{$primer_id}}
+		    	grep { grep {/^$primer_id$/} keys %$_;}
+		    	map { my ($k, $v) = each %$_; $v;} 
+			@{$primers->{$strand}};
 
 		return $primer_seq;
-		
 	}
 
 	# ---------------------------------------

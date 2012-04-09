@@ -14,7 +14,7 @@
 		phy_consensus : "Consensus Editor",
 		phy_alignment : "Alignment Viewer",
 		phy_tree : "PHYLIP NJ",
-		phy_tree_ml : "PHYLIP ML",
+		phy_tree_ml : "PHYLIP ML"
 	};
 	
 

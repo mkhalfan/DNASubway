@@ -1,6 +1,3 @@
-
-
-
 	<& /_messages &>
 % if ($enable_export){
 	<p>
@@ -31,8 +28,7 @@
 	<p>
 		<div>You have submitted the following sequences:</div>
 		<ul>
-% 		while (my $b = $bsubmissions->next) { 
-%			print STDERR '$b = ', $b, $/;
+% 		while (my $b = $bsubmissions->next) {
 			<li><% $b->specimen_id%> <span  style="font-size:11px">(<a href="view.html?id=<%$b%>">view</a>)</span></li>
 %		}
 		</ul>
@@ -102,9 +98,8 @@ In order to export sequences to GenBank, you must:
 	my $pm = DNALC::Pipeline::App::Phylogenetics::ProjectManager->new($pid);
 	my $proj = $pm->project;
 	unless ($proj && $proj->user_id == $s->{user_id}) {
-		$m->comp('/_message_add', 'Project not found!', 'error');
-		#$m->redirect('/project/');
-		#print "Project not found!";
+		#$m->comp('/_message_add', 'Project not found!', 'error');
+		print "Project not found!";
 		return;
 	}
 	elsif ($r->method eq "POST") {

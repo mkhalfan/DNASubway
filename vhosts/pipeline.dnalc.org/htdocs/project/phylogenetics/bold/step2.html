@@ -38,12 +38,17 @@
 	$s->{"bold_$pid"} ||= {};
 	my $bs = $s->{"bold_$pid"};
 	
-	print STDERR "S2. PID = ", $pid, Dumper($s), $/;
-	#print STDERR "S2. container = ", $container, $/;
-	
 	unless ($bs->{step1} == 1) {
 		$m->comp('/_message_add', 'Step 1 is incomplete!', 'error');
 		$m->redirect("./step1.html");
+	}
+	
+	$bs->{step2} = 1;
+	if ($r->headers_in->{Referer} =~ /step3/) {
+		$m->redirect("./step1.html");
+	}
+	else {
+		$m->redirect("./step3.html");
 	}
 	
 	if ($r->method eq "POST") {

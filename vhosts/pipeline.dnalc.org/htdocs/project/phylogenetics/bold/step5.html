@@ -1,4 +1,4 @@
-<div id="BOLDstep">Step 5 of 6</div>
+<div id="BOLDstep">Step 4 of 5</div>
 <div id="BOLDmain">
 
 <h2>Add photos</h2>
@@ -128,7 +128,6 @@ function toggle_add_photos(st) {
 			my $phy_cfg = DNALC::Pipeline::Config->new->cf("PHYLOGENETICS");
 			my $photo_dir = $phy_cfg->{PHOTO_SUBMISSION_DIR};
 
-			#print STDERR "Error: ", Dumper(\%ARGS), $/;
 			#print STDERR "Error: ", Dumper($bs->{photos}), $/;
 			#--------------------------------------------
 			if (defined $rm_photo && $rm_photo =~ /^\d$/) { # must be single digit #
