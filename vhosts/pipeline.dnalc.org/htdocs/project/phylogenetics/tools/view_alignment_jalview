@@ -26,22 +26,9 @@
 	<param name="linkUrl_1" value="null" />
 	<param name="showbutton" value="false" />
 	<param name="debug" value="true" />
-	<param name="showUnconserved" value="true" />
+	<!--<param name="showUnconserved" value="true" />-->
 </applet>
 
-% if ($is_owner) {
-<form id="forma1" method="post">
-	<div style="text-align:center">
-		<input type="hidden" id="data" name="data" value="" />
-		<input type="hidden" id="aln_length" value="<% $aln_length %>" />
-		<input type="hidden" id="pid" value="<% $proj->id %>" />
-		<input type="button" id="submit_trimmed" value="Submit trimmed alignment" onclick="phy.submit_trimmed_alignment();" />
-%#		<a href="./trim_alignment?pid=<% $pid |html %>">Trim alignment</a>
-	</div>
-</form>
-%#	<% $m->comp('../../.comp/filepath_to_web', file => $algn_file ) %>?<% rand(1000) %>
-%#	<% $algn_file %>
-% }
 	</div>
 % }
 % } # end if_else $ok
@@ -60,8 +47,8 @@
 	use Storable qw/thaw nfreeze/;
 
 	my %color = (
-			#default => 'Clustal',
-			default => '% Identity',
+			default => 'Clustal',
+			#default => '% Identity',
 			mtdna => '% Identity',
 			protein => 'Zappo',
 		);
