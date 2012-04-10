@@ -212,7 +212,7 @@ top.show_messages("GenBank submission processed successfully. Your ID for this s
 									sequence_id => $seq_to_store,
 									status => 'pending',
 									data => $js->pretty->encode($bs->{spec_data}),
-									container => $bs->{container},
+									container => $bs->{container} || "",
 								});
 							};
 
