@@ -53,6 +53,7 @@ use DNALC::Pipeline::App::Utils ();
 			pwd => $pwd,
 			ftp_user => $ftp_user,
 			ftp_pw => $ftp_pw,
+			ftp_passive => $phy_conf->{GB_FTP_PASSIVE} || 0,
 			validation_user => $validation_user,
 		}, __PACKAGE__;
 	}
@@ -473,13 +474,13 @@ use DNALC::Pipeline::App::Utils ();
 	#
 	sub submit {
 		my ($self, $record) = @_;
-	    my $specimen_id = $record->specimen_id;
+		my $specimen_id = $record->specimen_id;
 		my $seq_id = $record->sequence_id;
 		my $work_dir = $self->{work_dir} . "/$seq_id";
-		my $user = $self->{ftp_user},
-		my $pw = $self->{ftp_pw},
+		my $user = $self->{ftp_user};
+		my $pw = $self->{ftp_pw};
 		
-		my $ftp = Net::FTP->new("ftp-private.ncbi.nlm.nih.gov", Debug=>0, Passive => 0)
+		my $ftp = Net::FTP->new("ftp-private.ncbi.nlm.nih.gov", Debug=>0, Passive => $self->{ftp_passive})
 			or do {
 				$self->_email_admin($record, "Cannot connect to: ftp-private.ncbi.nlm.nih.gov: $@");
 				return {status => 'error', 'message' => "Cannot connect to: ftp-private.ncbi.nlm.nih.gov: $@" };
@@ -517,30 +518,20 @@ use DNALC::Pipeline::App::Utils ();
 		
 		my $ht = HTTP::Tiny->new(timeout => 30);
 		my $response = $ht->get("http://www.ncbi.nlm.nih.gov/WebSub/api/?user=$user&file=$specimen_id.tar");
-		print STDERR "Validation URL: http://www.ncbi.nlm.nih.gov/WebSub/api/?user=$user&file=$specimen_id.tar\n";
+		#print STDERR "Validation URL: http://www.ncbi.nlm.nih.gov/WebSub/api/?user=$user&file=$specimen_id.tar\n";
 		my $parsed_response;
 
 		if ($response->{success} && length $response->{content}) {
     		$parsed_response = XMLin($response->{content});
 			if ($parsed_response->{response}->{code} eq "FAIL"){
 				print STDERR "FAILED VALIDATION", $/;
-        		print STDERR "CODE: ", $parsed_response->{response}->{code}, $/;
-				#if (ref($parsed_response->{response}->{message}) eq 'ARRAY'){
-					#print "array! \n";
-					#my $message = "";
-					#for my $m (@{$parsed_response->{response}->{message}}){
-						#for (keys %$m) {
-							#$message .= $_ . " = ". $m->{$_} . "\n";
-						#}
-					#}
-					#print STDERR $message, $/;
+
 				$self->_email_admin($record, 'FAILED Validation - check email');
 				return {status => 'error', 'message' => "FAILED Validation - check email" };
 				#}
     		}
 			elsif ($parsed_response->{response}->{code} eq "PASS_WITH_WARNINGS") {
 				print STDERR "PASSED WITH WARNINGS\n";
-				#$self->_email_admin($record, 'Passed With Warnings - check email');
 				$self->_change_status($record, "Passed With Warnings");
 				$self->_email_user($record);
 				return {status => 'success'};
@@ -613,88 +604,71 @@ use DNALC::Pipeline::App::Utils ();
 		my $bail_out = sub { return {status => 'error', 'message' => shift} };		
 
 		# Run create_dir (doesn't return anything)
-    	$self->create_dir($id);
+		$self->create_dir($id);
 
-    	# Run create_fasta
-    	my $st = $self->create_fasta($id);
+    		# Run create_fasta
+		my $st = $self->create_fasta($id);
 
-    	# Run create_smt
-    	if ($st->{status} eq 'success'){
-        	$st = $self->create_smt($id);
-    	}
-    	else {
-        	return $bail_out->("ID: $id ERROR: $st->{message}");
-    	}
+		# Run create_smt
+		if ($st->{status} eq 'success'){
+			$st = $self->create_smt($id);
+		}
+		else {
+			return $bail_out->("ID: $id ERROR: $st->{message}");
+		}
 
-    	# Run make_template
+    		# Run make_template
    		if ($st->{status} eq 'success'){
-        	$st = $self->make_template($id);
-    	}
-    	else {
-        	return $bail_out->("ID: $id ERROR: $st->{message}");
+        		$st = $self->make_template($id);
+		}
+		else {
+        		return $bail_out->("ID: $id ERROR: $st->{message}");
    	 	}
 
- 		# Run run_tbl2asn
-    	if ($st->{status} eq 'success'){
-        	$st = $self->run_tbl2asn($id);
-    	}
-    	else {
-        	return $bail_out->("ID: $id ERROR: $st->{message}");
-    	}
+		# Run run_tbl2asn
+		if ($st->{status} eq 'success'){
+			$st = $self->run_tbl2asn($id);
+		}
+		else {
+			return $bail_out->("ID: $id ERROR: $st->{message}");
+		}
 
-    	# Run prep_trace_file
-    	if ($st->{status} eq 'success'){
-        	$st = $self->prep_trace_file($id);
-    	}
-    	else {
-        	return $bail_out->("ID: $id ERROR: $st->{message}");
-    	}
+		# Run prep_trace_file
+		if ($st->{status} eq 'success'){
+			$st = $self->prep_trace_file($id);
+		}
+		else {
+			return $bail_out->("ID: $id ERROR: $st->{message}");
+		}
 
-    	# Run prep_submission_file
-    	if ($st->{status} eq 'success'){
-        	$st = $self->prep_submission_file($id);
-    	}
-    	else {
-        	return $bail_out->("ID: $id ERROR: $st->{message}");
-    	}
+		# Run prep_submission_file
+		if ($st->{status} eq 'success'){
+			$st = $self->prep_submission_file($id);
+		}
+		else {
+			return $bail_out->("ID: $id ERROR: $st->{message}");
+		}
 		
 		# Run submit
-     	if ($st->{status} eq 'success'){
-        	$st = $self->submit($id);
-    	}
-    	else {
-        	return $bail_out->("ID: $id ERROR: $st->{message}");
-    	}
- 		# Run validate_submission
-    	if ($st->{status} eq 'success'){
-        	$st = $self->validate_submission($id);
-    	}
-    	else {
-        	return $bail_out->("ID: $id ERROR: $st->{message}");
-    	}
+		if ($st->{status} eq 'success'){
+			$st = $self->submit($id);
+		}
+		else {
+			return $bail_out->("ID: $id ERROR: $st->{message}");
+		}
+
+		# Run validate_submission
+		if ($st->{status} eq 'success'){
+			$st = $self->validate_submission($id);
+		}
+		else {
+			return $bail_out->("ID: $id ERROR: $st->{message}");
+		}
 
 		return {status => $st->{status}, message => $st->{message}};
-		
 	}
 }
 
 1;
 
-__END__
-package main;
-sub main {
-	my $gbm = DNALC::Pipeline::App::Phylogenetics::GBManager->new;
-	my @pending_submissions = $gbm->search('DNAS');
-	foreach (@pending_submissions){
-		$gbm->create_dir($_);
-		$gbm->create_fasta($_);
-		$gbm->create_smt($_);
-		$gbm->make_template($_);
-		$gbm->run_tbl2asn($_);
-		$gbm->prep_trace_file($_);
-		$gbm->prep_submission_file($_);
-		#$gbm->submit($_);
-		#$gbm->validate_submission($_);
-	}
-}
-main();
+
