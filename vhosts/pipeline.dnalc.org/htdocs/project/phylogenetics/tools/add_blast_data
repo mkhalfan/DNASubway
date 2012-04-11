@@ -49,7 +49,7 @@
 				}
 			}
 			else {
-				$dsource->delete;
+				#$dsource->delete;
 			}
 			$msg = join '<br/>', (@{$st->{errors}}, @{$st->{warnings}});
 		}

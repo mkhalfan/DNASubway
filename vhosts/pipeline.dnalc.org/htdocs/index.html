@@ -266,8 +266,8 @@ if ($r->method eq "POST") {
 			}
 		}
 
-		($user) = DNALC::Pipeline::User->search(username => $name);
-		$s->{username} = $name;
+		($user) = DNALC::Pipeline::User->search(username => lc $name);
+		$s->{username} = lc $name;
 		if ($ldap_u) { # we ldap auth was successful
 			unless ($user) { # unless the ldap user exist in out db, we have to create it
 				$dispatcher->info("AUTH: Adding new user from LDAP: ", $ldap_u->{username} );
