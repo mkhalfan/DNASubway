@@ -823,20 +823,23 @@ use Bio::Trace::ABIF ();
 		# @seq has the 2 DataSequence objects belonging to a pair
 		my @seq = map {$_->seq_id} @pair_sequences;
 
-		my ($ds_id_1) = map {$_ && $_->id} grep { $_->display_id eq $display_name_1 } @seq;
-		my ($ds_id_2) = map {$_ && $_->id} grep { $_->display_id eq $display_name_2 } @seq;
-
-		my ($df_id_1) = map {$_ && $_->file_id} grep { $_->display_id eq $display_name_1 } @seq;
-		my ($df_id_2) = map {$_ && $_->file_id} grep { $_->display_id eq $display_name_2 } @seq;
+		my ($ds_id_1, $df_id_1, $lt1, $rt1) = map {$_ && ($_->id, $_->file_id, length($_->left_trim), length($_->right_trim))} 
+				grep { $_->display_id eq $display_name_1 } @seq;
+		my ($ds_id_2, $df_id_2, $lt2, $rt2) = map {$_ && ($_->id, $_->file_id, length($_->left_trim), length($_->right_trim))} 
+				grep { $_->display_id eq $display_name_2 } @seq;
 
 		my ($df_1_strand) = map {$_ && $_->strand} grep { $_->seq_id eq $ds_id_1} @pair_sequences;
 		my ($df_2_strand) = map {$_ && $_->strand} grep { $_->seq_id eq $ds_id_2} @pair_sequences;
+
+		my $seq1_trimmed = $lt1;
+		my $seq2_trimmed = $lt2;
 
 		my $df1 = DNALC::Pipeline::Phylogenetics::DataFile->retrieve($df_id_1);
 		my @qs1 = $df1->quality_values if $df1;
 		return unless (@qs1);
 		if ($df_1_strand eq "R") {
 				@qs1 = reverse @qs1;
+				$seq1_trimmed = $rt1;
 		}
 
 		my $df2 = DNALC::Pipeline::Phylogenetics::DataFile->retrieve($df_id_2);
@@ -844,6 +847,7 @@ use Bio::Trace::ABIF ();
 		return unless (@qs2);
 		if ($df_2_strand eq "R") {
 				@qs2 = reverse @qs2;
+				$seq2_trimmed = $rt2;
 		}
 
 		my $x = 0;
@@ -862,14 +866,18 @@ use Bio::Trace::ABIF ();
 			$y++;
 		}
 
+
+
 		for (my $i = 0; $i <= length($seq1); $i++) {
-			if (substr($seq1, $i, 1) ne "N" && substr($seq2, $i, 1) ne "N") {
-				if (substr($seq1, $i, 1) ne substr($seq2, $i, 1)) {
-					if ($qs1[$i] > $qs2[$i]) {
-						substr ($consensus, $i, 1) = substr($seq1, $i, 1);
+			my ($chr1, $chr2) = (substr($seq1, $i, 1), substr($seq2, $i, 1));
+
+			if ($chr1 ne "N" && $chr2 ne "N") {
+				if ($chr1 ne $chr2) {
+					if ($qs1[$i + $seq1_trimmed] > $qs2[$i + $seq2_trimmed]) {
+						substr ($consensus, $i, 1) = $chr1;
 					}
 					else {
-						substr ($consensus, $i, 1) = substr($seq2, $i, 1);
+						substr ($consensus, $i, 1) = $chr2;
 					}
 				}
 			}
