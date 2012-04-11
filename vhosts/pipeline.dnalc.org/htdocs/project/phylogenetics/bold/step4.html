@@ -4,15 +4,6 @@
 <h2>Specimen info</h2>
 <div>
 <& /_messages &>
-% if (@err) {
-	 <div class="errors">
-%	for (@err) {
-	<div class="error">
-		<% $_ |html%>
-	</div>
-%	}
-	</div>
-% }
 </div>
 <p>
 	<form id="bform" method="POST">
@@ -390,6 +381,10 @@ new Tip('isolation_source_help', "some help here", {
 		unless (@err) {
 			$bs->{step4} = 1;
 			$m->redirect("./step5.html");
+		}
+		else {
+			$m->comp("/_message_add", join ("<br/>", @err), "error");
+			$m->redirect("./step4.html");
 		}
 	}
 	else {

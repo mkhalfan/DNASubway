@@ -221,6 +221,9 @@ function toggle_add_photos(st) {
 					$m->comp("/_message_add", "No image selected for upload!", "error");
 				}
 			}
+			elsif (! defined $bs->{photos} || @{$bs->{photos}} == 0) {
+				$m->comp("/_message_add", "No images were added!", "error");
+			}
 			else {
 				$bs->{step5} = 1;
 				$m->redirect("./step6.html");

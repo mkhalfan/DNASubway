@@ -36,9 +36,8 @@
 		$msg = "Project not found or you don't own the project.";
 	}
 	elsif ($blast && $pm) {
-		my $dsource = DNALC::Pipeline::Phylogenetics::DataSource
+		my ($dsource) = DNALC::Pipeline::Phylogenetics::DataSource
 						->search( project_id => $pid, name => "blast:$bid");
-		#print STDERR Dumper($dsource), $/;
 		unless ($dsource) {
 			my $st = $pm->add_blast_data($blast->id, $selected_results);
 			#print STDERR "XXXXXXXXXXXXX\n", Dumper($st), $/;
@@ -49,7 +48,7 @@
 				}
 			}
 			else {
-				#$dsource->delete;
+				eval {$dsource->delete;};
 			}
 			$msg = join '<br/>', (@{$st->{errors}}, @{$st->{warnings}});
 		}

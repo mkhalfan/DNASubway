@@ -11,7 +11,9 @@
 	<div>
 		<input type="radio" name="ans" value="yes" <% $bs->{specid} ? "checked=\"checked\"" : "" %>/>
 		Yes, I have already collected specimen data for a DNALC Barcoding Project
-		<div>Enter specimen ID: <input type="text" name="specid" value="<% $bs->{specid} %>" /></div>
+		<div>Enter specimen/sample ID: <input type="text" name="specid" value="<% $bs->{specid} %>" />
+			<small>(e.g. ZZZ-9999)</small>
+		</div>
 	</div>
 	<div>&nbsp;</div>
 	<div>
@@ -102,6 +104,7 @@
 					sex => $smpl->{sex} ? $sexes{$smpl->{sex}} : "",
 					stage => $smpl->{life_stage} ? $lstages{$smpl->{life_stage}} : "",
 				};
+
 				if ($smpl->{full_taxonomy}) {
 					my @taxo = split /\s+/, $smpl->{full_taxonomy};
 					$bs->{spec_data}->{genus} = $taxo[0];
