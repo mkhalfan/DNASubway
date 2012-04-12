@@ -29,7 +29,7 @@
 		<div>You have submitted the following sequences:</div>
 		<ul>
 % 		while (my $b = $bsubmissions->next) {
-			<li><% $b->specimen_id%> <span  style="font-size:11px">(<a href="view.html?id=<%$b%>">view</a>)</span></li>
+			<li><% $b->specimen_id %> <span  style="font-size:11px">(<a href="view.html?id=<%$b |html %>">view</a>)</span></li>
 %		}
 		</ul>
 	</p>	

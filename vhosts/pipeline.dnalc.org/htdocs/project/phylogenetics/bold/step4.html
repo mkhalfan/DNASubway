@@ -18,7 +18,7 @@
 %		my @temp = split ("#", $_);
 		<tr class="author_row" id="row<%++$ac%>">
 		<td>Collector/Author <% $ac == 1 ? "<img src='/images/question-icon.png' align='top' id='collectors' />" : "" %></td>
-		<td>&nbsp;&nbsp;<input class="fb" type="text" style="width:145px" id="collector_first" name="collector_first" value="<% $temp[0] %>"  onfocus="if(this.value=='First Name'){this.value=''};" onblur="if(this.value==''){this.value='First Name'};"/>&nbsp;<input class="fb" type="text" style="width:145px" id="collector_last" name="collector_last" value="<% $temp[1] %>" onfocus="if(this.value=='Last Name'){this.value=''};" onblur="if(this.value==''){this.value='Last Name'};" /><% exists $author_errors{$ac} ? "<strong style='color: red;'> * </strong>" : "" %><span id="add_author_link<%$ac%>"></span>
+		<td>&nbsp;&nbsp;<input class="fb" type="text" style="width:145px" id="collector_first" name="collector_first" value="<% $temp[0] |html %>"  onfocus="if(this.value=='First Name'){this.value=''};" onblur="if(this.value==''){this.value='First Name'};"/>&nbsp;<input class="fb" type="text" style="width:145px" id="collector_last" name="collector_last" value="<% $temp[1] |html %>" onfocus="if(this.value=='Last Name'){this.value=''};" onblur="if(this.value==''){this.value='Last Name'};" /><% exists $author_errors{$ac} ? "<strong style='color: red;'> * </strong>" : "" %><span id="add_author_link<%$ac%>"></span>
 %			if ($ac > 1){
 <span><a href="javascript:;" onclick="phy.addAuthor(<%$ac%>, 'remove')" style="text-decoration:none;font-weight:bold;color:black;" /><img src="/images/minus.jpg" border=0 width="12px" height="12px" />   Remove</a></span>
 %			}

@@ -1,7 +1,7 @@
 % if ($ok) {
 <script type="text/javascript">
 top.phy.close_window('BOLD');
-top.show_messages("GenBank submission processed successfully. Your ID for this submission is <% $id %>. Please keep this for future reference. You should be receiving an email confirming your submission momentarily.");
+top.show_messages("GenBank submission processed successfully. Your ID for this submission is <% $id |html %>. Please keep this for future reference. You should be receiving an email confirming your submission momentarily.");
 </script>
 % } 
 % elsif ($error) {
@@ -31,106 +31,106 @@ top.show_messages("GenBank submission processed successfully. Your ID for this s
 % my $ac = 1;
 % while (exists $bs->{spec_data}->{"author_first$ac"}) {
 <tr>
-<td width="150">Author/Collector <% $ac %>:</td>
-<td><%$bs->{spec_data}->{"author_first$ac"}%> <%$bs->{spec_data}->{"author_last$ac"}%></td>
+<td width="150">Author/Collector <% $ac |html %>:</td>
+<td><%$bs->{spec_data}->{"author_first$ac"} |html %> <%$bs->{spec_data}->{"author_last$ac"} |html %></td>
 </tr>
 %   $ac++;
 % }
 <tr>
 <td>Institution Storing:</td>
-<td><% $bs->{spec_data}->{institution_storing} %></td>
+<td><% $bs->{spec_data}->{institution_storing} |html %></td>
 </tr>
 <tr>
 <td>Identified By:</td>
-<td><% $bs->{spec_data}->{tax} %></td>
+<td><% $bs->{spec_data}->{tax} |html %></td>
 </tr>
 <tr>
 <td>Identifier's email:</td>
-<td><% $bs->{spec_data}->{tax_email} %></td>
+<td><% $bs->{spec_data}->{tax_email} |html %></td>
 </tr>
 <tr>
 <td>Phylum:</td>
-<td><% $bs->{spec_data}->{phylum} %></td>
+<td><% $bs->{spec_data}->{phylum} |html %></td>
 </tr>
 <tr>
 <td>Class:</td>
-<td><% $bs->{spec_data}->{class} %></td>
+<td><% $bs->{spec_data}->{class} |html %></td>
 </tr>
 <tr>
 <td>Order:</td>
-<td><% $bs->{spec_data}->{order} %></td>
+<td><% $bs->{spec_data}->{order} |html %></td>
 </tr>
 <tr>
 <td>Family:</td>
-<td><% $bs->{spec_data}->{family} %></td>
+<td><% $bs->{spec_data}->{family} |html %></td>
 </tr>
 <tr>
 <td>Genus:</td>
-<td><% $bs->{spec_data}->{genus} %></td>
+<td><% $bs->{spec_data}->{genus} |html %></td>
 </tr>
 <tr>
 <td>Species:</td>
-<td><% $bs->{spec_data}->{species} %></td>
+<td><% $bs->{spec_data}->{species} |html %></td>
 </tr>
 <tr>
 <td>Date Collected:</td>
-<td><% $bs->{spec_data}->{date_collected} %></td>
+<td><% $bs->{spec_data}->{date_collected} |html %></td>
 </tr>
 <tr>
 <td>Country:</td>
-<td><% $bs->{spec_data}->{country} %></td>
+<td><% $bs->{spec_data}->{country} |html %></td>
 </tr>
 <tr>
 <td>State:</td>
-<td><% $bs->{spec_data}->{state} %></td>
+<td><% $bs->{spec_data}->{state} |html %></td>
 </tr>
 <tr>
 <td>Exact Site:</td>
-<td><% $bs->{spec_data}->{site_desc} %></td>
+<td><% $bs->{spec_data}->{site_desc} |html %></td>
 </tr>
 <tr>
 <td>Isolation Source:</td>
-<td><% $bs->{spec_data}->{isolation_source} %></td>
+<td><% $bs->{spec_data}->{isolation_source} |html %></td>
 </tr>
 <tr>
 <td>Latitutide:</td>
-<td><% $bs->{spec_data}->{latitude} %></td>
+<td><% $bs->{spec_data}->{latitude} |html %></td>
 </tr>
 <tr>
 <td>Longitude:</td>
-<td><% $bs->{spec_data}->{longitude} %></td>
+<td><% $bs->{spec_data}->{longitude} |html %></td>
 </tr>
 <tr>
 <td>Notes:</td>
-<td><% $bs->{spec_data}->{notes} %></td>
+<td><% $bs->{spec_data}->{notes} |html %></td>
 </tr>
 <tr>
 <td>Sex:</td>
-<td><% $bs->{spec_data}->{sex} %></td>
+<td><% $bs->{spec_data}->{sex} |html %></td>
 </tr>
 <tr>
 <td>Life Stage:</td>
-<td><% $bs->{spec_data}->{stage} %></td>
+<td><% $bs->{spec_data}->{stage} |html %></td>
 </tr>
 <tr>
 <td>Forward Primer:</td>
-<td><% $bs->{spec_data}->{f_primer} %></td>
+<td><% $bs->{spec_data}->{f_primer} |html %></td>
 </tr>
 <tr>
 <td>Reverse Primer</td>
-<td><% $bs->{spec_data}->{r_primer} %></td>
+<td><% $bs->{spec_data}->{r_primer} |html %></td>
 </tr>
 </table>
 
-<div id="bimage_list_uploaded">
-	<ul>
+<div id="bimage_list_uploaded" style="margin-left:160px">
+
 % if ($bs->{photos}) {
 %  my $index = 0;
 %  for my $ph (@{$bs->{photos}}) {
 %	next unless $ph->{"th_path"};
-	<li><img src="<% $m->comp("../../.comp/filepath_to_web", file => $ph->{"th_path"}, just_return => 1) |html %>" /></li>
+	<div><img src="<% $m->comp("../../.comp/filepath_to_web", file => $ph->{"th_path"}, just_return => 1) |html %>" /></div>
 %  }
-	</ul>
+
 % }
 </div>
 <br style="clear:both" />
