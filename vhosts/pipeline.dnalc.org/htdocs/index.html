@@ -292,10 +292,10 @@ if ($r->method eq "POST") {
 			$m->comp("/_message_add", "Account is blocked. Contact the admin of the site for info.");
 
 			if ( exists $pcf->{SSL_LOGIN} && $pcf->{SSL_LOGIN}) {
-				$m->redirect($pcf->{PROJECT_HOME} . '/index2.html');
+				$m->redirect($pcf->{PROJECT_HOME} . '/');
 			}
 			else {
-				$m->redirect('/index2.html');
+				$m->redirect('/');
 			}
 		}
 	}
@@ -309,15 +309,24 @@ if ($r->method eq "POST") {
 		$user->increment_login_count;
 		$dispatcher->info($user->username . " just logged in");
 
-		#unless ($user->has_projects) {
-		#	$s->{new_user} = 1;
-		#}
+		delete $s->{attempts};
 	}
 	else {
+		$s->{attempts}++;
+
 		if ($name =~ /^guest_/) {
 			$s->{username} = '';
 		}
-		$m->comp("/_message_add", "Unable to log you in. Try again.");
+		if ($s->{attempts} > 2) {
+			$m->comp("/_message_add", "Unable to log you in. Please <a target=\"_blank\" "
+				. " href=\"http://www.iplantcollaborative.org/forms/support\">contact support</a>."
+			);
+		}
+		else {
+			$m->comp("/_message_add", "Unable to log you in. Try again.");
+		}
+		$m->redirect("/project/browsemy");
+
 	}
 	if ( exists $pcf->{SSL_LOGIN} && $pcf->{SSL_LOGIN}) {
 		$m->redirect($pcf->{PROJECT_HOME} . "/project/browsemy");
