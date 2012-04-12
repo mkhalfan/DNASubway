@@ -91,7 +91,7 @@ function toggle_add_photos(st) {
 	use Image::Resize();
 	use GD::Image();
 
-	use Data::Dumper;
+	#use Data::Dumper;
 	
 	my $max_photos = 3;
 	my $max_photo_size = 1 * 1024 * 1024;
@@ -206,9 +206,7 @@ function toggle_add_photos(st) {
 							#$img_to_add->{name} = delete $bs->{_photo_name};
 							push @{$bs->{photos}}, $img_to_add;
 							undef $gd;
-							
-							print STDERR Dumper($bs->{photos}), $/;
-							
+
 							$m->comp("/_message_add", "Image stored successfully!");
 							
 						}

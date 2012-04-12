@@ -198,14 +198,14 @@ new Tip('isolation_source_help', "some help here", {
 		{id => "institution_storing", type => "", err_msg => "Institution Storing", label => "Institution Storing <img src='/images/question-icon.png' align='top' id='institution' />", re => qr/\w+/, len => 128, },
 		{id => "tax", type => "", err_msg => "Identified By", label => "Identified By <img src='/images/question-icon.png' align='top' id='identifier' />", re => qr/\w+/, len => 128, },
 		{id => "tax_email", type => "", err_msg => "Identifier's email", label => "Identifier's email", re => qr/\w+/, len => 128, },
-		#{id => "", type => "label", label => "<strong>Identification</strong>", },
-		{id => "phylum", type => "", err_msg => "Phylum", label => "Phylum", re => qr/\w+/, len => 48, },
-		{id => "class", type => "", err_msg => "Class", label => "Class", re => qr/\w+/, len => 48, },
-		{id => "order", type => "", err_msg => "Order", label => "Order", re => qr/\w+/, len => 48, },
-		{id => "family", type => "", err_msg => "Family", label => "Family", re => qr/\w+/, len => 48, },
+
+		#{id => "phylum", type => "", err_msg => "Phylum", label => "Phylum", re => qr/\w+/, len => 48, },
+		#{id => "class", type => "", err_msg => "Class", label => "Class", re => qr/\w+/, len => 48, },
+		#{id => "order", type => "", err_msg => "Order", label => "Order", re => qr/\w+/, len => 48, },
+		#{id => "family", type => "", err_msg => "Family", label => "Family", re => qr/\w+/, len => 48, },
 		{id => "genus", type => "", err_msg => "Genus", label => "Genus", re => qr/\w+/, len => 48, },
 		{id => "species", type => "", err_msg => "Species", label => "Species", re => qr/\w+/, len => 48, },
-		#{id => "collectors", type => "textarea", err_msg => "Collectors", label => "Collectors", re => qr/\w+/, len => 255, },
+
 		{id => "date_collected", type => "", err_msg => "Date collected", label => "Date collected (dd/mm/yyyy)", re => qr/^\d\d\/\d\d\/\d{4}$/,},
 		{id => "country", type => "component", err_msg => "Country", label => "Country", re => qr/\w+/, len => 48,
 			component => '../../.comp/countries'},
@@ -216,9 +216,6 @@ new Tip('isolation_source_help', "some help here", {
 		{id => "isolation_source", type => "", err_msg => "Isolation Source", label => "Isolation Source (optional) <img src='/images/question-icon.png' align='top' id='isolation_source_help' />", re => qr/\w*/, len => 128, },
 		{id => "latitude", type => "", err_msg => "Latitude", label => "Latitude (ex: 40.77 N)", re => qr/^$RE{num}{real}\s*[NSns]$/, len => 16, },
 		{id => "longitude", type => "", err_msg => "Longitude", label => "Longitude (ex: 73.98 W)", re => qr/^$RE{num}{real}\s*[EWew]$/, len => 16, },
-
-		#{id => "latitude", type => "component", err_msg => "Latitude", label => "Latitude", component => 'latitude'},
-		#{id => "longitude", type => "component", err_msg => "Logintude", label => "Longitude", component => 'longitude'},
 
 		{id => "notes", type => "textarea", err_msg => "Notes ", label => "Notes (optional) <img src='/images/question-icon.png' align='top' id='notes_help' />", re => qr/\w*/, len => 255, },
 		{id => "sex", type => "radio", err_msg => "Sex of Specimen", label => "Sex of Specimen (optional)", values => ['male', 'female', 'hermaphrodite']},
