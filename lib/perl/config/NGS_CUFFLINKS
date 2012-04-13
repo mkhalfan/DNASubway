@@ -1,0 +1,14 @@
+{
+	id => 'cufflinks-ranger-1.0.3',
+	name => 'cufflinks',
+	inputs => [
+		{ id => 'query1', display_type => 'show_files', label => 'File to process'},
+		{ id => 'BIAS_FASTA', display_type => 'genome', hidden => 1},
+		{ id => 'GUIDE_GTF', alias => 'annotation', hidden => 1 },
+		{ id => 'ANNOTATION', hidden => 1 },
+	],
+	parameters => [
+	],
+	_output_dir => qr/\/cufflinks_out$/,
+	_output_files => qr/\.(gtf|fpkm_tracking)$/,
+}

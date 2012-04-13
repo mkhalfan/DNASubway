@@ -9,10 +9,11 @@ use aliased 'DNALC::Pipeline::NGS::JobParam';
 use aliased 'DNALC::Pipeline::NGS::Project';
 use aliased 'DNALC::Pipeline::NGS::DataFile';
 use aliased 'DNALC::Pipeline::NGS::DataSource';
+use aliased 'DNALC::Pipeline::NGS::JobTrack';
 
 use DNALC::Pipeline::Config ();
 use DNALC::Pipeline::Task ();
-use DNALC::Pipeline::TaskStatus ();
+#use DNALC::Pipeline::TaskStatus ();
 
 use iPlant::FoundationalAPI ();
 use iPlant::FoundationalAPI::Constants ':all';
@@ -21,6 +22,14 @@ use JSON::XS ();
 use Data::Dumper;
 
 {
+	my %status_map = (
+			"not-processed" => 1,
+			"done"          => 2,
+			"error"         => 3,
+			"processing"    => 4
+		);
+	my %status_id_to_name = reverse %status_map;
+
 	sub new {
 		my ($class, $params) = @_;
 		my $self = bless {
@@ -44,6 +53,19 @@ use Data::Dumper;
 				$self->project($project);
 			}
 		}
+
+		#------
+		my %task_id_to_name = ();
+		my %task_name_to_id = ();
+		my $tasks = DNALC::Pipeline::Task->retrieve_all;
+		while (my $task = $tasks->next) {
+			next unless $task->enabled;
+			$task_id_to_name{ $task->id } = $task->name;
+			$task_name_to_id{ $task->name } = $task->id;
+		}
+		$self->{task_id_to_name} = \%task_id_to_name;
+		$self->{task_name_to_id} = \%task_name_to_id;
+		#-------
 
 		$self;
 	}
@@ -114,7 +136,7 @@ use Data::Dumper;
 		my $data_src = DataSource->insert ({
 				project_id => $self->project,
 				name => $params->{source} || 'anonymous',
-				note => 'note',
+				note => $params->{source_note} || 'note',
 			});
 		return $bail_out->() unless $data_src;
 
@@ -207,7 +229,8 @@ use Data::Dumper;
 		my ($self, $app, $app_cf) = @_;
 
 
-		# do we want t make sure we have exact version of the app?!
+		#print STDERR  $app_cf->{id}, " eq ",  $app->id, $/;
+		# do we want to make sure we have exact version of the app?!
 		return unless $app_cf->{id} eq $app->id;
 
 		my $app_inputs = $app->inputs;
@@ -279,7 +302,11 @@ use Data::Dumper;
 	}
 
 	sub submit_job {
-		my ($self, $app, $params) = @_;
+		my ($self, $task_name, $app, $params) = @_;
+
+		unless ($self->project) {
+			return _error('Cannot submit job: project is missing!');
+		}
 
 		my $apif = $self->api_instance;
 		unless ($apif) {
@@ -295,12 +322,16 @@ use Data::Dumper;
 		if ($job_st && $job_st->{status} eq "success") {
 			my $api_job = $job_st->{data};
 
+
+			#print STDERR  Dumper($self->{task_name_to_id}), $/;
+			print STDERR  '**App name: ', $app->name, $/;
+
 			$jobdb = eval {DNALC::Pipeline::NGS::Job->create({
 						api_job_id => $api_job->{id},
-						project_id => 6,
-						user_id => 90,
-						task_id => 32,  # ngs_tophat
-						status_id => 4, # processing/pending
+						project_id => $self->project,
+						user_id => $self->project->user_id,
+						task_id => $self->{task_name_to_id}->{ $task_name },  # TODO - check if task exists
+						status_id => $status_map{processing},
 					});
 				};
 			if ($@) {
@@ -309,7 +340,11 @@ use Data::Dumper;
 				return _error($msg);
 			}
 			else {
-				# add job parameters
+
+				# keep track of this job, so that we can check it's status
+				$self->track_job({ job => $jobdb, token => $self->api_instance->token});
+
+				# store job parameters that were used
 				my @params = ();
 				for my $type (qw/inputs parameters/) {
 					my $sg_type = $type; $sg_type =~ s/s$//;
@@ -323,7 +358,7 @@ use Data::Dumper;
 
 				# add the rest of the job parameters
 				for my $name (sort keys %$api_job) {
-					next if $name =~ /^(?:inputs|parameters)$/;
+					next if $name =~ /^(?:inputs|parameters|status)$/;
 
 					my $value = $api_job->{$name} || '';
 					if (ref($value) eq 'ARRAY') {
@@ -340,6 +375,45 @@ use Data::Dumper;
 		}
 	}
 
+	#--------------------------------------
+	sub get_jobs_by_task {
+		my ($self, $task) = @_;
+		
+		my %task = (tophat => 32); # FIXME
+		#my $jobs = 
+		DNALC::Pipeline::NGS::Job->search(task_id => $task{tophat}, project_id => $self->project);
+	}
+
+	#--------------------------------------
+	sub get_job_by_id {
+		my ($self, $job_id) = @_;
+		
+		DNALC::Pipeline::NGS::Job->retrieve($job_id);
+	}
+
+	#--------------------------------------
+	sub track_job {
+		my ($self, $p) = @_;
+		my $job = $p->{job};
+
+ 		my $jt = eval {
+				JobTrack->create({
+					job_id => $job,
+					api_job_id => $job->api_job_id,
+					user_id => $job->user_id,
+					token => $p->{token},
+					api_status => 'PENDING',
+					tracker_status => '',
+				});
+ 			};
+ 		if ($@) {
+ 			print STDERR  "track_job: Unable to add tracker for job: ", $job, "\n", $!, "\n", $/;
+ 			print STDERR  $!, $/;
+ 		}
+ 		else {
+ 			print STDERR  "jt = ", $jt, $/;
+ 		}
+	}
 	#--------------------------------------
 	sub search {
 		my ($self, %args) = @_;
