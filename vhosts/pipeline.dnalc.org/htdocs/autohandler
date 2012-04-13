@@ -39,15 +39,20 @@
 			</span>
 			<span class="memberRow1">
 				<label class="memberLabel" for="passw">Password:</label>
-				<input type="password" maxlength="12" id="passw" name="passw" class="memberInput" />
+				<input type="password" maxlength="64" id="passw" name="passw" class="memberInput" />
 			</span>
 			<div class="memberRow2" style="">
 				<input type="submit" name="login" value="Log In" class="memberEnter" />
 				<input type="submit" name="guest" value="Enter As Guest" class="memberEnter" />
 			</div>
 			<div class="forgotPassword">
+% if ( exists $pcf->{LDAP_ENABLED} && $pcf->{LDAP_ENABLED}) {
+            <a href="https://user.iplantcollaborative.org/reset/request" title="" target="_blank">Forgot Password? &nbsp;</a>
+            <a href="https://user.iplantcollaborative.org/register" title="" target="_blank"><strong>Register</strong></a>
+% } else {
             <a href="/forgotpass.html" title="">Forgot Password? &nbsp;</a>
             <a href="/register.html" title=""><strong>Register</strong></a>
+% }
 			</div>
 		</form>
         </div> <!--END of ID member form-->
