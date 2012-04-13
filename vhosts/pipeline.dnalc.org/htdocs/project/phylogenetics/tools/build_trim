@@ -27,6 +27,7 @@
 	my @seq = $pm->sequences;
 	# Trim each sequence and update the DB
 	foreach my $seq (@seq){
+		next if $seq->trimming;
 		$seq->trim;
 	}
 	
