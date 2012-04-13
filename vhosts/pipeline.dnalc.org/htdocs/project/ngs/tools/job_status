@@ -7,7 +7,7 @@ j = <% $jid  %>
 	<div><strong><% $p->name %></strong> = <% $p->value |html%></div>
 % }
 <pre>
-	<p><% Dumper($job) %></p>
+%#	<p><% Dumper($job) %></p>
 %#	<% Dumper($job_params) %>
 </pre>
 %#-----------------------------------------------------------------
