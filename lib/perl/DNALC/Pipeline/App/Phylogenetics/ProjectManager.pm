@@ -1042,8 +1042,8 @@ use Bio::Trace::ABIF ();
 	#
 	sub undo_trimming {
 		my ($self) = @_;
-		my @seqs = $self->initial_sequences;
-		DataSequence->undo_trimming($self->project->id);
+		#my @seqs = $self->initial_sequences;
+		#DataSequence->undo_trimming($self->project->id);
 		$self->set_task_status('phy_trim', 'not-processed');
 	}
 
