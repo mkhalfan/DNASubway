@@ -131,7 +131,7 @@
 			#}
 		}
 		
-		print STDERR "app_cufflinks: form = ", Dumper( $form ), $/;
+		#print STDERR "app_cufflinks: form = ", Dumper( $form ), $/;
 		
 		# TODO - default input files should not be set?!
 		#for my $p (@{$app->inputs}) {
@@ -149,7 +149,7 @@
         }
 
 		$st = $pm->submit_job('ngs_cufflinks', $app, $form);
-		print STDERR "app_cufflinks: JOB status = ", Dumper( $st ), $/;
+		#print STDERR "app_cufflinks: JOB status = ", Dumper( $st ), $/;
 
 		if ($st->{status} ne "success") {
 			if ($st->{message} =~ /missing required/i && $st->{data} && %{$st->{data}}) {
