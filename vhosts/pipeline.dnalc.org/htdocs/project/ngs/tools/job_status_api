@@ -1,0 +1,43 @@
+
+j = <% $jid  %>
+a = <% $job ? $job->api_job_id : 0 %>
+
+<pre>
+	<p><% Dumper($job_api) %></p>
+%#	<% Dumper($job_params) %>
+</pre>
+%#-----------------------------------------------------------------
+<%args>
+	$pid => 0
+	$jid => 0
+</%args>
+<%once>
+	use Data::Dumper;
+	use DNALC::Pipeline::Utils qw(clean_query);
+	use DNALC::Pipeline::App::NGS::ProjectManager ();
+
+	use DNALC::Pipeline::User ();
+
+</%once>
+<%init>
+
+	$m->session->{pipeline} ||= {};
+	my $s = $m->session->{pipeline};
+	
+	my $apif = iPlant::FoundationalAPI->new(
+			user => $s->{username},
+			token => $s->{api_token},
+			debug => 0,
+		);
+	my $pm = DNALC::Pipeline::App::NGS::ProjectManager->new({project => $pid, debug => 1});
+	$pm->api_instance($apif) if $apif;
+	my $proj = $pm->project;
+	
+	my $job = $pm->get_job_by_id($jid);
+	my $job_params = $job->job_params if $job;
+	
+    my $job_ep = $apif->job;
+    my $job_api = $job_ep->job_details($job->api_job_id);
+
+
+</%init>

@@ -57,8 +57,8 @@
 	my ($path_to_read, $parent_dir, $dir_list, $files_added);
 	
 	if ($r->method eq "POST") {
-		print STDERR "curr_path: $current_path", $/;
-		print STDERR Dumper(\@files), $/;
+		#print STDERR "curr_path: $current_path", $/;
+		#print STDERR Dumper(\@files), $/;
 		my $pm = DNALC::Pipeline::App::NGS::ProjectManager->new({project => $pid});
 		#print STDERR Dumper($pm), $/;
 		$files_added = 0;

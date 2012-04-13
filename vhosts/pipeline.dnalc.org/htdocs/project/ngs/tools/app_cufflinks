@@ -63,7 +63,7 @@
 		<% Dumper($form) %>
 	</pre>
 % } else {
-	No application found for conf file: '<% $app_cf_file |html %>'.
+	No application found for conf file: 'CUFFLINKS'.
 % }
 </div>
 %#-----------------------------------------------------------------
@@ -101,9 +101,7 @@
 	my $is_owner = $s->{user_id} == $proj->user_id if $proj;
 
 	my $app;
-	#my $app_id = "tophat-ranger-1.3.1"; #"tophat";
-	my $app_cf_file = "NGS_TH";
-	my $st = $pm->app($app_cf_file);
+	my $st = $pm->app("NGS_CUFFLINKS");
 
 	if ($st->{status} eq "success") {
 		$app = $st->{app};
@@ -113,6 +111,7 @@
 	}
 
 	#my $app_inputs = $app->inputs if $app;
+	#print STDERR "app_inputs = ", Dumper( $app_inputs ), $/;
 	#my $app_params = $app->parameters if $app;
 
 	my $form = {};
@@ -127,12 +126,12 @@
 			if ($p->{hidden} && !defined $form->{$p->{id}}) {
 				$form->{$p->{id}} = $p->{value} || $p->{defaultValue};
 			}
-			if ($p->{id} eq "mate_inner_dist") {
-				print STDERR "app_th: p = ", $p->{validator}, $/;
-			}
+			#if ($p->{id} eq "mate_inner_dist") {
+			#	print STDERR "app_th: p = ", $p->{validator}, $/;
+			#}
 		}
 		
-		print STDERR "app_th: form = ", Dumper( $form ), $/;
+		print STDERR "app_cufflinks: form = ", Dumper( $form ), $/;
 		
 		# TODO - default input files should not be set?!
 		#for my $p (@{$app->inputs}) {
@@ -142,15 +141,15 @@
 		#}
 		
 		# what do we do when we don`t get the paths?!
-		$form->{genome} = $pm->project_genome_path;
-		$form->{annotation} = $pm->project_annotation_path;
+		$form->{BIAS_FASTA} = $pm->project_genome_path;
+		$form->{ANNOTATION} = $pm->project_annotation_path;
 
 		unless (defined $form->{archive}) {
             $form->{archive} = "true";
         }
 
-		$st = $pm->submit_job('ngs_tophat', $app, $form);
-		#print STDERR "app_th: JOB status = ", Dumper( $st ), $/;
+		$st = $pm->submit_job('ngs_cufflinks', $app, $form);
+		print STDERR "app_cufflinks: JOB status = ", Dumper( $st ), $/;
 
 		if ($st->{status} ne "success") {
 			if ($st->{message} =~ /missing required/i && $st->{data} && %{$st->{data}}) {
@@ -164,7 +163,7 @@
 				# redirect to our job list page
 				print STDERR "JOB ID: ", $st->{data}->id, "//", $st->{data}->api_job_id, $/;
 				$m->comp('/_message_add', 'Job submitted!');
-				$m->redirect("./tophat_list?pid=" . $pid);
+				$m->redirect("./cufflinks_list?pid=" . $pid);
 			}
 		}
 	}

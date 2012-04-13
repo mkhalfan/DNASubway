@@ -13,8 +13,9 @@ NGS.prototype.launch = function(what, where, title) {
 			pair: ['/project/phylogenetics/tools/pair?pid=', 'Pair Builder'],
 			blast: ['/project/phylogenetics/tools/blast.html?pid=', 'BLASTN'],
 			data: ['/project/ngs/tools/manage_data?pid=', 'Manage data'],
-			th: ['/project/ngs/tools/app_th?pid=', 'TopHat'],
-			manage_sequences: ['/project/phylogenetics/tools/manage_sequences?pid=', 'Select Data']
+			cufflinks: ['/project/ngs/tools/cufflinks_list?pid=', 'Cufflinks'],
+			tophat: ['/project/ngs/tools/tophat_list?pid=', 'TopHat'],
+			//manage_sequences: ['/project/phylogenetics/tools/manage_sequences?pid=', 'Select Data']
 		};
 
 	try {
