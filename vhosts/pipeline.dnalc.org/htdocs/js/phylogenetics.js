@@ -1849,7 +1849,7 @@
 				var img = '';
 				if (el.qs != null) {
 					var iqs = parseInt(el.qs, 10);
-					if (!isNaN(iqs) && iqs < 20) {
+					if (!isNaN(iqs) && iqs > 0 && iqs < 20) {
 						img = new Element('img', {src :'/images/chart_curve_error.png', title: 'QScore = ' + el.qs});
 					}
 				}
