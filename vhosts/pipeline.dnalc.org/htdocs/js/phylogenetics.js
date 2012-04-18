@@ -34,7 +34,6 @@
 			//--
 			var a = divz[k].innerHTML;
 			var b = divz[++k].innerHTML;
-			//console.info(a + ' == ' + b);
 
 			var shortest = a.length > b.length ? b : a;
 			var lshortest = shortest.length;
@@ -47,7 +46,7 @@
 				}
 			}
 
-			if (i > lshortest/2 && mism != "" && /[RF]/i.test(mism)) {
+			if (i > lshortest/2 && mism != "" && /^[RF]/i.test(mism)) {
 				// if already paired manually, skip it
 				var chkb = $$('#opdiv_' + divz[k].id.replace(/^id_/, '') + ' input')[0];
 				if (chkb.style.display != 'none') {
@@ -63,8 +62,9 @@
 					phy.add_pair([ divz[k-1].id.replace(/^id_/, ''), divz[k].id.replace(/^id_/, '') ]);
 					pair_cnt++;
 				}
+				k++;
 			}
-			k++;
+			//k++;
 		}
 	};
 

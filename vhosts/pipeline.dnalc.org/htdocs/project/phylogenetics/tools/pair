@@ -229,7 +229,7 @@ new Tip('auto-pair-help', "Auto Pair will attempt to pair your sequences for you
 						&&
 						($seq[0]->seq_id == $d->[1][0] || $seq[1]->seq_id == $d->[1][0]))
 					{
-						print STDERR "it matches: ", $seq[0]->seq_id,"/",$seq[1]->seq_id,  "==", $d->[0][0], "/", $d->[1][0], $/;
+						#print STDERR "it matches: ", $seq[0]->seq_id,"/",$seq[1]->seq_id,  "==", $d->[0][0], "/", $d->[1][0], $/;
 						$found = 1;
 						# CHECK strand..
 						last;

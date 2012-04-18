@@ -290,6 +290,9 @@ use Bio::Trace::ABIF ();
 
 		my %seq_names = map { $_->display_id => 1} $self->sequences;
 
+		# to remove primer from the seq
+		my $rmp = qr/M13([FR])(?:_-21_)?(_R)?_(?:\w\d+)/;
+
 		for my $fhash (@files) {
 			# store files
 			# this will return the path of the stored file, if any
@@ -299,6 +302,7 @@ use Bio::Trace::ABIF ();
 			}
 			my $filename = $fhash->{filename};
 			$filename =~ s/[\[\]\(\)\\\/:;]+/_/g;
+			$filename =~ s/$rmp/$1$2/;
 			$filename =~ s/_+/_/g;
 
 			my $f = $stored_file;
@@ -375,6 +379,7 @@ use Bio::Trace::ABIF ();
 				#remove any spaces
 				$display_id =~ s/\s+/_/g;
 				$display_id =~ s/[\[\]\(\):;]+/_/g;
+				$display_id =~ s/$rmp/$1$2/;
 				$display_id =~ s/_+/_/g;
 
 				if (defined $seq_names{$display_id}) {
