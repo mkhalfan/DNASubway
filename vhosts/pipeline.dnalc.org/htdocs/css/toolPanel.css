@@ -437,7 +437,7 @@ span.rot { -moz-transform:rotate(90deg); font-size: smaller;}
 	float:left;width:1px;margin-left:15px;overflow-x:hidden;font-family:courier;line-height: 1.2em;text-transform: uppercase; display:none;
 	}
 #phy-pair-builder #seqops, #phy-blast #seqops {
-	float:left; padding-left:15px; width: 20px;font-family:arial;line-height: 1.2em; color: #996600; display:none;
+	float:left; padding-left:15px; width: 30px;font-family:arial;line-height: 1.2em; color: #996600; display:none;
 	}
 #phy-pair-builder #seqops2 {
 	/*float:left; 
