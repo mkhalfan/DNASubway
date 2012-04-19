@@ -855,7 +855,7 @@ use Bio::Trace::ABIF ();
 				$seq2_trimmed = $rt2;
 		}
 
-		my $x = 0;
+		my $x = $seq1_trimmed;
 		foreach (split//, $seq1) {
 			if ($_ eq "-") {
 				splice @qs1, $x, 0, "-1";
@@ -863,7 +863,7 @@ use Bio::Trace::ABIF ();
 			$x++;
 		}
 
-		my $y = 0;
+		my $y = $seq2_trimmed;
 		foreach (split//, $seq2) {
 			if ($_ eq "-") {
 				splice @qs2, $y, 0, "-1";
