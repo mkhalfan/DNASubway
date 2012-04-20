@@ -2,6 +2,13 @@
   overflow:auto;
   font-family:Courier,monospace;
 }
+#alignment div div div.hgram{
+	position:absolute;
+	bottom:0;
+	background:#777;
+	border-top:1px solid black;
+}
+/* Barcode view is the initial, minimal zoom, all the way until the 1 level before the maximum zoom level*/
 #barcode div{
   white-space: nowrap;
 }
@@ -11,23 +18,12 @@
   display: inline-block;
   background-color:#f0f0f0;
 }
-#barcode div div.A{
-  background-color:green;
+/* fingerprint view is at the maximum zoom level but still showing bars, not the nucleotide letters */
+.fingerprint div div{
+  background-color:#f0f0f0;
+  color:#f0f0f0;
 }
-#barcode div div.G{
-  background-color:black;
-}
-#barcode div div.T{
-  background-color:red;
-}
-#barcode div div.C{
-  background-color:blue;
-}
-#barcode div div.M, #barcode div div.R, #barcode div div.W, #barcode div div.S, #barcode div div.Y, #barcode div div.K, #barcode div div.V, #barcode div div.H, #barcode div div.D, #barcode div div.B, #barcode div div.X, #barcode div div.N, #barcode div div.dash
-{
- color:#999;
- background-color:#999;
-}
+/* Sequence view is the view that shows the actual nucleotides/amino acids */
 #sequence div{
   white-space: nowrap;
 }
@@ -36,56 +32,9 @@
   margin:0px 0px;
   display: inline-block;
 }
-.fingerprint div div{
-  background-color:#f0f0f0;
-  color:#f0f0f0;
-}
-.fingerprint div div.A {
- color:green;
- background-color:green;
-}
-.fingerprint div div.G {
- color:black;
- background-color:black;
-}
-.fingerprint div div.T {
- color:red;
- background-color:red;
-}
-.fingerprint div div.C {
- color:blue;
- background-color:blue;
-}
-.fingerprint div div.M, .fingerprint div div.R, .fingerprint div div.W, .fingerprint div div.S, .fingerprint div div.Y, .fingerprint div div.K, .fingerprint div div.V, .fingerprint div div.H, .fingerprint div div.D, .fingerprint div div.B, .fingerprint div div.X, .fingerprint div div.N, .fingerprint div div.dash
-{
- color:#999;
- background-color:#999;
-}
-.bases div div.A {
- color:green;
- background-color:#F0F0F0;
-}
-.bases div div.G {
- color:black;
- background-color:#F0F0F0;
-}
-.bases div div.T {
- color:red;
- background-color:#F0F0F0;
-}
-.bases div div.C {
- color:blue;
- background-color:#F0F0F0;
-}
-.bases div div.M, .bases div div.R, .bases div div.W, .bases div div.S, .bases div div.Y, .bases div div.K, .bases div div.V, .bases div div.H, .bases div div.D, .bases div div.B, .bases div div.X, .bases div div.N, .bases div div.dash
-{
- color:grey;
- background-color:#F0F0F0;
-}
 .row{
  line-height:20px;
  margin:2px 0px;
- /*display:inline-block;*/
 }
 /*.row:hover{
  border: 1px solid black;
@@ -104,83 +53,20 @@ div.viewport {
  max-width:300px;
  overflow-x:auto; 
  white-space:nowrap;
+ margin-top:3px;
+ font-family: arial;
+ font-size:12px;
+ font-weight:bold;
 }
-.labels{
-max-width:300px
-}
+
 .bar{
 	width:12px;
 	display:inline-block;
 	position:relative;
-	height:21px
+	height:21px;
+	cursor:default;
 }
 
-#sequence div div[class*='cons_']{
-	background-color:#999;
-}
-
-#sequence div div.cons_cons{
-	background-color:#777;
-	height:100%;
-	z-index:1;
-	position:absolute;
-	bottom:0;
-}
-#sequence div div.cons_A{
-	background-color:green;
-}
-#sequence div div.cons_C{
-	background-color:blue;
-}
-#sequence div div.cons_T{
-	background-color:red;
-}
-#sequence div div.cons_G{
-	background-color:black;
-}
-
-
-.cons_hundred{
-	height:100%;
-	z-index:2;
-	position:absolute;
-	bottom:0;
-	border-left: 1px solid white;
-	border-right: 1px solid white;
-}
-.cons_sixtysix{
-	height:66%;
-	z-index:2;
-	position:absolute;
-	bottom:0;
-	border-left: 1px solid white;
-	border-right: 1px solid white;
-	border-top: 1px solid white;
-}
-.cons_fifty{
-	height:50%;
-	z-index:2;
-	position:absolute;
-	bottom:0;
-	border-left: 1px solid white;
-	border-right: 1px solid white;
-	border-top: 1px solid white;
-}
-.cons_thirtythree{
-	height:33%;
-	z-index:2;
-	position:absolute;
-	bottom:0;
-	border-left: 1px solid white;
-	border-right: 1px solid white;
-	border-top: 1px solid white;
-}
-#barcode div div.hgram{
-	position:absolute;
-	bottom:0;
-	background:#777;
-	border-top:1px solid black;
-}
 input.controls{
 	cursor:pointer;
 }
@@ -189,4 +75,95 @@ input.disabled{
 	filter:alpha(opacity=30); /* For IE8 and earlier */
 	cursor:default;
 }
+.unselectable {
+    -moz-user-select: -moz-none;
+    -khtml-user-select: none;
+    -webkit-user-select: none;
+    -o-user-select: none;
+    user-select: none;
+}
 
+/**
+*  aa_code_rollovers is here because the last definition is shared for the
+*  histogram rollovers as well (see .bar[data-title]:hover:after below)
+*  and we want to keep this all grouped together
+**/
+.aa_code_rollovers{
+	cursor:default;
+	padding-right:1px;
+	border-bottom:1px dotted;
+	font-family:courier,monospace;
+}
+.aa_code_rollovers:hover{
+	/*font-weight:bold;
+	padding-right:0px;*/
+	position:relative; /* need this to position/anchor the rollovers */
+}
+
+.aa_code_rollovers[data-title]:hover:after{
+	left:-95px;
+}
+
+.aa_code_rollovers[data-title]:hover:after, .bar[data-title]:hover:after {
+	content: attr(data-title);
+	padding: 4px 8px;
+	color: #333;
+	position: absolute;
+	/* left: -80px;*/
+	top: 26px;
+	white-space: nowrap;
+	z-index: 100;
+	-moz-border-radius: 5px;
+	-webkit-border-radius: 5px;
+	border-radius: 5px;
+	background-color: silver;
+	border:1px solid black;
+}
+
+/** 
+*  legend_but is only shown for protein sequences (and it's now called 'color  
+*  codes') but we define the style here since its shared with the pairwise 
+*  button (titled 'sequence similarity' now)
+**/
+#legend_but, #pairwise_but{
+	float:right;
+	/*width:60px;*/
+	/*height:22px;*/
+	margin-right:2px;
+	border:1px solid #999;
+	text-align:center;
+	font-family:arial;
+	font-size:10px;
+	padding:4px 9px;
+	cursor:pointer;
+	color:#999;
+}
+
+/**
+*  pairwise_div is displayed in both proteins and nucleotides
+**/
+#pairwise_div {
+	z-index:200;
+	width:auto;
+	height:auto;
+	position:absolute;
+	top:45px;
+	right:80px;
+	/*border:1px solid #999;*/
+	background:#F8FAFC;
+	text-align:center;
+}
+table, td{
+	border:0px solid #999;
+	padding:1px;
+}
+
+#pairwise_div  td{
+	padding:3px;
+	border:1px solid #999;
+}
+
+#alignment_links{
+	font-size:10px;
+	font-family:arial;
+}
