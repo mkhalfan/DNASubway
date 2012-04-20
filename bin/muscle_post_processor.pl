@@ -3,6 +3,8 @@
 use strict;
 
 use Bio::AlignIO;
+use Bio::LocatableSeq;
+use Bio::SimpleAlign;
 use Getopt::Long;
 use Data::Dumper;
 use IO::File ();
@@ -26,7 +28,6 @@ my $usage = <<END;
 END
 ;
 
-
 ($infile && $htmlout) or die $usage;
 my $in = Bio::AlignIO->new( -file => $infile );
 my @outfile = (-file => ">$outfile") if $outfile;
@@ -36,8 +37,22 @@ my $html_out = IO::File->new;
 my %seqs;
 my %rseqs;
 
-my $aln = $in->next_aln;;
+my $aln = $in->next_aln;
+
+my $consensus = $aln->consensus_string();
+my $consensus_seq = new Bio::LocatableSeq ( 
+		-seq => $consensus,
+		-id => 'Consensus',
+		-start => 1,
+		-end => length($consensus),
+);
+$aln->add_seq($consensus_seq, 0);
+
 my @seq = $aln->each_seq;
+
+my $pairwise_data = calculate_pairwise_ids($aln);
+#print Dumper (\%pairwise_ids), $/;
+my $pairwise_div = create_pairwise_table($pairwise_data);
 
 for my $seq (@seq) {
 	$seqs{$seq->display_id} = $seq->seq;
@@ -51,25 +66,35 @@ my $slice = auto_flush(\%seqs,\%rseqs,$aln);
 $out->write_aln($slice) if $outfile; #this creates the new *trimmed* alignment output file
 $slice->match;
 
-my $style = ($is_amino ? '<link rel="stylesheet" href="/css/alignment_viewer_amino.css" />' : '<link rel="stylesheet" href="/css/alignment_viewer.css" />');
-#my $style = '<link rel="stylesheet" href="/css/alignment_viewer_amino.css" />';
-my $script = '<script type="text/javascript" src="/js/prototype-1.6.1.js"></script>' . "\n";
-$script .= '<script type="text/javascript" src="/js/alignment_viewer.js"></script>';
-my $buttons = '<div><input type="image" class="controls" id="barcode_but" onclick="barcodeView()" src="/images/barcode_but.png"/> <input type="image" class="controls" id="zoom_out" onclick="zoomOut()" src="/images/zoom_out_but.png" /><input type="image" class="controls" id="zoom_in" onclick="zoomIn()" src="/images/zoom_in_but.png"/> <input type="image" class="controls" id="sequence_but" onclick="seqView()" src="/images/sequence_but.png" /></div>';
-my $body_tag = '<body onload="resizeFrame(parent.window.document.getElementById(\'aframe\'))">';
+my $seq_but_prefix = ($is_amino ? 'aa' : 'nuc');
+my $buttons = '<div><input type="image" class="controls" id="barcode_but" onclick="barcodeView()" src="/images/barcode_but.png"/> <input type="image" class="controls" id="zoom_out" onclick="zoomOut()" src="/images/zoom_out_but.png" /><input type="image" class="controls" id="zoom_in" onclick="zoomIn()" src="/images/zoom_in_but.png"/> <input type="image" class="controls" id="sequence_but" onclick="seqView()" src="/images/' . $seq_but_prefix . '_sequence_but.png" />';
+$buttons .= ($is_amino ? '<div id="legend_but" onclick="$(\'legend\').toggle();">COLOR CODES</div>' : '');
+$buttons .= '<div id="pairwise_but" onclick="$(\'pairwise_div\').toggle();">SEQUENCE SIMILARITY</div>';
+$buttons .= "</div>";
+
+my $css = ($is_amino ? 'alignment_viewer_amino.css' : 'alignment_viewer_nucleotide.css');
+
+my $set_css = <<END
+<script type="text/javascript">
+  var fileref = document.createElement("link");
+  fileref.setAttribute("rel", "stylesheet");
+  fileref.setAttribute("type", "text/css");
+  fileref.setAttribute("href", '/css/$css');
+  document.getElementsByTagName("head")[0].appendChild(fileref);
+</script>
+END
+;
 
 my $dec = decorate_alignment($slice);
 my $retval = $dec->{retval};
 my $barcode = $dec->{barcode};
 my $labels = $dec->{labels};
+my $div_height = (keys %{$aln->{_order}}) * 22 + 140;
 
 if ($html_out->open($htmlout, "w")){
-	print $html_out '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">', "\n";
-	print $html_out '<html xmlns="http://www.w3.org/1999/xhtml">';
-	print $html_out '<head>';
-	print $html_out '<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />';
-	print $html_out '<title>Alignment Viewer</title>';
-	print $html_out $style, "\n", $script, "\n", "</head>", "\n", $body_tag, "\n";
+	print $html_out $set_css, "\n";
+	print $html_out $pairwise_div, "\n";
+	print $html_out '<div id="muscle_post_processor_output" class="unselectable" style="height:' . $div_height . 'px;">', "\n";
 	print $html_out $buttons, "\n";
 	print $html_out '<div id="viewport" class="viewport">', "\n";
 	print $html_out '<div id="labels">', "\n", $labels, '</div>', "\n";
@@ -83,7 +108,7 @@ if ($html_out->open($htmlout, "w")){
 	print $html_out '</div><!--end alignment div-->', "\n";
 	print $html_out '</div><!--end viewport div-->', "\n";
 	print $html_out '<input type="hidden" id="div_width" value="1" />', "\n";
-	print $html_out '</body>', "\n", '</html>';
+	print $html_out '</div><!--end muscle_post_processor_output-->';
 
 	undef $html_out
 }
@@ -106,7 +131,7 @@ sub decorate_alignment {
 	## The element number in the @positions array corresponds to the 
 	## position in the alignment. The $mismatch arrayref holds the variants
 	## themselves and only stores which variants are present, NOT their 
-	## abundance
+	## abundance - for use in the sequence variation row
 	my @positions;
 
 	## The @histogram_data array will hold the fraction of conservation
@@ -184,68 +209,72 @@ sub decorate_alignment {
 		#unshift @$col, int($fraction*255 + 0.5);
 		push @columns, $col;
 	}
-	#my $cc = 0;
-	#for (@columns){
-	#	print @$_, " $fractions[$cc]", $/;
-	#	$cc++;
-	#}
-
-	## if it's an amino acid sequence, make a histogram here, otherwise
-	## make the stacked column style sequence conservation row.
-	if ($is_amino){
-		$retval .= '<div class="row">';
-		for my $h (@histogram_data){
-			my $height = ($h*100);
-			$retval .= "<div class='bar'><div class='hgram' style='height:$height%'>&nbsp;</div></div>";
-		}
-		$retval .= '</div><!--end row-->';
+	
+	## $both will hold things which will be pushed to both $retval and $barcode
+	## row_1 holds the histogram and sequence positions/numering
+	my $both = '<div class="row_1" style="height:42px;position:relative;"><div class="row" style="bottom:0;position:absolute">';
+	my $x = 1;
+	for my $h (@histogram_data){
+		my $height = ($h*100);
+		my $title = sprintf("%.1f", $height);
+		$both .= "<div class='bar' data-title='$title%'>";
+		$both .= ($x == 1 || $x % 100 == 0 ? "<div style='position:absolute;color:black;top:-21px;background-color:white'>$x</div>" : '');
+		$both .= "<div class='hgram' style='height:$height%'>&nbsp;</div></div>";
+		$x++;
 	}
-	else{
+	$both .= '</div><!--end row-->';
+	$both .= '</div><!--end row_1-->';
+
+	## if it's not a protein sequence, add the sequence variation row here
+	if (!$is_amino){
 		## Making the 'stacked column' style sequence conservation here
-		## store it in retval bc this is only shown in sequence view
-		$retval .= '<div class="row">';
+		$both .= '<div class="row">';
+
 		for my $mms (@positions){
 			my $num_mm = @$mms;
 
-			$retval .= '<div class="bar">';	
+			$both .= "<div class='bar'>";
+
 			if ($num_mm == 0){
-				$retval .= "<div class='hbar cons_cons'>&nbsp;</div>";
+				$both .= "<div class='hbar cons_cons'>&nbsp;</div>";
 			}
 			elsif ($num_mm == 1){
-				$retval .= "<div class='hbar cons_" . @$mms[0] ." cons_hundred'>&nbsp;</div>";
+				$both .= "<div class='hbar cons_" . @$mms[0] ." cons_hundred'>&nbsp;</div>";
 			}
 			elsif ($num_mm == 2){
-				$retval .= "<div class='hbar cons_" . @$mms[0] . " cons_hundred'>&nbsp;</div>";
-				$retval .= "<div class='hbar cons_" . @$mms[1] . " cons_fifty'>&nbsp;</div>";
+				$both .= "<div class='hbar cons_" . @$mms[0] . " cons_hundred'>&nbsp;</div>";
+				$both .= "<div class='hbar cons_" . @$mms[1] . " cons_fifty'>&nbsp;</div>";
 			}
 			elsif ($num_mm == 3){
-				$retval .= "<div class='hbar cons_" . @$mms[0] . " cons_hundred'>&nbsp;</div>";
-				$retval .= "<div class='hbar cons_" . @$mms[1] . " cons_sixtysix'>&nbsp;</div>";
-				$retval .= "<div class='hbar cons_" . @$mms[2] . " cons_thirtythree'>&nbsp;</div>";
+				$both .= "<div class='hbar cons_" . @$mms[0] . " cons_hundred'>&nbsp;</div>";
+				$both .= "<div class='hbar cons_" . @$mms[1] . " cons_sixtysix'>&nbsp;</div>";
+				$both .= "<div class='hbar cons_" . @$mms[2] . " cons_thirtythree'>&nbsp;</div>";
 			}
 			else{
-				$retval .= "<div class='hbar cons_err'>&nbsp;</div>";
+				$both .= "<div class='hbar cons_err'>&nbsp;</div>";
 			}
-			$retval .= '</div>'; #end div bar#
+			$both .= '</div>'; #end div bar#
 		}
-		$retval .= '</div><!--end row-->';
+		$both .= '</div><!--end row-->';
 	}
 
-	## Making the histogram here 
-	## store it in barcode because the histogram
-	## will be displayed in barcode mode
-	$barcode .= '<div class="row">';
-	for my $h (@histogram_data){
-	   my $height = ($h*100);
-	   $barcode .= "<div class='bar'><div class='hgram' style='height:$height%'>&nbsp;</div></div>";
-	}
-	$barcode .= '</div><!--end row-->';
+	$retval .= $both;
+	$barcode .= $both;
 
 	## Getting the labels and creating the barcode and sequence views here 
-	## first - add a label for the sequence conservation row
+	## first - add a label for the seq conservation row and a blank one to compensate for the numbers above the conservation (hgram) row
+	$labels .= "<div class='labels row'>&nbsp</div>"; #this blank row needed to compensate for the numbers above the Conservation row
 	$labels .= "<div class='labels row'>Sequence Conservation</div>\n";
+	## if it's not a protein sequence, add a label for the sequence variation row
+	$labels .= (!$is_amino ? "<div class='labels row'>Sequence Variation</div>" : ''); 
+	
+	## $z is counter which adds the sequence number to each sequence. ex: 1. Sequence A
+	my $z = 0;
 	for my $l (@labels) {
-		$labels .= "<div class='labels row'>$l</div>\n";
+		## when z = 0, this is the first row, the consensus sequence. Don't number the consensus
+		my $seq_num = ($z > 0 ? "$z." : '');
+		$labels .= "<div class='labels row'>$seq_num $l</div>\n";
+		$z++;
 
 		$retval .= '<div class="row">';
 		$barcode .= '<div class="row">';
@@ -255,7 +284,6 @@ sub decorate_alignment {
 			my $n;	
 			my $class;
 			$n = ($col eq '.' ? "&nbsp;" : $col); 
-			#$class = ($col ne '.' && $col ne 'A' && $col ne 'T' && $col ne 'C' && $col ne 'G' ? 'x' : $col); 
 			$class = ($col eq '-' ? 'dash' : $col);
 			$retval .= "<div class='$class'>$n</div>";
 			if ($fractions[$x] != 1){
@@ -307,4 +335,69 @@ sub auto_flush {
 	}
 
 	return $aln->slice($left_end,$right_end);
+}
+
+sub calculate_pairwise_ids {
+	my ($aln) = @_;
+	my %pairwise_ids = ();
+	my $num_seqs = $aln->no_sequences();
+	my @seq = $aln->each_seq;
+
+	my $x = 1;
+	for my $a (@seq) {
+		my $y = 1;
+		for my $b (@seq) {
+			my $key = $x . '-' . $y;
+			if ($a->display_id eq $b->display_id){
+				$pairwise_ids{$key} = '-';
+				$y++;
+				next;
+			}
+
+			my $pairwise_aln = new Bio::SimpleAlign();
+			$pairwise_aln->add_seq($a);
+			$pairwise_aln->add_seq($b);
+			
+			my $percent_id = $pairwise_aln->percentage_identity;
+			$pairwise_ids{$key} = sprintf("%.2f", $percent_id);
+
+			$y++;
+		}
+		$x++;
+	}
+
+	return {pairwise_ids => \%pairwise_ids, num_seqs => $num_seqs};
+}
+
+sub create_pairwise_table {
+	my ($pairwise_data) = @_;
+	my $num_seqs = $pairwise_data->{num_seqs};
+	my %pairwise_ids = %{$pairwise_data->{pairwise_ids}};
+
+	my $div;
+	$div  = '<div id="pairwise_div" style="display:none">' . "\n";
+	$div .= '<table id="pairwise_table" cellspacing=0>' .  "\n";
+	$div .= '<tr>'. "\n";
+	$div .= '<td></td>' . "\n";
+	for (my $y = 1; $y <= $num_seqs; $y++){
+		my $seq_value = ($y == 1 ? 'C' : $y - 1);
+		$div .= "<td>$seq_value</td>\n";
+	}
+	$div .= '</tr>' . "\n";
+
+	for (my $x = 1; $x <= $num_seqs; $x++){
+		$div .= '<tr>';
+		my $seq_value = ($x == 1 ? 'C' : $x - 1);
+		$div .= "<td>$seq_value</td>\n";
+		for (my $y = 1; $y <= $num_seqs; $y++){
+			#print "$x-$y = ", $pairwise_ids{$x . '-' . $y}, $/;
+			my $key = $x . '-' . $y;
+			my $value = $pairwise_ids{$key};
+			$div .= ($value eq '-' ? "<td>$value</td>\n" : "<td>$value%</td>\n");
+		}
+		$div .= '</tr>';
+	}
+	$div .= '</table>' . "\n";
+	$div .= '</div>' ."\n";
+	return $div;
 }
