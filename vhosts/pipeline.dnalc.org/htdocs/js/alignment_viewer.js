@@ -1,3 +1,37 @@
+var x;
+var y;
+var being_dragged = false;
+var element;
+
+function mouser(event){
+	if(being_dragged == true) {
+		if(event.offsetX || event.offsetY) {
+			x=event.offsetX;
+			y=event.offsetY;
+		}
+		else {
+			x=event.pageX;
+			y=event.pageY;
+		}
+
+		document.getElementById(element).style.left = x -5 +'px';
+		document.getElementById(element).style.top = y -5 +'px';
+	}
+}
+
+function mouse_down(event, ele_name) {
+	being_dragged = true;
+	element = ele_name;
+	document.getElementById(element).style.cursor = 'move';
+}
+
+function mouse_up() {
+	being_dragged = false;
+	document.getElementById(element).style.cursor = 'auto';
+	//document.getElementById(element).style.top = y +'px';
+	//document.getElementById(element).style.left = x +'px';
+} 
+
 function zoomIn() {
 	var r = scroll_a();
 	
@@ -137,12 +171,16 @@ function scroll_b(r){
 	
 	return p;
 }
+
 document.observe("dom:loaded", function() {
-	$('div_width').value = $$('#barcode div div')[0].getStyle('width').split('px')[0];
+	//$('div_width').value = $$('#barcode div div')[0].getStyle('width').split('px')[0];
+	$('div_width').value = 1;
 	$('zoom_out').disabled = true;
 	$('barcode_but').disabled = true;
 	$('zoom_out').addClassName('disabled');
 	$('barcode_but').addClassName('disabled');
 	$('zoom_in').disabled = false;
 	$('sequence_but').disabled = false;
+	document.body.addEventListener("mousemove", mouser, false);
+	
 });
