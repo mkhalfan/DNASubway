@@ -1,4 +1,4 @@
-<div id="conbodyx">
+<div id="conbodyx" class="unselectable">
 <p>
 % if ($ok == 1) {
 	<script type="text/javascript">
@@ -12,7 +12,7 @@
 		Error: can't open project "<% $pid|html%>".
 % 	} 
 %	else {
-%		if ($algn_file) {
+%		if ( -e $algn_file) {
 			<div id="legend" style="top:49px;right:33px;display:none;">
 				<div style="height:20px;">
 					<!--[if !IE]> -->
@@ -43,7 +43,7 @@
 										<abbr data-title="R Arginine" class="aa_code_rollovers">R</abbr>
 									</span>
 								</li>
-								<li>Negativ Charge, acidic: 
+								<li>Negative Charge, acidic: 
 									<span class="negative_charge">
 										<abbr data-title="D Aspartic Acid" class="aa_code_rollovers">D</abbr>
 										<abbr data-title="E Glutamic Acid" class="aa_code_rollovers">E</abbr>
@@ -126,6 +126,7 @@
 %#----------------------------------------------------------------------------
 <%once>
 	use DNALC::Pipeline::App::Phylogenetics::ProjectManager ();
+	use IO::File ();
 </%once>
 %#----------------------------------------------------------------------------
 <%init>
@@ -144,12 +145,16 @@
 	my $algn_file = $pm->get_alignment('html');
 	my $alignment_url = $m->comp("../../.comp/filepath_to_web", file => $algn_file, just_return => 1);
 	
+	print STDERR $alignment_url . " xxxxxxx " . $algn_file;
+	
 	my $algn_contents;
-	open FILE, $algn_file or die "Could not open alignment viewer file: $!";
-	while (<FILE>){
-		$algn_contents .= $_;
+	my $fh = IO::File->new();
+	if ($fh->open($algn_file)) {
+		while (<$fh>){
+			$algn_contents .= $_;
+		}
+		$fh->close;
 	}
-	#$m->redirect($alignment_url);
 	
 </%init>
 %#----------------------------------------------------------------------------

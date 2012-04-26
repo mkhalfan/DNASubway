@@ -1,18 +1,19 @@
-var x;
-var y;
+
 var being_dragged = false;
 var element;
 
 function mouser(event){
+	var x;
+	var y;
 	if(being_dragged == true) {
-		if(event.offsetX || event.offsetY) {
-			x=event.offsetX;
-			y=event.offsetY;
-		}
-		else {
+		
+		try{
 			x=event.pageX;
 			y=event.pageY;
 		}
+		catch(e) {
+		
+		};
 
 		document.getElementById(element).style.left = x -5 +'px';
 		document.getElementById(element).style.top = y -5 +'px';
@@ -28,8 +29,6 @@ function mouse_down(event, ele_name) {
 function mouse_up() {
 	being_dragged = false;
 	document.getElementById(element).style.cursor = 'auto';
-	//document.getElementById(element).style.top = y +'px';
-	//document.getElementById(element).style.left = x +'px';
 } 
 
 function zoomIn() {
@@ -181,6 +180,6 @@ document.observe("dom:loaded", function() {
 	$('barcode_but').addClassName('disabled');
 	$('zoom_in').disabled = false;
 	$('sequence_but').disabled = false;
-	document.body.addEventListener("mousemove", mouser, false);
+	try {document.body.addEventListener("mousemove", mouser, false);} catch (e) {};
 	
 });

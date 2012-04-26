@@ -32,9 +32,16 @@
   margin:0px 0px;
   display: inline-block;
 }
+/* each of the rows in the display are nested in 1 .row div */
 .row{
  line-height:20px;
  margin:2px 0px;
+}
+/* the first row which holds the histogram and sequence positions/numbering is contained in a div .row_1 */
+.row_1 {
+	height:45px;
+	position:relative;
+	z-index:1000;
 }
 /*.row:hover{
  border: 1px solid black;
@@ -112,7 +119,7 @@ input.disabled{
 	/* left: -80px;*/
 	top: 26px;
 	white-space: nowrap;
-	z-index: 100;
+	z-index: 1000;
 	-moz-border-radius: 5px;
 	-webkit-border-radius: 5px;
 	border-radius: 5px;
@@ -143,7 +150,7 @@ input.disabled{
 *  pairwise_div is displayed in both proteins and nucleotides
 **/
 #pairwise_div {
-	z-index:200;
+	z-index:1001;
 	width:auto;
 	height:auto;
 	position:absolute;
