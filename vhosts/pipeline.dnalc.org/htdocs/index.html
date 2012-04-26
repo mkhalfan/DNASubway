@@ -272,13 +272,14 @@ if ($r->method eq "POST") {
 			unless ($user) { # unless the ldap user exist in out db, we have to create it
 				$dispatcher->info("AUTH: Adding new user from LDAP: ", $ldap_u->{username} );
 				$user = DNALC::Pipeline::User->create({
-						username => $ldap_u->{username},
+						username => $s->{username},
 						name_first => $ldap_u->{name_first},
 						name_last => $ldap_u->{name_last},
 						email => $ldap_u->{email},
 						password => random_string(8,12),
 					});
 			}
+			$s->{institution} = $ldap_u->{institution};
 		}
 		else {
 			unless ($user && $user->password_valid($passw)) {
@@ -303,7 +304,7 @@ if ($r->method eq "POST") {
 		$s->{username} = $user->username;
 		$s->{full_name} = $user->full_name;
 		$s->{user_id} = $user->id;
-		$s->{institution} = DNALC::Pipeline::UserProfile->get_user_institution($user->id);
+		$s->{institution} ||= DNALC::Pipeline::UserProfile->get_user_institution($user->id);
 		$s->{logged_in} = 1;
 		
 		$user->increment_login_count;
@@ -325,7 +326,7 @@ if ($r->method eq "POST") {
 		else {
 			$m->comp("/_message_add", "Unable to log you in. Try again.");
 		}
-		$m->redirect("/project/browsemy");
+		$m->redirect("/");
 
 	}
 	if ( exists $pcf->{SSL_LOGIN} && $pcf->{SSL_LOGIN}) {
