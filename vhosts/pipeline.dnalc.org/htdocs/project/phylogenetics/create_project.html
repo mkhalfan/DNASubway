@@ -31,13 +31,11 @@
 		</div>  
 	<div class="conNewPro_title">Select Sequence Source *</div> 
 	<div class="conNewPro_label">
-		<input class="conRadiobox_align" type="radio" name="seq_src" id="seq_src_upload" 
-			value="upload" <% $seq_src eq "upload" ? "checked=\"checked\"" : ""%>/>&nbsp;
-
-			<label for="seq_src_upload">Upload AB1 trace files or sequences in <a href="http://en.wikipedia.org/wiki/FASTA_format#Format">FASTA format</a> <small>(max <% $seq_max_len %>kb)</small></label>:
-
-			<input class="conStylized_box1" type="file" type=file multiple id="seq_file" name="seq_file"  onchange="phy.set_source('upload')" onclick="phy.set_source('upload')"  />
-		</div>
+		<input class="conRadiobox_align" type="radio" name="seq_src" id="seq_src_upload" value="upload" disabled="">&nbsp;
+		<label for="seq_src_upload">Upload AB1 trace files or sequences in <a href="http://en.wikipedia.org/wiki/FASTA_format#Format">FASTA format</a></label>:
+		<div class="conNewPro_label" style="padding-left:20px"><small>(max 150kb)</small></div>
+		<input class="conStylized_box1" type="file" multiple="" id="seq_file" name="seq_file" onchange="phy.set_source('upload')" onclick="phy.set_source('upload')">
+	</div>
 
 		<div class="conNewPro_label">
 			<input class="conRadiobox_align" type="radio" name="seq_src" id="seq_src_paste" value="paste" <% $seq_src eq "paste" ? "checked=\"checked\"" : ""%> />&nbsp; 
