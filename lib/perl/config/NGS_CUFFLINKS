@@ -9,6 +9,7 @@
 	],
 	parameters => [
 	],
+	_input_file_filter => qr/\.bam$/,
 	_output_dir => qr/\/cufflinks_out$/,
 	_output_files => qr/\.(gtf|fpkm_tracking)$/,
 }

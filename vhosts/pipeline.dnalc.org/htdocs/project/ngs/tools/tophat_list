@@ -33,6 +33,6 @@
 	#$pm->api_instance($apif) if $apif;
 	my $proj = $pm->project;
 	
-	my $jobs = $pm->get_jobs_by_task('tophat');
+	my $jobs = $pm->get_jobs_by_task('ngs_tophat');
 
 </%init>

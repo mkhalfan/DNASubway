@@ -16,10 +16,10 @@
 				<!-- Column 1 start -->
 				<h2>TH + CL</h2>
 				<!-- Column 1 end -->
-				<div style="float:left; width: 50%;"><a onclick="javascript:ngs.launch('th');" href="#../tools/app_th?pid=<% $pid|html%>">Tophat</a></div>
+				<div style="float:left; width: 50%;"><a onclick="javascript:ngs.launch('tophat');" href="#../tools/app_th?pid=<% $pid|html%>">Tophat</a></div>
 				<div style="float:left; width: 50%;">
-					<a href="#">Cufflinks</a>
-					<a href="#">Cuffldiff</a>
+					<a href="#" onclick="javascript:ngs.launch('cufflinks');">Cufflinks</a>
+					<a href="#" onclick="javascript:ngs.launch('cuffdiff');">Cuffdiff</a>
 				</div>
 			</div>
 			<div class="col2">

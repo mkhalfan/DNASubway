@@ -2,7 +2,7 @@
 <& /_messages &>
 
 %#j = <% $jobs %>
-<strong><a href="./app_cufflinks?pid=<% $pid |html%>">Launch new Cufflinks job</a></strong>
+<strong><a href="./app_cuffdiff?pid=<% $pid |html%>">Launch new Cuffdiff job</a></strong>
 % while (my $job = $jobs->next) {
 %	my $attrs = $job->attrs;
 	<div><a href="./job_status?pid=<%$pid |html%>;jid=<% $job %>"><% $attrs->{name} |html%></div>
@@ -23,16 +23,11 @@
 
 	$m->session->{pipeline} ||= {};
 	my $s = $m->session->{pipeline};
-	
-	#my $apif = iPlant::FoundationalAPI->new(
-	#		user => $s->{username},
-	#		token => $s->{api_token},
-	#		debug => 0,
-	#	);
+
 	my $pm = DNALC::Pipeline::App::NGS::ProjectManager->new({project => $pid, debug => 0});
 	#$pm->api_instance($apif) if $apif;
 	my $proj = $pm->project;
 
-	my $jobs = $pm->get_jobs_by_task('ngs_cufflinks');
+	my $jobs = $pm->get_jobs_by_task('ngs_cuffdiff');
 
 </%init>

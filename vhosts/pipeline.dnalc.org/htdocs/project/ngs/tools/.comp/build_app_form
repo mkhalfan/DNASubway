@@ -14,7 +14,8 @@
 %				if ($i->{id} eq q{genome} ) {
 					include genomes - <% $form->{genome} || $i->{value} |html%>
 %				} elsif ($i->{display_type}) {
-					<div><& $i->{display_type}, pm => $pm,  element => $i, user_value => defined $form->{$i->{id}} ? $form->{$i->{id}} : $i->{value} &></div>
+					<div><& $i->{display_type}, pm => $pm, element => $i, filter => $app_input_filter, \
+						user_value => defined $form->{$i->{id}} ? $form->{$i->{id}} : $i->{value} &></div>
 %				} else {
 					<input type="text" id="<% $i->{id} %>" name="<% $i->{id} %>" req="<% $i->{required} %>" value="<% defined $form->{$i->{id}} ? $form->{$i->{id}} : $i->{value} |html%>" />
 %				}
@@ -23,7 +24,9 @@
 %		}
 			</tbody>
 				<tr>
-					<td colspan="2" style="font-weight:bold;background-color: #eee;">Parameters</td>
+					<td colspan="2" style="font-weight:bold;background-color: #eee;">Parameters
+						<a href="#" onclick="var p=$('app_parameters');p.style.display='block';this.update('')">+</a>
+					</td>
 				</tr>
 			<tbody id="app_parameters">
 % 		for my $p (@{$app->parameters}) {
@@ -46,6 +49,7 @@
 </%args>
 <%init>
 	return unless ($app && $pm);
-	#use Data::Dumper;
-	#print STDERR Dumper($flagged), $/;
+	
+	my $app_input_filter = $app->{conf}->{_input_file_filter};
+
 </%init>

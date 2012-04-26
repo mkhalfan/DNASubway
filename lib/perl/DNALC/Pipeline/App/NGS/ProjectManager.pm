@@ -57,7 +57,7 @@ use Data::Dumper;
 		#------
 		my %task_id_to_name = ();
 		my %task_name_to_id = ();
-		my $tasks = DNALC::Pipeline::Task->retrieve_all;
+		my $tasks = DNALC::Pipeline::Task->search_like(name => 'ngs_%');
 		while (my $task = $tasks->next) {
 			next unless $task->enabled;
 			$task_id_to_name{ $task->id } = $task->name;
@@ -213,7 +213,7 @@ use Data::Dumper;
 			$app ||= $apps->[0];
 
 			# TODO : find a better name for the next method
-			$self->apply_app_setting($app, $app_cf);
+			$self->apply_app_settings($app, $app_cf);
 
 			return {status => 'success', app => $app };
 		}
@@ -225,7 +225,7 @@ use Data::Dumper;
 	
 	# apply our own configuration file for the app
 	#	supply our own default values, or field labels, hide some of the fields
-	sub apply_app_setting {
+	sub apply_app_settings {
 		my ($self, $app, $app_cf) = @_;
 
 
@@ -273,6 +273,7 @@ use Data::Dumper;
 			push @params, $param;
 		}
 		$app->{parameters} = \@params if @params;
+		$app->{conf} = $app_cf;
 	}
 	#--------------------------------------
 	sub job {
@@ -318,6 +319,7 @@ use Data::Dumper;
 		my $job_ep = $apif->job;
 		my $job_st = $job_ep->submit_job($app, %$params);
 
+		print STDERR  "ProjectManager::submit_job: params = ", Dumper($params), $/;
 		#print STDERR  "ProjectManager::submit_job: ", Dumper($job_st), $/;
 		if ($job_st && $job_st->{status} eq "success") {
 			my $api_job = $job_st->{data};
@@ -378,10 +380,8 @@ use Data::Dumper;
 	#--------------------------------------
 	sub get_jobs_by_task {
 		my ($self, $task) = @_;
-		
-		my %task = (tophat => 32); # FIXME
-		#my $jobs = 
-		DNALC::Pipeline::NGS::Job->search(task_id => $task{tophat}, project_id => $self->project);
+
+		DNALC::Pipeline::NGS::Job->search(task_id => $self->{task_name_to_id}->{$task}, project_id => $self->project);
 	}
 
 	#--------------------------------------

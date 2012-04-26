@@ -10,6 +10,7 @@
 	$element => undef
 	$user_value => undef
 	$class => ''
+	$filter => undef;
 </%args>
 <%once>
 	use Data::Dumper;
@@ -18,6 +19,7 @@
 	return unless $pm && $element;
 	
 	my @files = $pm->data;
+	@files = grep {$_->file_name =~ /$filter/} @files if $filter;
 	
 	#print STDERR Dumper($user_value);
 </%init>

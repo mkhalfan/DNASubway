@@ -14,6 +14,7 @@ NGS.prototype.launch = function(what, where, title) {
 			blast: ['/project/phylogenetics/tools/blast.html?pid=', 'BLASTN'],
 			data: ['/project/ngs/tools/manage_data?pid=', 'Manage data'],
 			cufflinks: ['/project/ngs/tools/cufflinks_list?pid=', 'Cufflinks'],
+			cuffdiff: ['/project/ngs/tools/cuffdiff_list?pid=', 'Cuffdiff'],
 			tophat: ['/project/ngs/tools/tophat_list?pid=', 'TopHat'],
 			//manage_sequences: ['/project/phylogenetics/tools/manage_sequences?pid=', 'Select Data']
 		};
@@ -88,6 +89,9 @@ Event.observe(window, 'load', function() {
 		$('add').observe('click', function() {
 			ngs.add_data();
 		});
+	}
+	else if (step == 3) {
+		$('app_parameters').toggle();
 	}
 });
 
