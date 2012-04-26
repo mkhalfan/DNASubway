@@ -94,7 +94,7 @@ my $div_height = (keys %{$aln->{_order}}) * 22 + 140;
 if ($html_out->open($htmlout, "w")){
 	print $html_out $set_css, "\n";
 	print $html_out $pairwise_div, "\n";
-	print $html_out '<div id="muscle_post_processor_output" class="unselectable" style="height:' . $div_height . 'px;">', "\n";
+	print $html_out '<div id="muscle_post_processor_output" style="height:' . $div_height . 'px;">', "\n";
 	print $html_out $buttons, "\n";
 	print $html_out '<div id="viewport" class="viewport">', "\n";
 	print $html_out '<div id="labels">', "\n", $labels, '</div>', "\n";
@@ -212,7 +212,7 @@ sub decorate_alignment {
 	
 	## $both will hold things which will be pushed to both $retval and $barcode
 	## row_1 holds the histogram and sequence positions/numering
-	my $both = '<div class="row_1" style="height:42px;position:relative;"><div class="row" style="bottom:0;position:absolute">';
+	my $both = '<div class="row_1"><div class="row" style="bottom:0;position:absolute">';
 	my $x = 1;
 	for my $h (@histogram_data){
 		my $height = ($h*100);
