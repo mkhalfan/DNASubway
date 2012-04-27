@@ -67,10 +67,10 @@ $out->write_aln($slice) if $outfile; #this creates the new *trimmed* alignment o
 $slice->match;
 
 my $seq_but_prefix = ($is_amino ? 'aa' : 'nuc');
-my $buttons = '<div><input type="image" class="controls" id="barcode_but" onclick="barcodeView()" src="/images/barcode_but.png"/> <input type="image" class="controls" id="zoom_out" onclick="zoomOut()" src="/images/zoom_out_but.png" /><input type="image" class="controls" id="zoom_in" onclick="zoomIn()" src="/images/zoom_in_but.png"/> <input type="image" class="controls" id="sequence_but" onclick="seqView()" src="/images/' . $seq_but_prefix . '_sequence_but.png" />';
+my $buttons = '<div><div style="float:left"><input type="image" class="controls" id="barcode_but" onclick="barcodeView()" src="/images/barcode_but.png"/> <input type="image" class="controls" id="zoom_out" onclick="zoomOut()" src="/images/zoom_out_but.png" /><input type="image" class="controls" id="zoom_in" onclick="zoomIn()" src="/images/zoom_in_but.png"/> <input type="image" class="controls" id="sequence_but" onclick="seqView()" src="/images/' . $seq_but_prefix . '_sequence_but.png" /></div><div style="float:right">';
 $buttons .= ($is_amino ? '<div id="legend_but" onclick="$(\'legend\').toggle();">COLOR CODES</div>' : '');
 $buttons .= '<div id="pairwise_but" onclick="$(\'pairwise_div\').toggle();">SEQUENCE SIMILARITY</div>';
-$buttons .= "</div>";
+$buttons .= "</div></div><div style='clear:both;height:0;'>&nbsp;</div>";
 
 my $css = ($is_amino ? 'alignment_viewer_amino.css' : 'alignment_viewer_nucleotide.css');
 
