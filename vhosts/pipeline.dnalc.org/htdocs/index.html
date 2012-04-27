@@ -319,8 +319,11 @@ if ($r->method eq "POST") {
 			$s->{username} = '';
 		}
 		if ($s->{attempts} > 2) {
-			$m->comp("/_message_add", "Unable to log you in. Please <a target=\"_blank\" "
-				. " href=\"http://www.iplantcollaborative.org/forms/support\">contact support</a>."
+			$m->comp("/_message_add", "Unable to log you in. Try"
+				. " <a target=\"_blank\" href=\"https://user.iplantcollaborative.org/reset/request\">resetting your password</a>."
+				. "<div>&nbsp;</div>"
+				. "<p>If the problem persists, please <a target=\"_blank\" "
+				. " href=\"http://www.iplantcollaborative.org/forms/support\">contact support</a>.</p>"
 			);
 		}
 		else {
