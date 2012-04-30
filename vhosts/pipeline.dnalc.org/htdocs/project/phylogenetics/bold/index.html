@@ -44,25 +44,25 @@
 	</p>
 	<script type="text/javascript">
 	Event.observe(window, Prototype.Browser.IE ? 'load' : 'dom:loaded', function() {
-	new Tip('collectors', "Your team members", {
+	new Tip('collectors', "Name of person(s) who collected the sample. ", {
 			className: 'blue_help',
 		});
-	new Tip('institution', "This is the school, museum, or other institution where a sample<br />of the actual organism is stored and accessioned.", {
+	new Tip('institution', "Name of the institution where your sample is stored.", {
 			className: 'blue_help'
 		});
-	new Tip('identifier', "Who identified your specimen as belonging to a particular taxonomic group?", {
+	new Tip('identifier', "Name of the specialist that identified the species of your sample.", {
 			className: 'blue_help'
 		});
-	new Tip('tax', "The phylum, class, order, family, genus and species your specimen belongs to.", {
+	new Tip('tax', "Specify the Genus and Species your specimen belongs to.", {
 			className: 'blue_help',
 		});
-	new Tip('location', "You will need the country, state/province, latitude, longitude,<br />and a text description of the exact site your specimen was collected.", {
+	new Tip('location', "You will need the country, state/province, latitude, longitude, and a text description of the exact site your specimen was collected.", {
 			className: 'blue_help'
 		});
-	new Tip('photos', "maybe some size/format restrictions here", {
+	new Tip('photos', "Upload up to 3 jpg photos (max 1MB each).", {
 			className: 'blue_help'
 		});
-	new Tip('primers', "These are the actual PCR primers you used to amplify the barcoding<br/>locus (e.g. rbcL or COI)", {
+	new Tip('primers', "Name of each primer used in the PCR.", {
 			className: 'blue_help'
 		});
 		});

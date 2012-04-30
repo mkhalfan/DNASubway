@@ -156,22 +156,28 @@
 
 <script type="text/javascript">
 Event.observe(window, Prototype.Browser.IE ? 'load' : 'dom:loaded', function() {
-new Tip('collectors', "Enter your team members here. One author per row.", {
+new Tip('collectors', "Name of person(s) who collected the sample. One author per row.", {
 		className: 'blue_help',
 	});
-new Tip('institution', "some help here, this might be someones house or school", {
+new Tip('institution', "Name of the institution where your sample is stored.", {
 		className: 'blue_help'
 	});
-new Tip('identifier', "Who identified your specimen as belonging to a particular taxonomic group?", {
+new Tip('identifier', "Name of the specialist that identified the species of your sample.", {
 		className: 'blue_help'
 	});
-new Tip('exact_site_help', "some help here", {
+new Tip('exact_site_help', "Specify the type of location or habitat where the samples was found (e.g. store, park, pond, etc.)", {
 		className: 'blue_help',
 	});
-new Tip('notes_help', "some help here", {
+new Tip('notes_help', "Write down all relevant information pertaining your sample that help to get a clear idea what are the most important characteristics of it (e.g. muscle tissue obtained from the market, or sample was frozen when it was collected, etc.)", {
 		className: 'blue_help'
 	});
-new Tip('isolation_source_help', "some help here", {
+new Tip('isolation_source_help', "Specify the organism's tissue or part from where the DNA was extracted (e.g. muscle, leave, bark, blood, insect leg, etc.)", {
+		className: 'blue_help'
+	});
+new Tip('latitude_help', "Geographic Latitude (if you don't have this information, use Google Earth for locating the geographic coordinates of your sample's collection site.)", {
+		className: 'blue_help'
+	});
+new Tip('longitude_help', "Longitude: Geographic Longitude (if you don't have this information, use Google Earth for locating the geographic coordinates of your sample's collection site.)", {
 		className: 'blue_help'
 	});
 	});
@@ -214,8 +220,8 @@ new Tip('isolation_source_help', "some help here", {
 		{id => "city", type=> "", err_msg => "City", label => "City", re => qr/\w+/, len => 48,},
 		{id => "site_desc", type => "", err_msg => "Exact Site", label => "Exact Site <img src='/images/question-icon.png' align='top' id='exact_site_help' />", re => qr/\w+/, len => 128, },
 		{id => "isolation_source", type => "", err_msg => "Isolation Source", label => "Isolation Source (optional) <img src='/images/question-icon.png' align='top' id='isolation_source_help' />", re => qr/\w*/, len => 128, },
-		{id => "latitude", type => "", err_msg => "Latitude", label => "Latitude (ex: 40.77 N)", re => qr/^$RE{num}{real}\s*[NSns]$/, len => 16, },
-		{id => "longitude", type => "", err_msg => "Longitude", label => "Longitude (ex: 73.98 W)", re => qr/^$RE{num}{real}\s*[EWew]$/, len => 16, },
+		{id => "latitude", type => "", err_msg => "Latitude", label => "Latitude (ex: 40.77 N) <img src='/images/question-icon.png' align='top' id='latitude_help' />", re => qr/^$RE{num}{real}\s*[NSns]$/, len => 16, },
+		{id => "longitude", type => "", err_msg => "Longitude", label => "Longitude (ex: 73.98 W) <img src='/images/question-icon.png' align='top' id='longitude_help' />", re => qr/^$RE{num}{real}\s*[EWew]$/, len => 16, },
 
 		{id => "notes", type => "textarea", err_msg => "Notes ", label => "Notes (optional) <img src='/images/question-icon.png' align='top' id='notes_help' />", re => qr/\w*/, len => 255, },
 		{id => "sex", type => "radio", err_msg => "Sex of Specimen", label => "Sex of Specimen (optional)", values => ['male', 'female', 'hermaphrodite']},
