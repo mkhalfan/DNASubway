@@ -1,0 +1,35 @@
+%#----------------------------------------------------------------------------
+<%args>
+	$pid => 0
+	$tree_type => ''
+</%args>
+%#----------------------------------------------------------------------------
+<%once>
+	use DNALC::Pipeline::App::Phylogenetics::ProjectManager ();
+</%once>
+%#----------------------------------------------------------------------------
+<%init>
+	
+	$r->content_type("image/png");
+	$r->headers_out->{'Content-Disposition'} = "attachment;filename=tree.png";
+	$r->no_cache(1);
+
+	$m->session->{pipeline} ||= {};
+	
+	$pid =~ s/\D+//g;
+
+	my $pm = DNALC::Pipeline::App::Phylogenetics::ProjectManager->new($pid);
+	my $proj = $pm->project;
+	
+	my $tree_id = $pm->get_tree($tree_type)->{tree_file};
+	$tree_id =~ s/\.nw$//;
+
+	$r->sendfile("$tree_id.png");
+	
+</%init>
+%#----------------------------------------------------------------------------
+<%flags>
+	inherit => undef
+</%flags>
+%#----------------------------------------------------------------------------
+

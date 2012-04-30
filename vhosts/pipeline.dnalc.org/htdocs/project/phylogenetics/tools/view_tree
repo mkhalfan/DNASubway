@@ -13,11 +13,11 @@
 	<div id="tree_div"><% $svg_contents %></div>
 	<div class="tree_links" style="font-size:10px;font-family:arial">
 		<div style="float:left;">
-			<a href="get_tree_file?pid=<% $pid %>&tree_type=<% $tree_type %>"><img src="/images/download.png" border=0></a>
+			<img src="/images/download.png" />
 		</div> 
-		<div style="float:left;padding: 2px 0px 0px 2px;">
-			<a href="get_tree_file?pid=<% $pid %>&tree_type=<% $tree_type %>" style="color:grey">Download tree file</a>
-		</div>	
+		<div style="float:left;padding: 2px 0px 0px 2px;color:grey">
+			Download tree as an <a href="get_tree_img?pid=<% $pid %>&tree_type=<% $tree_type %>" style="color:grey" title="Download this tree as an image">image<a/> or in <a href="get_tree_file?pid=<% $pid %>&tree_type=<% $tree_type %>" style="color:grey" title="Download this tree in newick format">newick</a> format
+		</div>
 	</div>
 % }
 </div>
