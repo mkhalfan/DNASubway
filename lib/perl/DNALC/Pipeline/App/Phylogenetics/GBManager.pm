@@ -111,7 +111,7 @@ use DNALC::Pipeline::App::Utils ();
 		my $fasta_file = $self->{work_dir} . "/$seq_id/$id.fsa";
 		my $outfile = IO::File->new;
 		if ($outfile->open($fasta_file, "w")){
-			print $outfile ">", $id, " [BioProject=PRJNAXXXXXX] [tech=barcode] [organism=$organism]", "\n";
+			print $outfile ">", $id, " [BioProject=PRJNA159485] [tech=barcode] [organism=$organism]", "\n";
 			print $outfile $seq;
 			undef $outfile;
 			print STDERR "Fasta file created: ", $self->{work_dir}, "/$seq_id/$id.fsa\n";
