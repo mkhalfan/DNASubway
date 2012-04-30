@@ -140,7 +140,7 @@ input[type="checkbox"] {
 
 <script type="text/javascript">
 Event.observe(window, Prototype.Browser.IE ? 'load' : 'dom:loaded', function() {
-new Tip('auto-pair-help', "Auto Pair will attempt to pair your sequences for you.<br />Please note this may not always work, in which case<br />you will need to pair your sequences manually.", {
+new Tip('auto-pair-help', "Auto Pair will attempt to pair your sequences for you. Please note this may not always work, in which case you will need to pair your sequences manually.", {
 		className: 'blue_help',
 	});
 	});
