@@ -193,13 +193,14 @@ use Data::Dumper;
 			return {status => 'fail', message => 'sub app: config file is missong the app id'};
 		}
 
-		my $app_name = $app_cf->{name};
+		my ($app_id, $app_name) = ($app_cf->{name}, $app_cf->{id});
 		unless ($app_name) {
 			$app_name = $app_cf->{id};
 			$app_name =~ s/-[\d.]*$//;
 		}
 
-		print STDERR  'app_name = ', $app_name, $/;
+		print STDERR  ' + app_name = ', $app_name, $/;
+		print STDERR  ' + app_id = ', $app_id, $/;
 
 		my $api_instance = $self->api_instance;
 		return {status => 'fail', message => 'sub app: no api_instance object'} unless $api_instance;
@@ -209,7 +210,16 @@ use Data::Dumper;
 		my $app_ep = $api_instance->apps;
 		my $apps = $app_ep->find_by_name($app_name);
 		if (@$apps) {
-			($app) = grep {$_->id eq $app_name} @$apps;
+			#print STDERR Dumper( $apps), $/;
+			# get by id
+			($app) = grep {$_->id eq $app_id} @$apps;
+
+			# get by name
+			unless ($app) {
+				($app) = grep {$_->name eq $app_name} @$apps;
+			}
+
+			# get the 1st one
 			$app ||= $apps->[0];
 
 			# TODO : find a better name for the next method

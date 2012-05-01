@@ -8,40 +8,8 @@
 		
 		<form method="post">
 		<table>
-			<tbody id="app_info" style="background: #ccc;">
-				<tr>
-					<td colspan="2" style="font-weight:bold;">Job options</td>
-				</tr>
-				<tr>
-					<td><sup>*</sup>Job name:</td>
-					<td><input type="text" id="jobName" name="jobName" value="<% $form->{jobName} |html %>" /></td>
-				</tr>
-% if (0) {
-				<tr>
-					<td>Requested time:</td>
-					<td><input type="text" id="requestedTime" name="requestedTime" value="<% $form->{requestedTime} || q{0:15:00}|html %>" /></td>
-				</tr>
-				<tr>
-					<td>Memory:</td>
-					<td><input type="text" id="memory" name="memory" value="<% $form->{memory} || q{1G}|html %>" /></td>
-				</tr>
-				<tr>
-					<td><sup>*</sup>Processors:</td>
-					<td>
-						<select id="processors" name="processors">
-%					for my $p (1, 2, 4, 8, 16) {
-						<option value="<% $p |html %>" <% $p == $form->{processors} ? q{selected="selected"} : q{}%>><% $p %></option>
-%					}
-						</select>
-					</td>
-				</tr>
-% }
-				<tr>
-					<td>Notify me when job ends :</td>
-					<td><input type="checkbox" id="notify_user" name="notify_user" <% $form->{notify_user} ne "yes" ? "" : "checked=\"checked\"" %>" value="yes" /></td>
-				</tr>
-			</tbody>
-				<& ./.comp/build_app_form, pm => $pm, app => $app, form => $form, flagged => $flagged &>
+			<& ./.comp/job_options, form => $form &>
+			<& ./.comp/build_app_form, pm => $pm, app => $app, form => $form, flagged => $flagged &>
 			<tr>
 					<td></td>
 					<td><input type="submit" value="Submit" /></td>
@@ -92,7 +60,6 @@
 	my $is_owner = $s->{user_id} == $proj->user_id if $proj;
 
 	my $app;
-	#my $app_id = "tophat-ranger-1.3.1"; #"tophat";
 	my $app_cf_file = "NGS_TH";
 	my $st = $pm->app($app_cf_file);
 

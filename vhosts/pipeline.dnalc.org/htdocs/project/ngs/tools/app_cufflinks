@@ -8,38 +8,12 @@
 		
 		<form method="post">
 		<table>
-			<tbody id="app_info">
-				<tr>
-					<td colspan="2" style="font-weight:bold;background-color: #eee;">Job options</td>
-				</tr>
-				<tr>
-					<td><sup>*</sup>Job name:</td>
-					<td><input type="text" id="jobName" name="jobName" value="<% $form->{jobName} |html %>" /></td>
-				</tr>
-				<tr style="background: #ccc;">
-					<td>Requested time:</td>
-					<td><input type="text" id="requestedTime" name="requestedTime" value="<% $form->{requestedTime} || q{0:15:00}|html %>" /></td>
-				</tr>
-				<tr style="background: #ccc;">
-					<td>Memory:</td>
-					<td><input type="text" id="memory" name="memory" value="<% $form->{memory} || q{1G}|html %>" /></td>
-				</tr>
-				<tr style="background: #ccc;">
-					<td><sup>*</sup>Processors:</td>
-					<td>
-						<select id="processors" name="processors">
-%					for my $p (1, 2, 4, 8, 16) {
-						<option value="<% $p |html %>" <% $p == $form->{processors} ? q{selected="selected"} : q{}%>><% $p %></option>
-%					}
-						</select>
-					</td>
-				</tr>
-			</tbody>
-				<& ./.comp/build_app_form, pm => $pm, app => $app, form => $form, flagged => $flagged &>
+			<& ./.comp/job_options, form => $form &>
+			<& ./.comp/build_app_form, pm => $pm, app => $app, form => $form, flagged => $flagged &>
 			<tr>
-					<td></td>
-					<td><input type="submit" value="Submit" /></td>
-				</tr>
+				<td></td>
+				<td><input type="submit" value="Submit" /></td>
+			</tr>
 		</table>
 		</form>
 	</p>

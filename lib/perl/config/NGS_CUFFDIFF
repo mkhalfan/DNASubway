@@ -1,5 +1,6 @@
 {
 	id => 'cuffdiff-ranger-1.0.3',
+	#id => 'cuffdiff-trestles-1.0.3',
 	name => 'cuffdiff',
 	inputs => [
 		{ id => 'bias_fasta', display_type => 'genome', hidden => 1 },
@@ -23,8 +24,8 @@
         { id => 'fdr', label => 'False discovery rate used in testing', value => '0.05', },
 	],
 	_input_file_filter => qr/\.bam$/,
-	#_output_dir => qr/\/cuffdiff_out$/,
-	_output_files => qr/\.(bam)$/,
+	_output_dir => qr/\/cuffdiff_out$/,
+	_output_files => qr/\.(diff|fpkm_tracking)$/,
 }
 
 

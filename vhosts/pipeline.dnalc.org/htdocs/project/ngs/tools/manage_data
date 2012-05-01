@@ -3,8 +3,10 @@
 
 %#data = <% ref($data)%>
 
+%# VV - this could be a table - VV
+%#
 % while (my $f = $data->next) {
-	<div title="<% $f-> file_path |html %>"><% $f->file_name |html%></div>
+	<div title="<% $f-> file_path |html %>"><div style="min-width: 200px; display: inline;"><% $f->source->name |html%></div> <% $f->file_name |html%></div>
 % }
 
 %#-----------------------------------------------------------------
@@ -33,8 +35,7 @@
 	}
 
 	my $pm = DNALC::Pipeline::App::NGS::ProjectManager->new({project => $pid, debug => 0});
-	
-	#print STDERR Dumper($pm), $/;
+
 	my $proj = $pm->project;
 
 	# project's owner
