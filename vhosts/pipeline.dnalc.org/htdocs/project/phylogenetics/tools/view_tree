@@ -3,8 +3,16 @@
 	Error: can't open project "<% $pid|html%>".
 % } else {
 <script type="text/javascript">
+	var ns = {'svg': 'http://www.w3.org/2000/svg'};
+
+	isSVGCompliant = function() {
+		var div = document.createElement('div');
+		div.innerHTML = '<svg/>';
+		var bool = (div.firstChild && div.firstChild.namespaceURI) == ns.svg;
+		return bool;
+	};
 	document.observe("dom:loaded", function() {
-		if (!document.implementation.hasFeature("http://www.w3.org/TR/SVG11/feature#BasicStructure", "1.1")){
+		if (!isSVGCompliant()){
 			$('tree_div').update('<img src="<% $m->comp("../../.comp/filepath_to_web", file => "$tree_id.png" ) %>">');
 		}
 	});
