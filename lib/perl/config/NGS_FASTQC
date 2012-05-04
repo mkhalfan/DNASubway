@@ -1,0 +1,15 @@
+{
+	id => 'fastqc-0.10.0',
+	name => 'fastqc',
+	inputs => [
+		{ id => 'input', display_type => '', hidden => 0, label => 'Select an input FASTQ/BAM/SAM file' },
+	],
+	parameters => [
+		{ id => 'casava', label => 'Casava mode for newest Illumina pipeline', 'value' => 'false' },
+		{ id => 'format', label => 'Input file is in which format', 'value' => 'fastq' },
+		{ id => 'nogroup', label => 'Turn off the dynamic grouping of bases', 'value' => 'false' },
+	],
+	_input_file_filter => '',
+	_output_dir => '',
+	_output_files => '',
+}

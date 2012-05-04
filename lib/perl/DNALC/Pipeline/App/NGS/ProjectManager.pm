@@ -18,6 +18,7 @@ use DNALC::Pipeline::Task ();
 use iPlant::FoundationalAPI ();
 use iPlant::FoundationalAPI::Constants ':all';
 
+use Carp;
 use JSON::XS ();
 use Data::Dumper;
 
@@ -66,6 +67,7 @@ use Data::Dumper;
 		$self->{task_id_to_name} = \%task_id_to_name;
 		$self->{task_name_to_id} = \%task_name_to_id;
 		#-------
+		$self->{config} = DNALC::Pipeline::Config->new->cf('NGS');
 
 		$self;
 	}
@@ -106,6 +108,34 @@ use Data::Dumper;
 	}
 
 	#--------------------------------------
+	sub create_work_dir {
+		my ($self) = @_;
+
+		my $path = $self->work_dir;
+		return unless $path;
+
+		eval { mkpath($path) };
+		if ($@) {
+			print STDERR "Couldn't create $path: $@", $/;
+			return;
+   	}
+		return 1;
+	
+	}
+
+	sub work_dir {
+		my ($self) = @_;
+		return unless ref $self eq __PACKAGE__ ;
+		my $proj = $self->project;
+		unless ($proj)  {
+			confess "Project is missing...\n";
+			return;
+		}
+
+		return File::Spec->catfile($self->config->{PROJECTS_DIR}, sprintf("%04X", $proj->id)); 	
+	}
+
+	#--------------------------------------
 	sub add_data {
 		my ($self, $params, $options) = @_;
 
@@ -135,8 +165,8 @@ use Data::Dumper;
 
 		my $data_src = DataSource->insert ({
 				project_id => $self->project,
-				name => $params->{source} || 'anonymous',
-				note => $params->{source_note} || 'note',
+				name => $params->{source} || '',
+				note => $params->{source_note} || '',
 			});
 		return $bail_out->() unless $data_src;
 
@@ -190,7 +220,7 @@ use Data::Dumper;
 
 		my $app_cf = DNALC::Pipeline::Config->new->cf($app_conf_file);
 		unless ($app_cf && $app_cf->{id}) {
-			return {status => 'fail', message => 'sub app: config file is missong the app id'};
+			return {status => 'fail', message => 'sub app: config file is missing the specified app'};
 		}
 
 		my ($app_id, $app_name) = ($app_cf->{name}, $app_cf->{id});

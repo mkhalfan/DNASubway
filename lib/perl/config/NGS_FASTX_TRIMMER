@@ -1,0 +1,16 @@
+{
+	id => 'fastx_trimmer-0.0.13',
+	name => 'fastx_trimmer',
+	desc => 'Trim bases from FASTQ by position',
+	inputs => [
+		{ id => 'input', display_type => '', hidden => 0, label => 'Select a FASTQ file' },
+	],
+	parameters => [
+		{ id => 'firstBase', label => 'First base to keep', 'value' => '1' },
+		{ id => 'lastBase', label => 'Last base to keep (optional)', 'value' => '' },
+		{ id => 'q33', label => 'FASTQ file is in PHRED33 format', 'value' => '1' },
+	],
+	_input_file_filter => '',
+	_output_dir => '',
+	_output_files => '',
+}
