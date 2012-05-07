@@ -321,11 +321,15 @@ for my $rt ( keys %routines ) {
 my $cf = DNALC::Pipeline::Config->new->cf('PHYLOGENETICS');
 my $export_is_on = $cf->{EXPORT_ON};
 
+#check if project is of type rbcL or COI, true if it is
+my $is_barcoding = ($proj->type eq "rbcL" or $proj->type eq "COI" ? 1 : 0);
+if ($export_is_on && $username =~ m/^guest_/) {
+	$export_is_on = 0;
+}
+
 my $tree_store = File::Spec->catfile($pm->work_dir, "trees");
 my @trees = sort {$b cmp $a} <$tree_store/*.nw>;
 
-#check if project is of type rbcL or COI, true if it is
-my $is_barcoding = ($proj->type eq "rbcL" or $proj->type eq "COI" ? 1 : 0);
 
 </%init>
 %#-------------------------------------------------
