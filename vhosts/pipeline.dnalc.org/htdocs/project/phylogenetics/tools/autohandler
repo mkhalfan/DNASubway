@@ -10,10 +10,18 @@
 	top.document.location.replace("/");
 </script>
 % }
+
 % if ($m->request_comp->attr_if_exists('css') && @{$m->request_comp->attr('css')}) {
 %	foreach my $css (@{$m->request_comp->attr('css')}) {
 %		next unless $css;
 <link rel="stylesheet" href="/css/<% $css %>" type=text/css>
+%	}
+% }
+
+% if ($m->request_comp->attr_if_exists('js') && @{$m->request_comp->attr('js')}) {
+%	foreach my $js (@{$m->request_comp->attr('js')}) {
+%		next unless $js;
+<script type="text/javascript" src="/js/<% $js %>"></script>
 %	}
 % }
 
@@ -25,12 +33,6 @@
 
 % $m->call_next;
 
-% if ($m->request_comp->attr_if_exists('js') && @{$m->request_comp->attr('js')}) {
-%	foreach my $js (@{$m->request_comp->attr('js')}) {
-%		next unless $js;
-<script type="text/javascript" src="/js/<% $js %>"></script>
-%	}
-% }
 % unless ($ENV{DEVEL_SERVER}) {
 <script type="text/javascript">
 var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
