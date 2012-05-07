@@ -1,5 +1,5 @@
 	<& /_messages &>
-% if ($enable_export){
+% if ($enable_export) {
 	<p>
 	<form id="bform" method="post">
 %#	<input type="hidden" name="pid" value="<% $pid |html%>" />
@@ -67,8 +67,7 @@
 		});
 		});
 	</script>
-%}
-%else{
+% } else {
 <p style="padding:5px;background-color:yellow;font-weight:bold;">
 In order to export sequences to GenBank, you must:
 </p>
@@ -77,6 +76,7 @@ In order to export sequences to GenBank, you must:
 <li>have at least 2 trace files in your project</li>
 <li>not have started your project using a sample data set</li>
 <li>ensure your sequences have been trimmed</li>
+<li>not use a guest account</li>
 </ul>
 
 %}
@@ -129,5 +129,12 @@ In order to export sequences to GenBank, you must:
 	my $is_barcoding = ($proj->type eq "rbcL" or $proj->type eq "COI" ? 1 : 0);
 
 	## proj->sample is false if the project was not created with a sample data set, true if it was
-	$enable_export = 1 if ($trace_seqs->count > 1) && ($proj->sample == 0) && ($trimmed == 2) && ($is_barcoding);
+	if (	$s->{username} !~ m/^guest_/
+		&& $trace_seqs->count > 1 
+		&& $proj->sample == 0 
+		&& $trimmed == 2 
+		&& $is_barcoding)
+	{
+		$enable_export = 1;
+	}
 </%init>
