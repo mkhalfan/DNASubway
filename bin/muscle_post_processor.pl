@@ -347,9 +347,16 @@ sub calculate_pairwise_ids {
 	for my $a (@seq) {
 		my $y = 1;
 		for my $b (@seq) {
-			my $key = $x . '-' . $y;
-			if ($a->display_id eq $b->display_id){
+			my $key = "$x-$y";
+			if ($x == $y) {
 				$pairwise_ids{$key} = '-';
+				$y++;
+				next;
+			}
+
+			# simetric key
+			my $key_s = "$y-$x";
+			if( defined $pairwise_ids{$key_s}) {
 				$y++;
 				next;
 			}
@@ -360,6 +367,7 @@ sub calculate_pairwise_ids {
 			
 			my $percent_id = $pairwise_aln->percentage_identity;
 			$pairwise_ids{$key} = sprintf("%.2f", $percent_id);
+			$pairwise_ids{$key_s} = $pairwise_ids{$key};
 
 			$y++;
 		}
