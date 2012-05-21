@@ -6,31 +6,28 @@
 <div style="clear: both;"></div>
 %	}	
 	<div id="seqids" class="seqids">
-		<pre>
+
 % for (@files) {
 %	my $name = $_->file_name; $name =~ s/\..*?$//;
-<span id="x<% $_ |html %>"><a href="./view_sequences.html?pid=<% $pid |html%>;fid=<% $_->id %>;show_trimmed=<% $show_trimmed %>"><% $name |html%></a></span>
+<div id="x<% $_ |html %>" class="seq-rows"><a href="./view_sequences.html?pid=<% $pid |html%>;fid=<% $_->id %>;show_trimmed=<% $show_trimmed %>"><% $name |html%></a></div>
 % }
 % for (@sequences) {
-<span id="x<% $_->display_id |html %>"><% $_->display_id |html%></span>
+<div id="x<% $_->display_id |html %>" class="seq-rows"><% $_->display_id |html%></div>
 % }
-</pre>
 	</div>
 	
 	<div id="mini-trace-icons">
-		<pre>
 % for (@files) {
 %	if ($_->has_low_q){
-<span id="low_qs_<% $_->id %>"><a href="./view_sequences.html?pid=<% $pid |html%>;fid=<% $_->id %>;show_trimmed=<% $show_trimmed %>"><img src="/images/chart_curve_error.png" border=0 alt="Low Quality Score Alert" style="vertical-align: middle;" /></a></span>
+<div id="low_qs_<% $_->id %>" class="seq-rows"><a href="./view_sequences.html?pid=<% $pid |html%>;fid=<% $_->id %>;show_trimmed=<% $show_trimmed %>"><img src="/images/chart_curve_error.png" border=0 alt="Low Quality Score Alert" style="vertical-align: middle;" /></a></div>
 %	}
 %	else {
-<span><a href="./view_sequences.html?pid=<% $pid |html%>;fid=<% $_->id %>;show_trimmed=<% $show_trimmed %>"><img src="/images/chart_curve.png" border=0 alt="View Trace" title="View Trace" style="vertical-align: middle;" /></a></span>
+<div class="seq-rows"><a href="./view_sequences.html?pid=<% $pid |html%>;fid=<% $_->id %>;show_trimmed=<% $show_trimmed %>"><img src="/images/chart_curve.png" border=0 alt="View Trace" title="View Trace" style="vertical-align: middle;" /></a></div>
 %	}
 % }	
 % for (@sequences) {
 
 %}	
-</pre>
 	</div>
 	
 	<div id="seqs" class="seqs">
@@ -75,23 +72,21 @@
 %#	<pre><% Dumper($file)%></pre>
 % } else {
 <input type="hidden" id="step" value="22" />
-		<pre>
 % unless ($show_trimmed) {
 % 	for (@files) {
-<span id="<%$_%>" ><% $_->seq|html %></span>
+<div id="<%$_%>" class="seq-rows"><% $_->seq|html %></div>
 % 	}
 % 	for (@sequences) {
-<span id="<%$_%>" ><% $_->left_trim|html %><% $_->seq|html %><% $_->right_trim|html %></span>
+<div id="<%$_%>" class="seq-rows"><% $_->left_trim|html %><% $_->seq|html %><% $_->right_trim|html %></div>
 % 	}
 % } else {
 % 	for (@files) {
-<span id="<%$_%>" ><% $_->seq_object->seq|html %></span>
+<div id="<%$_%>" class="seq-rows"><% $_->seq_object->seq|html %></div>
 % 	}
 % 	for (@sequences) {
-<span id="<%$_%>" ><% $_->seq|html %></span>
+<div id="<%$_%>" class="seq-rows"><% $_->seq|html %></div>
 % 	}
 % }
-</pre>
 % }
 	 </div>
 %#     <div style="clear: both;">&nbsp;</div>

@@ -2048,7 +2048,7 @@
 	//
 	phy.setColumnWidths = function(w) {
 		var idsWidth = $('seqids').getWidth();
-		var seqsWidth = w - idsWidth;
+		var seqsWidth = w - idsWidth -9;
 		$('seqs').setStyle({
 			width: seqsWidth + 'px',
 			display: 'block'
@@ -2158,7 +2158,7 @@ Event.observe(window, Prototype.Browser.IE ? 'load' : 'dom:loaded', function() {
 	// step 22 is from the sequence viewer before you select a trace to view
 	else if (step == 22) {
 		// attach tool tip for low quality score alerts
-		$$('#mini-trace-icons span[id^=low]').each(function(el) {
+		$$('#mini-trace-icons div[id^=low]').each(function(el) {
 			var span_id = el.getAttribute('id');
 			debug("tip " + span_id);
 			new Tip(span_id, "The average error rate for this sequence is greater than 1%. This indicates that the sequence is of low quality and may produce erroneous analysis results.", {

@@ -411,6 +411,7 @@ span.rot { -moz-transform:rotate(90deg); font-size: smaller;}
 	width: 15px; 
 	line-height: 1.2em; 
 	margin-left:10px;
+	padding-top:2px;
 	}	
 .container_data1 #q-score-alert {
 	float:left; 
@@ -418,7 +419,11 @@ span.rot { -moz-transform:rotate(90deg); font-size: smaller;}
 	line-height: 1.2em; 
 	margin-right:1px;
 	}	
-
+.container_data1 div.seq-rows { 
+	height: 20px; 
+	font-family: monospace;  
+	white-space: pre; 
+}
 /* If you modify any widths here (including padding, margins) - you must update the JS at step == 8 */
 #phy-pair-builder, #phy-blast {
 	width: 840px;
@@ -974,7 +979,7 @@ p.info {
 background-color: yellow;
 }
 
-.fade {
+#add_blast_alert.fade {
   -transition-property: background-color;  
   -transition-duration: 2s; 
   -moz-transition-property: background-color;  
