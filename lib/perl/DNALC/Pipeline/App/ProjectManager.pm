@@ -133,6 +133,12 @@ sub create_project {
 }
 
 #-----------------------------------------------------------------------------
+#
+# adds files that will be used as evidence.
+#	- $r = Apache object (for the upload method)
+#	- $type = evid_nt or evid_prot - the type of evidence
+#	on success, the uplaoded data is turned into a blast db, with formatdb
+#
 sub add_evidence {
 	my ($self, $r, $type) = @_;
 	unless ($type =~ /^evid_(?:nt|prot)$/) {
@@ -146,7 +152,6 @@ sub add_evidence {
 	my $evidence_dir;
 
 	my $st = DNALC::Pipeline::App::Utils->save_upload( { r => $r, param_name => $type});
-	#print STDERR Dumper( $st), $/;
 
 	if ($st->{status} eq 'fail') {
 		print STDERR  'PM: __add_evidence__:', $st->{message}, $/;
@@ -163,20 +168,12 @@ sub add_evidence {
 	}
 
 	unless (@errors) {
-		# set the workflow history
-		#my $wfm = DNALC::Pipeline::App::WorkflowManager->new( $self->project );
-		#if ($self->fasta_file) {
-		#	$wfm->set_status('upload_fasta','Done');
-		#}
-
 		my $file = $evidence_dir . '/' . $type;
 		move $filepath, $file;
 
 		my $ftype = $type eq 'evid_nt' ? 'F' : 'T';
 		my $cmd = "/usr/bin/formatdb -i $file -p $ftype -o T -l $file" . '_log.txt 2>/dev/null';
-		#print STDERR  "CMD: ", $cmd, $/;
 		if (system($cmd) == 0) {
-			#print STDERR  "Format DB = success for ", $type, $/;
 			# remove the uploaded file (is this safe?!)
 			#unlink $file;
 			return {status => 'success'};
@@ -200,6 +197,9 @@ sub project {
 }
 
 #-----------------------------------------------------------------------------
+#
+# cleans the common name of certain problematic characters
+#
 sub cleaned_common_name {
 	my ($self) = @_;
 	
@@ -258,7 +258,8 @@ sub chado_user_database {
 	$dbname ? $dbname : $self->username;
 }
 #-----------------------------------------------------------------------------
-
+#
+# retunrns the FASTA file of the project
 sub fasta_file {
 	my ($self) = @_;
 	
@@ -282,7 +283,9 @@ sub create_work_dir {
 	return 1;
 }
 #-----------------------------------------------------------------------------
-
+#
+# creates the config files for the chado DB, initializes the DB
+#
 sub init_chado {
 	my ($self) = @_;
 
@@ -352,12 +355,18 @@ sub init_chado {
 	return $cutils->load_fasta($self->fasta_file);
 }
 #-----------------------------------------------------------------------------
+#
+# returns the chado_profile of the current user (via the project object)
+#
 sub chado_user_profile {
 	my ($self) = @_;
 	
 	sprintf("%s_%d", $self->username, $self->project->id);
 }
 #-----------------------------------------------------------------------------
+#
+# returns the GFF file for the specified routine, if it exists
+#
 sub get_gff3_file {
 	my ($self, $routine) = @_;
 	
@@ -375,7 +384,9 @@ sub get_gff3_file {
 	return $file if -f $file;
 }
 #-----------------------------------------------------------------------------
-
+#
+# returns one of the two output file we get from Repeat Masker
+#
 sub fasta_masked_nolow {
 	my ($self) = @_;
 	my $ff = $self->work_dir . '/REPEAT_MASKER2/output/fasta.fa.masked';
@@ -391,6 +402,9 @@ sub fasta_masked_xsmall {
 	return $ff;
 }
 #-----------------------------------------------------------------------------
+#
+# returns a list of all available GFF files
+#
 sub get_available_gff3_files {
 	my ($self) = @_;
 
@@ -406,6 +420,12 @@ sub get_available_gff3_files {
 	return \@files;
 }
 #-----------------------------------------------------------------------------
+#
+# returns any conflicts found with the species specified by the user
+#  it prevents the user from having inconsistent names for the species/common names in 
+#	his/her db
+#  it is used right before the creation of a project
+#
 sub get_organism_conflicts {
 	my ($self, $params) = @_;
 	my @orgs = DNALC::Pipeline::Project->get_used_organisms($params);

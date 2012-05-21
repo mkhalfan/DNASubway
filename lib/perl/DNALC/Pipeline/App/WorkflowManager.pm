@@ -82,6 +82,9 @@ use Carp;
 	}
 
 	#-------------------------------------------------------------------------
+	#
+	# sets the status of a rutine (and it arhchives any previous data of this task/project)
+	#
 	sub set_status {
 		my ($self, $task_name, $status_name, $duration) = @_;
 
@@ -169,6 +172,7 @@ use Carp;
 	}
 	#-------------------------------------------------------------------------
 	# returns a list of the done routines
+	#
 	sub get_done {
 		my ($self) = @_;
 		map { 
@@ -705,6 +709,9 @@ use Carp;
 
 	}
 	#-------------------------------------------------------------------------
+	#
+	# - stores the analysis results into the chado db
+	#
 	sub load_analysis_results {
 		my ($self, $gff_file, $routine) = @_;
 
@@ -723,12 +730,16 @@ use Carp;
 				'--profile', $profile,
 				'--algorithm', $routine,
 				'--gff', $gff_file);
-		print STDERR  "\n\nLOADING DATA:\n", $cmd, " ", "@args", $/;
-		print STDERR  '-' x 20, $/;
+		#print STDERR  "\n\nLOADING DATA:\n", $cmd, " ", "@args", $/;
+		#print STDERR  '-' x 20, $/;
 		system($cmd, @args);
 		return 1;
 	}
 	#-------------------------------------------------------------------------
+	#
+	# returns the number of runs /user/task/per day
+	#	 used for FgenesH and guest users only
+	#
 	sub count_runs {
 		my ($self, %args) = @_;
 

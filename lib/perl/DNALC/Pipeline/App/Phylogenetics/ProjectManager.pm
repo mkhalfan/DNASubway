@@ -247,6 +247,9 @@ use Bio::Trace::ABIF ();
 		return {status => 'success', msg => $msg};
 	}
 	#-----------------------------------------------------------------------------
+	#
+	# setter/getter for the project
+	#
 	sub project {
 		my ($self, $project) = @_;
 		
@@ -257,6 +260,9 @@ use Bio::Trace::ABIF ();
 		$self->{project};
 	}
 	#-----------------------------------------------------------------------------
+	#
+	# adds trace files or fasta files with sequences
+	#
 	sub add_data {
 		my ($self, $params) = @_;
 
@@ -441,6 +447,9 @@ use Bio::Trace::ABIF ();
 	}
 
 	#-----------------------------------------------------------------------------
+	#
+	# adds a set of sequences from our reference sets
+	#
 	sub add_reference {
 		my ($self, $ref_id) = @_;
 
@@ -448,10 +457,7 @@ use Bio::Trace::ABIF ();
 		my $type = $self->project->type;
 		my $ref_cf = DNALC::Pipeline::Config->new->cf('PHYLOGENETICS_REF');
 		my $refs = defined $ref_cf->{$type} ? $ref_cf->{$type} : [];
-		#print STDERR 'xx: ', Dumper( $refs ), $/;
 		my ($ref) = grep {$_->{id} =~ /^$ref_id$/} @$refs;
-		#print STDERR 'add_reference: ', $ref_id, $/;
-		#print STDERR 'ref = ', $ref, $/;
 		return unless $ref;
 
 		my $st = $self->add_data({
@@ -462,6 +468,7 @@ use Bio::Trace::ABIF ();
 	}
 
 	#-----------------------------------------------------------------------------
+	#
 	# returns a list of the used references in the project
 	sub references {
 		my ($self) = @_;
@@ -479,6 +486,9 @@ use Bio::Trace::ABIF ();
 		wantarray ? @refs : \@refs;
 	}
 	#-----------------------------------------------------------------------------
+	#
+	# adds the selected or all the blast sequences 
+	#
 	sub add_blast_data {
 		my ($self, $blast_id, $selected_sequences) = @_;
 
@@ -562,7 +572,9 @@ use Bio::Trace::ABIF ();
 		return $bail_out->();
 	}
 	#-----------------------------------------------------------------------------
-
+	#
+	# returns the traces/fasta files associated with a project
+	#
 	sub files {
 		my ($self, $type) = @_;
 		return unless $self->project;
@@ -590,7 +602,6 @@ use Bio::Trace::ABIF ();
 			});
 			die "Can't create pair.." unless $pair;
 			for my $s (@sequences) {
-				#$pair->add_to_pair_sequences($s);
 				my $pq = eval {
 					PairSequence->create({
 						seq_id => $s->{seq_id},
@@ -618,11 +629,15 @@ use Bio::Trace::ABIF ();
 	}
 
 	#-----------------------------------------------------------------------------
+	# returns the sequences that are not part of a pair
+	#
 	sub non_paired_sequences {
 		my ($self) = @_;
 		DataSequence->search_non_paired_sequences($self->project);
 	}
 	#-----------------------------------------------------------------------------
+	#
+	#
 	sub sequences {
 		my ($self) = @_;
 		return unless $self->project;
@@ -631,20 +646,15 @@ use Bio::Trace::ABIF ();
 		wantarray ? @sequences : \@sequences;
 	}
 	#-----------------------------------------------------------------------------
+	#
 	# returns a list of sequences that were used initially at project conception
+	# or added by upload or imported from DNALC
 	#
 	sub initial_sequences {
 		my ($self) = @_;
 		return unless $self->project;
 
 		my @sequences = ();
-		#for my $pair ($self->pairs) {
-		#	next unless $pair->consensus;
-		#	my @pair_sequences = $pair->paired_sequences;
-		#	my $name = join '_', map {$_->seq->display_id} @pair_sequences;
-		#	push @data, ">pair_" . $name;
-		#	push @data, $pair->consensus;
-		#}
 		for my $s ( DataSequence->search_initial_non_paired_sequences($self->project) ) {
 			push @sequences, $s;
 		}
@@ -653,7 +663,10 @@ use Bio::Trace::ABIF ();
 	}
 
 	#-----------------------------------------------------------------------------
+	#
 	# returns the sequences in FASTA format
+	#	- first it checks the pairs that have a consensus built
+	#	- then it looks for the non paired sequences
 	#
 	sub alignable_sequences {
 		my ($self) = @_;
@@ -685,6 +698,9 @@ use Bio::Trace::ABIF ();
 		join "\n", @data;
 	}
 	#-----------------------------------------------------------------------------
+	#
+	# - builds the consensus of a pair of two seqeunces/trace files
+	#
 	sub build_consensus {
 		my ($self, $pair) = @_;
 		
@@ -706,7 +722,6 @@ use Bio::Trace::ABIF ();
 					DIR => $pwd,
 					CLEANUP => 1,
 				);
-		#print STDERR "tmp dir = ", $wd->dirname, $/;
 
 		# copy sequences to files
 		# build merger params hash
@@ -714,7 +729,6 @@ use Bio::Trace::ABIF ();
 
 		my $outfile = File::Spec->catfile($wd->dirname, 'outfile.txt');
 		my $outseq  = File::Spec->catfile($wd->dirname, 'outseq.txt');
-		#my $dbgfile = File::Spec->catfile($wd->dirname, 'debug.txt');
 
 		my %merger_args = (
 				input_files => [],
@@ -726,7 +740,6 @@ use Bio::Trace::ABIF ();
 		my $cnt = 1;
 		for my $s (@pair_sequences) {
 			my $seq = $s->seq;
-			#print STDERR  "\tseq = ",$seq->display_id, $/;
 			my $seq_file = File::Spec->catfile($wd->dirname, "seq_$seq.fasta");
 			my $fh = IO::File->new;
 			if ($fh->open($seq_file, 'w')) {
@@ -741,8 +754,6 @@ use Bio::Trace::ABIF ();
 		}
 		my $merger = DNALC::Pipeline::Process::Merger->new($wd->dirname);
 		$merger->run(%merger_args);
-		#print STDERR Dumper( $merger ), $/;
-		#print STDERR "\nconsensus exit code = ", $merger->{exit_status}, $/;
 
 		if ($merger->{exit_status} == 0) { # success
 
@@ -752,8 +763,6 @@ use Bio::Trace::ABIF ();
 			$merger->build_consensus($outfile, $outseq, $formatted_alignment);
 
 			my $alignment = slurp($formatted_alignment);
-			#my $alignment = slurp($outfile);
-			#$alignment =~ s/#{3,}.*Report_file.*#{3,}\n*//ms;
 
 			# create a fasta file out of the $alignment;
 			my @alignment_line_1 =(split(': ',(grep {!/^Consensus\s*:/} split('\n', $alignment))[0]));
@@ -871,8 +880,6 @@ use Bio::Trace::ABIF ();
 			$y++;
 		}
 
-
-
 		for (my $i = 0; $i <= length($seq1); $i++) {
 			my ($chr1, $chr2) = (substr($seq1, $i, 1), substr($seq2, $i, 1));
 
@@ -891,6 +898,11 @@ use Bio::Trace::ABIF ();
 		return $consensus;
 	}
 
+	#
+	# builds an alignment from the projects' sequences
+	# these can be selected and sored in Memcached or all alignable sequences
+	# if $realign is true, we get the last alignment and we re-align it (sometimes
+	# a trimmed alignment can be realigned)
 	#-----------------------------------------------------------------------------
 	sub build_alignment {
 		my ($self, $realign) = @_;
@@ -963,8 +975,6 @@ use Bio::Trace::ABIF ();
 			$self->set_task_status("phy_alignment", "error");
 		}
 
-		#print STDERR "Fasta out: ", $output, $/;
-		#print STDERR "phylip out: ", $phy_out, $/;
 		return $output;
 	}
 	#-----------------------------------------------------------------------------
@@ -1099,6 +1109,7 @@ use Bio::Trace::ABIF ();
 	}
 
 	#-----------------------------------------------------------------------------
+	# returns the latest tree of the specified format found in the database
 	#
 	sub get_tree {
 		my ($self, $tree_type) = @_;
@@ -1135,6 +1146,7 @@ use Bio::Trace::ABIF ();
 	}
 
 	#-----------------------------------------------------------------------------
+	# stores the tree o the disk and their paths into the database
 	#
 	sub _store_tree {
 		my ($self, $file, $tree_type, $alignment) = @_;
@@ -1258,6 +1270,8 @@ use Bio::Trace::ABIF ();
 	}
 
 	#-----------------------------------------------------------------------------
+	# performs a blast search, but first checks if the results are already in the DB
+	#
 	sub do_blast_sequence {
 		my ($self, %args) = @_;
 
@@ -1424,6 +1438,8 @@ use Bio::Trace::ABIF ();
 		return File::Spec->catfile($wd, 'fasta.fa');
 	}
 	#-----------------------------------------------------------------------------
+	# utility to update the status of a blue line task
+	#
 	sub set_task_status {
 		my ($self, $task_name, $status_name, $duration) = @_;
 
@@ -1466,9 +1482,7 @@ use Bio::Trace::ABIF ();
 	sub get_task_status {
 		my ($self, $task_name) = @_;
 
-		#print STDERR  "TASK NAME = $task_name", $/;
 		my ($task) = DNALC::Pipeline::Task->search(name => $task_name );
-		#print STDERR  "TASK = $task", $/;
 		unless ($task) {
 			print STDERR  "Unknown task: ", $task_name, $/;
 			croak "Unknown task: ", $task_name, $/;

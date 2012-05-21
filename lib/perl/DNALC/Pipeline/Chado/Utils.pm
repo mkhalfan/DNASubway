@@ -713,6 +713,25 @@ sub dbh {
 	$self->{dbh} = $db_conf->dbh;
 }
 
+
+=head2 gmod_conf_file
+
+=over
+
+=item Usage
+
+  $obj->gmod_conf_file
+
+=item Function
+
+=item Returns
+
+the path the gmod_conf for the specifies project/username
+
+=back
+
+=cut
+
 sub gmod_conf_file {
     my ($self, $project_id, $dbname_override) = @_;
 
@@ -762,6 +781,25 @@ sub gmod_conf_file {
     return $conffile if (-f $conffile);
 }
 
+
+=head2 get_pool_size
+
+=over
+
+=item Usage
+
+  $obj->get_pool_size
+
+=item Function
+
+=item Returns
+
+the size of the pool with chado databases
+
+=back
+
+=cut
+
 sub get_pool_size {
 	my ($self) = @_;
 
@@ -780,6 +818,31 @@ sub get_pool_size {
 
 	return $db_num;
 }
+
+
+=head2 assign_pool_db
+
+Assignes a chado DB from the pool of chado databases to the specified user
+
+=over
+
+=item Usage
+
+  $obj->assign_pool_db($username)
+
+=item Function
+
+=item Arguments
+
+	$username
+
+=item Returns
+
+1 or 0E
+
+=back
+
+=cut
 
 sub assign_pool_db {
 	my ($self, $username) = @_;
@@ -811,6 +874,10 @@ sub assign_pool_db {
 	return $rc;
 }
 
+
+#
+# check if a db exists or not
+#
 sub check_db_exists {
 	my ($self, $db_name) = @_;
 
@@ -829,6 +896,25 @@ sub check_db_exists {
 
 	return $has_db;
 }
+
+
+=head2 create_db
+
+=over
+
+=item Usage
+
+  $obj->create_db
+
+=item Function
+
+=item Returns
+
+1
+
+=back
+
+=cut
 
 sub create_db {
     my ($self, $quiet) = @_;
@@ -923,6 +1009,10 @@ sub insert_organism {
     return 1;
 }
 
+
+#
+# loads the GFF file data into the DB 
+#
 sub load_analysis_results {
     my ($self, $file, $alg) = @_;
 
@@ -951,9 +1041,11 @@ sub load_analysis_results {
     return $rc;
 }
 
+#
+# creates if not already exists a new GBrowse config file for the specified project
+#
 sub create_gbrowse_conf {
     my ($self, $project_id, $base_db_dir) = @_;
-	#print STDERR Dumper( $self ), $/;
  
 	unless ($project_id && $project_id =~ /\d+/) {
 		warn "Project ID is missing or invalid\n";
@@ -1009,6 +1101,9 @@ sub create_gbrowse_conf {
     return $conffile if (-f $conffile);
 }
 
+#
+# returns the config GBrowse file for the specified project
+#	$dbname_override - is optional
 sub gbrowse_chado_conf {
     my ( $self, $project_id, $dbname_override ) = @_;
 
@@ -1065,7 +1160,9 @@ sub gbrowse_chado_conf {
     return $conffile if (-f $conffile);
 }
 
-
+#
+# turns the fasta file into the GFF file and loads it into the chado DB
+#
 sub load_fasta {
     my ($self, $fastafile) = @_;
 
@@ -1127,8 +1224,9 @@ sub additional_load_parameters {
     return '';
 }
 
-
+#
 # sets the ranks for any duplicate transcripts to 0
+#	if this isn't done, secondary transcripts will not be visible in gbrowse  
 #
 sub  fix_apollo_transcripts {
 	my ($self, $trimmed_common_name) = @_;
@@ -1139,7 +1237,7 @@ sub  fix_apollo_transcripts {
 	my $query = q{UPDATE featureloc SET rank=0 
 			FROM feature
 			WHERE feature.name = ? AND featureloc.rank > 0 AND featureloc.srcfeature_id = feature.feature_id};
-	print STDERR "\n-----------------\n$query\n", $trimmed_common_name, "\n--------------\n";
+	#print STDERR "\n-----------------\n$query\n", $trimmed_common_name, "\n--------------\n";
 	my $sth = $dbh->prepare($query);
 	$sth->execute($trimmed_common_name) or do {
 		print STDERR  "Unable to fix_apollo_transcripts: ", $!, $/;
@@ -1148,7 +1246,9 @@ sub  fix_apollo_transcripts {
 	$dbh->disconnect;
 }
 
-
+#
+# created the XML chado adapter for Apollo
+#
 sub create_chado_adapter {
     my ($self, $apollo_conf_dir) = @_;
 	#my $project_id= shift;
@@ -1312,6 +1412,9 @@ sub remove_lock_file {
     return;
 }
 
+#
+# created and stores the JNLP file bases on specified params
+#
 sub write_jnlp {
 
 	my ($self, $args) = @_;
