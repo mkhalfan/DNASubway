@@ -95,8 +95,8 @@
 			<% $algn_contents %>
 			<div id="alignment_links">
 				<div style="float:left">
-					<div style="float:left"><a href="get_trimmed_alignment?pid=<% $pid %>"><img src="/images/download.png" border=0></a></div> 
-					<div style="float:left;padding: 2px 0px 0px 2px;"><a href="get_trimmed_alignment?pid=<% $pid %>" style="color:grey">Download trimmed alignment</a></div>
+					<div style="float:left"><a href="get_alignment?pid=<% $pid %>"><img src="/images/download.png" border=0></a></div> 
+					<div style="float:left;padding: 2px 0px 0px 2px;"><a href="get_alignment?pid=<% $pid %>" style="color:grey">Download this alignment</a></div>
 					<div style="clear:both;height:1px">&nbsp;</div>
 					<div style="float:left"><a href="view_alignment_jalview?pid=<% $pid %>"><img src="/images/java.png" border=0></a></div> 
 					<div style="float:left;padding: 2px 0px 0px 2px;"><a href="view_alignment_jalview?pid=<% $pid %>" style="color:grey">Launch in Jalview</a></div>
