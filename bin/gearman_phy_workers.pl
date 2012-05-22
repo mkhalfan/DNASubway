@@ -213,7 +213,7 @@ sub run_muscle {
 	my $gearman = shift;
 	my $args = thaw( $gearman->arg );
 
-	my ($status, $msg, $realign) = ('error', '', $args->{realign} || 0);
+	my ($status, $msg, $realign, $trim) = ('error', '', $args->{realign} || 0, $args->{trim} || 0);
 
 	my $pm = DNALC::Pipeline::App::Phylogenetics::ProjectManager->new($args->{pid});
 	my $proj = $pm->project;
@@ -222,7 +222,7 @@ sub run_muscle {
 		print STDERR  "Project not found!", $/;
 	}
 	else {
-		if ($pm->build_alignment($realign)) {
+		if ($pm->build_alignment($realign, $trim)) {
 			$status = "success";
 		}
 	}
