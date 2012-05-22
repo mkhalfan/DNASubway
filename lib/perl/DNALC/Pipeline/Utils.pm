@@ -15,21 +15,12 @@ use vars qw(
            );
 @ISA = qw(Exporter);
 @EXPORT_OK = qw(
-                    array_diff
 					break_long_text
                     clean_query
-                    debug_cdbi
-                    escape_js
                     isin
-                    html_escape
 					lcs_name
-                    md5_salt
 					nicebasepairs
-                    nicebytes
-                    nicenumbers
-                    path2args
                     random_string
-                    round
                     uri2args
                    );
 %EXPORT_TAGS = ( 'all' => \@EXPORT_OK );
@@ -38,26 +29,10 @@ use vars qw(
 sub random_string {
     my $min = shift || 4; $min =~ /\D/ and $min = 4;
     my $max = shift || 8; $max !~ /\D/ && $max >= $min or $max = $min+5;
-    #my @chars = ('.', '/', 0..9, 'A'..'Z', 'a'..'z');
-	#my @chars = ( 0..9, 'A'..'Z', 'a'..'z', 0..9);
     my @chars = ( 0..9, 'A'..'Z', 'A'..'Z', 0..9);
     my $string = '';
 	$string .= $chars[rand 64] for( 1 .. $min + rand($max-$min) );
 	$string;
-}
-
-sub md5_salt {
-	return '$1$' . random_string(8,8) . '$';
-}
-
-sub nicenumbers {
-    my ($no, $digits) = @_;
-    $no = reverse $no;
-    $no =~ s/(\d\d\d)(?=\d)(?!\d*\.)/$1,/g;
-    $no = scalar reverse $no;
-    $no =~ s/\.(\d{$digits})\d+/\.$1/g if $digits;
-	$no =~ s/\.0+(?=\D|$)//g;
-    return $no;
 }
 
 sub nicebasepairs {
@@ -71,58 +46,10 @@ sub nicebasepairs {
     return sprintf "%02.02f gb", $giga;
 }
 
-sub nicebytes {
-    my $bytes = shift || 0;
-    return "$bytes B" if $bytes < 1024;
-    my $kilo = $bytes / 1024;
-    return sprintf "%02.02f KB", $kilo if $kilo < 1024;
-    my $mega = $kilo / 1024;
-    return sprintf "%02.02f MB", $mega if $mega < 1024;
-    my $giga = $mega / 1024;
-    return sprintf "%02.02f GB", $giga;
-}
-
 sub isin {
     my ($term, @array) = @_;
     foreach(@array) { return 1 if $_ eq $term }
     return 0;
-}
-
-sub escape_js {
-    local $_ = shift;
-    s/'/\\'/sg;
-    s{\r?\n}{\\r\\n}sg;
-    $_;
-}
-
-sub html_escape {
-    my ($text) = shift || return '';
-    my %html_escape = ('&' => '&amp;', '>'=>'&gt;', '<'=>'&lt;', '"'=>'&quot;');
-    my $html_escape = join('', keys %html_escape);
-    $text =~ s/([$html_escape])/$html_escape{$1}/mgoe;
-    return $text;
-}    
-
-sub path2args {
-    my $margs = {};
-    my $path = shift || return $margs;
-
-    ### grab key/value pairs
-    while ($path =~ s{/([^/]+)/([^/]+)}{}) {
-        my ($key, $val) = ($1,$2);
-        for ($key, $val) {
-            $_ =~ s/%([0-9A-Fa-f]{2})/chr(hex($1))/eg;
-        }
-        push @{$margs->{$key}}, $val;
-    }
-    ### normalize single values
-    foreach (keys %{$margs}) {
-        if (@{$margs->{$_}} == 1) {
-            $margs->{$_} = $margs->{$_}[0];
-        }
-    }
-
-    return $margs;
 }
 
 sub uri2args {
@@ -165,17 +92,6 @@ sub percent {
      	: 0;
 }
 
-sub array_diff {
-    my ($a1,$a2) = @_;
-    my %h;
-    @h{@$a1} = @$a1; 
-    my @res = ();
-    foreach (@$a2) {
-        push @res, $_ unless exists $h{$_}
-    }    
-    @res
-}
-
 # it returns the LCS base on the given two strings
 # if theere are more then $x (=3) diffs, is concatenates the input strings
 sub lcs_name {
@@ -193,12 +109,6 @@ sub lcs_name {
     
 	return $name;
 }
-
-sub round {
-    local $_ = shift;
-    int($_ + .5)
-}
-
 
 sub break_long_text {
 	my ($text, $maxlen) = @_;
@@ -220,31 +130,6 @@ sub break_long_text {
 	}
 	$text;
 }
-
-#=================================
-# ARGUMENTS: ($query, @args)
-#-----------------
-sub debug_sql {
-    my ($query, @args) = @_;
-    $query =~ s/\s+/ /gs;
-    my $toret = '';
-    foreach (@args) {
-        s/'/\\'/sg;
-        $query =~ s/^(.+?)\?//;
-        $toret .= "$1'$_'";
-    }
-    $toret .= $query;
-    return $toret;
-}
-
-#=================================
-# ARGUMENTS: ($cdbi_object [, $separator])
-#-----------------
-sub debug_cdbi {
-	my ($o, $sep) = @_;
-	$sep ||= ' ';
-	return join $sep, map { "[$_: " . $o->$_ . ']' } sort $o->columns;
-};
 
 
 #=================================

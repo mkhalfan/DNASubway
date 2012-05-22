@@ -6,7 +6,7 @@
 	<form id="form2">
 		<input type="hidden" name="pid" value="<% $pid %>" />
 		<p>In order to identify related sequences click a gene or transposons (up to 
-		<% nicenumbers($tcf->{MAX_SEQ_LEN}) %> basepairs) in the Local Browser 
+		<% nicebasepairs($tcf->{MAX_SEQ_LEN}) %> - basepairs) in the Local Browser 
 		and submit it to TARGeT, a tool to conduct Tree Analysis of Related Genes and Transposons.
 		</p>
 		<input type="submit" name="continue" value="Continue" /><br/>
@@ -27,7 +27,7 @@
 	use DNALC::Pipeline::App::ProjectManager ();
 	use DNALC::Pipeline::Config ();
 	use DNALC::Pipeline::Chado::Utils ();
-	use DNALC::Pipeline::Utils qw(nicenumbers);
+	use DNALC::Pipeline::Utils qw(nicebasepairs);
 
 	my $pcf = DNALC::Pipeline::Config->new->cf('PIPELINE');
 	my $tcf = DNALC::Pipeline::Config->new->cf('TARGET');
