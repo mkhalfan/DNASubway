@@ -2,6 +2,7 @@
 <%args>
 	$pid => 0
 	$aln => ''
+	$trim => 0
 </%args>
 <%once>
 	use DNALC::Pipeline::App::Phylogenetics::ProjectManager ();
@@ -30,7 +31,7 @@
 	my $client = Gearman::Client->new;
 	my $sx = $client->job_servers(@{$pcf->{GEARMAN_SERVERS}});
 	
-	my $params = nfreeze( {pid => $pid, user_id => $s->{user_id}});
+	my $params = nfreeze( {pid => $pid, user_id => $s->{user_id}, trim => $trim});
 	my $rc = $client->do_task( 'phy_alignment' =>  $params);
 	$rc = thaw($$rc);
 	if ($rc && defined $rc->{status}) {

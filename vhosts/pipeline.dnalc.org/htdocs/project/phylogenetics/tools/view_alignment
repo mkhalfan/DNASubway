@@ -119,17 +119,12 @@
 % } # end if_else $ok
 </div>
 %#----------------------------------------------------------------------------
-<%args>
-	$pid => 0
-	$data => undef
-</%args>
-%#----------------------------------------------------------------------------
 <%once>
 	use DNALC::Pipeline::App::Phylogenetics::ProjectManager ();
 	use IO::File ();
 </%once>
 %#----------------------------------------------------------------------------
-<%init>
+<%shared>
 	my $ok = 0;
 	
 	$r->content_type("text/html");
@@ -138,14 +133,13 @@
 	$m->session->{pipeline} ||= {};
 	my $s = $m->session->{pipeline};
 	my $pcf = DNALC::Pipeline::Config->new->cf('PIPELINE');
+	my $pid = $m->request_args->{pid};
 	$pid =~ s/\D+//g;
 
 	my $pm = DNALC::Pipeline::App::Phylogenetics::ProjectManager->new($pid);
 	my $proj = $pm->project;
 	my $algn_file = $pm->get_alignment('html');
 	my $alignment_url = $m->comp("../../.comp/filepath_to_web", file => $algn_file, just_return => 1);
-	
-	print STDERR $alignment_url . " xxxxxxx " . $algn_file;
 	
 	my $algn_contents;
 	my $fh = IO::File->new();
@@ -155,9 +149,16 @@
 		}
 		$fh->close;
 	}
-	
-</%init>
+
+	my $project_type = $proj->type;
+	my $style = ($project_type eq 'protein' ? 'alignment_viewer_amino.css' : 'alignment_viewer_nucleotide.css');
+</%shared>
 %#----------------------------------------------------------------------------
 <%attr>
 	js => ['prototype-1.6.1.js', 'phylogenetics.js', 'alignment_viewer.js']
 </%attr>
+%#----------------------------------------------------------------------------
+%#----------------------------------------------------------------------------
+<%method style>\
+<link type="text/css" rel="stylesheet" href="/css/<% $style %>" />
+</%method>

@@ -171,6 +171,34 @@ function scroll_b(r){
 	return p;
 }
 
+function do_trim(pid) {
+	$('trim_but').update('TRIMMING<img src="/images/ajax-loader-2.gif" id="trim_loader" />');
+	$('trim_but').setStyle({
+		cursor:'default'
+	});
+	new Ajax.Request('/project/phylogenetics/tools/build_alignment', {
+		method:'get',	
+		parameters: {'pid': pid, 'trim': 1},
+		onSuccess: function(transport){
+			var response = transport.responseText || "{'status':'error', 'message':'No response'}";
+			var r = response.evalJSON();
+			if (r.status == 'success') {
+				$('trim_but').update('LOADING<img src="/images/ajax-loader-2.gif" id="trim_loader" />');
+				//window.location.reload();
+				document.location.reload();
+				console.info('successful 100');
+			}
+			else {
+				$('trim_but').update('<span style="color:red">ERROR</span>');
+				console.info('Error: ' + r.message);
+			}
+		},
+		onFailure: function(){					
+			alert('Something went wrong!\nAborting...');
+		}
+	});
+}
+
 document.observe("dom:loaded", function() {
 	//$('div_width').value = $$('#barcode div div')[0].getStyle('width').split('px')[0];
 	$('div_width').value = 1;
@@ -180,6 +208,8 @@ document.observe("dom:loaded", function() {
 	$('barcode_but').addClassName('disabled');
 	$('zoom_in').disabled = false;
 	$('sequence_but').disabled = false;
+	Element.addClassName.delay(3, 'trimmed_notice', 'fade');
 	try {document.body.addEventListener("mousemove", mouser, false);} catch (e) {};
-	
+	var width = $('pairwise_div').getWidth();
+	$('pairwise_div').setStyle({width:width + 'px'});
 });

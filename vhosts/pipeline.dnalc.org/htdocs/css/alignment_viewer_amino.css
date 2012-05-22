@@ -81,7 +81,7 @@
 	border:1px solid #999;
 	background:#999;
 }
-#legend div.draggable {
+/*#legend div.draggable {
 	float:left;
 	margin:2px;
 	background-image:url('/images/dragger.png');
@@ -89,12 +89,13 @@
 	height:16px;
 	cursor:move
 }
-
 #legend div.close_button {
 	float:right;
 	padding:1px;
 	cursor:pointer;
 }
+*/
+
 #legend_body {
 	height:200px;
 	background:#F8FAFC;

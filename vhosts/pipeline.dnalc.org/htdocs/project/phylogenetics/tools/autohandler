@@ -3,19 +3,13 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 <title></title>
+<& SELF:style &>
 <link type="text/css" rel="stylesheet" href="/css/toolPanel.css" />
 <link rel="stylesheet" type="text/css" href="/css/prototip.css" />
 % if ($s->{logged_in} == 0) {
 <script type="text/javascript">
 	top.document.location.replace("/");
 </script>
-% }
-
-% if ($m->request_comp->attr_if_exists('css') && @{$m->request_comp->attr('css')}) {
-%	foreach my $css (@{$m->request_comp->attr('css')}) {
-%		next unless $css;
-<link rel="stylesheet" href="/css/<% $css %>" type=text/css>
-%	}
 % }
 
 % if ($m->request_comp->attr_if_exists('js') && @{$m->request_comp->attr('js')}) {
@@ -65,3 +59,5 @@ try { var pageTracker = _gat._getTracker("UA-1818773-7"); pageTracker._trackPage
 	inherit => undef
 </%flags>
 %#---------------------------------
+<%method style>
+</%method>
