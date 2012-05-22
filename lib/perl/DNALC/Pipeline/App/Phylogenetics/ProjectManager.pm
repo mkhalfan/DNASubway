@@ -905,7 +905,7 @@ use Bio::Trace::ABIF ();
 	# a trimmed alignment can be realigned)
 	#-----------------------------------------------------------------------------
 	sub build_alignment {
-		my ($self, $realign) = @_;
+		my ($self, $realign, $trim) = @_;
 
 		my $pwd = $self->work_dir;
 		return unless $pwd && -d $pwd;
@@ -956,8 +956,10 @@ use Bio::Trace::ABIF ();
 
 			# send the --is_amino switch if it's a protein trype project
 			my $is_amino = ($project_type eq "protein" ? "--is_amino" : '');
+			
+			my $do_trim = ($trim ? '--do_trim' : '' );
 
-			my $st = $m->do_postprocessing($output, $is_amino);
+			my $st = $m->do_postprocessing($self->project, $output, $is_amino, $do_trim);
 
 			my $html_output = $st->{html_output} if $st;
 			my $trimmed_alignment = $st->{trimmed_output} if $st;
@@ -965,7 +967,7 @@ use Bio::Trace::ABIF ();
 				$self->_store_alignments($html_output);
 			}
 			
-			if (defined $trimmed_alignment && -f $trimmed_alignment) {
+			if ($trim && defined $trimmed_alignment && -f $trimmed_alignment) {
 				$self->_store_alignments($trimmed_alignment);
 			}
 
@@ -1004,6 +1006,7 @@ use Bio::Trace::ABIF ();
 
 		return $out_file if ($out_file && -f $out_file);
 	}
+
 	#-----------------------------------------------------------------------------
 	# trims the last alignment
 	#
