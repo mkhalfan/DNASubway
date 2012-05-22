@@ -8,15 +8,18 @@ use Bio::SimpleAlign;
 use Getopt::Long;
 use Data::Dumper;
 use IO::File ();
-#use CGI qw/:standard start_table end_table start_row end_row/;
 
 my ($infile, $htmlout, $numgap, $outfile);
 my $is_amino = '';
+my $do_trim = '';
+my $pid = 0;
 GetOptions	(
-	    "infile|i=s"  => \$infile,    # input alignment (required)
+	    "pid|p:i"	  => \$pid,       # project id, needed if you want to be able to trim (optional)
+		"infile|i=s"  => \$infile,    # input alignment (required)
 		"htmlout|h=s" => \$htmlout,	  # html output file (required)
-	    "outfile|o:s" => \$outfile,   # output file (optional -- print to STDOUT otherwise)
+	    "outfile|o:s" => \$outfile,   # output file (optional)
 		"is_amino"	  => \$is_amino,  # flag to indicate protein sequences
+		"do_trim"	  => \$do_trim,	  # flag to indicate trimming is desired
 	    "numgap|n:i"  => \$numgap,    # number of sequences with terminal gaps allowed (optional) 
                                       # 0-N, where N = num sequences; default = int(N/2 + 0.5)
 );
@@ -31,7 +34,7 @@ END
 ($infile && $htmlout) or die $usage;
 my $in = Bio::AlignIO->new( -file => $infile );
 my @outfile = (-file => ">$outfile") if $outfile;
-my $out = Bio::AlignIO->new( -format => 'fasta', @outfile );
+my $out = Bio::AlignIO->new( -format => 'fasta', @outfile ) if $outfile;
 my $html_out = IO::File->new;
 
 my %seqs;
@@ -39,20 +42,28 @@ my %rseqs;
 
 my $aln = $in->next_aln;
 
+## Build a consensus from the current alignment here
 my $consensus = $aln->consensus_string();
+
+## Create a LocatableSeq object for the consensus, needs to be 
+## a LocatableSeq in order to add it to the alignment
 my $consensus_seq = new Bio::LocatableSeq ( 
 		-seq => $consensus,
 		-id => 'Consensus',
 		-start => 1,
 		-end => length($consensus),
 );
+
+## Add the consensus to the current alignment at the first position
+## (position is 0 or 1 depending on the BioPerl version)
 $aln->add_seq($consensus_seq, 0);
 
-my @seq = $aln->each_seq;
-
+## Calculate the Pairwise Identity Similarity, and create the table
+## which will show this information
 my $pairwise_data = calculate_pairwise_ids($aln);
-#print Dumper (\%pairwise_ids), $/;
 my $pairwise_div = create_pairwise_table($pairwise_data);
+
+my @seq = $aln->each_seq;
 
 for my $seq (@seq) {
 	$seqs{$seq->display_id} = $seq->seq;
@@ -62,37 +73,41 @@ for my $seq (@seq) {
 # preserve seq ID order
 @seq = map {$_->display_id} @seq;
 $numgap = int(@seq/2+0.5) unless defined $numgap;
-my $slice = auto_flush(\%seqs,\%rseqs,$aln);
-$out->write_aln($slice) if $outfile; #this creates the new *trimmed* alignment output file
-$slice->match;
 
-my $seq_but_prefix = ($is_amino ? 'aa' : 'nuc');
-my $buttons = '<div><div style="float:left"><input type="image" class="controls" id="barcode_but" onclick="barcodeView()" src="/images/barcode_but.png"/> <input type="image" class="controls" id="zoom_out" onclick="zoomOut()" src="/images/zoom_out_but.png" /><input type="image" class="controls" id="zoom_in" onclick="zoomIn()" src="/images/zoom_in_but.png"/> <input type="image" class="controls" id="sequence_but" onclick="seqView()" src="/images/' . $seq_but_prefix . '_sequence_but.png" /></div><div style="float:right">';
-$buttons .= ($is_amino ? '<div id="legend_but" onclick="$(\'legend\').toggle();">COLOR CODES</div>' : '');
-$buttons .= '<div id="pairwise_but" onclick="$(\'pairwise_div\').toggle();">SEQUENCE SIMILARITY</div>';
-$buttons .= "</div></div><div style='clear:both;height:0;'>&nbsp;</div>";
+## If trimming, create the $slice object by calling auto_flush, write the
+## trimmed alignment to the output file, and run the match function on the
+## $slice object. If not trimming, run the match function on the regular $aln. 
+## (match Goes through all columns and changes residues that are identical to 
+## residue in first sequence to match '.' character.)
+my $slice;
+if ($do_trim) {
+	$slice = auto_flush(\%seqs,\%rseqs,$aln);
+	$out->write_aln($slice) if $outfile; #this creates the new *trimmed* alignment output file
+	$slice->match;
+}
+else {
+	$aln->match;
+}
 
-my $css = ($is_amino ? 'alignment_viewer_amino.css' : 'alignment_viewer_nucleotide.css');
-
-my $set_css = <<END
-<script type="text/javascript">
-  var fileref = document.createElement("link");
-  fileref.setAttribute("rel", "stylesheet");
-  fileref.setAttribute("type", "text/css");
-  fileref.setAttribute("href", '/css/$css');
-  document.getElementsByTagName("head")[0].appendChild(fileref);
-</script>
-END
-;
-
-my $dec = decorate_alignment($slice);
+## Creating the visualization of the ailgnment here
+my $dec = ($do_trim ? decorate_alignment($slice) : decorate_alignment($aln));
 my $retval = $dec->{retval};
 my $barcode = $dec->{barcode};
 my $labels = $dec->{labels};
+
+## Creating the peripheral stuff here (buttons)
+my $seq_but_prefix = ($is_amino ? 'aa' : 'nuc');
+my $buttons = '<div><div style="float:left"><input type="image" class="controls" id="barcode_but" onclick="barcodeView()" src="/images/barcode_but.png" title="Toggle Barcode View"/> <input type="image" class="controls" id="zoom_out" onclick="zoomOut()" src="/images/zoom_out_but.png" title="Zoom Out"/><input type="image" class="controls" id="zoom_in" onclick="zoomIn()" src="/images/zoom_in_but.png" title="Zoom In"/> <input type="image" class="controls" id="sequence_but" onclick="seqView()" src="/images/' . $seq_but_prefix . '_sequence_but.png" title="Toggle Sequence View"/>';
+$buttons .= ($do_trim ? '<div id="trimmed_notice">Your Alignment Has Been Trimmed</div>' : '<div id="trim_but" onclick="do_trim(' . $pid . ')">TRIM ALIGNMENT</div>');
+$buttons .= '</div><div style="float:right">';
+$buttons .= ($is_amino ? '<div id="legend_but" onclick="$(\'legend\').toggle();">COLOR CODES</div>' : '');
+$buttons .= '<div id="pairwise_but" onclick="$(\'pairwise_div\').toggle();">SEQUENCE SIMILARITY %</div>';
+$buttons .= "</div></div><div style='clear:both;height:0;'>&nbsp;</div>";
+
 my $div_height = (keys %{$aln->{_order}}) * 22 + 140;
 
+## Create the HTML output here
 if ($html_out->open($htmlout, "w")){
-	print $html_out $set_css, "\n";
 	print $html_out $pairwise_div, "\n";
 	print $html_out '<div id="muscle_post_processor_output" style="height:' . $div_height . 'px;">', "\n";
 	print $html_out $buttons, "\n";
@@ -383,8 +398,14 @@ sub create_pairwise_table {
 	my %pairwise_ids = %{$pairwise_data->{pairwise_ids}};
 
 	my $div;
-	$div  = '<div id="pairwise_div" style="display:none">' . "\n";
-	$div .= '<table id="pairwise_table" cellspacing=0>' .  "\n";
+	$div  = '<div id="pairwise_div" style="display:none;top:45px;right:80px;">' . "\n";
+	$div .= '<div style="height:20px;">' . "\n";
+	$div .= "<!--[if !IE]> -->\n";
+	$div .= '<div onmouseup="mouse_up()" onmousedown="mouse_down(event, \'pairwise_div\')" class="draggable unselectable"></div>' ."\n";
+	$div .= "<!-- <![endif]-->\n";
+	$div .= '<div class="close_button"><img src="/images/prototip/styles/blue/close.png" onclick="$(\'pairwise_div\').hide();"></div>' . "\n";
+	$div .= "</div>\n";
+	$div .= '<div id="pairwise_div_body"><table id="pairwise_table" cellspacing=0>' .  "\n";
 	$div .= '<tr>'. "\n";
 	$div .= '<td></td>' . "\n";
 	for (my $y = 1; $y <= $num_seqs; $y++){
@@ -401,11 +422,11 @@ sub create_pairwise_table {
 			#print "$x-$y = ", $pairwise_ids{$x . '-' . $y}, $/;
 			my $key = $x . '-' . $y;
 			my $value = $pairwise_ids{$key};
-			$div .= ($value eq '-' ? "<td>$value</td>\n" : "<td>$value%</td>\n");
+			$div .= ($value eq '-' ? "<td>$value</td>\n" : "<td>$value</td>\n");
 		}
 		$div .= '</tr>';
 	}
-	$div .= '</table>' . "\n";
+	$div .= '</table></div>' . "\n";
 	$div .= '</div>' ."\n";
 	return $div;
 }
