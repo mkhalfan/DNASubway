@@ -970,6 +970,9 @@ use Bio::Trace::ABIF ();
 			if ($trim && defined $trimmed_alignment && -f $trimmed_alignment) {
 				$self->_store_alignments($trimmed_alignment);
 			}
+			else {
+				$self->_store_alignments($output);
+			}
 
 			$self->set_task_status("phy_alignment", "done", $m->{elapsed});
 		}
