@@ -1,8 +1,10 @@
 <select class="<% $class %>" id="<% $element->{id} %>" name="<% $element->{id} %>">
 <option value="">-= Choose file =-</option>
 % for (@files) {
-%	my $sel = $user_value && $user_value eq $_->file_path ? q{selected="selected"} : "";
-	<option value="<% $_->file_path %>" <% $sel %>><% $_->file_name |html%></option>
+%#	my $sel = $user_value && $user_value eq $_->file_path ? q{selected="selected"} : "";
+%#	<option value="<% $_->file_path %>" <% $sel %>><% $_->file_name |html%></option>
+%	my $sel = defined $user_value && $user_value eq $_->id ? q{selected="selected"} : "";
+	<option value="<% $_->id %>" <% $sel %>><% $_->file_name |html%></option>
 % }
 </select>
 <%args>
@@ -12,14 +14,12 @@
 	$class => ''
 	$filter => undef;
 </%args>
-<%once>
-	use Data::Dumper;
-</%once>
 <%init>
 	return unless $pm && $element;
 	
-	my @files = $pm->data;
+	my @files = grep {$_->is_input} $pm->data;
 	@files = grep {$_->file_name =~ /$filter/} @files if $filter;
 	
+	#use Data::Dumper;
 	#print STDERR Dumper($user_value);
 </%init>

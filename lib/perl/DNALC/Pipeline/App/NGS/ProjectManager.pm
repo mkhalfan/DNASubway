@@ -8,16 +8,20 @@ use aliased 'DNALC::Pipeline::NGS::Job';
 use aliased 'DNALC::Pipeline::NGS::JobParam';
 use aliased 'DNALC::Pipeline::NGS::Project';
 use aliased 'DNALC::Pipeline::NGS::DataFile';
+use aliased 'DNALC::Pipeline::NGS::DataFileTrimmed';
 use aliased 'DNALC::Pipeline::NGS::DataSource';
 use aliased 'DNALC::Pipeline::NGS::JobTrack';
 
 use DNALC::Pipeline::Config ();
 use DNALC::Pipeline::Task ();
-#use DNALC::Pipeline::TaskStatus ();
+use DNALC::Pipeline::CacheMemcached ();
 
 use iPlant::FoundationalAPI ();
 use iPlant::FoundationalAPI::Constants ':all';
 
+use Archive::Zip ();
+use Archive::Zip qw( :ERROR_CODES :CONSTANTS );
+use File::Basename qw/basename/;
 use Carp;
 use JSON::XS ();
 use Data::Dumper;
@@ -34,6 +38,7 @@ use Data::Dumper;
 	sub new {
 		my ($class, $params) = @_;
 		my $self = bless {
+			_mc => DNALC::Pipeline::CacheMemcached->new,
 			api_instance => undef,
 			debug => $params->{debug} || undef,
 		}, __PACKAGE__;
@@ -103,11 +108,19 @@ use Data::Dumper;
 		}
 
 		$self->project($proj);
+		$self->create_work_dir;
 
 		return {status => 'success', message => $msg};
 	}
 
 	#--------------------------------------
+	#
+	sub config {
+		return shift->{config};
+	}
+
+	#--------------------------------------
+
 	sub create_work_dir {
 		my ($self) = @_;
 
@@ -136,7 +149,11 @@ use Data::Dumper;
 	}
 
 	#--------------------------------------
+	# adds a set of files to the project
+	# $pm->add_data([$file_details1, $file_details2, ..], $options)
+	#
 	sub add_data {
+		#my ($self, $params, $options) = @_;
 		my ($self, $params, $options) = @_;
 
 		my (@errors, @warnings);
@@ -271,7 +288,10 @@ use Data::Dumper;
 
 		#print STDERR  $app_cf->{id}, " eq ",  $app->id, $/;
 		# do we want to make sure we have exact version of the app?!
-		return unless $app_cf->{id} eq $app->id;
+		unless ($app_cf->{id} eq $app->id) {
+			print STDERR  "Version mismatch for: ", $app->id, $/;
+			return;
+		}
 
 		my $app_inputs = $app->inputs;
 		my $app_params = $app->parameters;
@@ -307,8 +327,8 @@ use Data::Dumper;
 			#next if $cf_input->{$id}->{hidden};
 			$param->{hidden} = $cf_param->{hidden} if $cf_param->{hidden};
 			$param->{display_type} = $cf_param->{display_type};
-			$param->{value} = $cf_param->{value} if $cf_param->{value};
-			$param->{label} = $cf_param->{label} if $cf_param->{label};
+			$param->{value} = $cf_param->{value} if defined $cf_param->{value};
+			$param->{label} = $cf_param->{label} if $cf_param->{label} ne '';
 
 			push @params, $param;
 		}
@@ -354,12 +374,44 @@ use Data::Dumper;
 			return _error('API instance not set.');
 		}
 
+		# if there are the inputs with {display_type => 'show_files'}
+		#
+		my %input_files = ();
+		my @input_files = ();
+		for my $input (grep {defined $_->{display_type} && $_->{display_type} eq 'show_files'} @{$app->inputs}) {
+			if (defined $params->{$input->{id}} && $params->{$input->{id}} =~ /^\d+$/) {
+				my $input_file = DataFile->retrieve($params->{$input->{id}});
+				next unless $input_file;
+				$input_files{$input->{id}} = {
+						'id' => $params->{$input->{id}},
+						'path' => $input_file->file_path,
+					};
+
+				push @input_files, {
+							app_input_id => $input->{id},
+							file_id => $params->{$input->{id}},
+							file_path => $input_file->file_path,
+					};
+				$params->{$input->{id}} = $input_file->file_path;
+			}
+		}
+
+		print STDERR "ProjectManager::submit_job: params = ", Dumper($params), $/;
+		#print STDERR "ProjectManager::submit_job: INPUT FILEZ = ", Dumper(\@input_files), $/;
 		my $jobdb; #
 
 		my $job_ep = $apif->job;
 		my $job_st = $job_ep->submit_job($app, %$params);
 
-		print STDERR  "ProjectManager::submit_job: params = ", Dumper($params), $/;
+		# this sux
+		# revert altered input fileds
+		#for (keys %input_files) {
+		#	$params->{$_} = $input_files{$_}->{id};
+		#}
+		for my $if (@input_files) {
+			 $params->{ $if->{app_input_id} } = $if->{file_id};
+		}
+
 		#print STDERR  "ProjectManager::submit_job: ", Dumper($job_st), $/;
 		if ($job_st && $job_st->{status} eq "success") {
 			my $api_job = $job_st->{data};
@@ -382,6 +434,20 @@ use Data::Dumper;
 				return _error($msg);
 			}
 			else {
+
+				# cache status
+				#my $mc_key = sprintf("ngs-%d-%s", $self->project->id, $app->id);
+
+				# add input files
+				for my $if (@input_files) {
+					$jobdb->add_to_input_files({
+							file_id => $if->{file_id},
+							project_id => $self->project,
+							app_input_id => $if->{app_input_id},
+						});
+					#$mc_key .= '-' . $if->{file_id};
+				}
+				#$self->{_mc}->set($mc_key, 'pending');
 
 				# keep track of this job, so that we can check it's status
 				$self->track_job({ job => $jobdb, token => $self->api_instance->token});
@@ -516,6 +582,11 @@ use Data::Dumper;
 		$self->{api_instance};
 	}
 
+	#--------------------------------------
+	#sub set_status {
+	#	my ($self, $app_id, $status, @input_files) = @_;
+	#}
+	#--------------------------------------
 	sub _error {
 		my ($self, $msg, $data) = @_;
 		if (!ref($self)) {
@@ -525,6 +596,144 @@ use Data::Dumper;
 
 		return {status => 'error', message => $msg || 'Unspecified error.', data => $data};
 	}
+	#--------------------------------------
+	#--------------------------------------
+	# job/task specific routines
+
+	#--------------------------------------
+	sub task_handle_trimmed_file {
+		my ($self, $job, $api_files) = @_;
+
+		# one input file for this task
+		my ($job_input_file) = ($job->input_files);
+
+		my $task_name = $self->{task_id_to_name}->{$job->{task_id}};
+		#my $data_src = DataSource->insert ({
+		#		project_id => $self->project,
+		#		name => join('/', 'job', $job->id, $task_name),
+		#		note => '',
+		#	});
+
+		my @project_files = $self->data;
+		for my $f (@$api_files) {
+			my $file_path = $f->path;
+
+			my $file_name = basename($file_path);
+			$file_name =~ s/fastx_trimmer_(.*?)\.fastq/$1_trimmed.fastq/;
+
+			my $tdf = $self->add_data({
+						source => join('/', 'job', $job->id, $task_name),
+						file_name => $file_name,
+						file_path => $file_path,
+						file_type => 'fastq',
+					},
+					{_no_remote_check => 1},
+				);
+
+			if ($tdf) {
+				my $if = $job_input_file->file;
+				$if->trimmed_file_id($tdf);
+				$if->update;
+
+				my $mc_key = sprintf("ngs-%d-%s-%d", $self->project->id, "fastx_trimmer-0.0.13", $if->id);
+				$self->{_mc}->set($mc_key, 'done');
+			}
+		}
+	}
+
+	#--------------------------------------
+	sub task_handle_qc {
+		my ($self, $job, $api_files) = @_;
+
+		my @ifiles = $job->input_files;
+		#print STDERR Dumper( \@ifiles), $/;
+
+		# one input file for this task
+		#amy ($job_input_file) = map {$_->{value}} $job->input_files;
+		my ($job_input_file) = ($job->input_files);
+
+		#print STDERR  "** > ", $job_input_file, $/;
+
+		my $working_dir =$self->work_dir;
+		my $qc_dir = File::Spec->catfile($working_dir, 'qc');
+		unless (-d $qc_dir) {
+			mkdir $qc_dir, 0777;
+		}
+
+		my ($archive) = grep {/\.zip$/ } map {$_->path} @$api_files;
+
+		my $save_to = File::Spec->catfile($qc_dir, sprintf("%d-QC-%s", $job->id, $job_input_file->file->file_name));
+		my $save_to_file = sprintf("%s.zip", $save_to);
+
+		my $io = $self->api_instance->io;
+		if ($io) {
+			my $data = $io->stream_file($archive, save_to => $save_to_file);
+
+			#print STDERR "dest: ", $save_to, $/;
+			#print STDERR "data: ", $data, $/;
+
+			my $html_file;
+			if (-f $save_to_file) {
+				
+				my $zip = Archive::Zip->new;
+				unless ( $zip->read( $save_to_file ) == AZ_OK ) {
+					die 'read error';
+				}
+				my @members = grep {$_->fileName !~ m|/\._|} $zip->members;
+				my ($root) = map {$_->fileName} grep {$_->fileName =~ m|_fastqc/$|} @members;
+
+				#print STDERR 'root: ', $root, $/;
+
+				mkdir($save_to);
+
+				# extract files
+				for (qw/Images Icons/) {
+					mkdir File::Spec->catfile($save_to, $_);
+				}
+
+				for my $m (@members) {
+					my $f = $m->fileName;
+					$f =~ s/$root//;
+					my $dest_f = File::Spec->catfile($save_to, $f);
+					#print $dest_f, $/;
+					$zip->extractMember($m, $dest_f);
+
+					$html_file = $dest_f if $f =~ /fastqc_report\.html$/;
+				}
+
+			}
+
+			if (-f $html_file) {
+				## file path relative to the website
+				#$html_file =~ s/$working_dir//;
+
+				#print STDERR  "HTML_FILE: ", $html_file, $/;
+				unlink $save_to_file; # remove the zip file
+
+				# updated the input file of this job with this QC report associated to it
+
+				# add the file
+				my $hfile = $self->add_data({
+							source => sprintf('QC data from job#%d',  $job),
+							file_name => 'FastQC report',
+							file_path => $html_file,
+							file_type => 'html',
+						},
+						{_no_remote_check => 1}
+					);
+				if ($hfile) {
+					my $ifile = $job_input_file->file;
+					$ifile->qc_file_id($hfile);
+					$ifile->update;
+
+					my $mc_key_qc = sprintf("ngs-%d-%s-%d", $self->project->id, "ngs_fastqc", $ifile->id);
+					#print STDERR  $mc_key_qc, $/;
+					$self->{_mc}->set($mc_key_qc, 'done');
+				}
+			}
+		}
+	}
+
 }
 
 1;

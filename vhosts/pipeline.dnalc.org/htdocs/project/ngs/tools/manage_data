@@ -1,14 +1,60 @@
 
 <a href="./add_data?pid=<% $proj->id %>">add data</a>
+<input type="hidden" id="pid" value="<% $pid |html%>"/>
 
 %#data = <% ref($data)%>
 
-%# VV - this could be a table - VV
-%#
+<table>
+	<tr>
+		<th>File</th>
+		<th>Source</th>
+		<th>QC</th>
+		<th>Trimmed</th>
+	</tr>
 % while (my $f = $data->next) {
-	<div title="<% $f-> file_path |html %>"><div style="min-width: 200px; display: inline;"><% $f->source->name |html%></div> <% $f->file_name |html%></div>
+%	next unless $f->is_input;
+%#	TODO: need a better way of assessing if a file is fastq or not
+%#
+%	my $is_fastq = $f->file_path =~ /\.fastq$/;
+	<tr>
+		<td title="<% $f-> file_path |html %>"><% $f->file_name |html%></td>
+		<td style="min-width: 200px;"><% $f->source->name |html%></td>
+%	if ($is_fastq) {
+		<& .fastq_options, f =>$f, pid => $pid, pm => $pm &>
+%	} else {
+		<td colspan="2">&nbsp;</td>
+%	}
+	</tr>
 % }
+</table>
 
+<%def .fastq_options>
+<%args>
+	$f => undef
+	$pid => undef
+	#$mc_key => ""
+	$pm => undef
+</%args>
+<%init>
+	return "" unless $f && $pm;
+	my $qc_report = $f->qc_file_id ? $m->comp("../../.comp/filepath_to_web", file => $f->qc_report, just_return => 1) : 0;
+	my $trimmed_file = $f->trimmed_file;
+
+	my $mc_key = sprintf("ngs-%d-%s-%d", $pm->project->id, "ngs_fxtrimmer", $f->id);
+	my $is_trimming = $pm->{_mc}->get($mc_key);
+
+	my $mc_key_qc = sprintf("ngs-%d-%s-%d", $pm->project->id, "ngs_fastqc", $f->id);
+	my $is_qcing = $pm->{_mc}->get($mc_key_qc);
+
+</%init>
+		<td><% $qc_report ? "<a href='$qc_report'>open</a>" : $is_qcing ? 'qcing' : '<a href="javascript:ngs.do_qc(' . $f->id . ')">do QC</a>'%></td>
+%	if ($qc_report) {
+%#		<td title="<% $trimmed_file ? $trimmed_file->file_path : "do trimm" %>"><% $trimmed_file ? "yes" : "<a href=\"javascript:do_trim()\">Trim" %></td>
+		<td><% $trimmed_file ? "yes" : $is_trimming ? "trimming pending" : "<a href=\"javascript:ngs.do_trim(" . $f->id . ");\">do Trim" %></td>
+%	} else {
+		<td>&nbsp;</td>
+%	}
+</%def>
 %#-----------------------------------------------------------------
 <%args>
 	$pid => 0
@@ -17,12 +63,9 @@
 	use Data::Dumper;
 	use DNALC::Pipeline::Utils qw(clean_query);
 	use DNALC::Pipeline::App::NGS::ProjectManager ();
-	#use DNALC::Pipeline::Config ();
-	#use iPlant::FoundationalAPI ();
-	#use iPlant::FoundationalAPI::Constants ':all';
 	use DNALC::Pipeline::User ();
 	
-	my %clades = ();
+	#my %clades = ();
 </%once>
 <%init>
 

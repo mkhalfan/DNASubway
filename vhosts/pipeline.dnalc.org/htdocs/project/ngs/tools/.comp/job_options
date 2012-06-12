@@ -28,7 +28,7 @@
 % }
 		<tr>
 			<td>Notify me when job ends :</td>
-			<td><input type="checkbox" id="notify_user" name="notify_user" <% $form->{notify_user} ne "yes" ? "" : "checked=\"checked\"" %>" value="yes" /></td>
+			<td><input type="checkbox" id="notify_user" name="notify_user" <% $form->{notify_user} ne "yes" ? "" : "checked=\"checked\"" %> value="yes" /></td>
 		</tr>
 	</tbody>
 	

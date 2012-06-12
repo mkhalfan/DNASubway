@@ -1,5 +1,6 @@
 {
 	id => 'cufflinks-ranger-1.0.3',
+	#id => 'cufflinks-trestles-1.0.3',
 	name => 'cufflinks',
 	inputs => [
 		{ id => 'query1', display_type => 'show_files', label => 'File to process'},
@@ -8,8 +9,28 @@
 		{ id => 'ANNOTATION', hidden => 1 },
 	],
 	parameters => [
+		{ id => 'compatibleHitsNorm', label => 'Use annotation-compatible hits to calculate FPKM', 'value' => 'false' },
+		{ id => 'intronOverhangTolerance', label => 'Intron overhang tolerance', 'value' => '10' },
+		{ id => 'libraryType', label => 'Library type', 'value' => 'fr-unstranded' },
+		{ id => 'maxBundleLength', label => 'Maximum genomic length for an assembled bundle', 'value' => '3500000' },
+		{ id => 'maxIntronLength', label => 'Maxiumum intron length', 'value' => '300000' },
+		{ id => 'minFragsPerTransfrag', label => 'Minimum number of fragments needed for new transfrags', 'value' => '10' },
+		{ id => 'minIntronLength', label => 'Minimum assembled intron length', 'value' => '50' },
+		{ id => 'minIsoformFraction', label => 'Minimum isoform fraction', 'value' => '0.1' },
+		{ id => 'multiReadCorrect', label => 'Perform multiply-matched read correction', 'value' => 'false' },
+		{ id => 'noFauxReads', label => 'Don\'t use faux reads', 'value' => 'false' },
+		{ id => 'overhangTolerance', label => 'Read overhang tolerance', 'value' => '10' },
+		{ id => 'overhangTolerance3', label => '3\' overhange tolerance', 'value' => '600' },
+		{ id => 'preMrnaFraction', label => 'Pre-mRNA fraction', 'value' => '0.15' },
+		{ id => 'smallAnchorFraction', label => 'Small anchor fraction', 'value' => '0.09' },
+		{ id => 'totalHitsNorm', label => 'Use total hits to calculate FPKM', 'value' => 'true' },
+		{ id => 'trim3avgcovThresh', label => 'Minimum average coverage before beginning 3\' trimming', 'value' => '10' },
+		{ id => 'trim3dropoffFrac', label => 'Coverage threshold for 3\' trimming', 'value' => '0.1' },
+		{ id => 'upperQuartileNorm', label => 'Perform upper-quartile normalization', 'value' => 'false' },
 	],
+	_task_name => 'ngs_cufflinks',
 	_input_file_filter => qr/\.bam$/,
 	_output_dir => qr/\/cufflinks_out$/,
 	_output_files => qr/\.(gtf|fpkm_tracking)$/,
+
 }

@@ -100,6 +100,7 @@
 		# what do we do when we don`t get the paths?!
 		$form->{genome} = $pm->project_genome_path;
 		$form->{annotation} = $pm->project_annotation_path;
+		$form->{processors} ||= 4;
 
 		unless (defined $form->{archive}) {
             $form->{archive} = "true";
@@ -110,7 +111,7 @@
 		}
 
 		$form->{requestedTime} ||= '0:45:00';
-		print STDERR "app_th: form = ", Dumper( $form ), $/;
+		#print STDERR "app_th: form = ", Dumper( $form ), $/;
 
 		$st = $pm->submit_job('ngs_tophat', $app, $form);
 		print STDERR "app_th: JOB status = ", Dumper( $st ), $/;
@@ -134,8 +135,9 @@
 	else {
 		for my $p (@{$app->parameters}) {
 			unless ($p->{hidden}) {
-				$form->{$p->{id}} = $p->{value} || $p->{defaultValue};
+				$form->{$p->{id}} = defined $p->{value} ? $p->{value} : $p->{defaultValue};
 			}
 		}
 	}
 </%init>
+

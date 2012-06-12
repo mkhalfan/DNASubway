@@ -22,12 +22,13 @@
 		<% Dumper($form) %>
 	</pre>
 % } else {
-	No application found for conf file: 'CUFFLINKS'.
+	No application found for conf file: 'app_fastqc'.
 % }
 </div>
 %#-----------------------------------------------------------------
 <%args>
 	$pid => 0
+	$f => 0
 </%args>
 <%once>
 	use Data::Dumper;
@@ -60,7 +61,7 @@
 	my $is_owner = $s->{user_id} == $proj->user_id if $proj;
 
 	my $app;
-	my $st = $pm->app("NGS_CUFFLINKS");
+	my $st = $pm->app("NGS_FASTQC");
 
 	if ($st->{status} eq "success") {
 		$app = $st->{app};
@@ -72,7 +73,7 @@
 	my $form = {};
 	my $flagged = {}; # to report errors
 
-	if ( $r->method eq "POST") {
+	if ($r->method eq "POST") {
 		$form = \%ARGS;
 		
 		$form->{jobName} =~ s|/+||g;
@@ -81,30 +82,21 @@
 			if ($p->{hidden} && !defined $form->{$p->{id}}) {
 				$form->{$p->{id}} = $p->{value} || $p->{defaultValue};
 			}
-			#if ($p->{id} eq "mate_inner_dist") {
-			#	print STDERR "app_th: p = ", $p->{validator}, $/;
-			#}
 		}
-		
-		# TODO - default input files should not be set?!
-		#for my $p (@{$app->inputs}) {
-		#	unless (defined $form->{$p->{id}}) {
-		#		$form->{$p->{id}} = $p->{value};
-		#	}
-		#}
-		
-		# what do we do when we don`t get the paths?!
-		$form->{BIAS_FASTA} = $pm->project_genome_path;
-		$form->{ANNOTATION} = $pm->project_annotation_path;
 
 		unless (defined $form->{archive}) {
             $form->{archive} = "true";
         }
+		
+		if ($form->{notify_user}) {
+			$form->{callbackUrl} = $s->{user_email};
+		}
+		
+		$form->{requestedTime} ||= '0:45:00';
 
-		#$st = $pm->submit_job('ngs_cufflinks', $app, $form);
 		$st = $pm->submit_job($app->{conf}->{_task_name}, $app, $form);
 		print STDERR $app->{conf}->{_task_name}, ": JOB status = ", Dumper( $st ), $/;
-		print STDERR $app->{conf}->{_task_name}, ": form = ", Dumper( $form ), $/;
+		#print STDERR $app->{conf}->{_task_name}, ": form = ", Dumper( $form ), $/;
 
 		if ($st->{status} ne "success") {
 			if ($st->{message} =~ /missing required/i && $st->{data} && %{$st->{data}}) {
@@ -115,18 +107,28 @@
 		}
 		else {
 			if ($st->{data}) {
+			
+				my $mc_key = sprintf("ngs-%d-%s-%d", $pm->project->id, "ngs_fastqc", $form->{input});
+				print STDERR "mc_key: ", $mc_key, $/;
+				$pm->{_mc}->set($mc_key, 'pending');
+			
 				# redirect to our job list page
 				print STDERR "JOB ID: ", $st->{data}->id, "//", $st->{data}->api_job_id, $/;
 				$m->comp('/_message_add', 'Job submitted!');
-				$m->redirect("./cufflinks_list?pid=" . $pid);
+				$m->redirect("./manage_data?pid=" . $pid);
 			}
 		}
 	}
-	else {
+	elsif ($app) {
 		for my $p (@{$app->parameters}) {
 			unless ($p->{hidden}) {
 				$form->{$p->{id}} = $p->{value} || $p->{defaultValue};
 			}
+		}
+		
+		# set the default file
+		if ($f && $f =~ /^\d+$/) {
+			$form->{input} = $f;
 		}
 	}
 </%init>

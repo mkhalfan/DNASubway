@@ -28,9 +28,9 @@ my $api_instance = iPlant::FoundationalAPI->new(
 		token => $ENV{iPLANT_TOKEN},
 	);
 
-unless ($api_instance) {
+unless ($api_instance->token) {
 	print "\nError:\n",
-		"Env vars iPLANT_USER and/or iPLANT_TOKEN not ser or token expired\n\n";
+		"\tEnv vars iPLANT_USER and/or iPLANT_TOKEN not ser or token expired!\n\n";
 
 	exit 1;
 }

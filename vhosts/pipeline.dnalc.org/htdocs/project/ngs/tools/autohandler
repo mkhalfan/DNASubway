@@ -1,9 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-<script src="/js/prototype-1.6.1.js"></script>
-<script src="/js/ngs.js"></script>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <style type="text/css">
 tr.flagged {
 	background: pink;
@@ -18,6 +16,8 @@ tr.flagged {
 
 % $m->call_next;
 
+<script src="/js/prototype-1.6.1.js"></script>
+<script src="/js/ngs.js"></script>
 </body>
 </html>
 <%init>

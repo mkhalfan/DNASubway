@@ -57,6 +57,7 @@ NGS.prototype.close_window = function(id) {
 	this.windows[id] && this.windows[id].destroy();
 };
 
+
 NGS.prototype.add_data = function() {
 	var data = [];
 	$$('input[type=checkbox]').each(function(el) {
@@ -65,6 +66,15 @@ NGS.prototype.add_data = function() {
 		}
 	});
 	//console.debug(data);
+};
+
+
+NGS.prototype.do_trim = function(id) {
+	document.location.replace('/project/ngs/tools/app_fastxtr?pid=' + this.pid + ';f=' + id);
+};
+
+NGS.prototype.do_qc = function(id) {
+	document.location.replace('/project/ngs/tools/app_fastqc?pid=' + this.pid + ';f=' + id);
 };
 
 var ngs, window;

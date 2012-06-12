@@ -14,6 +14,7 @@ __PACKAGE__->sequence('ngs_job_id_seq');
 __PACKAGE__->has_a(project_id => 'DNALC::Pipeline::NGS::Project');
 
 __PACKAGE__->has_many(job_params => 'DNALC::Pipeline::NGS::JobParam');
+__PACKAGE__->has_many(input_files => 'DNALC::Pipeline::NGS::JobInputFile');
 
 __PACKAGE__->add_trigger(before_create => sub {
 	$_[0]->{created} ||= POSIX::strftime "%Y-%m-%d %H:%M:%S", localtime(+time);
@@ -27,12 +28,19 @@ sub _get_next_id {
 
 
 sub attrs {
-	my ($class) = @_;
+	my ($self) = @_;
 	my %data;
-	for ($class->job_params) {
+	for ($self->job_params) {
 		$data{$_->name} = $_->value;
 	}
 	\%data;
+}
+
+sub input_files_x {
+	my ($self) = @_;
+	my @data = grep {$_->{type} eq 'input' } $self->job_params;
+
+	wantarray ? @data : \@data;
 }
 
 sub status {
