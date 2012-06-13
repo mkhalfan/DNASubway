@@ -15,6 +15,7 @@
 					include genomes - <% $form->{genome} || $i->{value} |html%>
 %				} elsif ($i->{display_type}) {
 					<div><& $i->{display_type}, pm => $pm, element => $i, filter => $app_input_filter,
+						input_files_only => $app->{conf}->{_input_only_files},
 						user_value => defined $form->{$i->{id}} ? $form->{$i->{id}} : (ref $i->{value} ? $i->{value}->{default} : $i->{value}) &>
 					</div>
 %				} else {

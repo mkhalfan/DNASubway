@@ -12,9 +12,9 @@
 		{ id => 'library_type',			hidden => 0, value => 'fr-unstranded', label => 'Library type', },
 		{ id => 'mate_inner_dist',		hidden => 0, value => '200', label => 'Mate inner distance', },
 		{ id => 'mate_std_dev',			hidden => 0, value => '20', label => 'Mate distance stdev', },
-		{ id => 'max_deletion_length',	hidden => 0, value => '0', label => 'Maxium deletion length', },
-		{ id => 'max_insertion_length', hidden => 0, value => '0', label => 'Maxium insertion length', },
-		{ id => 'max_intron_length',	hidden => 0, value => '0', label => 'Maxium intron length', },
+		{ id => 'max_deletion_length',	hidden => 0, value => '3', label => 'Maxium deletion length', },
+		{ id => 'max_insertion_length', hidden => 0, value => '3', label => 'Maxium insertion length', },
+		{ id => 'max_intron_length',	hidden => 0, value => '50000', label => 'Maxium intron length', },
 		{ id => 'max_multihits',		hidden => 0, value => '20', label => 'Maxium multiple hits to genome', },
 		{ id => 'min_anchor_length',	hidden => 0, value => '8', label => 'Minimum anchor length', },
 		{ id => 'min_intron_length',	hidden => 0, value => '70', label => 'Minimum intron length', },
@@ -23,7 +23,9 @@
 		{ id => 'splice_mismatches',	hidden => 0, value => '0', label => 'Mate distance stdev', },
 	],
 	_task_name => 'ngs_tophat',
-	_input_file_filter => qr/\.fastq$/,
-	_output_dir => qr/\/tophat_out$/,
-	_output_files => qr/sorted\.bam$/,
+	_input_only_files => 1,				# show only the files marked as `is_input` in the drop down selector
+	_input_file_filter => qr/\.fastq$/, # show only the files matching this RE in the drop down selector
+	_output_dir => qr/\/tophat_out$/,   # folder to search for - here we have the output file(s)
+	_output_files => qr/sorted\.bam$/,  # output files we need to process
+	_propagate_input_file_name => 1, # output file should have the same basename as the input
 }

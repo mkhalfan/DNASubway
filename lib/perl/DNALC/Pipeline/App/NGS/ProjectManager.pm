@@ -193,6 +193,7 @@ use Data::Dumper;
 				file_name => $params->{file_name},
 				file_path => $params->{file_path},
 				file_type => $file_type,
+				is_input => $params->{is_input} || 0,
 			});
 	}
 	
@@ -375,17 +376,18 @@ use Data::Dumper;
 		}
 
 		# if there are the inputs with {display_type => 'show_files'}
-		#
-		my %input_files = ();
+		#	- basically we replace the file id's when we send the data to the API
+		#	- we keep track of the replaced data, in case we hit an error
+		#my %input_files = ();
 		my @input_files = ();
 		for my $input (grep {defined $_->{display_type} && $_->{display_type} eq 'show_files'} @{$app->inputs}) {
 			if (defined $params->{$input->{id}} && $params->{$input->{id}} =~ /^\d+$/) {
 				my $input_file = DataFile->retrieve($params->{$input->{id}});
 				next unless $input_file;
-				$input_files{$input->{id}} = {
-						'id' => $params->{$input->{id}},
-						'path' => $input_file->file_path,
-					};
+
+				# if we have a trimmed file for this selected file, make use of it!!
+				my $tdf = $input_file->trimmed_file; #DataFile->retrieve($input_file->trimmed_file_id);
+				$input_file = $tdf if $tdf;
 
 				push @input_files, {
 							app_input_id => $input->{id},
@@ -396,18 +398,14 @@ use Data::Dumper;
 			}
 		}
 
-		print STDERR "ProjectManager::submit_job: params = ", Dumper($params), $/;
-		#print STDERR "ProjectManager::submit_job: INPUT FILEZ = ", Dumper(\@input_files), $/;
+		print STDERR "ProjectManager::submit_job: params = ", Dumper($params), $/ if $self->debug;
 		my $jobdb; #
 
 		my $job_ep = $apif->job;
 		my $job_st = $job_ep->submit_job($app, %$params);
 
 		# this sux
-		# revert altered input fileds
-		#for (keys %input_files) {
-		#	$params->{$_} = $input_files{$_}->{id};
-		#}
+		# revert the values of the input parameters we changed 20 lines above
 		for my $if (@input_files) {
 			 $params->{ $if->{app_input_id} } = $if->{file_id};
 		}
@@ -438,7 +436,7 @@ use Data::Dumper;
 				# cache status
 				#my $mc_key = sprintf("ngs-%d-%s", $self->project->id, $app->id);
 
-				# add input files
+				# add input files to the job object
 				for my $if (@input_files) {
 					$jobdb->add_to_input_files({
 							file_id => $if->{file_id},
@@ -447,7 +445,6 @@ use Data::Dumper;
 						});
 					#$mc_key .= '-' . $if->{file_id};
 				}
-				#$self->{_mc}->set($mc_key, 'pending');
 
 				# keep track of this job, so that we can check it's status
 				$self->track_job({ job => $jobdb, token => $self->api_instance->token});

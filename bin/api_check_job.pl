@@ -20,7 +20,6 @@ my $debug = shift;
 
 #----------------------
 
-#my $jts = DNALC::Pipeline::NGS::JobTrack->search(token => "22277cfff376bc4c599396c7d0074808");
 my $jts = DNALC::Pipeline::NGS::JobTrack->search(tracker_status => '');
 
 while (my $jt = $jts->next) {
@@ -101,7 +100,7 @@ while (my $jt = $jts->next) {
 					$pm->$output_handler($job, \@data_files);
 				}
 				else {
-					print STDERR  "No [on_success] handler defined for [", $app_conf->{id},"]\n";
+					print STDERR  "No [on_success] handler defined for [", $app_conf->{id},"]\n" if $debug;
 					if (@data_files) {
 						#print STDERR Dumper( \@data_files ), $/ if $debug;
 						$src_id = DNALC::Pipeline::NGS::DataSource->create({
@@ -115,15 +114,35 @@ while (my $jt = $jts->next) {
 					}
 
 					if ($src_id) {
+						my $counter = 0;
+						my $base_name = '';
+						my @job_input_files = $job->input_files;
+						if (@job_input_files == 1) {
+							$base_name = $job_input_files[0]->file->file_name;
+							$base_name =~ s/\.(.*?)$//;
+						}
+
 						for my $df (@data_files)  {
 							my ($file_type) = $df->path =~ /\.(.*?)$/;
+							my $fname = $df->name;
+
+							# keep the same basename for the file
+							if ($app_conf->{_propagate_input_file_name}) {
+								if ($base_name) {
+									$fname = $base_name . sprintf("%s.%s", $counter > 1 ? $counter : '', $fname =~ /\.(.*?)$/);
+								}
+							}
+
+							print STDERR  'output file: ', $fname, $/ if $debug;
+							#next;
 							my $data_file = DNALC::Pipeline::NGS::DataFile->create({
 									project_id => $job->project_id,
 									source_id => $src_id,
-									file_name => sprintf("(%s-%d) %s", $task, $job->id, $df->name),
+									file_name => $fname,
 									file_path => $df->path,
 									file_type => $file_type || '',
 								});
+							$counter++;
 						}
 					} # end if($src_id)
 				}

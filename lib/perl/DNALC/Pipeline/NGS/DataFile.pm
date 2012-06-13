@@ -27,7 +27,7 @@ sub source {
 
 sub trimmed_file {
 	my $file = shift;
-	return $file->trimmed_file_id;
+	return __PACKAGE__->retrieve($file->trimmed_file_id);
 }
 
 sub qc_report {

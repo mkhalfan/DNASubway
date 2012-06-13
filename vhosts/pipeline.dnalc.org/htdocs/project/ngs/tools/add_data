@@ -68,6 +68,7 @@
 				my $f = $pm->add_data({
 							file_name => basename($file_to_add),
 							file_path => $current_path . "/" . $file_to_add,
+							is_input => 1,
 						},
 						{_no_remote_check => 0} # do check if files exist
 					);
