@@ -1664,6 +1664,61 @@
 		});
 	}
 	
+	/*
+	 * Edit the name of the pair in the consensus editor
+	 *
+	 */
+	phy.edit_pair_name = function () {
+		$('pair-title').toggle();
+		$('edit-pair-title').toggle();
+		$('edit-name-link').toggle();
+		$('save-name-link').toggle();
+	}
+	/*
+	 * Save the name of the pair in the database after changing it in the consensus editor
+	 *
+	 */
+	phy.save_pair_name = function (name, num, pair_id) {
+		if (name == ''){
+			top.show_messages('Enter a name for your pair');
+			return;
+		}
+		if (name.length > 128){
+			top.show_messages('Pair name must be less than 128 characters');
+			return;
+		}
+		var regex = /[^-_.\w\d]/;
+		if (regex.exec(name)){
+			top.show_messages('Pair names can only contain letters, numbers, periods, dashes, and underscores. Spaces and special characters are not allowed.');
+			return;
+		}
+		new Ajax.Request('/project/phylogenetics/tools/save_pair_name', {
+			method:'get',	
+			parameters: {'pair_id': pair_id, 'name': name},
+			onSuccess: function(transport){
+				var response = transport.responseText || "{'status':'error', 'message':'No response'}";
+				var r = response.evalJSON();
+				if (r.status == 'success') {
+					$('pair-title').update('Pair ' + num + ': ' + name);
+					$('edit-pair-title').toggle();
+					$('pair-title').toggle();
+					$('edit-name-link').toggle();
+					$('save-name-link').toggle();
+					$$('div.pair-id-block.active small').each(function(el) {
+						el.update(name);
+					});
+				}
+				else {
+					top.show_messages('Error: ' + r.message);
+				}
+			},
+			onFailure: function(){					
+				alert('Something went wrong!\nAborting...');
+			}
+		});		
+	}
+	
+	
 
 	phy.add_data = function () {
 		var seq_src = $$('input[type="radio"]').find(function(el){

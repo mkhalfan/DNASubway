@@ -737,7 +737,77 @@ span.bold {
 	text-transform: uppercase;
 	letter-spacing: .2em;
 	font-family: courier new, courier, monospace;
+}
 
+#view-consensus{
+	font-family:arial;
+}
+
+#view-consensus #pair-menu{
+	width: 15%;
+	float:left;
+	overflow: none;
+}
+
+#view-consensus .pair-id-block{
+	padding-bottom:3px;
+	border-top:1px solid white;
+	border-bottom:1px solid white;
+	overflow:hidden;
+}
+#view-consensus .pair-id-block a{
+	text-decoration:none;
+	display:block;
+	color:#006699;
+	font-weight:bold;
+}
+#view-consensus .pair-id-block a small{
+	color:#996600;
+	font-weight:normal;
+}
+#view-consensus .pair-id-block:hover{
+	background-color:#F8FAFC;
+	border-top:1px solid #e0e9f6;
+	border-bottom:1px solid #e0e9f6;
+}
+#view-consensus .pair-id-block.active{
+	background-color:#F8FAFC;
+	border-top:1px solid #e0e9f6;
+	border-bottom:1px solid #e0e9f6;
+}
+
+#view-consensus #pair-title-block{
+	background-color:white;
+	padding-bottom:4px;
+	font-weight:bold;
+	height:24px;
+}
+#view-consensus #pair-title-block a{
+	color:#006699;
+}
+
+#view-consensus #pair-title{
+	float:left;
+	max-width:75%;
+	white-space:nowrap;
+	overflow:hidden;
+}
+
+
+#view-consensus #edit-name-link, #view-consensus #save-name-link{
+	font-family:courier;
+	font-size:xx-small;
+	padding-top:3px;
+	float:left;
+	font-weight:normal;
+	color:#006699;	
+	padding-left:5px;
+}
+
+#view-consensus #edit-panel{
+	width: 85%;
+	float:left;
+	background:#e0e9f6;
 }
 
 #view-consensus .non-match {
@@ -746,19 +816,22 @@ span.bold {
 }
 
 #view-consensus .new-nucleotide-option {
-	margin-left:5px;
+	margin:0 5px;
 	cursor: pointer;
 	border: 1px solid black;
-	padding-left:2px;
-	padding-right:2px;
+	padding:1px 3px;
+	font-family:courier;
+}
+#view-consensus .new-nucleotide-option:hover {
+	background-color:#ff9999;
 }
 
 #view-consensus .current-nucleotide {
-	margin-left:5px;
+	margin:0 5px;
 	border: 1px solid black;
 	cursor: pointer;
-	padding-left:2px;
-	padding-right:2px;
+	padding:1px 3px;
+	font-family:courier;
 }
 
 #view-consensus .changed-base {
@@ -771,27 +844,35 @@ span.bold {
 }
 
 #view-consensus #labels {
-float:left; 
-padding-left:10px;
-padding-top:10px;
-padding-right:15px;
+	float:left; 
+	padding-left:10px;
+	padding-top:10px;
+	padding-right:15px;
 }
 
 #view-consensus #colons {
-float:left; 
-padding-top:10px;
-padding-right:5px;
+	float:left; 
+	padding-top:10px;
+	padding-right:5px;
 }
 
 #view-consensus #sequences {
-overflow:auto;
-padding-top:10px;
-white-space:nowrap;
+	overflow:auto;
+	padding-top:10px;
+	white-space:nowrap;
 }
 
 #view-consensus ul {
-list-style-type:none; margin:0; padding: 5px;
+	list-style-type:none;
+	margin:0;
+	padding:5px;
 }
+
+#view-consensus #change_base_area{
+	padding-top:10px;
+	padding-left:10px;
+}
+
 
 #view-seqs-help-bubble{
 position:absolute;

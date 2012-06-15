@@ -120,7 +120,8 @@ google.load("search", "1");
 		$sid =~ s/\D//g;
 		my $pair = DNALC::Pipeline::Phylogenetics::Pair->retrieve($sid);
 		if ($pair) {
-			$display_id = lcs_name( map {$_->seq->display_id} $pair->paired_sequences);
+			#$display_id = lcs_name( map {$_->seq->display_id} $pair->paired_sequences);
+			$display_id = $pair->name;
 		}
 	}
 	

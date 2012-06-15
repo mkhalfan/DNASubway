@@ -100,7 +100,8 @@
 	for my $pair ($pm->pairs) {
 		next unless $pair->consensus;
 		my @pair_sequences = $pair->paired_sequences;
-		my $name = lcs_name( map {$_->seq->display_id} @pair_sequences);
+		#my $name = lcs_name( map {$_->seq->display_id} @pair_sequences);
+		my $name = $pair->name;
 		$name =~ s/[-_\s]+$//;
 		push @{$sequence_groups{init}}, { name => "Pair $name", id => "p$pair"};
 		$available_sequences{ "p$pair" } = 1;

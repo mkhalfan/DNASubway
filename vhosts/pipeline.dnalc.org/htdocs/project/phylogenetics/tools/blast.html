@@ -5,7 +5,7 @@
 	<div id="seqids">
 		<pre>
 % for (@pairs) {
-%	my $name = lcs_name( map {$_->seq->display_id} $_->paired_sequences);
+%	my $name = $_->name;
 <span id="x<% $_ |html %>"><% $name |html%></span>
 % }
 % for (@sequences) {

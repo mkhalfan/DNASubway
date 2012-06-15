@@ -1,27 +1,38 @@
+<div id="container_data_line">&nbsp;</div>
 <div id="view-consensus">
 % unless ($proj) {
 	Error: can't open project "<% $pid|html%>".
 % } 
 % else {
-	<div style="color:#996600;width: 15%;float:left;overflow: none;">
+	<div id="pair-menu">
 	<ul>
 %	my $cnt = 1;
 %	for my $p (@pairs) {
 		<li>
-			<div><a style="color: #006699; font-weight: bold; text-decoration: none;" href="./view_consensus?pid=<%$pid |html%>;pair_id=<% $p->id %>">Pair <% $cnt++%></a></div>
-			<small><% lcs_name( map {$_->seq->display_id} $p->paired_sequences) |html%></small>
+			<div class="pair-id-block<% ($cnt == $num ? " active" : "")%>">
+				<a href="./view_consensus?pid=<%$pid |html%>;pair_id=<% $p->id %>;num=<% $cnt %>">Pair <% $cnt++ %><br />
+				<small><% $p->name |html%></small></a>
+			</div>
 		</li>
 %	}
 	</ul>
 	</div>
-	<div style="width: 85%;float:left;background:silver;">
+	<div id="edit-panel">
 %	if ($pair) {
-		<div>Pair <strong><% lcs_name( map {$_->seq->display_id} $pair->paired_sequences) |html%></strong></div>
+		<div id="pair-title-block">
+			<div id="pair-title">Pair <% $num %>: <% $pair->name |html%></div>
+			<div id="edit-pair-title" style="float:left;display:none">Pair <% $num %>: <input type="text" name="pair-name" id="pair-name" value="<% $pair->name |html%>" maxlength="128"/></div>
+			<div id="edit-name-link">[<a href="javascript:;" onclick="phy.edit_pair_name();">Edit Name</a>]</div>
+			<div id="save-name-link" style="display:none;">[<a href="javascript:;" onclick="phy.save_pair_name($('pair-name').value, <% $num %>, <% $pair %>);">Save</a>] [<a href="javascript:;" onclick="phy.edit_pair_name();">Cancel</a>]</div>
+			<div style="clear:both;height:0px">&nbsp;</div>
+		</div>
+		<div style="clear:both;height:0px">&nbsp;</div>
 		<div style="overflow: auto;" class="monospace">
-			<div id="labels">
+			<div id="labels" style="color:#996600">
 				<div id="seq1_name"></div>
 				<div id="seq2_name"></div>
 				<div id="consensus_div_name"></div>
+				<div style="color:#006699;font-family:courier;font-size:xx-small;padding-top:3px;">[<a href="" style="color:#006699;font-family:courier;font-size:xx-small;">Trim Consensus</a>]</div>
 			</div>
 			<div id="colons" style="display:none">
 				<div>:</div>
@@ -36,12 +47,12 @@
 		</div>
 		
 		<p><img id="progress" style="padding-left:100px;display:none" src="/images/ajax-loader-2.gif" alt=""></p> 
-		<div id="change_base_area" class="monospace" style="padding-top:15px;padding-left:5px;"></div>
+		<div id="change_base_area" class="monospace"></div>
 		<div id="trace_canvas_div" style="display:none; padding:20px;">
 			<canvas id="trace_viewer_1" height="210" style="margin-right:10px;">Your browser doesnt support canvas objects.</canvas>
 			<canvas id="trace_viewer_2" height="210">Your browser doesnt support canvas objects.</canvas>
 		</div>
-		<div id="save_changes_button_div">
+		<div id="save_changes_button_div" style="background-color:white;padding-top:8px;">
 			<input type="button" id="save_changes_btn" value="Save Changes" onclick="phy.consensus_change()" style="margin-left:5px;display:none"/>
 		</div>
 
@@ -56,12 +67,15 @@
 	</div>
 % }
 </div>
+<div style="clear: both;">&nbsp;</div>
+<div id="container_data_lineBottom">&nbsp;</div>
 
 
 %#----------------------------------------------------------------------------
 <%args>
 	$pid => 0
 	$pair_id => 0
+	$num => 1
 </%args>
 %#----------------------------------------------------------------------------
 <%once>
