@@ -614,6 +614,9 @@ use Bio::Trace::ABIF ();
 					confess "Can't add sequence $s->{seq_id} to pair in project " . $self->project;
 				}
 			}
+			my $pair_name = lcs_name( map {$_->seq->display_id} $pair->paired_sequences);
+			$pair->name(substr $pair_name, 0, 128);
+			$pair->update;
 		});
 		
 		return $pair;
@@ -687,7 +690,8 @@ use Bio::Trace::ABIF ();
 		for my $pair ($self->pairs) {
 			next if ($has_selected_sequences && !defined $selected_sequences{"p$pair"});
 			next unless $pair->consensus;
-			my $name = lcs_name( map {$_->seq->display_id} $pair->paired_sequences);
+			#my $name = lcs_name( map {$_->seq->display_id} $pair->paired_sequences);
+			my $name = $pair->name;
 			push @data, ">" . $name;
 			push @data, $pair->consensus;
 		}
@@ -903,6 +907,9 @@ use Bio::Trace::ABIF ();
 	# these can be selected and sored in Memcached or all alignable sequences
 	# if $realign is true, we get the last alignment and we re-align it (sometimes
 	# a trimmed alignment can be realigned)
+	#
+	# @param realign	if true, we get the last alignment and we re-align it
+	# @param trim		if true, this alignment will be trimmed
 	#-----------------------------------------------------------------------------
 	sub build_alignment {
 		my ($self, $realign, $trim) = @_;
