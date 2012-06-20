@@ -141,3 +141,131 @@ function pasted_data_ok() {
 	var re = /[^actugn\s\d]/i;
 	return re.test(t) == false;
 }
+
+function set_organism_type(type) {
+	if (!type)
+		return;
+	type = type.toLowerCase().replace(/^\s+/,'').replace(/\s+$/,'');
+	$('forma1').insert(new Element('input', {'type': 'hidden', 'id':'type', 'name':'type', 'value':'animals'}));
+	get_samples(type);
+	$('conProject_dispatcher').hide();
+	$('conProject_newLeft').toggle();
+	$('conProject_newRight').toggle();
+	
+	
+	$$('#conProject_newRight input[type=radio]').each(function(obj){obj.parentNode.hide()});
+
+	if (type == 'fungi') {
+		$('gf').parentNode.show();
+	}
+	else if (type == 'animals') {
+		$('ga').parentNode.show();
+	}
+	else {
+		['gm', 'gd', 'go', 'gu'].each(function(obj) {
+				$(obj).parentNode.show();
+			});
+	}
+}
+
+function get_samples(type) {
+	// remove current samples
+	var ssamples = $('specie').options;
+	while(ssamples.length) {
+		ssamples[0].remove();
+	}
+
+	new Ajax.Request('/project/get_samples',{
+		method:'get',
+		parameters: { 't': type}, 
+		onSuccess: function(transport){
+			var response = transport.responseText || "{'status':'error', 'message':'No response'}";
+			var samples = response.evalJSON();
+			samples.each (function(s) {
+				if (s) {
+					var txt = s['organism'] + ' (' + s['common_name'] + ') ' + s['segment'] + ', ' + s['len'];
+					$('specie').insert(new Element('option', {id:'o' + s['id'], value:s['id'], 'clade': s['clade']}).update(txt));
+				}
+			});
+
+		},
+		onFailure: function(){
+				alert('Something went wrong!\nAborting...');
+			}
+	});
+}
+//-------------
+// keep this at the end
+Event.observe(window, isMSIE ? 'load' : 'dom:loaded', function() {
+
+	if ($('test1')) {
+			if (!$('type')) {
+			$('conProject_newLeft').hide();
+			$('conProject_newRight').hide();
+
+			$$('#conProject_dispatcher div.btn').each(function(obj,idx) {
+				obj.observe('click', function(ev){set_organism_type(this.innerText||this.textContent)});
+			});
+		}
+		//alert($('test1').id);
+	}
+	else if ($('test2')) {
+		if ($('otypep').checked) {
+			$('clades').show();
+			['gm', 'gd', 'go', 'gu'].each(function(obj) {
+				$(obj).parentNode.show();
+			});
+			['ga', 'gf'].each(function(obj) {
+				$(obj).parentNode.hide();
+			});
+		}
+		else {
+			$('clades').hide();
+		}
+
+		$$('input[name=otype]').each(function(obj, idx) {
+			obj.observe('click', function(){ 
+				get_samples(obj.value);
+				$$('#conProject_newRight input[type=radio]').each(function(obj){obj.parentNode.hide()});
+				if (obj.value == "plants") {
+					$('clades').show();
+					['gm', 'gd', 'go', 'gu'].each(function(obj) {
+						$(obj).parentNode.show();
+					});
+				}
+				else {
+					$('clades').hide();
+				}
+				
+				$$('#forma1 input,textarea,select').each(function(obj){
+				  if (obj.id.indexOf('otype')) obj.enable();
+				});
+				
+				$('otypep').prototip.remove();
+			});
+			//console.info(obj);
+		});
+		
+		$$('#forma1 input,textarea,select').each(function(obj){
+		  if (obj.id.indexOf('otype')) obj.disable();
+		});
+		
+		var tip = new Tip('otypep', " &nbsp;Start here!", {
+				//title: "Start here",
+				border: 5,
+				radius: 5,
+				style: 'red',
+                stem: 'leftMiddle',
+                hook: { mouse: false, tip: 'leftMiddle' },
+                offset: { x: 60, y: 0 },
+                width: 90,
+				hideAfter: 5,
+				hideOn: '',
+			});
+		$('otypep').prototip.show();
+	}
+	else {
+		//alert("no");
+		$('conProject_dispatcher').hide();
+	}
+});

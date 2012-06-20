@@ -11,7 +11,21 @@
 <form id="forma1" enctype="multipart/form-data" method="post">
 <div id="conRedlineLeft1"> 
 	<div id="conProject_newLeft"> 
-		<div class="conNewPro_title">Select Sequence Source *</div> 
+
+		<div class="conNewPro_label">
+			<div class="conNewPro_title">Select Organism type *</div>
+			<div class="conNewPro_label1">
+				<span class="conNewPro_smallContainerx">
+				<input class="conRadiobox_align" type="radio" name="otype" id="otypea" value="animals" <% $otype eq "animals" ? "checked=\"checked\"" : ""%>/>&nbsp; Animals</span>
+				<span class="conNewPro_smallContainerx">
+				<input class="conRadiobox_align" type="radio" name="otype" id="otypef" value="fungi" <% $otype eq "fungi" ? "checked=\"checked\"" : ""%>/>&nbsp; Fungi</span>
+				<span class="conNewPro_smallContainerx">
+				<input class="conRadiobox_align" type="radio" name="otype" id="otypep" value="plants" <% $otype eq "plants" ? "checked=\"checked\"" : ""%>/>&nbsp; Plants</span>
+			</div>
+			<div style="clear: both;">&nbsp;</div>
+		 </div>
+	
+		<div class="conNewPro_title">Select Sequence Source *</div>
 
 		<div class="conNewPro_label">
 			<input class="conRadiobox_align" type="radio" name="seq_src" id="seq_src_upload" value="upload" onclick="select_source(this)" <% $seq_src eq "upload" ? "checked=\"checked\"" : ""%>/>&nbsp; 
@@ -36,14 +50,10 @@
 % }
 			</select>
 		</div>
-		<div style="clear: both;">&nbsp;</div>
-        <div class="conNewPro_title">Description</div>
-        <div class="conNewPro_label">&nbsp;&nbsp;&nbsp;&nbsp; Total characters (max.140): &nbsp;<span id="desc_len"><% length $description %></span></div>
-		<div>
-			<textarea id="description" name="description" cols="40" class="conStylized_box5" onkeyup="check_description_length(event);"><% $description |html %></textarea>
-		</div>
+
         <div style="clear: both;">&nbsp;</div>
-        <div style="clear: both;">&nbsp;</div>
+		<div id="con_star"><b>*</b> Required information</div>
+              <div style="clear: both;">&nbsp;</div>
         
 	</div>
 	  <!--END of ID conProject_newLeft-->
@@ -69,7 +79,7 @@
 								<input class="conStylized_box4" type="text"name="common_name" id="common_name" value="<% $common_name |html%>" maxlength="128"   />
  				 	</div> 
              <div style="clear: both;">&nbsp;</div> 
-				<div class="conNewPro_label1">
+				<div class="conNewPro_label1" id="clades">
 					<label>Class:</label>
 					<div style="clear: both;">&nbsp;</div>
 					<div class="conNewPro_label1">
@@ -83,19 +93,24 @@
 						<input class="conRadiobox_align" type="radio" name="group" id="go" value="o" <% $group eq "o" ? "checked=\"checked\"" : ""%>/>&nbsp; Other</span>
 						<span class="conNewPro_smallContainer">
 						<input class="conRadiobox_align" type="radio" name="group" id="gu" value="u" <% $group eq "u" ? "checked=\"checked\"" : ""%>/>&nbsp; I don't know</span>
-%	if (grep $s->{username}, @{$pcf->{ADMINS}}) {
 					</div>
 					<div class="conNewPro_label1">
 						<span class="conNewPro_smallContainer">
-						<input class="conRadiobox_align" type="radio" name="group" id="gh" value="h" <% $group eq "h" ? "checked=\"checked\"" : ""%>/>&nbsp; Human</span>
-%	}
+						<input class="conRadiobox_align" type="radio" name="group" id="gf" value="f" <% $group eq "h" ? "checked=\"checked\"" : ""%>/>&nbsp; Fungi</span>
+						<span class="conNewPro_smallContainer">
+						<input class="conRadiobox_align" type="radio" name="group" id="ga" value="a" <% $group eq "a" ? "checked=\"checked\"" : ""%>/>&nbsp; Animals</span>
 					</div>
  				 </div>
+				 
+		<div style="clear: both;">&nbsp;</div>
+        <div class="conNewPro_title">Description</div>
+        <div class="conNewPro_label">Total characters (max.140): &nbsp;<span id="desc_len"><% length $description %></span></div>
+		<div>
+			<textarea id="description" name="description" cols="40" class="conStylized_box5" onkeyup="check_description_length(event);"
+				style="width:300px; margin-left: 0px"><% $description |html %></textarea>
+		</div>		
 				<div style="clear: both;">&nbsp;</div> <div style="clear: both;">&nbsp;</div> 
               <div class="conBT_continue"><a id="step_one_btn" href="javascript:void(0);" onclick="javascript:step_one();"></a></div>
-              <div style="clear: both;">&nbsp;</div>
-              <div id="con_star"><b>*</b> Required information</div>
-              <div style="clear: both;">&nbsp;</div>
               <div style="clear: both;">&nbsp;</div>
 
             </div><!--END of ID conProject_newRight-->
@@ -105,6 +120,7 @@
 <input type="hidden" id="isnew" value="1" />
 % }
 </form>
+<input type="hidden" id="test2" value="1" />
 </div><!--END of ID container_rightContent-->
 %#-----------------------------------------------------------------
 <%args>
@@ -116,6 +132,7 @@
 	$group => ''
 	$sequence => ''
 	$description => ''
+	$otype => ''
 </%args>
 <%once>
 	use DNALC::Pipeline::Utils qw/nicebasepairs random_string/;
@@ -127,6 +144,12 @@
 	use Carp;
 	use IO::File ();
 	use Data::Dumper;
+	
+	my %clade_map = (
+		animals => [qw/a/],
+		fungi => [qw/f/],
+		plants => [qw/d m/],
+	);
 </%once>
 
 <%init>
@@ -137,7 +160,10 @@ my $cf = DNALC::Pipeline::Config->new;
 my $pcf = $cf->cf('PIPELINE');
 my $seq_max_len = int(($pcf->{sequence_length} || 50_000) / 1_000);
 
-my @samples = DNALC::Pipeline::Sample->search( active => 1, {order_by => "organism, segment, start"});
+#my @samples = DNALC::Pipeline::Sample->search( active => 1, {order_by => "organism, segment, start"});
+my @samples = ($otype && defined $clade_map{$otype})
+				? DNALC::Pipeline::Sample->get_by_type( @{$clade_map{$otype}})
+				: (); 
 
 my @err = ();
 
@@ -326,7 +352,8 @@ if ($r->method eq 'POST') {
 
 %#-----------------------------------------------------------------
 <%attr>
-	js => ['create_project.js']
+	js => ['create_project.js', 'prototip/prototip.js']
+	css => ['prototip.css']
 	load_window_ui => 1
 	current_section => 'red'
 </%attr>

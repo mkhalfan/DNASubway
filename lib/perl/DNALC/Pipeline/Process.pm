@@ -10,6 +10,9 @@ use Carp;
 
 {
 
+	# 
+	# constructor of the class 
+	#
 	sub new {
 		my ($class, $task_name, $project_dir) = @_;
 
@@ -26,6 +29,8 @@ use Carp;
 		unless ($pcf) {
 			return;
 		}
+
+		# checks if file exists and it's executable
 		if (! -x $pcf->{program} ) {
 			print STDERR "Program [$pcf->{program}] not found!", $/;
 			return;
@@ -38,6 +43,9 @@ use Carp;
 		$self;
 	}
 
+	#
+	# performs the setup of the Task/Run based on it's config file
+	#
 	sub _setup {
 		my ($self, $project_dir) = @_;
 
@@ -96,6 +104,9 @@ use Carp;
 		return @opts;
 	}
 
+	#
+	# executes the task/routine
+	#
 	# FIXME split this into 2 functions.. _prepare() and run()
 	sub run {
 		my ($self, %params) = @_;
@@ -117,9 +128,6 @@ use Carp;
 
 		my @opts = ($self->{conf}->{program});
 		push @opts, $self->get_options;
-		#if ($self->{work_options}) {
-		#	push @opts, @{$self->{work_options}};
-		#}
 
 		# take extra params and check if we find them in the config file
 		my $option_glue = $self->{conf}->{option_glue} || undef;
@@ -156,6 +164,8 @@ use Carp;
 				$self->{exit_status} = $?;
 			}
 			else {
+				# retirect STDIN & STDOUT
+				#
 				open OLDOUT,'>&', \*STDOUT or die "Can't dup STDOUT: $!";
 				open OLDERR, '>&', \*STDERR or die "Can't dup STDERR: $!";
 				open STDOUT, '>', $stdout_file 
