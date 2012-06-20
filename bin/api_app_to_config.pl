@@ -66,7 +66,7 @@ if ($app) {
 		"	],\n",
 		"	parameters => [\n",
 				map({
-					my ($l, $v) = ($_->{label}, $_->{defaultValue});
+					my ($l, $v) = ($_->{details}->{label}, $_->{defaultValue});
 					$l =~ s/'/\\'/g; $v =~ s/'/\\'/g;
 					"\t\t{ id => '" . $_->{id} . "', label => '". $l . "', 'value' => '" . $v . "' },\n"
 				} @params),

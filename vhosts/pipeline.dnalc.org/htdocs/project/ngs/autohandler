@@ -8,6 +8,9 @@
 
 <%init>
 	$r->content_type("text/html");
+	
+	# TODO: check session expiration
+	
 </%init>
 <%method title>
 </%method>

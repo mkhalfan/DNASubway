@@ -60,7 +60,7 @@
 	my $is_owner = $s->{user_id} == $proj->user_id if $proj;
 
 	my $app;
-	my $app_cf_file = "NGS_TH";
+	my $app_cf_file = "NGS_TOPHAT";
 	my $st = $pm->app($app_cf_file);
 
 	if ($st->{status} eq "success") {
@@ -70,8 +70,7 @@
 		print STDERR $st->{status}, " ", $st->{message}, $/;
 	}
 
-	#my $app_inputs = $app->inputs if $app;
-	#my $app_params = $app->parameters if $app;
+	#print STDERR Dumper($app), $/;
 
 	my $form = {};
 	my $flagged = {}; # to report errors
@@ -86,7 +85,7 @@
 				$form->{$p->{id}} = $p->{value} || $p->{defaultValue};
 			}
 			if ($p->{id} eq "mate_inner_dist") {
-				print STDERR "app_th: p = ", $p->{validator}, $/;
+				print STDERR "app_tophat: p = ", $p->{validator}, $/;
 			}
 		}
 
@@ -111,10 +110,10 @@
 		}
 
 		$form->{requestedTime} ||= '0:45:00';
-		#print STDERR "app_th: form = ", Dumper( $form ), $/;
+		#print STDERR "app_tophat: form = ", Dumper( $form ), $/;
 
 		$st = $pm->submit_job('ngs_tophat', $app, $form);
-		print STDERR "app_th: JOB status = ", Dumper( $st ), $/;
+		print STDERR "app_tophat: JOB status = ", Dumper( $st ), $/;
 
 		if ($st->{status} ne "success") {
 			if ($st->{message} =~ /missing required/i && $st->{data} && %{$st->{data}}) {

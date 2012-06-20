@@ -1,0 +1,66 @@
+<%args>
+	$pid => 0
+	$f => undef
+</%args>
+%#-----------------------------------------------------------------
+<%once>
+	use Data::Dumper;
+	#use DNALC::Pipeline::Utils qw(clean_query);
+	use DNALC::Pipeline::App::NGS::ProjectManager ();
+	use DNALC::Pipeline::NGS::DataFile ();
+
+
+</%once>
+%#-----------------------------------------------------------------
+<%init>
+
+	$m->session->{pipeline} ||= {};
+	my $s = $m->session->{pipeline};
+
+	my $pm = DNALC::Pipeline::App::NGS::ProjectManager->new({project => $pid, debug => 1});
+	my $proj = $pm->project;
+
+	unless ($proj) {
+		print "hmm";
+		return;
+	}
+
+	# project's owner
+	my $is_owner = $s->{user_id} == $proj->user_id if $proj;
+	
+	my ($file) = DNALC::Pipeline::NGS::DataFile->search(project_id => $proj, id => $f) if $f;
+	
+	# if $file, then share this file to dnalcadmin with canRead=true
+	# then user dnalcadmin's credentials to stream the data
+	
+	if ($file) {
+		# FAPI
+		my $cfg = $pm->config;
+		my $apif = iPlant::FoundationalAPI->new(
+			user => $cfg->{admin_user},
+			token => $cfg->{admin_pwd},
+			debug => 0,
+		);
+
+		unless ($apif->auth) {
+			print "AUTH failed\n";
+			print STDERR "stream_data::FAPI auth failed\n", $/;
+			return;
+		}
+		$pm->api_instance($apif) if $apif;
+
+		my $ok;
+		my $io = $pm->api_instance->io;
+		if ($io) {
+			# TODO
+			# - set content_type('application/octet-stream')
+			# - set filename; # disposition download...
+
+			$ok = $io->stream_file($file->file_path, stream_to_stdout => 1);
+		}
+	}
+</%init>
+
+<%flags>
+	inherit => undef
+</%flags>

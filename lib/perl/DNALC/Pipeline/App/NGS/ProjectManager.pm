@@ -177,7 +177,7 @@ use Data::Dumper;
 			}
 		}
 		else {
-			print STDERR  "__add_data__: Not checking if file exists.", $/ if $self->debug;
+			Carp::croak ("__add_data__: Not checking if file exists.\n");
 		}
 
 		my $data_src = DataSource->insert ({
@@ -319,6 +319,7 @@ use Data::Dumper;
 
 		my @params = ();
 		my %app_params = map {$_->{id} => $_} @$app_params;
+		#print STDERR Dumper( $app_cf->{parameters} ), $/;
 
 		for my $cf_param (@{$app_cf->{parameters}}) {
 			my $id = $cf_param->{id};
@@ -461,6 +462,7 @@ use Data::Dumper;
 					}
 				}
 
+				print STDERR  'TODO: move job_params to NGS::Job', $/;
 				# add the rest of the job parameters
 				for my $name (sort keys %$api_job) {
 					next if $name =~ /^(?:inputs|parameters|status)$/;

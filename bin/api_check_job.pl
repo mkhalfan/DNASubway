@@ -29,8 +29,7 @@ while (my $jt = $jts->next) {
 	my $user = DNALC::Pipeline::User->retrieve($jt->user_id);
 	print $jt, " ", $job, " ", $user->username, $/ if $debug;
 	my $fapi = iPlant::FoundationalAPI->new( user => $user->username, token => $jt->token );
-	#print STDERR  "FAPI: ", $fapi->auth, $/;
-	#print STDERR Dumper( $fapi), $/;
+	#$fapi->debug($debug);
 
 	if ($fapi->auth) { # if successfully authenticated 
 		my $pm = DNALC::Pipeline::App::NGS::ProjectManager->new({project => $job->project_id});
@@ -39,6 +38,10 @@ while (my $jt = $jts->next) {
 		my $job_ep = $fapi->job;
 		my $api_job = $job_ep->job_details($jt->api_job_id);
 		next unless ref($api_job);
+
+		# ths mostly sets startTime, endTime
+		$job->set_params($api_job);
+
 		#print STDERR Dumper( $api_job), $/;
 		my $api_status = $api_job->{status};
 
@@ -48,34 +51,17 @@ while (my $jt = $jts->next) {
 		if ($api_status =~ /(?:FINISHED|KILLED|FAILED|STOPPED|ARCHIVING_FINISHED|ARCHIVING_FAILED)/) {
 			# the job hit a terminal stage: it will not change it's status
 
-			# FIXME: set submitTime, startTime, endTime
 			$jt->token('');
 			if ($api_status =~ /(?:FINISHED|ARCHIVING_FINISHED)/) {
 				$jt->tracker_status('success');
 				$job->status_id(2); # done
 
-				my $task = $job->task_id;
-				# FIXME
-				if ($task == 32) {
-					$task = uc 'ngs_th';
-				}
-				elsif ($task == 33) {
-					$task = uc 'ngs_cufflinks';
-				}
-				elsif ($task == 34) {
-					$task = uc 'ngs_cuffdiff';
-				}
-				elsif ($task == 35) {
-					$task = uc 'ngs_fastqc';
-				}
-				elsif ($task == 36) {
-					$task = uc 'ngs_fxtrimmer';
-				}
+				my $task = $job->task_id->name;
 
-				print STDERR  '$task = ', $task, $/ if $debug;
+ 				print STDERR  '$task = ', $task, $/ if $debug;
 
 				my $job_name = $job->attrs->{name};
-				my $app_conf = DNALC::Pipeline::Config->new->cf($task);
+				my $app_conf = DNALC::Pipeline::Config->new->cf(uc $task);
 
 				my $io_ep = $fapi->io;
 				my $all_files    = $io_ep->ls($api_job->{archivePath});
@@ -91,6 +77,15 @@ while (my $jt = $jts->next) {
 					if $data_dir;
 
 				print STDERR 'data_files: ', "@data_files", $/ if $debug;
+
+				#
+				# mark output file are shared so $DNALCADMIN user be able to read them
+				my $ngs_cfg = DNALC::Pipeline::Config->new->cf('NGS');
+				for (@data_files) {
+					print STDERR  '++ sharing file ', $_->name, $/ if $debug;
+					my $st = $io_ep->share($_->path, $ngs_cfg->{admin_user}, canRead => 1);
+					#print STDERR '++ shared: ', Dumper( $st ), $/;
+				}
 
 				my $src_id;
 				
@@ -134,7 +129,6 @@ while (my $jt = $jts->next) {
 							}
 
 							print STDERR  'output file: ', $fname, $/ if $debug;
-							#next;
 							my $data_file = DNALC::Pipeline::NGS::DataFile->create({
 									project_id => $job->project_id,
 									source_id => $src_id,
