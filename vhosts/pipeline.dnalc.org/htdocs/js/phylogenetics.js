@@ -1860,6 +1860,9 @@
 					$$('div.pair-id-block.active small').each(function(el) {
 						el.update(name);
 					});
+					$$('.pair-id-block.active').each(function(el){
+						el.title=name;
+					});
 				}
 				else {
 					top.show_messages('Error: ' + r.message);
