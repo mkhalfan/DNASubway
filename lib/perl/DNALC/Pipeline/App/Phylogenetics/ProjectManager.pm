@@ -13,7 +13,7 @@ use File::Copy;
 use File::Slurp qw/slurp/;
 use Carp;
 use Digest::MD5();
-use POSIX q/strftime/;
+use POSIX qw/strftime floor/;
 use Data::Dumper;
 
 #use DNALC::Pipeline::ProjectLogger ();
@@ -901,6 +901,116 @@ use Bio::Trace::ABIF ();
 
 		return $consensus;
 	}
+		
+	#
+	# Updates the consensus sequence with the trimmed consensus from the
+	# consensus editor. Will update both the 'consensus' and 'alignment' columns
+	# in the phy_pair table
+	#
+	# @param left		the number of base pairs to trim from the left side
+	# @param right		the number of base pairs to trim from the right side
+	# @param pair_id	the pair id
+	#----------------------------------------------------------------------------
+	sub trim_consensus{
+		my ($self, $args) = @_;
+		
+		my $pair = Pair->retrieve($args->{pair_id});
+		
+		unless ($pair){
+			return {status=> "error", msg => 'no such pair found'};
+		}
+
+		my $alignment = $pair->alignment;
+		my $consensus = $pair->consensus;
+
+		# here we check to ensure the length of the trim values are not greater
+		# than half the length of the entire sequence
+		my $max_l = floor((length $consensus) / 2);
+		if ($args->{left} > $max_l || $args->{right} > $max_l ){
+			return {status=> "error", msg => "Invalid trim values specified. Trim values cannot be greater than $max_l."};
+		}
+
+		# the new, trimmed consensus is a substring of the original consensus starting
+		# from the value of left, running the length of the consensus minus the left trim
+		# amount and minus the right trim amount
+		my $new_length = (length $consensus) - $args->{left} - $args->{right};
+		my $new_consensus = substr $consensus, $args->{left}, $new_length;
+
+		# parse the individual sequences from the alignment so you can manipulate them
+ 		my @alignment_line_1 = (split(/\s*:\s*/,(split('\n', $alignment))[0]));
+        my @alignment_line_2 = (split(/\s*:\s*/,(split('\n', $alignment))[1]));
+		my @alignment_line_3 = (split(/\s*:\s*/,(split('\n', $alignment))[2]));
+        my ($display_name_1, $seq1) = ($alignment_line_1[0], $alignment_line_1[1]); # Sequence 1
+        my ($display_name_2, $seq2) = ($alignment_line_2[0], $alignment_line_2[1]); # Sequence 2
+		my ($display_name_3, $seq3) = ($alignment_line_3[0], $alignment_line_3[1]); # Sequence 3 (consensus)
+
+		# This code below is to determine the strands for each of the 2 sequences in the 
+		# alignment field (which seq is the forward and which is the reverse)
+		my @pair_sequences = $pair->paired_sequences;
+	 	# @seq has the 2 DataSequence objects belonging to a pair
+        my @seq = map {$_->seq_id} @pair_sequences;
+
+        my ($ds_id_1, $df_id_1, $lt1, $rt1) = map {$_ && ($_->id, $_->file_id, length($_->left_trim), length($_->right_trim))}
+                grep { $_->display_id eq $display_name_1 } @seq;
+        my ($ds_id_2, $df_id_2, $lt2, $rt2) = map {$_ && ($_->id, $_->file_id, length($_->left_trim), length($_->right_trim))}
+                grep { $_->display_id eq $display_name_2 } @seq;
+
+        my ($df_1_strand) = map {$_ && $_->strand} grep { $_->seq_id eq $ds_id_1} @pair_sequences;
+        my ($df_2_strand) = map {$_ && $_->strand} grep { $_->seq_id eq $ds_id_2} @pair_sequences;
+		
+		# using the unmodified alignment, determine the number of actual nucleoties 
+		# (not including dashes) which are trimmed from the sequences. These values 
+		# are needed for when you need to call up the mini traces in the consensus
+		# editor (so you can get the right position in the trace file). And this is
+		# why we needed/computed the strands in the above step.
+		my $real_f_trim = int($pair->f_trim);
+		my $real_r_trim = int($pair->r_trim);
+		print STDERR "\n\n df_1_strand: $df_1_strand\n\n";
+		if ($df_1_strand eq "F"){
+			my $seq_f = substr $seq1, 0, $args->{left};
+        	my $dash_count_f = ($seq_f =~ s/-//g);
+        	$real_f_trim += ($args->{left} - $dash_count_f);
+
+			my $seq_r = substr $seq2, 0, $args->{left};
+        	my $dash_count_r = ($seq_r =~ s/-//g);
+			$real_r_trim += ($args->{left} - $dash_count_r);
+
+        	print STDERR "\n\nreal left trim: $real_f_trim | real right trim: $real_r_trim\n\n";
+		}
+		else {
+			my $seq_f = substr $seq2, 0, $args->{left};
+            my $dash_count_f = ($seq_f =~ s/-//g);
+            $real_f_trim += ($args->{left} - $dash_count_f);
+
+            my $seq_r = substr $seq1, 0, $args->{left};
+            my $dash_count_r = ($seq_r =~ s/-//g);
+			$real_r_trim += ($args->{left} - $dash_count_r);
+
+            print STDERR "\n\nreal left trim: $real_f_trim | real right trim: $real_r_trim\n\n";
+		}	
+		
+		# modify the sequences in the alignment
+		$seq1 = substr $seq1, $args->{left}, $new_length;
+		$seq2 = substr $seq2, $args->{left}, $new_length;
+		$seq3 = substr $seq3, $args->{left}, $new_length;
+		
+		# create the new alignment
+		my $new_alignment = "$display_name_1 : $seq1\n$display_name_2 : $seq2\n$display_name_3 : $seq3";
+		
+		# update the DB with the new consensus and alignment
+		$pair->consensus($new_consensus);
+		$pair->alignment($new_alignment);
+		$pair->f_trim($real_f_trim);
+		$pair->r_trim($real_r_trim);
+
+		if ($pair->update){
+			return {status=> "success"};
+		}
+		else{
+			return {status=> "error", message=> "failed to update db"};
+		}	
+
+	}
 
 	#
 	# builds an alignment from the projects' sequences
@@ -1247,7 +1357,7 @@ use Bio::Trace::ABIF ();
 				print STDERR "Error storing alignment: $@", $/;	
 				return;
 			}
-			print STDERR Dumper( $aln ), $/;
+			#print STDERR Dumper( $aln ), $/;
 
 		}
 

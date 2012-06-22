@@ -6,7 +6,7 @@ use DNALC::Pipeline::Phylogenetics::PairSequence ();
 
 __PACKAGE__->table('phy_pair');
 __PACKAGE__->columns(Primary => qw/pair_id/);
-__PACKAGE__->columns(Essential => qw/project_id alignment consensus name/);
+__PACKAGE__->columns(Essential => qw/project_id alignment consensus name f_trim r_trim/);
 __PACKAGE__->sequence('phy_pair_pair_id_seq');
 
 __PACKAGE__->has_a(project_id => 'DNALC::Pipeline::Phylogenetics::Project');
