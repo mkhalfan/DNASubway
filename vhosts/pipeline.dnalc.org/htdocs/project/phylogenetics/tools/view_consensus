@@ -32,7 +32,7 @@
 				<div id="seq1_name"></div>
 				<div id="seq2_name"></div>
 				<div id="consensus_div_name"></div>
-				<div id="trim-link" class="text-links">[<a href="javascript:;" onclick="phy.enable_trim();">Trim Consensus</a>]</div>
+				<div id="trim-link" class="text-links" style="display:none;">[<a href="javascript:;" onclick="phy.enable_trim();">Trim Consensus</a>]</div>
 				<div id="trim-exit-link" style="display:none;" class="text-links">[<a href="javascript:;" onclick="phy.exit_trim();">Exit Trim Mode</a>]</div>
 			</div>
 			<div id="colons" style="display:none">

@@ -1439,8 +1439,8 @@
 			else{
 				//temp = "<span>" + consensus.charAt(i) + "</span>";
 				consensus_span = new Element('span', {'position': i+1}).update(consensus.charAt(i));
-				seq1_span = new Element('span', {'position': i+1}).update(seq1.charAt(i));
-				seq2_span = new Element('span', {'position': i+1}).update(seq2.charAt(i));
+				seq1_span = new Element('span').update(seq1.charAt(i));
+				seq2_span = new Element('span').update(seq2.charAt(i));
 			}
 			
 			$('consensus_div_seq').insert(consensus_span);
@@ -1450,6 +1450,11 @@
 			// Initially, set the save_changes_button to be disabled
 			$('save_changes_btn').disabled = true;
 		} 
+		
+		// We load the 'trim consensus' button as being having display:none (inline css)
+		// because we want the button to appear only after the alignment has loaded. 
+		// So now, we can set it to display. 
+		$('trim-link').show();
 	};
 	
 	/*
