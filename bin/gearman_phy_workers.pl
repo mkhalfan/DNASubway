@@ -63,6 +63,19 @@ sub run_build_tree {
 			}
 
 			if ($tb) {
+				# Read the first line of the file..
+				# here we check to ensure there are at least
+				# 3 sequences being sent to muscle, if not
+				# return the error
+				open(my $fh, $input);
+				my $first = <$fh>;
+				close $fh;
+				$first =~ m/([0-9]+)/;
+ 				if ($1 <= 2) {
+					$status = "error";
+					$msg = "You must select at least three <b>non-empty sequences</b>.";	
+				    return nfreeze({status => $status, msg => $msg});
+				}
 				$tb->run(input => $input, debug => 0, input_is_protein => $proj->type eq 'protein');
 				$tree = $tb->get_tree;
 
