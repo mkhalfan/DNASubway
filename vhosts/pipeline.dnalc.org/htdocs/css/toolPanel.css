@@ -751,8 +751,8 @@ span.bold {
 
 #view-consensus .pair-id-block{
 	padding-bottom:3px;
-	border-top:1px solid white;
-	border-bottom:1px solid white;
+	border-top:1px solid #fdfdfd;
+	border-bottom:1px solid #fdfdfd;
 	overflow:hidden;
 }
 #view-consensus .pair-id-block a{
@@ -777,12 +777,12 @@ span.bold {
 }
 
 #view-consensus #pair-title-block{
-	background-color:white;
+	background-color:#fdfdfd;
 	padding-bottom:4px;
 	font-weight:bold;
 	height:24px;
 }
-#view-consensus #pair-title-block a{
+#view-consensus #pair-title-block a, #view-consensus .text-links a{
 	color:#006699;
 }
 
@@ -791,23 +791,38 @@ span.bold {
 	max-width:75%;
 	white-space:nowrap;
 	overflow:hidden;
+	padding-right:5px;
 }
 
-
-#view-consensus #edit-name-link, #view-consensus #save-name-link{
-	font-family:courier;
-	font-size:xx-small;
+#view-consensus .text-links{
+	font-family:arial;
+	font-size:small;
 	padding-top:3px;
 	float:left;
 	font-weight:normal;
 	color:#006699;	
-	padding-left:5px;
 }
 
 #view-consensus #edit-panel{
 	width: 85%;
 	float:left;
 	background:#e0e9f6;
+}
+
+#view-consensus .trim{
+	background-color:white;
+	cursor:pointer;
+	display:inline-block;
+}
+
+#view-consensus #consensus_div_seq.trim span:hover{
+	background-color:#999;
+}
+
+#view-consensus  #consensus_div_seq.trim span.to_trim{
+	text-decoration:line-through;
+	color:red;
+
 }
 
 #view-consensus .non-match {
@@ -858,8 +873,9 @@ span.bold {
 
 #view-consensus #sequences {
 	overflow:auto;
-	padding-top:10px;
+	margin-top:10px;
 	white-space:nowrap;
+	margin-right:3px;
 }
 
 #view-consensus ul {
@@ -871,8 +887,34 @@ span.bold {
 #view-consensus #change_base_area{
 	padding-top:10px;
 	padding-left:10px;
+	display:inline-block;
+	font-family:arial;
 }
 
+#view-consensus #trim-info{
+	font-size:12px;
+	font-family:arial;
+	color:black;
+	padding:10px;
+	margin-top:-20px;
+}
+#view-consensus #trim-info .trim_total_label{
+	width:65px;
+	display:inline-block;
+}
+#view-consensus #trim-info span{
+	margin-left:5px;
+	color:#006699;
+}
+#view-consensus #trim-info #left_trim_value, #view-consensus #trim-info #right_trim_value{
+	width:20px;
+	display:inline-block;
+	text-align:right
+}
+#view-consensus #trim-info a{
+	color:#006699;
+	font-size:10px;
+}
 
 #view-seqs-help-bubble{
 position:absolute;

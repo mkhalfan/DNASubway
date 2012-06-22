@@ -57,6 +57,11 @@
 	#my ($display_name_2, $seq2) = ($alignment_line_2[0], $alignment_line_2[1]);
 
 	
+	# Get the left and right trim values which were trimmed from the CONSENSUS! 
+	#(in the consensus editor, stored in the phy_pair table)
+	my $f_cons_trim_value = $pair->f_trim;
+	my $r_cons_trim_value = $pair->r_trim;
+	
 	for (0, 1) {
 		my ($display_name, $seq) = split('\s*:\s*', $aln_lines[$_]);
 		my $file = DNALC::Pipeline::Phylogenetics::DataFile->retrieve($pseq[$_]->seq->file_id);
@@ -88,9 +93,10 @@
 					$trimmed_end = $temp->end_pos;
 				}
 				
-				$original_seq_pos = $pos- $dash_count + $trimmed;
+				$original_seq_pos = $pos- $dash_count + $trimmed + $f_cons_trim_value;
 				($low, $high) = ($original_seq_pos - 3, $original_seq_pos + 3);
 				$low = $trimmed if $low < $trimmed;
+				
 				$high = ($trimmed_end - 1) if $temp && $high > ($trimmed_end - 1);
 				$offset = 3 - ($original_seq_pos - $trimmed)  if $original_seq_pos - $trimmed < 3;
 			}
@@ -105,7 +111,7 @@
 					$trimmed_left = length($temp->left_trim);
 				}
 				
-				$original_seq_pos = length($entire_sequence) - $pos + $dash_count - 1 - $trimmed;
+				$original_seq_pos = length($entire_sequence) - $pos + $dash_count - 1 - $trimmed - $r_cons_trim_value;
 				($low, $high) = ($original_seq_pos - 3, $original_seq_pos + 3);
 				$low = $trimmed_left if $low < $trimmed_left;
 				#$low = $trimmed if $low < $trimmed;

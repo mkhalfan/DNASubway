@@ -1,0 +1,70 @@
+{"status":"<% $status %>", "message":"<% $message %>"}
+%#-----------------------------------------------------
+<%args> 
+	$left => 0
+	$right => 0
+	$pair_id => 0
+</%args>
+
+<%once>
+	use DNALC::Pipeline::Phylogenetics::Pair;
+	use DNALC::Pipeline::App::Phylogenetics::ProjectManager ();
+	use Data::Dumper;
+	#use JSON::XS ();
+</%once>
+
+<%init>
+
+	$r->no_cache(1);
+	
+	my $status = "failed";
+	my $message = "";
+
+	#1. make sure the user is logged in (session is active)
+	my $s = $m->session->{pipeline};
+	my $now = time();
+	if (!$s->{logged_in} || ($now - $s->{last} > 3600)) {
+		print '{"status":"failed", "message":"Your session expired. Please login again."}';
+		return;
+	}
+	
+	#2. make sure we get appropriate data to trim, if not, dont even bother to search for the pair/project in the DB	
+	
+	# both values must be integers 
+	if ($left =~ /\D/ || $right =~ /\D/) {
+		print '{"status":"failed", "message":"Invalid trim values specified. Trim values must be positive integers only."}';
+		return;
+	}
+	
+	# both values should not be 0, otherwise there would be nothing to trim
+	if ($left == 0 && $right == 0) {
+		print '{"status":"failed", "message":"Nothing to trim"}';
+		return;
+	}
+	
+	#3. make sure the project of this pair belongs to the right user
+	my $pair = DNALC::Pipeline::Phylogenetics::Pair->retrieve($pair_id);
+	my $proj = $pair->project_id if $pair;
+	
+	if (!$proj || $s->{user_id} != $proj->user_id) {
+		print '{"status":"failed", "message":"Project not found!"}';
+		return;
+	}
+	
+	#4. send the data to project manager to process
+	
+	# package data to be sent
+	my $args = {left => $left, right => $right, pair_id => $pair_id};
+	
+	my $pm = DNALC::Pipeline::App::Phylogenetics::ProjectManager->new($proj);
+	my $st = $pm->trim_consensus($args);
+	$status = $st->{status};
+	$message = $st->{msg};
+	
+
+	
+</%init>
+
+<%flags>
+	inherit => undef
+</%flags>

@@ -1394,7 +1394,7 @@
 		$('seq2_name').update(display_name_2);
 		$('consensus_div_name').update("Consensus");
 		$('colons').show();
-		$('save_changes_btn').show();
+		//$('save_changes_btn').show();
 		
 		var startStop1 = phy.getDashPositions(seq1);
 		var startStop2 = phy.getDashPositions(seq2);
@@ -1438,9 +1438,9 @@
 			}
 			else{
 				//temp = "<span>" + consensus.charAt(i) + "</span>";
-				consensus_span = new Element('span').update(consensus.charAt(i));
-				seq1_span = new Element('span').update(seq1.charAt(i));
-				seq2_span = new Element('span').update(seq2.charAt(i));
+				consensus_span = new Element('span', {'position': i+1}).update(consensus.charAt(i));
+				seq1_span = new Element('span', {'position': i+1}).update(seq1.charAt(i));
+				seq2_span = new Element('span', {'position': i+1}).update(seq2.charAt(i));
 			}
 			
 			$('consensus_div_seq').insert(consensus_span);
@@ -1489,7 +1489,7 @@
 		});
 		
 		// Displays the info 'Change Base X at position # to:'
-		$('change_base_area').update('Change Base ')
+		$('change_base_area').update('Change base ')
 					.insert(base_span)
 					.insert('&nbsp;at position ' + current_base_position + ' to: ');
 					
@@ -1536,6 +1536,8 @@
 				});
 			$('change_base_area').insert(base_span);
 		});
+		$('save_changes_btn').show();
+		
 	};		
 	
 	/*
@@ -1568,7 +1570,7 @@
 			$('save_changes_btn').disable();
 		}
 		$('save_changes_btn').value = saveBtnTxt;	
-	}
+	};
 	
 	/*
 	 * Commits consensus sequence changes made by the user to the database
@@ -1598,6 +1600,9 @@
 						// Hide the Trace Canvas Div
 						$('trace_canvas_div').hide();
 						
+						// Hide the change base area div
+						$('change_base_area').hide();
+						
 						// Update the consensus div (so all BG's are yellow)
 						$$('#consensus_div_seq span.changed-base').each(function(el) {
 									el.removeClassName('changed-base');
@@ -1613,7 +1618,7 @@
 					}
 		});
 		
-	}
+	};
 	
 	/*
 	 * View the traces for the mismatched bases in the Consensus Editor
@@ -1629,6 +1634,8 @@
 		$('trace_canvas_div').hide();
 		// Hide the Change Bases Area Div
 		$('change_base_area').hide();
+		// Hide the save button
+		$('save_changes_btn').hide();
 		
 		new Ajax.Request('/project/phylogenetics/tools/consensus_data', {
 				method:'get',	
@@ -1662,7 +1669,146 @@
 						alert('Something went wrong!\nAborting...');
 					}
 		});
+	};
+	/*
+	 * Activate trim mode in consensus editor
+	 *
+	 */
+	phy.enable_trim = function () {
+		// disable mis-match editing
+		$$('.non-match').each(function(el) {
+			el.removeClassName('non-match');
+		});
+		$$('.changed-base').each(function(el) {
+			el.removeClassName('changed-base');
+		});
+		$('change_base_area').hide();
+		$('trace_canvas_div').hide();
+		$('save_changes_btn').hide();
+		$$('div span[base]').each(function(element) {
+			element.stopObserving();
+		});
+	
+		// enable trimming functions
+		$('trim-info').show();
+		$('trim-link').hide();
+		$('trim-exit-link').show();
+		
+		// adding class .trim to the 3 sequence divs gives it the 
+		// white BG and hover style
+		$('consensus_div_seq').addClassName('trim');
+
+		// ----------------
+		var spanArray = $$('#consensus_div_seq span');
+		var arrayLength = spanArray.length;
+		var half = arrayLength / 2;
+		spanArray.each(function(el) {
+			Event.observe(el, 'click', function(event) {
+				var el_o = el;
+				var pos = parseInt(el.getAttribute('position'), 10);
+				if (pos < half){
+					$('left_trim_value').update(pos);
+					el.addClassName('to_trim');
+					while (el_o.previous()){
+						el_o = el_o.previous();
+						el_o.addClassName('to_trim');
+					}
+					var nxt = el.next();
+					while (nxt && parseInt(nxt.getAttribute('position'), 10) < half && nxt.hasClassName('to_trim')){
+						nxt.removeClassName('to_trim');
+						nxt = nxt.next();
+						//console.info(nxt.getAttribute('position'));
+					}
+				}
+				else {
+					$('right_trim_value').update(arrayLength - pos + 1);
+					el.addClassName('to_trim');
+					var nxt = el.previous();
+					while (nxt && parseInt(nxt.getAttribute('position'), 10) > half && nxt.hasClassName('to_trim')){
+						nxt.removeClassName('to_trim');
+						nxt = nxt.previous();
+						//console.info(nxt.getAttribute('position'));
+					}
+					while (el_o.next()){
+						el_o = el_o.next();
+						el_o.addClassName('to_trim');
+					}
+				}
+			});
+		});
+	};
+	/*
+	 * Exit trim mode in the consensus editor
+	 *
+	 */
+	phy.exit_trim = function () {
+		document.location.reload();
+	};
+	/*
+	 * Commit consus trim changes to DB
+	 *
+	 */
+	phy.commit_consensus_trim = function (pair_id) {
+		var left = $('left_trim_value').innerHTML;
+		var right = $('right_trim_value').innerHTML;
+		var intRegex = /^\d+$/;
+		if(!intRegex.test(left) || !intRegex.test(right)) {
+			top.show_messages('Invalid trim values specified. Trim values must be positive integers only.');
+			return;
+		}
+		if (left == 0 && right == 0){
+			top.show_messages('Nothing to trim');
+			return;
+		}
+		//console.info("pair id: " + pair_id + " | lt: " + left + " | rt: " + right );
+		new Ajax.Request('/project/phylogenetics/tools/commit_consensus_trimming', {
+			method:'get',	
+			parameters: {'pair_id': pair_id, 'left': left, 'right': right},
+			onSuccess: function(transport){
+				var response = transport.responseText || "{'status':'error', 'message':'No response'}";
+				var r = response.evalJSON();
+				if (r.status == 'success') {
+					document.location.reload();
+					//console.info('100');
+				}
+				else {
+					top.show_messages('Error: ' + r.message);
+				}
+			},
+			onFailure: function(){					
+				alert('Something went wrong!\nAborting...');
+			}
+		});	
 	}
+	
+	/*
+	 * Reset the trim in the consensus editor
+	 *
+	 */
+	phy.reset_consensus_trim = function (dir) {
+		var spanArray = $$('#consensus_div_seq.trim span');
+		var arrayLength = spanArray.length;
+		var half = arrayLength / 2;
+		var elArray = $$('#consensus_div_seq.trim span.to_trim');
+		if (dir == 'l' || dir == 'left'){
+			$('left_trim_value').update('0');
+			elArray.each(function(el) {
+				var pos = parseInt(el.getAttribute('position'), 10);
+				if (pos < half){
+					el.removeClassName('to_trim');
+				}
+			});
+		}
+		if (dir == 'r' || dir == 'right'){
+			$('right_trim_value').update('0');
+			elArray.each(function(el) {
+				var pos = parseInt(el.getAttribute('position'), 10);
+				if (pos > half){
+					el.removeClassName('to_trim');
+				}
+			});
+		}
+	};
 	
 	/*
 	 * Edit the name of the pair in the consensus editor
@@ -1673,7 +1819,7 @@
 		$('edit-pair-title').toggle();
 		$('edit-name-link').toggle();
 		$('save-name-link').toggle();
-	}
+	};
 	/*
 	 * Save the name of the pair in the database after changing it in the consensus editor
 	 *
@@ -1716,7 +1862,7 @@
 				alert('Something went wrong!\nAborting...');
 			}
 		});		
-	}
+	};
 	
 	
 

@@ -9,7 +9,7 @@
 %	my $cnt = 1;
 %	for my $p (@pairs) {
 		<li>
-			<div class="pair-id-block<% ($cnt == $num ? " active" : "")%>">
+			<div class="pair-id-block<% ($cnt == $num ? " active" : "")%>" title="<% $p->name |html%>">
 				<a href="./view_consensus?pid=<%$pid |html%>;pair_id=<% $p->id %>;num=<% $cnt %>">Pair <% $cnt++ %><br />
 				<small><% $p->name |html%></small></a>
 			</div>
@@ -21,9 +21,9 @@
 %	if ($pair) {
 		<div id="pair-title-block">
 			<div id="pair-title">Pair <% $num %>: <% $pair->name |html%></div>
-			<div id="edit-pair-title" style="float:left;display:none">Pair <% $num %>: <input type="text" name="pair-name" id="pair-name" value="<% $pair->name |html%>" maxlength="128"/></div>
-			<div id="edit-name-link">[<a href="javascript:;" onclick="phy.edit_pair_name();">Edit Name</a>]</div>
-			<div id="save-name-link" style="display:none;">[<a href="javascript:;" onclick="phy.save_pair_name($('pair-name').value, <% $num %>, <% $pair %>);">Save</a>] [<a href="javascript:;" onclick="phy.edit_pair_name();">Cancel</a>]</div>
+			<div id="edit-pair-title" style="float:left;padding-right:5px;display:none">Pair <% $num %>: <input type="text" name="pair-name" id="pair-name" value="<% $pair->name |html%>" maxlength="128"/></div>
+			<div id="edit-name-link" class="text-links">[<a href="javascript:;" onclick="phy.edit_pair_name();">Edit Name</a>]</div>
+			<div id="save-name-link" style="display:none;" class="text-links">[<a href="javascript:;" onclick="phy.save_pair_name($('pair-name').value, <% $num %>, <% $pair %>);">Save</a>] [<a href="javascript:;" onclick="phy.edit_pair_name();">Cancel</a>]</div>
 			<div style="clear:both;height:0px">&nbsp;</div>
 		</div>
 		<div style="clear:both;height:0px">&nbsp;</div>
@@ -32,7 +32,8 @@
 				<div id="seq1_name"></div>
 				<div id="seq2_name"></div>
 				<div id="consensus_div_name"></div>
-				<div style="color:#006699;font-family:courier;font-size:xx-small;padding-top:3px;">[<a href="" style="color:#006699;font-family:courier;font-size:xx-small;">Trim Consensus</a>]</div>
+				<div id="trim-link" class="text-links">[<a href="javascript:;" onclick="phy.enable_trim();">Trim Consensus</a>]</div>
+				<div id="trim-exit-link" style="display:none;" class="text-links">[<a href="javascript:;" onclick="phy.exit_trim();">Exit Trim Mode</a>]</div>
 			</div>
 			<div id="colons" style="display:none">
 				<div>:</div>
@@ -48,13 +49,26 @@
 		
 		<p><img id="progress" style="padding-left:100px;display:none" src="/images/ajax-loader-2.gif" alt=""></p> 
 		<div id="change_base_area" class="monospace"></div>
+		<input type="button" id="save_changes_btn" value="Save Changes" onclick="phy.consensus_change()" style="margin-left:5px;display:none;"/>
 		<div id="trace_canvas_div" style="display:none; padding:20px;">
-			<canvas id="trace_viewer_1" height="210" style="margin-right:10px;">Your browser doesnt support canvas objects.</canvas>
-			<canvas id="trace_viewer_2" height="210">Your browser doesnt support canvas objects.</canvas>
+			<canvas id="trace_viewer_1" height="210" style="margin-right:10px;border:1px solid grey;">Your browser doesnt support canvas objects.</canvas>
+			<canvas id="trace_viewer_2" height="210" style="border:1px solid grey;">&nbsp;</canvas>
 		</div>
-		<div id="save_changes_button_div" style="background-color:white;padding-top:8px;">
-			<input type="button" id="save_changes_btn" value="Save Changes" onclick="phy.consensus_change()" style="margin-left:5px;display:none"/>
+
+		<div id="trim-info" style="display:none;">
+			<div>
+				<div class="trim_total_label">Left Trim: </div>
+				<div id="left_trim_value">0</div> bp 
+				<span>[<a href="javascript:;" onclick="phy.reset_consensus_trim('l');">Reset</a>]</span>
+			</div>
+			<div>
+				<div class="trim_total_label">Right Trim: </div>
+				<div id="right_trim_value">0</div> bp 
+				<span>[<a href="javascript:;" onclick="phy.reset_consensus_trim('r');">Reset</a>]</span>
+			</div>
+			<input type="submit" value="Save Changes" style="margin-top:10px;" onclick="phy.commit_consensus_trim(<% $pair %>);"/>
 		</div>
+		
 
 		<input type="hidden" id="step" value="5" />		
 		<input type="hidden" id="seq1" value="<% $seq1 %>" />
