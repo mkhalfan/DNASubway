@@ -1598,16 +1598,18 @@
 						$('save_changes_btn').disable();
 						
 						// Hide the Trace Canvas Div
-						$('trace_canvas_div').hide();
+						//$('trace_canvas_div').hide();
 						
 						// Hide the change base area div
-						$('change_base_area').hide();
+						//$('change_base_area').hide();
 						
 						// Update the consensus div (so all BG's are yellow)
 						$$('#consensus_div_seq span.changed-base').each(function(el) {
 									el.removeClassName('changed-base');
 									el.addClassName('non-match');
 							});
+							
+						document.location.reload();
 					}
 					else {
 						alert('Error: ' + r.message);
