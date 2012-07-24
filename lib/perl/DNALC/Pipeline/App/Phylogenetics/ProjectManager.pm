@@ -1003,6 +1003,14 @@ use Bio::Trace::ABIF ();
 		$pair->f_trim($real_f_trim);
 		$pair->r_trim($real_r_trim);
 
+		# delete the entry for this sequence in the BlastRun table, if it exists
+		# BlastRun run_id = pid . -p . pair_id (ex: 427-p1909)
+		my $blast_run_id = $self->project . '-p' . $args->{pair_id};
+		my ($blast_run) = BlastRun->search(run_id=>$blast_run_id);
+		if ($blast_run) {
+			$blast_run->delete;
+		}
+
 		if ($pair->update){
 			return {status=> "success"};
 		}
