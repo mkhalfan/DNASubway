@@ -1,7 +1,7 @@
 {
 	program => '/usr/local/bin/neighbor',
 	menu_options => "L\n2\nY\n",
-	#menu_options_wb => "L\n2\nM\n%d\n101\nY\n", # %d will be replaced by sprintf
+	menu_options_wb => "L\n2\nM\n%d\n101\nY\n", # %d will be replaced by sprintf
 
 	input_file => 'infile',
 	output_file => 'outfile',

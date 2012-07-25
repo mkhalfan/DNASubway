@@ -16,6 +16,7 @@ use DNALC::Pipeline::Process::Phylip::ProMl ();
 use DNALC::Pipeline::Process::Phylip::Neighbor ();
 use DNALC::Pipeline::Process::Phylip::Consense ();
 use DNALC::Pipeline::Config();
+use IO::File ();
 use File::Basename;
 use Data::Dumper;
 use Image::LibRSVG ();
@@ -41,6 +42,11 @@ sub run_build_tree {
 		my $alignment = my $input = $pm->get_alignment('phyi');
 		my ($tree, $tb);
 
+		# are we using bootstraping for NJ trees?
+		my $phy_cfg = DNALC::Pipeline::Config->new->cf('PHYLOGENETICS');
+		my $bootstrap_num = $phy_cfg->{BOOTSTRAPS} || 0;
+		#$bootstrap_num = $bootstrap_num / 10 if ($bootstrap_num && $proj->type eq 'protein');
+
 		if (-f $input) {
 
 			if ($tree_type eq 'ML') {
@@ -49,17 +55,40 @@ sub run_build_tree {
 						: DNALC::Pipeline::Process::Phylip::ProMl->new($pwd);
 			}
 			else {
-				# compute distance
-				my $d;
 
-				$d = $proj->type ne 'protein'
-						? DNALC::Pipeline::Process::Phylip::DNADist->new($pwd)
-						: DNALC::Pipeline::Process::Phylip::ProtDist->new($pwd);
-				$d->run(input => $input, debug => 0);
-				$input = $d->get_output;
+				# NJ trees - may use bootstraping
+				if ($bootstrap_num) {
+					# Step 1
+					my $s = DNALC::Pipeline::Process::Phylip::SeqBoot->new($pwd);
+					$s->run(input => $input, bootstraps => $bootstrap_num);
+					$input = $s->get_output;
 
-				$tb = DNALC::Pipeline::Process::Phylip::Neighbor->new($pwd);
+					# Step 2 - compute distance
+					my $d = $proj->type ne 'protein'
+							? DNALC::Pipeline::Process::Phylip::DNADist->new($pwd)
+							: DNALC::Pipeline::Process::Phylip::ProtDist->new($pwd);
+					$d->run(input => $input, debug => 0, bootstraps => $bootstrap_num);
+					$input = $d->get_output;
 
+					# Step 3
+					my $nj = DNALC::Pipeline::Process::Phylip::Neighbor->new($pwd);
+					$nj->run(input => $input, debug => 1, bootstraps => $bootstrap_num, 
+							input_is_protein => $proj->type eq 'protein');
+					$input = $nj->get_tree;
+
+					# Step 4 - create the concensus
+					$tb = DNALC::Pipeline::Process::Phylip::Consense->new($pwd);
+				}
+				else {
+					my $d = $proj->type ne 'protein'
+							? DNALC::Pipeline::Process::Phylip::DNADist->new($pwd)
+							: DNALC::Pipeline::Process::Phylip::ProtDist->new($pwd);
+					$d->run(input => $input, debug => 0, bootstraps => $bootstrap_num);
+					$input = $d->get_output;
+
+					$tb = DNALC::Pipeline::Process::Phylip::Neighbor->new($pwd);
+				}
+	
 			}
 
 			if ($tb) {
@@ -76,8 +105,35 @@ sub run_build_tree {
 					$msg = "You must select at least three <b>non-empty sequences</b>.";	
 				    return nfreeze({status => $status, msg => $msg});
 				}
-				$tb->run(input => $input, debug => 0, input_is_protein => $proj->type eq 'protein');
+				$tb->run(input => $input, debug => 1, input_is_protein => $proj->type eq 'protein');
 				$tree = $tb->get_tree;
+
+				# clean up some nmbers from the .nw file
+				if ($bootstrap_num && $tree_type eq 'NJ') {
+					my $fhi = IO::File->new($tree, 'r');
+					
+					#print STDERR  ":: tree = ", $tree, $/;
+					$tree .= "_x";
+					#print STDERR  ":: tree = ", $tree, $/;
+
+					my $fho = IO::File->new($tree, 'w');
+					my $tree_str = '';
+					if (defined $fhi && defined $fho) {
+						while (my $line = <$fhi>) {
+							$tree_str .= $line;
+						}
+						undef $fhi;
+
+						# actual cleaning step
+						$tree_str =~ s/\n//g;
+						$tree_str =~ s/([^)]):[.0-9]+/$1/g;
+						$tree_str =~ s/:|\.0//g;
+
+						#store new data
+						print $fho $tree_str;
+						undef $fho;
+					}
+				}
 
 				my $stree = $pm->_store_tree($tree, $tree_type, $alignment) if -f $tree;
 
@@ -114,8 +170,12 @@ sub run_build_tree {
 						return nfreeze({status => 'error', msg => $msg});
 					}
 
+					# NOTE: if we do bootstraping, we display the NJ tree as a cladogram
 					if (system("java -jar /usr/local/TreeVector/source/TreeVector.jar " 
-						. $pm->get_tree($tree_type)->{tree_file} . " -out $tree_id.svg -size 760 $tree_height") == 0) 
+								. $pm->get_tree($tree_type)->{tree_file} 
+								. ($bootstrap_num && $tree_type eq 'NJ' ? " -simpleclad" : '')
+								. " -out $tree_id.svg -size 760 $tree_height"
+						) == 0)
 					{
 						## Convert the SVG to a PNG
 						my $rsvg = new Image::LibRSVG();
