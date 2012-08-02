@@ -408,11 +408,15 @@ span.rot { -moz-transform:rotate(90deg); font-size: smaller;}
 	}
 .container_data1 #mini-trace-icons {
 	float:left; 
-	width: 15px; 
+	max-width: 24px; 
+	min-width: 15px; 
 	line-height: 1.2em; 
 	margin-left:10px;
 	padding-top:2px;
-	}	
+	}
+.container_data1 #mini-trace-icons  a img{
+	vertical-align: middle;
+}
 .container_data1 #q-score-alert {
 	float:left; 
 	width: 15px; 
