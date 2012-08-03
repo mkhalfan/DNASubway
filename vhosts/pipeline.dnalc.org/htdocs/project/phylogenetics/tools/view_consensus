@@ -71,11 +71,11 @@
 		
 
 		<input type="hidden" id="step" value="5" />		
-		<input type="hidden" id="seq1" value="<% $seq1 %>" />
-		<input type="hidden" id="seq2" value="<% $seq2 %>" />
-		<input type="hidden" id="display_name_1" value="<% $display_name_1 %>" />
-		<input type="hidden" id="display_name_2" value="<% $display_name_2 %>" />
-		<input type="hidden" id="consensus" value="<% $consensus %>" />
+		<input type="hidden" id="seq1" value="<% $seq1 |html%>" data-qscores="[<% $qstr1 %>]" />
+		<input type="hidden" id="seq2" value="<% $seq2 |html%>" data-qscores="[<% $qstr2 %>]" />
+		<input type="hidden" id="display_name_1" value="<% $display_name_1 |html%>" />
+		<input type="hidden" id="display_name_2" value="<% $display_name_2 |html%>" />
+		<input type="hidden" id="consensus" value="<% $consensus |html%>" />
 		<input type="hidden" id="pair_id" value="<% $pair->id %>" />
 %	}
 	</div>
@@ -95,6 +95,7 @@
 <%once>
 	use DNALC::Pipeline::App::Phylogenetics::ProjectManager ();
 	use DNALC::Pipeline::Phylogenetics::Pair ();
+	use DNALC::Pipeline::Phylogenetics::DataFile ();
 	use DNALC::Pipeline::Utils qw/lcs_name/;
 	use File::Slurp qw(read_file);
 </%once>
@@ -116,6 +117,7 @@
 	my $alignment;
 	my @alignment_line_1;
 	my @alignment_line_2;
+	my ($qstr1, $qstr2);
 
 	unless ($proj) {
 		$msg = "Project not found."
@@ -139,7 +141,20 @@
 		#($display_name_2, $seq2) = ($alignment_line_2[0], $alignment_line_2[1]);
 		($display_name_1, $seq1) = split(': ', $aln_lines[0]);
 		($display_name_2, $seq2) = split(': ', $aln_lines[1]);
-		$consensus = $pair->consensus if $pair;
+		
+		if ($pair) {
+			$consensus = $pair->consensus if $pair;
+
+			# Get Quality Scores
+			my ($df1) = DNALC::Pipeline::Phylogenetics::DataFile->search(id => $seqs[0]->seq_id->file_id );
+			my ($df2) = DNALC::Pipeline::Phylogenetics::DataFile->search(id => $seqs[1]->seq_id->file_id );
+
+			my @qs1 = $df1->quality_values();       
+			my @qs2 = $df2->quality_values();       
+
+			$qstr1 = join(",", @qs1[ $seqs[0]->seq_id->start_pos  ..  $seqs[0]->seq_id->end_pos ]);
+			$qstr2 = join(",", @qs2[ $seqs[1]->seq_id->start_pos  ..  $seqs[1]->seq_id->end_pos ]);
+		}
 	}
 
 </%init>

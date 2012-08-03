@@ -920,6 +920,9 @@ span.bold {
 	font-size:10px;
 }
 
+#view-consensus span.hiQS, #view-consensus span.loQS {
+}
+
 #view-seqs-help-bubble{
 position:absolute;
 z-index:1;
