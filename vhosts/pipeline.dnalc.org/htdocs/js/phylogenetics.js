@@ -1382,6 +1382,8 @@
 	phy.show_mismatches = function () {
 		var seq1 = $('seq1').value;
 		var seq2 = $('seq2').value;
+		var qs1 = $("seq1").getAttribute("data-qscores").evalJSON();
+		var qs2 = $("seq2").getAttribute("data-qscores").evalJSON()
 		var display_name_1 = $('display_name_1').value;
 		var display_name_2 = $('display_name_2').value;
 		var consensus = $('consensus').value;
@@ -1402,7 +1404,9 @@
 		var start = Math.max(startStop1[0], startStop2[0]);
 		var stop = Math.min(startStop1[1], startStop2[1]);;
 
-		var y = 0;
+		var i_seq1, i_seq2, y;
+		i_seq1 = i_seq2 = y = 0;
+
 		for ( var i = 0; i < sequenceLength; i++){
 			
 			//if ( (!re.test(seq1.charAt(i)) || !re.test(seq2.charAt(i))) 
@@ -1443,6 +1447,14 @@
 				seq2_span = new Element('span').update(seq2.charAt(i));
 			}
 			
+			// show bases w/ low Q Scores
+			if (seq1.charAt(i)!= "-") { 
+				seq1_span.addClassName(qs1[i_seq1++] > 20 ? "hiQS" : "loQS"); 
+			}
+			if (seq2.charAt(i)!= "-") { 
+				seq2_span.addClassName(qs2[i_seq2++] > 20 ? "hiQS" : "loQS"); 
+			}
+ 
 			$('consensus_div_seq').insert(consensus_span);
 			$('seq1_div').insert(seq1_span);
 			$('seq2_div').insert(seq2_span);
@@ -1682,20 +1694,10 @@
 	 *
 	 */
 	phy.enable_trim = function () {
-		// disable mis-match editing
-		$$('.non-match').each(function(el) {
-			el.removeClassName('non-match');
-		});
-		$$('.changed-base').each(function(el) {
-			el.removeClassName('changed-base');
-		});
-		$('change_base_area').hide();
-		$('trace_canvas_div').hide();
-		$('save_changes_btn').hide();
-		$$('div span[base]').each(function(element) {
-			element.stopObserving();
-		});
-	
+
+		// Show quality colours for bases
+		//$$("span.loQS").invoke("setStyle", {'color': '#aaa'})
+
 		// enable trimming functions
 		$('trim-info').show();
 		$('trim-link').hide();

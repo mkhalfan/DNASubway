@@ -920,7 +920,10 @@ span.bold {
 	font-size:10px;
 }
 
-#view-consensus span.hiQS, #view-consensus span.loQS {
+#view-consensus span.hiQS {
+}
+#view-consensus span.loQS {
+	color: #aaa;
 }
 
 #view-seqs-help-bubble{
