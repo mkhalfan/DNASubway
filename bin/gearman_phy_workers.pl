@@ -21,6 +21,7 @@ use File::Basename;
 use Data::Dumper;
 use Image::LibRSVG ();
 use File::chdir;
+use Time::HiRes qw(gettimeofday tv_interval);
 
 
 sub run_build_tree {
@@ -47,6 +48,8 @@ sub run_build_tree {
 		my $bootstrap_num = $phy_cfg->{BOOTSTRAPS} || 0;
 		#$bootstrap_num = $bootstrap_num / 10 if ($bootstrap_num && $proj->type eq 'protein');
 
+		# get the exact duration of the whole workflow
+		my $t0 = [gettimeofday];
 		if (-f $input) {
 
 			if ($tree_type eq 'ML') {
@@ -135,17 +138,20 @@ sub run_build_tree {
 					}
 				}
 
+				my $elapsed = tv_interval ( $t0 );
+
 				my $stree = $pm->_store_tree($tree, $tree_type, $alignment) if -f $tree;
 
 				if (-s $stree->{tree_file}) {
 					if ($tree_type eq 'ML') {
-						$pm->set_task_status("phy_tree_ml", "done", $tb->{elapsed});
+						$pm->set_task_status("phy_tree_ml", "done", $elapsed);
 					}
 					else {
-						$pm->set_task_status("phy_tree", "done", $tb->{elapsed});
+						$pm->set_task_status("phy_tree", "done", $elapsed);
 					}
 					$status = "success";
 				}
+				#print STDERR 'Tree done in ', $elapsed, ' seconds', $/;
 				
 				## Get current nw tree and store the name of this file (to create a svg and png of the same name)
 				## (we are actually saving the complete file path minus the .nw extension in this variable, we'll

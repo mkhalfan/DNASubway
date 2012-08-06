@@ -89,7 +89,7 @@ sub trace {
 sub quality_values {
 	my ($self) = @_;
 	my @q = ();
-	return unless ref($self) eq __PACKAGE__ || $self->file_type !~ /^trace$/i;
+	return @q unless ref($self) eq __PACKAGE__ || $self->file_type !~ /^trace$/i;
 	
 	my $ab = Bio::Trace::ABIF->new;
 	my $file_path = $self->get_file_path;

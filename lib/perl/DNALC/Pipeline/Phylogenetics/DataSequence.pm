@@ -1,11 +1,10 @@
 package DNALC::Pipeline::Phylogenetics::DataSequence;
 
-#use DNALC::Pipeline::Config ();
-
 use base qw(DNALC::Pipeline::DBI);
 
 use DNALC::Pipeline::MasterProject ();
 use POSIX qw/strftime/;
+use List::Util qw/sum/;
 #use Data::Dumper;
 
 __PACKAGE__->table('phy_data_sequence');
@@ -30,26 +29,32 @@ sub trim {
 	my ($self, $window_length, $threshold) = @_;
 
 	my ($file) = DNALC::Pipeline::Phylogenetics::DataFile->search(id => $self->file_id);
-	my @quality_values = $file->quality_values;
+	my @quality_values = $file ? $file->quality_values : ();
 
 	my $sequence = $self->seq;
 	
 	my $forward_total = _trim_sequence_string($sequence);
 	my $reverse_total = _trim_sequence_string(scalar reverse $sequence);
 
-	my $qscore_trim_forward = _trim_quality_scores(@quality_values);
-	my $qscore_trim_reverse = _trim_quality_scores(reverse @quality_values);
+	my ($qscore_trim_forward, $qscore_trim_reverse) = (0, 0);
 
-	print STDERR "forward_total: $forward_total, reverse_total: $reverse_total, qscore_trim_forward: $qscore_trim_forward, qscore_trim_reverse: $qscore_trim_reverse\n";
+	if (@quality_values) {
+		# remove the appropriate numbers of qvalues
+		splice(@quality_values, @quality_values - $reverse_total, $reverse_total) if $reverse_total;
+		splice(@quality_values, 0, $forward_total) if $forward_total;
 
-	if ($qscore_trim_forward > $forward_total) { 
-		$forward_total = $qscore_trim_forward; 
+		# do the second trimming
+		$qscore_trim_forward = _trim_quality_scores(\@quality_values);
+		$qscore_trim_reverse = _trim_quality_scores([reverse @quality_values]);
 	}
-	if ($qscore_trim_reverse > $reverse_total) { 
-		$reverse_total = $qscore_trim_reverse; 
-	}
 
-	my $trimmed_seq_length = (length $sequence) - $reverse_total - $forward_total;
+	#print STDERR "[", $self->project_id, "] forward_total: $forward_total, reverse_total: $reverse_total,\n\t",
+	#		"qscore_trim_forward: $qscore_trim_forward, qscore_trim_reverse: $qscore_trim_reverse\n";
+
+	$forward_total += $qscore_trim_forward;
+	$reverse_total += $qscore_trim_reverse;
+
+	my $trimmed_seq_length = length($sequence) - $reverse_total - $forward_total;
 	my $trimmed_sequence = substr($sequence, $forward_total, $trimmed_seq_length);
 	
 	
@@ -57,22 +62,27 @@ sub trim {
 	$self->left_trim(substr ($sequence, 0, $forward_total));
 	$self->right_trim(substr ($sequence, (length $sequence) - $reverse_total, $reverse_total));
 	$self->start_pos($forward_total);
-	$self->end_pos((length $sequence) - $reverse_total);
+	$self->end_pos(length($sequence) - $reverse_total);
 	$self->seq($trimmed_sequence);
 	return $self->update;
 }
 
 sub _trim_quality_scores {
-    my (@quality_scores, $window_size, $threshold) = @_;
-    
-    my $window_size |= 20;
-    my $threshold |= 20;
+    my ($quality_scores, $window_size, $threshold) = @_;
+
+    my @quality_scores = @$quality_scores;
+
+    $window_size ||= 18;
+    $threshold ||= 22;
+
     my $trim = 0;
 
-   for (my $i = 0; $i <= $#quality_scores; $i++) {
-        my $sum=0; 
-        ( $sum+=$_ ) for @quality_scores[ $i..($i + $window_size-1)%$#quality_scores ]; 
+    for (my $i = 0; $i <= $#quality_scores; $i++) {
+        my $sum = sum(@quality_scores[ $i .. ($i + $window_size-1) % $#quality_scores ]);
+		$sum ||= 0;
+        
         my $avg = $sum/$window_size;
+        
         if ($avg < $threshold) { $trim += 1; }
         else { return $trim; }
     }
@@ -91,10 +101,7 @@ sub _trim_sequence_string {
 	for (my $i = 0; $i <= length $seq; $i++) {
 		my $window = substr($seq, $i, $window_length);
 		my $cnt = () = $window =~ /N/g;
-		if (index($window, "N") == 0){
-			$total++;
-		}
-		elsif ($cnt >= $threshold){
+        if (index($window, "N") == 0 || $cnt >= $threshold) {
 			$total++;
 		}
 		else {
