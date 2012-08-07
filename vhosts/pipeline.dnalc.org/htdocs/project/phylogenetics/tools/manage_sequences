@@ -4,7 +4,7 @@
 %#	<input type="hidden" id="selection_changed" value="" />
 	<div class="con_BL_subTitle">
 		<input type="checkbox" id="" title="Select all" \
-		onclick="$('selection_changed').show();var chk=this.checked;$$('#seqs input[type=checkbox]').each(function(el) { el.checked = chk});"/> Select all
+		onclick="$('selection_changed').show();var chk=this.checked;$$('#seqs input[type=checkbox]').each(function(el) { el.checked = el.disabled ? false : chk});"/> Select all
 	</div>
 	<div id="seqs" class="seqs">
 %# show "init" sources at the top
@@ -15,14 +15,14 @@
 	<fieldset id="f<% $source_id %>" style="width:500px;float:left;">
 		<legend>
 			<input type="checkbox" id="s<%$source_id%>"
-			onclick="$('selection_changed').show();var val=this.checked;$$('#f<% $source_id %> input').each(function(i){i.checked = val;});" />
+			onclick="$('selection_changed').show();var val=this.checked;$$('#f<% $source_id %> input').each(function(i){i.checked = i.disabled ? false: val;});" />
 			<& _buildSourceName, $source &>
 		</legend>
 %	for (@{$sequence_groups{$source}}) {
 	<div style="padding-left: 20px;">
-		<input type="checkbox" name="seqids" value="<% $_->{id} %>" id="seq<% $_->{s} %>" \
+		<input type="checkbox" name="seqids" value="<% $_->{id} %>" id="seq<% $_->{s} %>" <% $_->{length} ? "" : q{disabled="disabled"}%>\
 		<% $selected_sequences{$_->{id}} ? "checked=\"checked\"" : "" %> onclick="$('selection_changed').show();"/>
-		<span id="seq<% $_->{id} |html %>"><% $_->{name} |html%></span>
+		<span id="seq<% $_->{id} |html %>"><% $_->{name} |html%> <% $_->{length} ? "" : "<em><small> - missing seq data</small></em>" %></span>
 	</div>
 %	}
 		</fieldset>
@@ -103,13 +103,13 @@
 		#my $name = lcs_name( map {$_->seq->display_id} @pair_sequences);
 		my $name = $pair->name;
 		$name =~ s/[-_\s]+$//;
-		push @{$sequence_groups{init}}, { name => "Pair $name", id => "p$pair"};
+		push @{$sequence_groups{init}}, { name => "Pair $name", id => "p$pair", "length" => length $pair->consensus};
 		$available_sequences{ "p$pair" } = 1;
 	}
 	# TODO DataSequence->search_non_paired_sequences_with_sources($self->project);
 	for my $seq (sort { $a->source_name cmp $b->source_name } $pm->non_paired_sequences) {
 		#push @sequences, {name => $seq->display_id, id => $seq->id, source => $seq->source_name};
-		push @{$sequence_groups{ $seq->source_name} }, {name => $seq->display_id, id => $seq->id };
+		push @{$sequence_groups{ $seq->source_name} }, {name => $seq->display_id, id => $seq->id, "length" => length $seq->seq };
 
 		$available_sequences{ $seq->{id} } = 1;
 	}

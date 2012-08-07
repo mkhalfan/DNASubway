@@ -49,7 +49,8 @@
 			if (i > lshortest/2 && mism != "" && /^[RF]/i.test(mism)) {
 				// if already paired manually, skip it
 				var chkb = $$('#opdiv_' + divz[k].id.replace(/^id_/, '') + ' input')[0];
-				if (chkb.style.display != 'none') {
+				var chkb_a = $$('#opdiv_' + divz[k-1].id.replace(/^id_/, '') + ' input')[0];
+				if (chkb.style.display != 'none' && !chkb_a.disabled && !chkb.disabled) {
 					// if A.innerHTML == R, don't reverse complement it anymore
 					var anchor1 = $$('#opdiv_' + divz[k-1].id.replace(/^id_/, '') + ' a')[0];
 					var anchor2 = $$('#opdiv_' + divz[k].id.replace(/^id_/, '') + ' a')[0];
@@ -2328,11 +2329,21 @@ Event.observe(window, Prototype.Browser.IE ? 'load' : 'dom:loaded', function() {
 	}
 	// Step 1 : Pair Builder
 	else if (step == 1) {
+
+		// sequences that don't have bases can't be used to form pairs
+		$('seqs').down().descendants().each(function(s){
+			if (!(s.hasClassName('paired-light') || s.hasClassName('paired-dark'))) {
+				if (s.innerHTML.length < 2) {
+					$('op' + s.id).disable();
+					$('rc' + s.id).update(' ').setStyle({textDecoration: 'none', cursor: 'default'});
+				}
+			}
+		});
+
 		$('seqops').down().descendants().each(function(sp){
 		  if (sp.type && sp.type == "checkbox") {
 			Event.observe(sp, 'click', function(ev){
 				var el = Event.element(ev);
-				//el.checked = false;
 				var id = el.id.replace(/^op/,'');
 				if (el.checked) {
 					$(id).addClassName('bold');

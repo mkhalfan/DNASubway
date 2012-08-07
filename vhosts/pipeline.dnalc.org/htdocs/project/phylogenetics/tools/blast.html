@@ -48,13 +48,14 @@
 % }
 % for (@sequences) {
 %	my ($blast_run) = BlastRun->search(run_id=>$pid . '-s' . $_->id);
-%if ($blast_run){
+%	if ($blast_run) {
 <span id ='s<%$_->id%>'><a href='/project/phylogenetics/tools/view_blast?bid=<%$blast_run->bid%>;pid=<%$pid%>;sid=s<%$_->id%>'>View Results</a></span>
-%}
-%else{
+%	}
+%	elsif ($_->seq) {
 <span id ='s<%$_->id%>'><span id='blp<%$_->id%>'><a href='#' onclick="phy.do_blast('s<%$_->id%>');">blast</a></span></span>
-%}
-%#<span id="bls<% $_->id %>"><a href="#" onclick="phy.do_blast('s<%$_->id%>');">blast</a></span> <span id ="s<%$_->id%>"><% $blast_run ? "<a href='/project/phylogenetics/tools/view_blast?bid=" . $blast_run->bid . ";pid=" . $pid . ";sid=s" . $_->id . "'>View Results</a>" : "" %></span>
+%	} else {
+<span></span>
+%	}
 % }
 </pre>
 <input type="hidden" id="pid" value="<% $proj->id %>" />
