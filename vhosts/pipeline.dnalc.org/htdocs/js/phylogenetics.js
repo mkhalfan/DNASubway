@@ -1664,7 +1664,14 @@
 					var response = transport.responseText || "{'status':'error', 'message':'No response'}";
 					var data = response.evalJSON();
 					if (data) {
-						phy.change_bases(ev);
+						// Check first, if you are in trim mode, update the change base area with a message 
+						// because we do not want to allow changing bases while in trim mode
+						if ($('trim-info').visible()){
+							$('change_base_area').update('Once you exit trim mode, you will be able to edit this base.');
+						}
+						else{
+							phy.change_bases(ev);
+						}
 						
 						if (data[0])
 							phy.draw(data[0], 'trace_viewer_1');
@@ -1704,7 +1711,7 @@
 		$('trim-link').hide();
 		$('trim-exit-link').show();
 		
-		// adding class .trim to the 3 sequence divs gives it the 
+		// adding class .trim to the consensus div gives it the 
 		// white BG and hover style
 		$('consensus_div_seq').addClassName('trim');
 

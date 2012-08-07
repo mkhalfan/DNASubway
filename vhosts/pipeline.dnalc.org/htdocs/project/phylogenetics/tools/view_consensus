@@ -34,6 +34,7 @@
 				<div id="consensus_div_name"></div>
 				<div id="trim-link" class="text-links" style="display:none;">[<a href="javascript:;" onclick="phy.enable_trim();">Trim Consensus</a>]</div>
 				<div id="trim-exit-link" style="display:none;" class="text-links">[<a href="javascript:;" onclick="phy.exit_trim();">Exit Trim Mode</a>]</div>
+				<img style="position:relative;top:5px;left:5px" src="/images/question-12.png" id="trim-help" />
 			</div>
 			<div id="colons" style="display:none">
 				<div>:</div>
@@ -47,14 +48,7 @@
 			</div>
 		</div>
 		
-		<p><img id="progress" style="padding-left:100px;display:none" src="/images/ajax-loader-2.gif" alt=""></p> 
-		<div id="change_base_area" class="monospace"></div>
-		<input type="button" id="save_changes_btn" value="Save Changes" onclick="phy.consensus_change()" style="margin-left:5px;display:none;"/>
-		<div id="trace_canvas_div" style="display:none; padding:20px;">
-			<canvas id="trace_viewer_1" height="210" style="margin-right:10px;border:1px solid grey;">Your browser doesnt support canvas objects.</canvas>
-			<canvas id="trace_viewer_2" height="210" style="border:1px solid grey;">&nbsp;</canvas>
-		</div>
-
+		<p></p>
 		<div id="trim-info" style="display:none;">
 			<div>
 				<div class="trim_total_label">Left Trim: </div>
@@ -66,8 +60,17 @@
 				<div id="right_trim_value">0</div> bp 
 				<span>[<a href="javascript:;" onclick="phy.reset_consensus_trim('r');">Reset</a>]</span>
 			</div>
-			<input type="submit" value="Save Changes" style="margin-top:10px;" onclick="phy.commit_consensus_trim(<% $pair %>);"/>
+			<input type="submit" value="Commit Trimming" style="margin-top:10px;" onclick="phy.commit_consensus_trim(<% $pair %>);"/>
 		</div>
+		<p><img id="progress" style="padding-left:100px;display:none" src="/images/ajax-loader-2.gif" alt=""></p> 
+		<div id="change_base_area" class="monospace"></div>
+		<input type="button" id="save_changes_btn" value="Save Changes" onclick="phy.consensus_change()" style="margin-left:5px;display:none;"/>
+		<div id="trace_canvas_div" style="display:none; padding:20px;">
+			<canvas id="trace_viewer_1" height="210" style="margin-right:10px;border:1px solid grey;">Your browser doesnt support canvas objects.</canvas>
+			<canvas id="trace_viewer_2" height="210" style="border:1px solid grey;">&nbsp;</canvas>
+		</div>
+
+
 		
 
 		<input type="hidden" id="step" value="5" />		
@@ -83,6 +86,18 @@
 </div>
 <div style="clear: both;">&nbsp;</div>
 <div id="container_data_lineBottom">&nbsp;</div>
+<script type="text/javascript">
+	Event.observe(window, Prototype.Browser.IE ? 'load' : 'dom:loaded', function() {
+		new Tip('trim-help', "<strong>Trimming the Consensus Sequence</strong><p>To trim your consensus sequence, click the 'Trim Consensus' link to the left. Once you are in trim mode, rollover the consensus sequence and click on the base you wish to trim up to. Bases to be trimmed will be indicated by a red strikethrough. You can trim from both the left and right ends of the sequence. Reset your trimming by clicking the respective reset buttons. Once you have selected your regions for trimming, you must click the 'Commit Trimming' button in order to execute and save your trimmed consensus sequence.</p><p><strong>Low Quality Bases</strong></p><p>Low quality bases are indicated in grey. This information may be helpful when determining what regions of the consensus to trim.</p><p><strong>Mismatches</strong></p><p>Mismatches between two trace files are highlighted in yellow. Click a mismatch to view the trace for both sequences in this region.</p><p align=center><img src='/images/consensus_help.png' /></p>", {
+			className: 'blue_help_wide',
+			hook: {target:'bottomRight', tip:'topLeft'},
+			hideAfter: 1,
+			hideOn: false,
+			closeButton:true,
+
+		});
+	});
+</script>
 
 
 %#----------------------------------------------------------------------------
@@ -159,7 +174,7 @@
 
 </%init>
 <%attr>
-	js => ['prototype-1.6.1.js', 'phylogenetics.js']
+	js => ['prototype-1.6.1.js', 'phylogenetics.js', 'prototip/prototip.js']
 	load_ie_canvas => 0
 </%attr>
 %#----------------------------------------------------------------------------
