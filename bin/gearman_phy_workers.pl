@@ -75,7 +75,7 @@ sub run_build_tree {
 
 					# Step 3
 					my $nj = DNALC::Pipeline::Process::Phylip::Neighbor->new($pwd);
-					$nj->run(input => $input, debug => 1, bootstraps => $bootstrap_num, 
+					$nj->run(input => $input, debug => 0, bootstraps => $bootstrap_num, 
 							input_is_protein => $proj->type eq 'protein');
 					$input = $nj->get_tree;
 
@@ -108,16 +108,14 @@ sub run_build_tree {
 					$msg = "You must select at least three <b>non-empty sequences</b>.";	
 				    return nfreeze({status => $status, msg => $msg});
 				}
-				$tb->run(input => $input, debug => 1, input_is_protein => $proj->type eq 'protein');
+				$tb->run(input => $input, debug => 0, input_is_protein => $proj->type eq 'protein');
 				$tree = $tb->get_tree;
 
 				# clean up some nmbers from the .nw file
 				if ($bootstrap_num && $tree_type eq 'NJ') {
 					my $fhi = IO::File->new($tree, 'r');
 					
-					#print STDERR  ":: tree = ", $tree, $/;
 					$tree .= "_x";
-					#print STDERR  ":: tree = ", $tree, $/;
 
 					my $fho = IO::File->new($tree, 'w');
 					my $tree_str = '';
@@ -127,10 +125,15 @@ sub run_build_tree {
 						}
 						undef $fhi;
 
+						my ($outer_value) = $tree_str =~ /:([0-9.]+)\);/;
+						$outer_value = sprintf("%d", $outer_value) if defined $outer_value;
+
 						# actual cleaning step
 						$tree_str =~ s/\n//g;
 						$tree_str =~ s/([^)]):[.0-9]+/$1/g;
 						$tree_str =~ s/:|\.0//g;
+
+						$tree_str =~ s/;/$outer_value;/;
 
 						#store new data
 						print $fho $tree_str;

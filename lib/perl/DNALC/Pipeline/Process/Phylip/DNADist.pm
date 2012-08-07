@@ -141,7 +141,7 @@ use Time::HiRes qw/gettimeofday tv_interval/;
 		if (-s $in_fixed) {
 			move $in_fixed, $in;
 		}
-		print STDERR "fixed: ", $in, " ", -s $in, $/;
+		#print STDERR "fixed: ", $in, " ", -s $in, $/;
 	}
 
 }
