@@ -1,4 +1,4 @@
-#!/usr/bin/perl 
+#!/usr/bin/perl -w
 
 use strict;
 use lib ("/var/www/lib/perl", "/home/gearman/dnasubway/lib/perl");
@@ -52,6 +52,16 @@ sub run_build_tree {
 		my $t0 = [gettimeofday];
 		if (-f $input) {
 
+			open(my $fh, $input);
+			my $first = <$fh>;
+			close $fh;
+			$first =~ m/([0-9]+)/;
+ 			if ($1 <= 2) {
+				$status = "error";
+				$msg = "You must select at least three <b>non-empty sequences</b>.";	
+				return nfreeze({status => $status, msg => $msg});
+			}
+
 			if ($tree_type eq 'ML') {
 				$tb = $proj->type ne 'protein'
 						? DNALC::Pipeline::Process::Phylip::DNAMl->new($pwd)
@@ -99,15 +109,7 @@ sub run_build_tree {
 				# here we check to ensure there are at least
 				# 3 sequences being sent to muscle, if not
 				# return the error
-				open(my $fh, $input);
-				my $first = <$fh>;
-				close $fh;
-				$first =~ m/([0-9]+)/;
- 				if ($1 <= 2) {
-					$status = "error";
-					$msg = "You must select at least three <b>non-empty sequences</b>.";	
-				    return nfreeze({status => $status, msg => $msg});
-				}
+
 				$tb->run(input => $input, debug => 0, input_is_protein => $proj->type eq 'protein');
 				$tree = $tb->get_tree;
 
