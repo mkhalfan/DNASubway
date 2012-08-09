@@ -38,14 +38,19 @@ sub trim {
 
 	my ($qscore_trim_forward, $qscore_trim_reverse) = (0, 0);
 
-	if (@quality_values) {
-		# remove the appropriate numbers of qvalues
-		splice(@quality_values, @quality_values - $reverse_total, $reverse_total) if $reverse_total;
-		splice(@quality_values, 0, $forward_total) if $forward_total;
+	if (@quality_values && (length $sequence > @quality_values)) {
+		eval {
+			# remove the appropriate numbers of qvalues
+			splice(@quality_values, @quality_values - $reverse_total, $reverse_total) if $reverse_total;
+			splice(@quality_values, 0, $forward_total) if $forward_total;
 
-		# do the second trimming
-		$qscore_trim_forward = _trim_quality_scores(\@quality_values);
-		$qscore_trim_reverse = _trim_quality_scores([reverse @quality_values]);
+			# do the second trimming
+			$qscore_trim_forward = _trim_quality_scores(\@quality_values);
+			$qscore_trim_reverse = _trim_quality_scores([reverse @quality_values]);
+		};
+		if ($@) {
+			print STDERR "Error trimming by QSCORES:\n", $@, "\n\n";
+		}
 	}
 
 	#print STDERR "[", $self->project_id, "] forward_total: $forward_total, reverse_total: $reverse_total,\n\t",
@@ -101,7 +106,7 @@ sub _trim_sequence_string {
 	for (my $i = 0; $i <= length $seq; $i++) {
 		my $window = substr($seq, $i, $window_length);
 		my $cnt = () = $window =~ /N/g;
-        if (index($window, "N") == 0 || $cnt >= $threshold) {
+		if (index($window, "N") == 0 || $cnt >= $threshold) {
 			$total++;
 		}
 		else {
