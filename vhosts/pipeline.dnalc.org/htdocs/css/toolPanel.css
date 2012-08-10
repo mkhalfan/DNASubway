@@ -819,6 +819,12 @@ span.bold {
 	background-color:white;
 	cursor:pointer;
 	display:inline-block;
+	/* unselectable style below */
+	-moz-user-select: -moz-none;
+    -khtml-user-select: none;
+    -webkit-user-select: none;
+    -o-user-select: none;
+    user-select: none;
 }
 
 #view-consensus #consensus_div_seq.trim span:hover{
