@@ -404,7 +404,8 @@ span.rot { -moz-transform:rotate(90deg); font-size: smaller;}
 	float:left; width: auto; max-width: 275px; font-family:arial; line-height: 1.2em; overflow-x:auto; color:#996600; 
 	}
 .container_data1 .seqs {
-	float:left; width:1px; margin-left:10px; overflow-x:auto; font-family:courier, monospace; line-height: 1.2em; text-transform: uppercase; display:none;
+	float:left; width:1px; margin-left:10px; overflow-x:auto; font-family:courier, monospace; line-height: 1.2em; text-transform: uppercase; 
+	/*display:none;*/
 	}
 .container_data1 #mini-trace-icons {
 	float:left; 
@@ -418,6 +419,7 @@ span.rot { -moz-transform:rotate(90deg); font-size: smaller;}
 .container_data1 #mini-trace-icons  a img{
 	vertical-align: middle;
 	margin-right:5px;
+	border: none;
 }
 .container_data1 #q-score-alert {
 	float:left; 
