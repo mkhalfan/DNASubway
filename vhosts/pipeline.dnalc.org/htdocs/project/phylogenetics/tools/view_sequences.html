@@ -19,7 +19,7 @@
 	<div id="mini-trace-icons">
 % for (@files) {
 %	if ($_->has_low_q) {
-<div id="low_qs_<% $_->id %>" class="seq-rows"><a href="./view_sequences.html?pid=<% $pid |html%>;fid=<% $_->id %>;show_trimmed=<% $show_trimmed %>"><img src="/images/chart_curve_error.png" border=0 alt="Low Quality Score Alert" style="vertical-align: middle;" /></a><& .dlink, path => $_->file_path &></div>
+<div class="seq-rows"><span id="low_qs_<% $_->id %>"><a href="./view_sequences.html?pid=<% $pid |html%>;fid=<% $_->id %>;show_trimmed=<% $show_trimmed %>"><img src="/images/chart_curve_error.png" border=0 alt="Low Quality Score Alert" style="vertical-align: middle;" /></a></span><& .dlink, path => $_->file_path &></div>
 %	}
 %	else {
 <div class="seq-rows"><a href="./view_sequences.html?pid=<% $pid |html%>;fid=<% $_->id %>;show_trimmed=<% $show_trimmed %>"><img src="/images/chart_curve.png" alt="View Trace" title="View Trace" /></a><& .dlink, path => $_->file_path &></div>
