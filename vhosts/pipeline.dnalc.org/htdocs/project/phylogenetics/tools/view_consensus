@@ -164,11 +164,11 @@
 			my ($df1) = DNALC::Pipeline::Phylogenetics::DataFile->search(id => $seqs[0]->seq_id->file_id );
 			my ($df2) = DNALC::Pipeline::Phylogenetics::DataFile->search(id => $seqs[1]->seq_id->file_id );
 
-			my @qs1 = $df1->quality_values();       
-			my @qs2 = $df2->quality_values();       
+			my @qs1 = $df1->file_type eq "trace" ? $df1->quality_values() : ();
+			my @qs2 = $df2->file_type eq "trace" ? $df2->quality_values() : ();
 
-			$qstr1 = join(",", @qs1[ $seqs[0]->seq_id->start_pos  ..  $seqs[0]->seq_id->end_pos ]);
-			$qstr2 = join(",", @qs2[ $seqs[1]->seq_id->start_pos  ..  $seqs[1]->seq_id->end_pos ]);
+			$qstr1 = @qs1 ? join(",", @qs1[ $seqs[0]->seq_id->start_pos  ..  $seqs[0]->seq_id->end_pos ]) : "";
+			$qstr2 = @qs2 ? join(",", @qs2[ $seqs[1]->seq_id->start_pos  ..  $seqs[1]->seq_id->end_pos ]) : "";
 		}
 	}
 

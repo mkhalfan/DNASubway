@@ -1408,9 +1408,8 @@
 		var i_seq1, i_seq2, y;
 		i_seq1 = i_seq2 = y = 0;
 
-		for ( var i = 0; i < sequenceLength; i++){
-			
-			//if ( (!re.test(seq1.charAt(i)) || !re.test(seq2.charAt(i))) 
+		for ( var i = 0; i < sequenceLength; i++) {
+
 			if ((i > start && i < stop) && (seq1.charAt(i) != 'N' && seq2.charAt(i) != "N")
 					&& (consensus.charAt(i - y) != seq1.charAt(i) || consensus.charAt(i - y) != seq2.charAt(i) )
 						&& (seq1.charAt(i) != "-" && seq2.charAt(i) != "-")
@@ -1441,18 +1440,17 @@
 					Event.observe(seq2_span, 'click', phy.view_mismatch_trace);
 				//}
 			}
-			else{
-				//temp = "<span>" + consensus.charAt(i) + "</span>";
+			else {
 				consensus_span = new Element('span', {'position': i+1}).update(consensus.charAt(i));
 				seq1_span = new Element('span').update(seq1.charAt(i));
 				seq2_span = new Element('span').update(seq2.charAt(i));
 			}
 			
 			// show bases w/ low Q Scores
-			if (seq1.charAt(i)!= "-") { 
+			if (seq1.charAt(i)!= "-" && qs1.length && qs1[i_seq1] != undefined) { 
 				seq1_span.addClassName(qs1[i_seq1++] > 20 ? "hiQS" : "loQS"); 
 			}
-			if (seq2.charAt(i)!= "-") { 
+			if (seq2.charAt(i)!= "-" && qs2.length && qs2[i_seq2] != undefined) { 
 				seq2_span.addClassName(qs2[i_seq2++] > 20 ? "hiQS" : "loQS"); 
 			}
  
@@ -1462,7 +1460,7 @@
 			
 			// Initially, set the save_changes_button to be disabled
 			$('save_changes_btn').disabled = true;
-		} 
+		}
 		
 		// We load the 'trim consensus' button as being having display:none (inline css)
 		// because we want the button to appear only after the alignment has loaded. 
