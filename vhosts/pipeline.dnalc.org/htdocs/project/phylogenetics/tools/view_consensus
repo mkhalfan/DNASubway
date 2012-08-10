@@ -70,9 +70,6 @@
 			<canvas id="trace_viewer_2" height="210" style="border:1px solid grey;">&nbsp;</canvas>
 		</div>
 
-
-		
-
 		<input type="hidden" id="step" value="5" />		
 		<input type="hidden" id="seq1" value="<% $seq1 |html%>" data-qscores="[<% $qstr1 %>]" />
 		<input type="hidden" id="seq2" value="<% $seq2 |html%>" data-qscores="[<% $qstr2 %>]" />
@@ -93,8 +90,7 @@
 			hook: {target:'bottomRight', tip:'topLeft'},
 			hideAfter: 1,
 			hideOn: false,
-			closeButton:true,
-
+			closeButton:true
 		});
 	});
 </script>
@@ -158,7 +154,9 @@
 		($display_name_2, $seq2) = split(': ', $aln_lines[1]);
 		
 		if ($pair) {
-			$consensus = $pair->consensus if $pair;
+			$consensus = $pair->consensus;
+			
+			my @pseq = sort {$a->seq->display_id cmp $b->seq->display_id } $pair->paired_sequences;
 
 			# Get Quality Scores
 			my ($df1) = DNALC::Pipeline::Phylogenetics::DataFile->search(id => $seqs[0]->seq_id->file_id );
@@ -166,9 +164,33 @@
 
 			my @qs1 = $df1->file_type eq "trace" ? $df1->quality_values() : ();
 			my @qs2 = $df2->file_type eq "trace" ? $df2->quality_values() : ();
+			
+			my @qs1x = my @qs2x = ();
+			my $i = $seqs[0]->seq_id->start_pos;
+			my $j = $seqs[1]->seq_id->start_pos;
 
-			$qstr1 = @qs1 ? join(",", @qs1[ $seqs[0]->seq_id->start_pos  ..  $seqs[0]->seq_id->end_pos ]) : "";
-			$qstr2 = @qs2 ? join(",", @qs2[ $seqs[1]->seq_id->start_pos  ..  $seqs[1]->seq_id->end_pos ]) : "";
+			if ($pseq[0]->strand eq "R") {
+				$i = length($seqs[0]->seq_id->right_trim);
+				@qs1 = reverse @qs1;
+			}
+			if ($pseq[1]->strand eq "R") {
+				$j = length($seqs[1]->seq_id->right_trim);
+				@qs2 = reverse @qs2;
+			}
+
+			for (0 .. length($consensus) - 1) {
+				if (substr($seq1, $_, 1) ne "-") {
+					push @qs1x, $qs1[$i++];
+				}
+
+				if (substr($seq2, $_, 1) ne "-") {
+					push @qs2x, $qs2[$j++];
+				}
+
+			}
+			
+			$qstr1 = join ",", @qs1x;
+			$qstr2 = join ",", @qs2x;
 		}
 	}
 
