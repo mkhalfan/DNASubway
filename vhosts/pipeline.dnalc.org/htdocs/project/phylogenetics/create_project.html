@@ -241,8 +241,6 @@ if ($r->method eq "POST") {
 						u => [$r->upload('seq_file')],
 					});
 
-			#print STDERR Dumper($st), $/;
-
 			if ($st->{status} eq "fail") {
 				push @err, "Unable to upload file: ". $st->{message};
 			}
@@ -309,8 +307,11 @@ if ($r->method eq "POST") {
 				if (@{$st->{errors}}) {
 					push @err, @{$st->{errors}};
 				}
+				if (@{$st->{warnings}}) {
+					push @messages, @{$st->{warnings}};
+				}
 			}
-			#print STDERR  "Added seqs =  ", $added, $/;
+
 			# do we have at least one sequence added?
 			unless ($added) {
 				push @err, "Unable to add sequences!";
@@ -351,7 +352,7 @@ if ($r->method eq "POST") {
 			delete $s->{new_user} if exists $s->{new_user};
 
 			for (@messages) {
-				print STDERR "adding message: ", $_, $/;
+				#print STDERR "adding message: ", $_, $/;
 				$m->comp('/_message_add', $_);
 			}
 			# redirect user to console

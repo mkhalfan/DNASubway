@@ -288,7 +288,6 @@ use Bio::Trace::ABIF ();
 		open (my $fasta_fh, ">> $fasta") or do {
 				print STDERR  "Unable to open fasta file: $fasta\n$!", $/;
 			};
-		#print STDERR "fh1 = ", $fasta_fh, $/;
 		flock $fasta_fh, LOCK_EX or print STDERR "Unable to lock fasta file!!!\n$!\n";
 		my $out_io  = Bio::SeqIO->new(-fh => $fasta_fh, -format => 'Fasta', -flush  => 0);
 
@@ -393,9 +392,8 @@ use Bio::Trace::ABIF ();
 					push @warnings, "File '$filename' already added to this project.";
 					next;
 				}
-				else {
-					$seq_names{$display_id} = 1;
-				}
+
+				$seq_names{$display_id} = 1;
 
 				my $seq_obj = Bio::Seq->new(
 						-seq => $sequence,
