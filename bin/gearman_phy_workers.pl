@@ -184,7 +184,7 @@ sub run_build_tree {
 					# NOTE: if we do bootstraping, we display the NJ tree as a cladogram
 					if (system("java -jar /usr/local/TreeVector/source/TreeVector.jar " 
 								. $pm->get_tree($tree_type)->{tree_file} 
-								. ($bootstrap_num && $tree_type eq 'NJ' ? " -simpleclad" : '')
+								. ($bootstrap_num && $tree_type eq 'NJ' ? " -clad" : '')
 								. " -out $tree_id.svg -size 760 $tree_height"
 						) == 0)
 					{
