@@ -963,7 +963,7 @@ use Bio::Trace::ABIF ();
 		# why we needed/computed the strands in the above step.
 		my $real_f_trim = int($pair->f_trim);
 		my $real_r_trim = int($pair->r_trim);
-		print STDERR "\n\n df_1_strand: $df_1_strand\n\n";
+
 		if ($df_1_strand eq "F"){
 			my $seq_f = substr $seq1, 0, $args->{left};
         	my $dash_count_f = ($seq_f =~ s/-//g);
@@ -972,8 +972,6 @@ use Bio::Trace::ABIF ();
 			my $seq_r = substr $seq2, 0, $args->{left};
         	my $dash_count_r = ($seq_r =~ s/-//g);
 			$real_r_trim += ($args->{left} - $dash_count_r);
-
-        	print STDERR "\n\nreal left trim: $real_f_trim | real right trim: $real_r_trim\n\n";
 		}
 		else {
 			my $seq_f = substr $seq2, 0, $args->{left};
@@ -983,8 +981,6 @@ use Bio::Trace::ABIF ();
             my $seq_r = substr $seq1, 0, $args->{left};
             my $dash_count_r = ($seq_r =~ s/-//g);
 			$real_r_trim += ($args->{left} - $dash_count_r);
-
-            print STDERR "\n\nreal left trim: $real_f_trim | real right trim: $real_r_trim\n\n";
 		}	
 		
 		# modify the sequences in the alignment

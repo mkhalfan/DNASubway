@@ -166,15 +166,15 @@
 			my @qs2 = $df2->file_type eq "trace" ? $df2->quality_values() : ();
 			
 			my @qs1x = my @qs2x = ();
-			my $i = $seqs[0]->seq_id->start_pos;
-			my $j = $seqs[1]->seq_id->start_pos;
+			my $i = $seqs[0]->seq_id->start_pos + $pair->f_trim;
+			my $j = $seqs[1]->seq_id->start_pos + $pair->f_trim;
 
 			if ($pseq[0]->strand eq "R") {
-				$i = length($seqs[0]->seq_id->right_trim);
+				$i = length($seqs[0]->seq_id->right_trim) + $pair->r_trim;
 				@qs1 = reverse @qs1;
 			}
 			if ($pseq[1]->strand eq "R") {
-				$j = length($seqs[1]->seq_id->right_trim);
+				$j = length($seqs[1]->seq_id->right_trim) + $pair->r_trim;
 				@qs2 = reverse @qs2;
 			}
 
