@@ -5,11 +5,12 @@
 </%args>
 %#----------------------------------------------------------------------------
 <%once>
+	use Apache2::Const qw(HTTP_OK);
 	use DNALC::Pipeline::App::Phylogenetics::ProjectManager ();
 </%once>
 %#----------------------------------------------------------------------------
 <%init>
-	
+	$m->clear_buffer();
 	$r->content_type("image/png");
 	$r->headers_out->{'Content-Disposition'} = "attachment;filename=tree.png";
 	$r->no_cache(1);
@@ -25,7 +26,7 @@
 	$tree_id =~ s/\.nw$//;
 
 	$r->sendfile("$tree_id.png");
-	
+	$r->abort( Apache2::Const::HTTP_OK );
 </%init>
 %#----------------------------------------------------------------------------
 <%flags>
