@@ -127,15 +127,15 @@ sub run_build_tree {
 						}
 						undef $fhi;
 
-						my ($outer_value) = $tree_str =~ /:([0-9.]+)\);/;
-						$outer_value = sprintf("%d", $outer_value) if defined $outer_value;
+						#my ($outer_value) = $tree_str =~ /:([0-9.]+)\);/;
+						#$outer_value = sprintf("%d", $outer_value) if defined $outer_value;
 
 						# actual cleaning step
 						$tree_str =~ s/\n//g;
 						$tree_str =~ s/([^)]):[.0-9]+/$1/g;
 						$tree_str =~ s/:|\.0//g;
 
-						$tree_str =~ s/;/$outer_value;/;
+						#$tree_str =~ s/;/$outer_value;/;
 
 						#store new data
 						print $fho $tree_str;
