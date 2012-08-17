@@ -38,7 +38,9 @@ sub trim {
 
 	my ($qscore_trim_forward, $qscore_trim_reverse) = (0, 0);
 
-	if (@quality_values && (length $sequence > @quality_values)) {
+	#print STDERR "[", length($sequence), " == ", scalar @quality_values, " ==> ", (length $sequence > @quality_values), "\n";
+
+	if (@quality_values) {
 		eval {
 			# remove the appropriate numbers of qvalues
 			splice(@quality_values, @quality_values - $reverse_total, $reverse_total) if $reverse_total;
@@ -49,7 +51,7 @@ sub trim {
 			$qscore_trim_reverse = _trim_quality_scores([reverse @quality_values]);
 		};
 		if ($@) {
-			print STDERR "Error trimming by QSCORES:\n", $@, "\n\n";
+			print STDERR "Error trimming by QSCORES: ", length ($sequence), ' =?= ',scalar(@quality_values) , "\n", $@, "\n\n";
 		}
 	}
 
