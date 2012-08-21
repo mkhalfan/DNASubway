@@ -97,10 +97,9 @@
 <select name="f_primer" id="f_primer">
 	<option value="">Select</option>
 % for my $i (@{$primers->{forward}}){
-% 	for my $key (keys %$i){
+% 	for my $key (grep {/^$project_type/i} keys %$i){
 		<optgroup label="<% $key %>">
 % 		for my $x (keys %{$i->{$key}}){
-%#			print $x, ": ", $i->{$key}->{$x}, "<br>";
 			<option value="<% $x %>" id="<% $x %>"><% $x %></option>
 % 		}
 		</optgroup>
@@ -116,7 +115,7 @@
 <select name="r_primer" id="r_primer">
 	<option value="">Select</option>
 % for my $i (@{$primers->{reverse}}){
-% 	for my $key (keys %$i){
+% 	for my $key (grep {/^$project_type/i} keys %$i){
 		<optgroup label="<% $key %>">
 % 		for my $x (keys %{$i->{$key}}){
 %#			print $x, ": ", $i->{$key}->{$x}, "<br>";
@@ -195,6 +194,7 @@ new Tip('longitude_help', "Longitude: Geographic Longitude (if you don't have th
 	use DNALC::Pipeline::Utils qw(clean_query);
 	use Data::Dumper;
 	use Scalar::Util qw(looks_like_number);
+	use DNALC::Pipeline::Phylogenetics::Project ();
 	
 	my $cf = DNALC::Pipeline::Config->new;
 	my $primers = $cf->cf("PRIMERS");
@@ -236,14 +236,7 @@ new Tip('longitude_help', "Longitude: Geographic Longitude (if you don't have th
 	my $pid = $s->{boldpid};
 	$s->{"bold_$pid"} ||= {};
 	my $bs = $s->{"bold_$pid"};
-	
-	sub trim {
-		my $string = shift;
-		$string =~ s/^\s+//;
-		$string =~ s/\s+$//;
-		return $string;
-	}	
-	
+
 	#print STDERR "S4. PID = ", $pid, Dumper($s), $/;
 	
 	unless ($bs->{step3} == 1) {
@@ -253,6 +246,7 @@ new Tip('longitude_help', "Longitude: Geographic Longitude (if you don't have th
 
 	my @err = ();
 	
+	my $project_type;
 	my $data = {};
 	
 	my @authors;
@@ -260,6 +254,11 @@ new Tip('longitude_help', "Longitude: Geographic Longitude (if you don't have th
 	
 	my $f_primer_err;
 	my $r_primer_err;
+	
+	{
+		my $project = DNALC::Pipeline::Phylogenetics::Project->retrieve($pid);
+		$project_type = lc $project->type;
+	}
 
 	if ($r->method eq "POST") {
 		
@@ -275,11 +274,11 @@ new Tip('longitude_help', "Longitude: Geographic Longitude (if you don't have th
 				# "temp[1] = last name"
 				# "temp[2] = row number"
 				my $error_monitor;
-				if ($temp[0] eq "First Name" or trim($temp[0]) eq ""){
+				if ($temp[0] eq "First Name" || clean_query($temp[0]) eq ""){
 					push @err, "Author #$temp[2] first name not valid";
 					$error_monitor = 1;
 				}
-				if ($temp[1] eq "Last Name" || trim($temp[1]) eq ""){
+				if ($temp[1] eq "Last Name" || clean_query($temp[1]) eq ""){
 					push @err, "Author #$temp[2] last name not valid";
 					$error_monitor = 1;
 				}
