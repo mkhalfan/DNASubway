@@ -1975,15 +1975,15 @@
 		var table = new Element('table');
 		var tr;
 		if (Object.isArray(data)) {
-			tr = phy.build_tr(["Tracking #", "Date", "Name", "Institution"], 'header', meta);
+			tr = phy.build_tr(["Tracking #", "Date", "Description", "Name", "Institution"], 'header', meta);
 			// adjust cells' width
-			tr.cells[2].addClassName("twenty5p");
-			tr.cells[3].addClassName("forty5p");
+			//tr.cells[3].addClassName("twenty5p");
+			//tr.cells[4].addClassName("forty5p");
 			table.insert(tr);
 			data.each(function(d) {
 				var lnk = new Element('a', {href: 'javascript:;'}).update(d.number);
 				Event.observe(lnk, 'click', function() {phy.get_dnalc_data(meta.p, d.id, meta.s, meta.d, meta.q, meta.f ? '' : '1');});
-				tr = phy.build_tr([lnk, d.date, d.name, d.institution]);
+				tr = phy.build_tr([lnk, d.date, d.description, d.name, d.institution]);
 				table.insert(tr);
 			});
 		}
@@ -2091,7 +2091,7 @@
 		if (_class)
 			tr.addClassName(_class);
 		data.each(function(el, i) {
-			if (meta && _class == "header") {
+			if (meta && _class == "header" && el != "Description") {
 				var query = meta.q ? meta.q.replace(/'/g, '\'') : '';
 				var ch = el.toLowerCase().substring(0,1);
 				// unicode arrows from http://www.fileformat.info/info/unicode/block/arrows/utf8test.htm
