@@ -463,6 +463,10 @@ span.rot { -moz-transform:rotate(90deg); font-size: smaller;}
 	/*float:left;*/
 }	
 
+#phy-pair-builder .reverse_strand_indicator{
+	color:red;
+}
+
 
 /*** not being used any more -> converted to #phy-pair-builder and #phy-blast (see above)	
 .container_data2 {

@@ -42,7 +42,7 @@ input[type="checkbox"] {
 % $cnt = 0;
 % for (@sequences) {
 %	my $class = $_->{type} eq "p" ? $pair_classes[$cnt++] : "";
-<div class="<% $class %>" id="<%$_->{s}%>"><% $_->{s}->seq || " "|html %></div>\
+<div class="<% $class %>" id="<%$_->{s}%>"><% $_->{s}->seq || ""|html %><% $_->{s}->seq  ? "" : "&nbsp;" %></div>\
 % }
 		</pre>
 	</div>
@@ -74,7 +74,7 @@ input[type="checkbox"] {
 %	my $class = $is_pair ? $pair_classes[$cnt] : "";
 % 	if ($is_pair && $cnt++ % 2 == 0) {
 <div class="<% $class %>" id="pb<% $_->{s}->id %>" pair_id="<% $_->{pair_id} %>">\
-<a style="text-decoration:none;color:red;" href="javascript:;" onclick="phy.pop_from_pair(<%$_->{s}->id%>);">x</a></div>\
+<a style="text-decoration:none;color:black;" href="javascript:;" onclick="phy.pop_from_pair(<%$_->{s}->id%>);" title="Break this pair">x</a></div>\
 % 	}
 % }
 </pre>

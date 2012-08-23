@@ -438,10 +438,14 @@
 		var id = el.id.replace(/^rc/, '');
 		
 		if (norclbl == undefined) {
-			if (el.innerHTML == "R")
+			if (el.innerHTML == "R") {
 				el.innerHTML = "F";
-			else if (el.innerHTML == "F")
+				el.removeClassName('reverse_strand_indicator');
+			}
+			else if (el.innerHTML == "F") {
 				el.innerHTML = "R";
+				el.addClassName('reverse_strand_indicator');
+			}
 		}
 
 		if (el.hasAttribute("rc")) {
@@ -2338,7 +2342,7 @@ Event.observe(window, Prototype.Browser.IE ? 'load' : 'dom:loaded', function() {
 		// sequences that don't have bases can't be used to form pairs
 		$('seqs').down().descendants().each(function(s){
 			if (!(s.hasClassName('paired-light') || s.hasClassName('paired-dark'))) {
-				if (s.innerHTML.length < 2) {
+				if (s.innerHTML.length < 2 || s.innerHTML == '&nbsp;') {
 					$('op' + s.id).disable();
 					$('rc' + s.id).update(' ').setStyle({textDecoration: 'none', cursor: 'default'});
 				}
@@ -2369,6 +2373,7 @@ Event.observe(window, Prototype.Browser.IE ? 'load' : 'dom:loaded', function() {
 				var a_rc = $('rc' + el);
 				if (a_rc && a_rc.innerHTML == "R") {
 					phy.toggle_strand(a_rc, 1);
+					a_rc.addClassName('reverse_strand_indicator');
 				}
 				$('op' + el).disable();
 				$('op' + el).hide();
