@@ -20,9 +20,12 @@
 		</legend>
 %	for (@{$sequence_groups{$source}}) {
 	<div style="padding-left: 20px;">
-		<input type="checkbox" name="seqids" value="<% $_->{id} %>" id="seq<% $_->{s} %>" <% $_->{length} ? "" : q{disabled="disabled"}%>\
+		<input type="checkbox" name="seqids" value="<% $_->{id} %>" id="seq<% $_->{s} %>" <% $_->{length} and !defined $_->{noconsensus} ? "" : q{disabled="disabled"}%>\
 		<% $selected_sequences{$_->{id}} ? "checked=\"checked\"" : "" %> onclick="$('selection_changed').show();"/>
-		<span id="seq<% $_->{id} |html %>"><% $_->{name} |html%> <% $_->{length} ? "" : "<em><small> - missing seq data</small></em>" %></span>
+		<span id="seq<% $_->{id} |html %>"><% $_->{name} |html%> 
+			<% $_->{length} ? "" : "<em><small> - missing seq data</small></em>" %>
+			<% !defined $_->{noconsensus} ? "" : "<em><small> - missing consensus</small></em>" %>
+		</span>
 	</div>
 %	}
 		</fieldset>
@@ -97,15 +100,21 @@
 		return;
 	}
 
-	for my $pair ($pm->pairs) {
-		next unless $pair->consensus;
-		my @pair_sequences = $pair->paired_sequences;
-		#my $name = lcs_name( map {$_->seq->display_id} @pair_sequences);
+
+        for my $pair ($pm->pairs) {
 		my $name = $pair->name;
-		$name =~ s/[-_\s]+$//;
-		push @{$sequence_groups{init}}, { name => "Pair $name", id => "p$pair", "length" => length $pair->consensus};
-		$available_sequences{ "p$pair" } = 1;
-	}
+                $name =~ s/[-_\s]+$//;
+                if(!$pair->consensus) {
+                        push @{$sequence_groups{init}}, { name => "Pair $name", id => "p$pair", "length" => 1, "noconsensus" => 1 };
+                        $available_sequences{ "p$pair" } = 0;
+                } else {
+                        my @pair_sequences = $pair->paired_sequences;
+                        #my $name = lcs_name( map {$_->seq->display_id} @pair_sequences);
+                        push @{$sequence_groups{init}}, { name => "Pair $name", id => "p$pair", "length" => length $pair->consensus};
+                        $available_sequences{ "p$pair" } = 1;
+                }
+        }
+
 	# TODO DataSequence->search_non_paired_sequences_with_sources($self->project);
 	for my $seq (sort { $a->source_name cmp $b->source_name } $pm->non_paired_sequences) {
 		#push @sequences, {name => $seq->display_id, id => $seq->id, source => $seq->source_name};
