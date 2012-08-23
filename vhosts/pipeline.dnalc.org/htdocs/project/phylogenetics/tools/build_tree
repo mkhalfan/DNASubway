@@ -36,7 +36,7 @@
 	$rc = thaw($$rc);
 	if ($rc && defined $rc->{status}) {
 		$status = $rc->{status};
-		$msg = $rc->{status};
+		$msg = $rc->{msg};
 	}
 
 </%init>
