@@ -20,11 +20,11 @@
 		</legend>
 %	for (@{$sequence_groups{$source}}) {
 	<div style="padding-left: 20px;">
-		<input type="checkbox" name="seqids" value="<% $_->{id} %>" id="seq<% $_->{s} %>" <% $_->{length} and !defined $_->{noconsensus} ? "" : q{disabled="disabled"}%>\
+		<input type="checkbox" name="seqids" value="<% $_->{id} %>" id="seq<% $_->{s} %>" <% $_->{length} && !$_->{noconsensus} ? "" : q{disabled="disabled"}%>\
 		<% $selected_sequences{$_->{id}} ? "checked=\"checked\"" : "" %> onclick="$('selection_changed').show();"/>
 		<span id="seq<% $_->{id} |html %>"><% $_->{name} |html%> 
 			<% $_->{length} ? "" : "<em><small> - missing seq data</small></em>" %>
-			<% !defined $_->{noconsensus} ? "" : "<em><small> - missing consensus</small></em>" %>
+			<% !defined $_->{noconsensus} ? "" : "<em><small> - no consensus built for this pair</small></em>" %>
 		</span>
 	</div>
 %	}
