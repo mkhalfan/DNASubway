@@ -136,6 +136,13 @@ function seqView() {
 		$('zoom_out').removeClassName('disabled');
 		$('barcode_but').removeClassName('disabled');
 }
+
+function toggleTable(e){
+	var y = e.cumulativeScrollOffset()[1];
+	e.setStyle({top:y + 45 + 'px'});
+	e.toggle();
+}
+
 function resizeFrame(f) {
 	f.style.height = (f.contentWindow.document.body.scrollHeight + 20) + "px";
 }
@@ -178,7 +185,7 @@ function do_trim(pid) {
 	});
 	new Ajax.Request('/project/phylogenetics/tools/build_alignment', {
 		method:'get',	
-		parameters: {'pid': pid, 'trim': 1},
+		parameters: {'pid': pid, 'trim': 1, 'rand': Math.random()},
 		onSuccess: function(transport){
 			var response = transport.responseText || "{'status':'error', 'message':'No response'}";
 			var r = response.evalJSON();

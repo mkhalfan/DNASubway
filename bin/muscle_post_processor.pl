@@ -6,7 +6,6 @@ use Bio::AlignIO;
 use Bio::LocatableSeq;
 use Bio::SimpleAlign;
 use Getopt::Long;
-use Data::Dumper;
 use IO::File ();
 
 my ($infile, $htmlout, $numgap, $outfile);
@@ -97,11 +96,11 @@ my $labels = $dec->{labels};
 
 ## Creating the peripheral stuff here (buttons)
 my $seq_but_prefix = ($is_amino ? 'aa' : 'nuc');
-my $buttons = '<div><div style="float:left"><input type="image" class="controls" id="barcode_but" onclick="barcodeView()" src="/images/barcode_but.png" title="Toggle Barcode View"/> <input type="image" class="controls" id="zoom_out" onclick="zoomOut()" src="/images/zoom_out_but.png" title="Zoom Out"/><input type="image" class="controls" id="zoom_in" onclick="zoomIn()" src="/images/zoom_in_but.png" title="Zoom In"/> <input type="image" class="controls" id="sequence_but" onclick="seqView()" src="/images/' . $seq_but_prefix . '_sequence_but.png" title="Toggle Sequence View"/>';
+my $buttons = '<div id="controls_div"><div style="float:left;position:relative;left:5px;"><input type="image" class="controls" id="barcode_but" onclick="barcodeView()" src="/images/barcode_but.png" title="Toggle Barcode View"/> <input type="image" class="controls" id="zoom_out" onclick="zoomOut()" src="/images/zoom_out_but.png" title="Zoom Out"/><input type="image" class="controls" id="zoom_in" onclick="zoomIn()" src="/images/zoom_in_but.png" title="Zoom In"/> <input type="image" class="controls" id="sequence_but" onclick="seqView()" src="/images/' . $seq_but_prefix . '_sequence_but.png" title="Toggle Sequence View"/>';
 $buttons .= ($do_trim ? '<div id="trimmed_notice">Your Alignment Has Been Trimmed</div>' : '<div id="trim_but" onclick="do_trim(' . $pid . ')">TRIM ALIGNMENT</div>');
-$buttons .= '</div><div style="float:right">';
-$buttons .= ($is_amino ? '<div id="legend_but" onclick="$(\'legend\').toggle();">COLOR CODES</div>' : '');
-$buttons .= '<div id="pairwise_but" onclick="$(\'pairwise_div\').toggle();">SEQUENCE SIMILARITY %</div>';
+$buttons .= '</div><div style="position:fixed;right:5px;">';
+$buttons .= ($is_amino ? '<div id="legend_but" onclick="toggleTable($(\'legend\'));">COLOR CODES</div>' : '');
+$buttons .= '<div id="pairwise_but" onclick="toggleTable($(\'pairwise_div\'));">SEQUENCE SIMILARITY %</div>';
 $buttons .= "</div></div><div style='clear:both;height:0;'>&nbsp;</div>";
 
 my $div_height = (keys %{$aln->{_order}}) * 22 + 140;
@@ -299,7 +298,11 @@ sub decorate_alignment {
 			my $n;	
 			my $class;
 			$n = ($col eq '.' ? "&nbsp;" : $col); 
-			$class = ($col eq '-' ? 'dash' : $col);
+			$class = $col eq '-' 
+						? 'dash' 
+						: $col eq '?' 
+							? 'ambiguous' 
+							: $col;
 			$retval .= "<div class='$class'>$n</div>";
 			if ($fractions[$x] != 1){
 				$barcode .= "<div class='$class'>&nbsp;</div>";
