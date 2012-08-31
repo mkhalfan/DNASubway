@@ -26,6 +26,7 @@
 	_input_only_files => 1,				# show only the files marked as `is_input` in the drop down selector
 	_input_file_filter => qr/\.fastq$/, # show only the files matching this RE in the drop down selector
 	_output_dir => qr/\/tophat_out$/,   # folder to search for - here we have the output file(s)
-	_output_files => qr/sorted\.bam$/,  # output files we need to process
+	_output_files => qr/sorted\.bam(:?\.bai)?$/,  # output files we need to process
 	_propagate_input_file_name => 1,    # output file should have the same basename as the input
+	_on_success => 'handle_tophat_output',
 }

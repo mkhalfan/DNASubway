@@ -2,10 +2,16 @@
 <& /_messages &>
 
 %#j = <% $jobs %>
-<strong><a href="./app_th?pid=<% $pid |html%>">Launch new Tophat job</a></strong>
+<p><strong><a href="./app_th?pid=<% $pid |html%>">Launch new Tophat job</a></strong></p>
 % while (my $job = $jobs->next) {
 %	my $attrs = $job->attrs;
-	<div><a href="./job_status?pid=<%$pid |html%>;jid=<% $job %>"><% $attrs->{name} |html%></div>
+	<div>
+		<a href="./job_status?pid=<%$pid |html%>;jid=<% $job %>"><strong><% $attrs->{name} |html%></strong></a>
+% if ($job->status eq 'done') {
+		<a href="./launch_igv?pid=<% $proj %>;jid=<% $job %>">view in IGV-static</a>
+		&nbsp;<a href="./launch_igv?pid=<% $proj %>;jid=<% $job %>">view in IGV-dynamic</a>
+%	}
+	</div>
 % }
 %#-----------------------------------------------------------------
 <%args>
@@ -33,6 +39,6 @@
 	#$pm->api_instance($apif) if $apif;
 	my $proj = $pm->project;
 	
-	my $jobs = $pm->get_jobs_by_task('ngs_tophat');
+	my $jobs = $pm->get_jobs_by_task('ngs_tophat'); # show non-deleted jobs only
 
 </%init>

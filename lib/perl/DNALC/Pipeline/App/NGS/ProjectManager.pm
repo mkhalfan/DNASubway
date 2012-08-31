@@ -21,6 +21,7 @@ use iPlant::FoundationalAPI::Constants ':all';
 
 use Archive::Zip ();
 use Archive::Zip qw( :ERROR_CODES :CONSTANTS );
+use File::Path qw/make_path/;
 use File::Basename qw/basename/;
 use Carp;
 use JSON::XS ();
@@ -127,13 +128,20 @@ use Data::Dumper;
 		my $path = $self->work_dir;
 		return unless $path;
 
-		eval { mkpath($path) };
+		eval { make_path($path) };
 		if ($@) {
 			print STDERR "Couldn't create $path: $@", $/;
 			return;
-   	}
+		}
+
+		# also create the QC dir
+		eval { make_path("$path/qc") };
+		if ($@) {
+			print STDERR "Couldn't create QC $path/qc: $@", $/;
+			return;
+		}
+
 		return 1;
-	
 	}
 
 	sub work_dir {
@@ -177,7 +185,7 @@ use Data::Dumper;
 			}
 		}
 		else {
-			Carp::croak ("__add_data__: Not checking if file exists.\n");
+			print STDERR "__add_data__: Not checking if file exists.\n";
 		}
 
 		my $data_src = DataSource->insert ({
@@ -484,9 +492,18 @@ use Data::Dumper;
 
 	#--------------------------------------
 	sub get_jobs_by_task {
-		my ($self, $task) = @_;
+		my ($self, $task, $show_deleted) = @_;
 
-		DNALC::Pipeline::NGS::Job->search(task_id => $self->{task_name_to_id}->{$task}, project_id => $self->project);
+		$show_deleted ||= 0;
+
+		$show_deleted 
+			? DNALC::Pipeline::NGS::Job->search(
+					task_id => $self->{task_name_to_id}->{$task}, 
+					project_id => $self->project, { order_by=>'id' })
+			: DNALC::Pipeline::NGS::Job->search(
+					task_id => $self->{task_name_to_id}->{$task}, 
+					project_id => $self->project,
+					deleted => 0, { order_by=>'id' });
 	}
 
 	#--------------------------------------
@@ -600,6 +617,160 @@ use Data::Dumper;
 	# job/task specific routines
 
 	#--------------------------------------
+	# default task handler
+	sub task_handle_default {
+		my ($self, $job, $api_files) = @_;
+
+		my $src_id;
+		my $task = $job->task_id->name;
+		my $app_conf = DNALC::Pipeline::Config->new->cf(uc $task);
+
+		return unless @$api_files;
+
+		# create a data_source_file entry
+		#
+		my $job_name = $job->attrs->{name};
+		$src_id = DNALC::Pipeline::NGS::DataSource->create({
+					project_id => $job->project_id,
+					name => 'Output from ' . $task,
+					note => $job_name || '',
+				});
+		if ($!) {
+			print STDERR 'Can\'t add source: ', $! , $/;
+		}
+
+		if ($src_id) {
+			my $counter = 0;
+			my $base_name = '';
+			my @job_input_files = $job->input_files;
+			if (@job_input_files == 1) {
+				$base_name = $job_input_files[0]->file->file_name;
+				$base_name =~ s/\.(.*?)$//;
+			}
+
+			for my $df (@$api_files)  {
+				my ($file_type) = $df->path =~ /\.(.*?)$/;
+				my $fname = $df->name;
+
+				# keep the same basename for the file
+				if ($app_conf->{_propagate_input_file_name}) {
+					if ($base_name) {
+						$fname = $base_name . sprintf("%s.%s", $counter > 1 ? $counter : '', $fname =~ /\.(.*?)$/);
+					}
+				}
+
+				print STDERR  'output file: ', $fname, $/ if $self->debug;
+				my $data_file = DNALC::Pipeline::NGS::DataFile->create({
+						project_id => $job->project_id,
+						source_id => $src_id,
+						file_name => $fname,
+						file_path => $df->path,
+						file_type => $file_type || '',
+					});
+				if ($data_file) {
+					my $outfile = DNALC::Pipeline::NGS::JobOutputFile->create({
+							file_id => $data_file,
+							job_id => $job,
+							project_id => $job->project_id,
+						});
+				}
+				$counter++;
+			}
+		} # end if($src_id)
+
+	}
+	#--------------------------------------
+	#
+	sub task_handle_tophat_output {
+		my ($self, $job, $api_files) = @_;
+
+		return unless @$api_files;
+
+		my $src_id;
+		my $task = $job->task_id->name;
+		my $app_conf = DNALC::Pipeline::Config->new->cf(uc $task);
+
+		$self->task_handle_default($job, $api_files);
+
+		# create a data_source_file entry
+		#
+		my $job_name = $job->attrs->{name};
+		$src_id = DNALC::Pipeline::NGS::DataSource->create({
+					project_id => $job->project_id,
+					name => 'Local files from ' . $task,
+					note => sprintf("%d/%s", $job->id, $job_name || ''),
+				});
+		if ($!) {
+			print STDERR 'Can\'t add source: ', $! , $/;
+		}
+
+
+		my $dest_dir = File::Spec->catfile($self->work_dir, "tophat");
+		unless (-d $dest_dir) {
+			unless (make_path($dest_dir)) {
+				print STDERR  " oo unlable to create TH directory: ", $!, $/;
+			}
+		}
+print STDERR  " -- dest dir: ", $dest_dir, $/ if $self->debug;
+
+		if ($src_id) {
+			my $counter = 0;
+			my $base_name = '';
+			my @job_input_files = $job->input_files;
+			if (@job_input_files == 1) {
+				$base_name = $job_input_files[0]->file->file_name;
+				$base_name =~ s/\.(.*?)$//;
+			}
+
+			# download the files
+			#
+			my $io = $self->api_instance->io;
+
+			for my $df (@$api_files)  {
+				my ($file_type) = $df->path =~ /\.(.*?)$/;
+				my $fname = $df->name;
+
+				# keep the same basename for the file
+				if ($app_conf->{_propagate_input_file_name}) {
+					if ($base_name) {
+						$fname = $base_name . sprintf("%s.%s", $counter > 1 ? $counter : '', $fname =~ /\.(.*?)$/);
+					}
+				}
+
+				my $save_to_file = File::Spec->catfile($dest_dir, sprintf("%d.%s", $job, $fname));
+				if ($io) {
+					unless (-f $save_to_file) {
+						my $data = $io->stream_file($df->path, save_to => $save_to_file);
+						print STDERR  " oo saved: ", $data, " ", $save_to_file, $/;
+					}
+				}
+
+
+				if (-f $save_to_file) {
+					print STDERR  'output file: ', $fname, $/ if $self->debug;
+					my $data_file = DNALC::Pipeline::NGS::DataFile->create({
+							project_id => $job->project_id,
+							source_id => $src_id,
+							file_name => $fname,
+							file_path => $save_to_file,
+							file_type => $file_type || '',
+							is_local => 1,
+						});
+					if ($data_file) {
+						my $outfile = DNALC::Pipeline::NGS::JobOutputFile->create({
+								file_id => $data_file,
+								job_id => $job,
+								project_id => $job->project_id,
+							});
+					}
+					$counter++;
+				}
+			} # end for (@$api_files)
+		} # end if($src_id)
+
+	}
+
+	#--------------------------------------
 	sub task_handle_trimmed_file {
 		my ($self, $job, $api_files) = @_;
 
@@ -635,7 +806,7 @@ use Data::Dumper;
 				$if->update;
 
 				my $mc_key = sprintf("ngs-%d-%s-%d", $self->project->id, "fastx_trimmer-0.0.13", $if->id);
-				$self->{_mc}->set($mc_key, 'done');
+				$self->{_mc}->set($mc_key, '', 1);
 			}
 		}
 	}
@@ -656,7 +827,7 @@ use Data::Dumper;
 		my $working_dir =$self->work_dir;
 		my $qc_dir = File::Spec->catfile($working_dir, 'qc');
 		unless (-d $qc_dir) {
-			mkdir $qc_dir, 0777;
+			mkdir $qc_dir, 0777 or print STDERR "Unable to create QCDir: ", $qc_dir, $/;
 		}
 
 		my ($archive) = grep {/\.zip$/ } map {$_->path} @$api_files;
@@ -676,7 +847,8 @@ use Data::Dumper;
 				
 				my $zip = Archive::Zip->new;
 				unless ( $zip->read( $save_to_file ) == AZ_OK ) {
-					die 'read error';
+					print STDERR  'ZIP read error';
+					return;
 				}
 				my @members = grep {$_->fileName !~ m|/\._|} $zip->members;
 				my ($root) = map {$_->fileName} grep {$_->fileName =~ m|_fastqc/$|} @members;
@@ -694,7 +866,8 @@ use Data::Dumper;
 					my $f = $m->fileName;
 					$f =~ s/$root//;
 					my $dest_f = File::Spec->catfile($save_to, $f);
-					#print $dest_f, $/;
+					#print "\t", $f, $/;
+					#print "\t", $dest_f, $/;
 					$zip->extractMember($m, $dest_f);
 
 					$html_file = $dest_f if $f =~ /fastqc_report\.html$/;
@@ -717,9 +890,11 @@ use Data::Dumper;
 							file_name => 'FastQC report',
 							file_path => $html_file,
 							file_type => 'html',
+							is_local => 1,
 						},
 						{_no_remote_check => 1}
 					);
+
 				if ($hfile) {
 					my $ifile = $job_input_file->file;
 					$ifile->qc_file_id($hfile);
@@ -727,7 +902,7 @@ use Data::Dumper;
 
 					my $mc_key_qc = sprintf("ngs-%d-%s-%d", $self->project->id, "ngs_fastqc", $ifile->id);
 					#print STDERR  $mc_key_qc, $/;
-					$self->{_mc}->set($mc_key_qc, 'done');
+					$self->{_mc}->set($mc_key_qc, '', 1);
 				}
 			}
 		}

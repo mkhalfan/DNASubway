@@ -110,7 +110,7 @@
 			
 				my $mc_key = sprintf("ngs-%d-%s-%d", $pm->project->id, "ngs_fastqc", $form->{input});
 				print STDERR "mc_key: ", $mc_key, $/;
-				$pm->{_mc}->set($mc_key, 'pending');
+				$pm->{_mc}->set($mc_key, 'pending', 7200);
 			
 				# redirect to our job list page
 				print STDERR "JOB ID: ", $st->{data}->id, "//", $st->{data}->api_job_id, $/;

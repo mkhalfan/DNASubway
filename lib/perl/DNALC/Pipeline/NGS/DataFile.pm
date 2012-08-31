@@ -7,7 +7,7 @@ use POSIX ();
 __PACKAGE__->table('ngs_data_file');
 __PACKAGE__->columns(Primary => qw/id/);
 __PACKAGE__->columns(Essential => qw/project_id source_id file_name file_path file_type 
-									is_input qc_file_id trimmed_file_id created/);
+									is_input is_local qc_file_id trimmed_file_id created/);
 __PACKAGE__->sequence('ngs_data_file_id_seq');
 
 __PACKAGE__->has_a(project_id => 'DNALC::Pipeline::NGS::Project');
