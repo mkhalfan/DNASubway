@@ -3,6 +3,7 @@
 	PROJECTS_DIR => '/var/www/vhosts/pipeline.dnalc.org/var/projects/phylogenetics', 
 	Q_THRESHOLD => 20,
 	BOOTSTRAPS => 100,
+	MAX_SEQ_COUNT => 80,
 	MAX_BLAST_RESULTS => 20,
 	DNALC_TRANSFER_DIR => '/var/tmp',
 	PHOTO_SUBMISSION_DIR => '/var/www/vhosts/pipeline.dnalc.org/var/projects/phylogenetics/photo_submissions',
@@ -14,9 +15,4 @@
 	GB_VALIDATION_USER => 'test_dnasubway_bankit',
 	GB_FTP_PW => '',
 	EXPORT_ON => 1,
-	
-
-	# not used yet
-	MAX_SEQ_NO => 100,
-	MAX_SEQ_LEN => 10000,
 }

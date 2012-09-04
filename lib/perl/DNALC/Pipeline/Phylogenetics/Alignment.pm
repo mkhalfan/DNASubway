@@ -11,7 +11,7 @@ __PACKAGE__->sequence('phy_alignment_id_seq');
 __PACKAGE__->has_a(project_id => 'DNALC::Pipeline::Phylogenetics::Project');
 
 __PACKAGE__->add_trigger(before_create => sub {
-	my $tmpl = sprintf("a%s-%%y%%m%%d.%%H%%M%%S", $_[0]->{tree_type});
+	my $tmpl = sprintf("a%s-%%y%%m%%d.%%H%%M%%S", $_[0]->{aln_type} || '');
 	$_[0]->{aln_name} ||= POSIX::strftime $tmpl, localtime(+time);
 });
 

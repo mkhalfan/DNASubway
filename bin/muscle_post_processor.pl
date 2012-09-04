@@ -57,12 +57,14 @@ my $consensus_seq = new Bio::LocatableSeq (
 ## (position is 0 or 1 depending on the BioPerl version)
 $aln->add_seq($consensus_seq, 0);
 
+my @seq = $aln->each_seq;
+
 ## Calculate the Pairwise Identity Similarity, and create the table
 ## which will show this information
-my $pairwise_data = calculate_pairwise_ids($aln);
+##  -- do Pairwise alignment when we have less than 50 sequences
+my $pairwise_data = @seq <= 50 ? calculate_pairwise_ids($aln) : {pairwise_ids => {}, num_seqs => 0};
 my $pairwise_div = create_pairwise_table($pairwise_data);
 
-my @seq = $aln->each_seq;
 
 for my $seq (@seq) {
 	$seqs{$seq->display_id} = $seq->seq;
@@ -110,6 +112,10 @@ if ($html_out->open($htmlout, "w")){
 	print $html_out $pairwise_div, "\n";
 	print $html_out '<div id="muscle_post_processor_output" style="height:' . $div_height . 'px;">', "\n";
 	print $html_out $buttons, "\n";
+	if (@seq > 80) {
+		my $num_seq = scalar @seq - 1;
+		print $html_out "<p style=\"margin-top: 30px;font-size: small;\">Alignment limited to first $num_seq sequences</p>\n";
+	}
 	print $html_out '<div id="viewport" class="viewport">', "\n";
 	print $html_out '<div id="labels">', "\n", $labels, '</div>', "\n";
 	print $html_out '<div id="alignment">', "\n";
@@ -408,7 +414,16 @@ sub create_pairwise_table {
 	$div .= "<!-- <![endif]-->\n";
 	$div .= '<div class="close_button"><img src="/images/prototip/styles/blue/close.png" onclick="$(\'pairwise_div\').hide();"></div>' . "\n";
 	$div .= "</div>\n";
-	$div .= '<div id="pairwise_div_body"><table id="pairwise_table" cellspacing=0>' .  "\n";
+
+	$div .= '<div id="pairwise_div_body">';
+
+	unless ($num_seqs) {
+		$div .= "<div style=\"background-color: #fff;\">Pairwise similarity computed only when 50 or fewer sequences selected!</div>";
+		$div .= "</div></div>";
+		return $div;
+	}
+
+	$div .= '<table id="pairwise_table" cellspacing=0>' .  "\n";
 	$div .= '<tr>'. "\n";
 	$div .= '<td></td>' . "\n";
 	for (my $y = 1; $y <= $num_seqs; $y++){

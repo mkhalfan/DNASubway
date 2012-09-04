@@ -335,6 +335,10 @@ use Bio::Trace::ABIF ();
 					push @errors, sprintf("File %s is not an FASTA file!", $filename);
 					next;
 				}
+
+				my $fa_seq_cnt  = 0;
+				my $max_seq_cnt = $self->config->{MAX_SEQ_COUNT} || 100;
+
 				my $seqio = Bio::SeqIO->new(-file => $f, -format => 'fasta');
 				while (my $seq_obj = $seqio->next_seq) {
 					#print ">", $seq_obj->display_id, $/;
@@ -360,6 +364,12 @@ use Bio::Trace::ABIF ();
 							seq => $seq_obj->seq,
 						});
 					$out_io->write_seq($seq_obj);
+
+					$fa_seq_cnt++;
+					unless ( $fa_seq_cnt < $max_seq_cnt ) {
+						push @warnings, sprintf("Max number of sequences (%d) has been reached!", $max_seq_cnt);
+						last;
+					}
 				}
 
 				$seq_count++;
@@ -673,17 +683,26 @@ use Bio::Trace::ABIF ();
 		my ($self) = @_;
 
 		my %selected_sequences = ();
+		my $max_seq_cnt = $self->config->{MAX_SEQ_COUNT} || 100;
+
 		my $memcached = DNALC::Pipeline::CacheMemcached->new;
 		if ($memcached) {
 			my $mc_key = "selected-seq-" . $self->project->id;
 			my $sel = $memcached->get($mc_key);
 			if ($sel && @$sel) {
-				%selected_sequences = map {$_ => 1} @$sel;
+				if (scalar(@$sel) > $max_seq_cnt) {
+					my @limited = @{$sel}[0 .. $max_seq_cnt - 1];
+					%selected_sequences = map {$_ => 1} @limited;
+				}
+				else {
+					%selected_sequences = map {$_ => 1} @$sel;
+				}
 			}
 		}
 
 		my $has_selected_sequences = keys %selected_sequences;
 
+		my $seq_count = 0;
 		my @data = ();
 		for my $pair ($self->pairs) {
 			next if ($has_selected_sequences && !defined $selected_sequences{"p$pair"});
@@ -692,11 +711,16 @@ use Bio::Trace::ABIF ();
 			my $name = $pair->name;
 			push @data, ">" . $name;
 			push @data, $pair->consensus;
+
+			last if $seq_count++ > $max_seq_cnt;
 		}
 		for my $s ($self->non_paired_sequences) {
 			next if ($has_selected_sequences && !defined $selected_sequences{$s->id});
 			push @data, ('>' . $s->display_id, $s->seq);
+
+			last if $seq_count++ > $max_seq_cnt;
 		}
+
 		join "\n", @data;
 	}
 	#-----------------------------------------------------------------------------
@@ -1016,7 +1040,7 @@ use Bio::Trace::ABIF ();
 
 	#
 	# builds an alignment from the projects' sequences
-	# these can be selected and sored in Memcached or all alignable sequences
+	# these can be selected and stored in Memcached or all alignable sequences
 	# if $realign is true, we get the last alignment and we re-align it (sometimes
 	# a trimmed alignment can be realigned)
 	#
