@@ -1563,6 +1563,19 @@ use Bio::Trace::ABIF ();
 		return File::Spec->catfile($self->config->{PROJECTS_DIR}, sprintf("%04X", $proj->id));
 	}
 	#-----------------------------------------------------------------------------
+	sub remove_project {
+		my ($self) = @_;
+		my $p = $self->project;
+
+		my $mp = $p->master_project;
+		$mp->public(0);
+		$mp->archived(1);
+		if ($mp->update) {
+			my $dir = $self->work_dir;
+			DNALC::Pipeline::App::Utils->remove_dir($dir);
+		}
+	}
+	#-----------------------------------------------------------------------------
 	sub config {
 		my ($self) = @_;
 

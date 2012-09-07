@@ -80,4 +80,9 @@ sub get_used_organisms {
 	return @data;
 }
 
+sub master_project {
+	my ($mp) = DNALC::Pipeline::MasterProject->search(project_id => $_[0], project_type => 'annotation');
+	return $mp;
+}
+
 1;

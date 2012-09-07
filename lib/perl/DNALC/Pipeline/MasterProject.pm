@@ -6,7 +6,7 @@ use Class::DBI::Pager;
 
 __PACKAGE__->table('master_project');
 __PACKAGE__->columns(Primary => qw/mp_id/);
-__PACKAGE__->columns(Essential => qw/user_id project_id project_type public/);
+__PACKAGE__->columns(Essential => qw/user_id project_id project_type public archived/);
 
 __PACKAGE__->sequence('master_project_mp_id_seq');
 
@@ -39,6 +39,7 @@ __PACKAGE__->set_sql(get_sorted => q{
 		WHEN 'phylogenetics' THEN pp.id
 		WHEN 'NGS' THEN np.id
 	END IS NOT NULL 
+	AND mp.archived = false
 		%s
 	ORDER BY %s
 	});
@@ -47,7 +48,7 @@ sub get_public_sorted {
 	my ($class, $args) = @_;
 
 	my $order_by = $args->{order_by} || 'mp.mp_id DESC';
-	my $where_str = 'AND mp.public = true ';
+	my $where_str = 'AND mp.archived = false AND mp.public = true ';
 	my @params = ();
 	
 	if ($args->{where} && $args->{where}) {

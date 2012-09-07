@@ -511,7 +511,13 @@ sub remove_project {
 	my $dir = $self->work_dir;
 	DNALC::Pipeline::App::Utils->remove_dir($dir);
 	my $pid = $p->id;
-	my $rc = $p->delete;
+
+	my $mp = $p->master_project;
+
+	$mp->public(0);
+	$mp->archived(1);
+	my $rc = $mp->update;
+	#my $rc = $p->delete;
 	unless ($rc) {
 		$self->log("Unable to remove project $pid", type => 'ERR', user_id => $user_id);
 	}

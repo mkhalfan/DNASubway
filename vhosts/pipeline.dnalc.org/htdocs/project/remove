@@ -38,8 +38,10 @@ my $dir;
 if ($mp->project_type eq "target") {
 	my ($p) = DNALC::Pipeline::TargetProject->search(tpid => $mp->project_id, user_id => $s->{user_id});
 	$dir = $p->work_dir;
-	#$mp->delete;
-	$p->delete;
+	$mp->archived(1);
+	$mp->public(0);
+	$mp->update;
+
 	DNALC::Pipeline::App::Utils->remove_dir($dir);
 
 	$m->comp('/_message_add', 'Project removed!', 'error');
@@ -57,9 +59,7 @@ elsif ($mp->project_type eq "annotation") {
 elsif ($mp->project_type eq "phylogenetics") {
 	my $pm = DNALC::Pipeline::App::Phylogenetics::ProjectManager->new($mp->project_id);
 	if ($pm->project) {
-		$dir = $pm->work_dir;
-		$pm->project->delete;
-		DNALC::Pipeline::App::Utils->remove_dir($dir);
+		$pm->remove_project;
 		$m->comp('/_message_add', 'Project removed!', 'error');
 	}
 }

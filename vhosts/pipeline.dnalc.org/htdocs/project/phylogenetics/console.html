@@ -283,7 +283,7 @@ my $s = $m->session->{pipeline};
 
 my $pm = DNALC::Pipeline::App::Phylogenetics::ProjectManager->new($pid);
 my $proj = $pm->project;
-unless ($proj) {
+if (!$proj || $proj->master_project->archived) {
 	$m->comp('/_message_add', 'Project not found!', 'error');
 	$m->redirect('/project/');
 }
