@@ -83,40 +83,28 @@
 		</span><!--END of span class conRedline_ConCellAdd2-->
 % }		
 
-% if ( $nt_evid ne "done" || $prot_evid ne "done") {
+%# if ( $nt_evid ne "done" || $prot_evid ne "done") {
 		<span class="conRedline_ConCellAdd2">
 			<span class="conIndicator_box"><div id="evidence_ind" class="conIndicator_<% $rm_status eq 'done' && $is_owner ? 'not-processed' : 'disabled' %>"></div></span>
 			<span class="bt_run">
 			
 			<span style="position:relative;">
 				<div id="add_evidence" class="popup">
-% if ( $nt_evid ne "done" || $prot_evid ne "done") {
+%# if ( $nt_evid ne "done" || $prot_evid ne "done") {
 				<form enctype="multipart/form-data" method="post">
 				<input type="hidden" name="notused" value="1" />
-% if ( $nt_evid ne "done") {
-					<div class="panel_container">Add DNA data in FASTA format:                     
+					<div class="panel_container"><% $nt_evid ne "done" ? "Add" : "Replace" %> DNA data in FASTA format:                     
 						<input class="conStylized_box1" type="file" id="evid_nt" name="evid_nt"/>
 					</div>
-% }
-% if ( $prot_evid ne "done") {
-					<div class="panel_container">Add Protein data in FASTA format:                      
+					<div class="panel_container"><%$prot_evid ne "done" ? "Add" : "Replace" %> Protein data in FASTA format:                      
 						<input class="conStylized_box1" type="file" id="evid_prot" name="evid_prot"/>
 					</div>
-% }
 					<div class="panel_container1">
 						<input type="button" value="  Cancel  " class="input" onclick="javascript:$('add_evidence').hide();$('add_evidence_link').show();" /> &nbsp; &nbsp; &nbsp; &nbsp;
 						<input type="submit" value="  Upload  " class="input" />
 					</div>
 				</form>
-% } else {
-				<p>&nbsp;</p>
-				<p>&nbsp;</p>
-				All possible evidence uploaded.
-				<p>&nbsp;</p>
-				<div class="panel_container1">
-					<input type="button" value="  OK  " class="input" onclick="javascript:$('add_evidence').hide();$('add_evidence_link').show();" /> &nbsp; &nbsp; &nbsp; &nbsp;
-				</div>
-% }
+%# }
 				</div>
 				<a id="add_evidence_link" href="javascript:void(0);" \
 % if ($is_owner && $rm_status eq "done" ) {
@@ -129,7 +117,7 @@
 
 		</span><!--END of span class conRedline_ConCell-->
 	</span>		
-% }
+%# }
 	</span><!--END of class conRedline_ConColumn-->
 </div><!--END of ID conRedlineLeft2-->
 
@@ -312,7 +300,7 @@ my $s = $m->session->{pipeline};
 
 my $pm = DNALC::Pipeline::App::ProjectManager->new($pid);
 my $proj = $pm->project;
-unless ($proj) {
+if (!$proj || $proj->master_project->archived) {
 	$m->comp('/_message_add', 'Project not found!', 'error');
 	$m->redirect('/project/');
 }
@@ -345,19 +333,27 @@ if ($r->method eq "POST") {
 		$m->comp('/_message_add', 'Only the owner of the project is allowed to do this!', 'error');
 	}
 	elsif ($ARGS{evid_nt} || $ARGS{evid_prot}) {
-		#my $wfm = DNALC::Pipeline::App::WorkflowManager->new( $proj );
-		for (qw/evid_nt evid_prot/) {
-			if ($ARGS{$_}) {
-				my $st = $pm->add_evidence($r, $_);
+		for my $evt (qw/evid_nt evid_prot/) {
+			if ($ARGS{$evt}) {
+				my $routine = $evt eq "evid_nt" ? "blastn_user" : "blastx_user";
+				my $routine_status = $wfm->get_status($routine)->name;
+
+				if ($routine_status eq "done") {
+					my $st = $pm->remove_analysis_results($routine);
+
+					if ($st->{status} eq "success") {
+						$wfm->set_status($routine, "not-processed");
+					}
+				}
+				my $st = $pm->add_evidence($r, $evt);
 				if ($st->{status} eq "success") {
-					#$m->comp("/_message_add", $_ . " evidence added.");
-					$wfm->set_status("upload_$_", 'done');
+					$wfm->set_status("upload_$evt", 'done');
 				}
 				else {
 					$m->comp("/_message_add", 
-						$_ . ": error formatting the evidence database." . $st->{message}, 
+						$evt . ": error formatting the evidence database." . $st->{message}, 
 						"error");
-					$wfm->set_status("upload_$_", 'error');
+					$wfm->set_status("upload_$evt", 'error');
 				}
 			}
 		}

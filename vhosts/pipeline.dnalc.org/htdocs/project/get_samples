@@ -23,7 +23,7 @@
 		unless (defined $cached_samples) {
 			my @samples = DNALC::Pipeline::Sample->get_by_type( @{$clade_map{$t}});
 			$cached_samples = \@samples;
-			#$m->cache->set($key, $cached_samples, '15 min');# if @samples;
+			$m->cache->set($key, $cached_samples, '15 min');# if @samples;
 		}
 	}
 

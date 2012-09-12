@@ -1042,6 +1042,37 @@ sub load_analysis_results {
 }
 
 #
+# removes user blast data
+#
+sub remove_analysis_results {
+	my ($self, $project_id, $analysis) = @_;
+
+	my $ref = $self->common_name . '_' . $project_id;
+	$ref =~ s/[ -]+/_/g;
+
+	my $sql = "DELETE FROM feature WHERE feature_id IN (
+				SELECT feature_id FROM gff3view
+				WHERE ref= ? AND source = ? AND type = 'match'
+				ORDER by feature_id
+			)";
+	my $dbh = $self->dbh;
+	unless ($dbh) {
+		print STDERR "Unable to connect to DB [C::Utils::remove_analysis_results].\n";
+		return;
+	}
+
+	my $sth = $dbh->prepare($sql);
+	my $rc = $sth->execute($ref, uc $analysis) or do {
+		print STDERR  "\nERROR: Unable to remove data for user blast data for $ref: ", $!, $/;
+	};
+	$sth->finish;
+	$dbh->disconnect;
+
+	# number of rows deleted
+	$rc;
+}
+
+#
 # creates if not already exists a new GBrowse config file for the specified project
 #
 sub create_gbrowse_conf {

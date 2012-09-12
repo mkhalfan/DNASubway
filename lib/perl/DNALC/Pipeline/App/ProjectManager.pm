@@ -385,6 +385,31 @@ sub get_gff3_file {
 }
 #-----------------------------------------------------------------------------
 #
+# removes user blast data from a chado database
+#
+sub remove_analysis_results {
+	my ($self, $routine) = @_;
+	# read data from new file
+
+	my $project = $self->project;
+	my $organism_str = join('_', split /\s+/, $project->organism)
+						. '_' . $project->common_name;
+
+	my $cutils = DNALC::Pipeline::Chado::Utils->new(
+					username => $self->username,
+					organism_string => $organism_str,
+					profile => $self->chado_user_profile,
+				);
+	if ($@) {
+		print STDERR  "Unable to create CHADO instance..: ", $@, $/;
+	}
+
+	my $rc = $cutils->remove_analysis_results($project, $routine);
+	
+	return {status => $rc ? 'success' : '', message => ''};
+}
+#-----------------------------------------------------------------------------
+#
 # returns one of the two output file we get from Repeat Masker
 #
 sub fasta_masked_nolow {
