@@ -16,13 +16,26 @@
 			<div class="conNewPro_title">Select Organism type *</div>
 			<div class="conNewPro_label1">
 				<span class="conNewPro_smallContainerx">
-				<input class="conRadiobox_align" type="radio" name="otype" id="otypea" value="animals" <% $otype eq "animals" ? "checked=\"checked\"" : ""%>/>&nbsp; Animals</span>
+				<input class="conRadiobox_align" type="radio" name="otype" id="otypea" value="animals" <% $otype eq "animals" ? "checked=\"checked\"" : ""%>/><label for="otypea"> Animals</label></span>
 				<span class="conNewPro_smallContainerx">
-				<input class="conRadiobox_align" type="radio" name="otype" id="otypef" value="fungi" <% $otype eq "fungi" ? "checked=\"checked\"" : ""%>/>&nbsp; Fungi</span>
+				<input class="conRadiobox_align" type="radio" name="otype" id="otypep" value="plants" <% $otype eq "plants" ? "checked=\"checked\"" : ""%>/><label for="otypep"> Plants</label></span>
 				<span class="conNewPro_smallContainerx">
-				<input class="conRadiobox_align" type="radio" name="otype" id="otypep" value="plants" <% $otype eq "plants" ? "checked=\"checked\"" : ""%>/>&nbsp; Plants</span>
+				<input class="conRadiobox_align" type="radio" name="otype" id="otypef" value="fungi" <% $otype eq "fungi" ? "checked=\"checked\"" : ""%>/><label for="otypef"> Fungi</label></span>
 			</div>
-			<div style="clear: both;">&nbsp;</div>
+			<div style="clear:both;height:5px;">&nbsp;</div>
+			<div style="height:18px;">
+				<div id="animals_level_2" style="display:none;background-color:#CFECEC;padding:1px 10px 1px 2px;margin-left:40px;font-size:0.9em;">
+					<input type="radio" id="mammals" name="animal_type" value="mammals" /><label for="mammals"> Mammals</label>
+					<input type="radio" id="fish" name="animal_type" value="fish" /><label for="fish"> Fish</label>
+					<input type="radio" id="insects" name="animal_type" value="insects" /><label for="insects"> Insects</label>
+					<input type="radio" id="nematodes" name="animal_type" value="nematodes" /><label for="nematodes"> Nematodes</label>
+				</div>
+				<div id="plants_level_2" style="display:none;background-color:#CFECEC;padding:1px 10px 1px 2px;margin-left:40px;font-size:0.9em;">
+					<input type="radio" id="monocotyledons" name="plant_type" value="monocotyledons" /><label for="monocotyledons"> Monocotyledons</label>
+					<input type="radio" id="dicotyledons" name="plant_type" value="dicotyledons" /><label for="dicotyledons"> Dicotyledons</label>
+				</div>
+			</div>
+			<div style="clear:both;height:2px;">&nbsp;</div>
 		 </div>
 	
 		<div class="conNewPro_title">Select Sequence Source *</div>
@@ -78,30 +91,7 @@
 						<label>Common name:</label>
 								<input class="conStylized_box4" type="text"name="common_name" id="common_name" value="<% $common_name |html%>" maxlength="128"   />
  				 	</div> 
-             <div style="clear: both;">&nbsp;</div> 
-				<div class="conNewPro_label1" id="clades">
-					<label>Class:</label>
-					<div style="clear: both;">&nbsp;</div>
-					<div class="conNewPro_label1">
-						<span class="conNewPro_smallContainer">
-						<input class="conRadiobox_align" type="radio" name="group" id="gm" value="m" <% $group eq "m" ? "checked=\"checked\"" : ""%>/>&nbsp; Monocotyledons</span>
-						<span class="conNewPro_smallContainer">
-						<input class="conRadiobox_align" type="radio" name="group" id="gd" value="d" <% $group eq "d" ? "checked=\"checked\"" : ""%>/>&nbsp; Dicotyledons</span>                     
-					</div>
-					<div class="conNewPro_label1">
-						<span class="conNewPro_smallContainer">
-						<input class="conRadiobox_align" type="radio" name="group" id="go" value="o" <% $group eq "o" ? "checked=\"checked\"" : ""%>/>&nbsp; Other</span>
-						<span class="conNewPro_smallContainer">
-						<input class="conRadiobox_align" type="radio" name="group" id="gu" value="u" <% $group eq "u" ? "checked=\"checked\"" : ""%>/>&nbsp; I don't know</span>
-					</div>
-					<div class="conNewPro_label1">
-						<span class="conNewPro_smallContainer">
-						<input class="conRadiobox_align" type="radio" name="group" id="gf" value="f" <% $group eq "h" ? "checked=\"checked\"" : ""%>/>&nbsp; Fungi</span>
-						<span class="conNewPro_smallContainer">
-						<input class="conRadiobox_align" type="radio" name="group" id="ga" value="a" <% $group eq "a" ? "checked=\"checked\"" : ""%>/>&nbsp; Animals</span>
-					</div>
- 				 </div>
-				 
+            <!-- class: monocot, dicot, other, unkown was here-->
 		<div style="clear: both;">&nbsp;</div>
         <div class="conNewPro_title">Description</div>
         <div class="conNewPro_label">Total characters (max.140): &nbsp;<span id="desc_len"><% length $description %></span></div>

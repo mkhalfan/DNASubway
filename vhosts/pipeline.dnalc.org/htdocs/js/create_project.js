@@ -142,7 +142,8 @@ function pasted_data_ok() {
 	return re.test(t) == false;
 }
 
-function set_organism_type(type) {
+/*
+function set_organism_typewe(type) {
 	if (!type)
 		return;
 	type = type.toLowerCase().replace(/^\s+/,'').replace(/\s+$/,'');
@@ -167,6 +168,7 @@ function set_organism_type(type) {
 			});
 	}
 }
+*/
 
 function get_samples(type) {
 	// remove current samples
@@ -198,19 +200,8 @@ function get_samples(type) {
 // keep this at the end
 Event.observe(window, isMSIE ? 'load' : 'dom:loaded', function() {
 
-	if ($('test1')) {
-			if (!$('type')) {
-			$('conProject_newLeft').hide();
-			$('conProject_newRight').hide();
-
-			$$('#conProject_dispatcher div.btn').each(function(obj,idx) {
-				obj.observe('click', function(ev){set_organism_type(this.innerText||this.textContent)});
-			});
-		}
-		//alert($('test1').id);
-	}
-	else if ($('test2')) {
-		if ($('otypep').checked) {
+ //if ($('test2')) {
+		/*if ($('otypep').checked) {
 			$('clades').show();
 			['gm', 'gd', 'go', 'gu'].each(function(obj) {
 				$(obj).parentNode.show();
@@ -221,27 +212,31 @@ Event.observe(window, isMSIE ? 'load' : 'dom:loaded', function() {
 		}
 		else {
 			$('clades').hide();
-		}
+		}*/
 
 		$$('input[name=otype]').each(function(obj, idx) {
 			obj.observe('click', function(){ 
 				get_samples(obj.value);
 				$$('#conProject_newRight input[type=radio]').each(function(obj){obj.parentNode.hide()});
 				if (obj.value == "plants") {
-					$('clades').show();
-					['gm', 'gd', 'go', 'gu'].each(function(obj) {
-						$(obj).parentNode.show();
-					});
+					$('animals_level_2').hide();
+					$('plants_level_2').setStyle({display: 'inline-block'});
+				}
+				else if (obj.value == "animals") {
+					$('plants_level_2').hide();
+					$('animals_level_2').setStyle({display: 'inline-block'});
 				}
 				else {
-					$('clades').hide();
+					$('animals_level_2').hide();
+					$('plants_level_2').hide();
 				}
 				
 				$$('#forma1 input,textarea,select').each(function(obj){
 				  if (obj.id.indexOf('otype')) obj.enable();
 				});
-				
-				$('otypep').prototip.remove();
+				if ($('otypep').prototip){
+					$('otypep').prototip.remove();
+				}
 			});
 			//console.info(obj);
 		});
@@ -257,15 +252,16 @@ Event.observe(window, isMSIE ? 'load' : 'dom:loaded', function() {
 				style: 'red',
                 stem: 'leftMiddle',
                 hook: { mouse: false, tip: 'leftMiddle' },
-                offset: { x: 60, y: 0 },
+                offset: { x: 110, y: 5 },
                 width: 90,
 				hideAfter: 5,
 				hideOn: '',
 			});
 		$('otypep').prototip.show();
+/*
 	}
 	else {
 		//alert("no");
 		$('conProject_dispatcher').hide();
-	}
+	}*/
 });
