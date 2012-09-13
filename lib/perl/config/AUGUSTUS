@@ -14,9 +14,13 @@
 	species_map => {
 		d => '--species=arabidopsis',
 		m => '--species=maize',
-		h => '--species=human',
-		a => '--species=human',
 		default => '--species=arabidopsis',
+
+		'♞' => '--species=human', # the horse char :p
+		h => '--species=human',
+		f => '--species=fish',
+		i => '--species=fly',
+		w => '--species=worm',
 	},
 
 }

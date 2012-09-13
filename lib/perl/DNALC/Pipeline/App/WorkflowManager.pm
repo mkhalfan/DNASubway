@@ -584,7 +584,7 @@ use Carp;
 
 		# no deed to check for canned results in this case
 
-		my $blastn = DNALC::Pipeline::Process::Blast->new( $pm->work_dir, 'blastn_user' );
+		my $blastn = DNALC::Pipeline::Process::Blast->new( $pm->work_dir, 'blastn_user', $proj->clade );
 		if ($blastn) {
 
 			my $input_file = $pm->fasta_masked_xsmall;
@@ -618,7 +618,7 @@ use Carp;
 		my $proj = $self->project;
 		my $pm   = $self->pmanager;
 
-		my $blastx = DNALC::Pipeline::Process::Blast->new( $pm->work_dir, 'blastx_user' );
+		my $blastx = DNALC::Pipeline::Process::Blast->new( $pm->work_dir, 'blastx_user', $proj->clade );
 		if ($blastx) {
 			my $input_file = $pm->fasta_masked_xsmall;
 			if ($input_file) {

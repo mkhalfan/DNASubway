@@ -8,8 +8,8 @@
 	use JSON::XS ();
 	
 	my %clade_map = (
-		animals => [qw/a/],
-		fungi => [qw/f/],
+		animals => [qw/♞ f i w/], # mamals fish insect worms
+		fungi => [qw/x/],
 		plants => [qw/d m/],
 	);
 </%once>
@@ -21,9 +21,9 @@
 		my $key = 'cached_aasamples_' . $t;
 		$cached_samples = $m->cache->get($key, busy_lock=>'30 sec');
 		unless (defined $cached_samples) {
-			my @samples = DNALC::Pipeline::Sample->get_by_type( @{$clade_map{$t}});
+			my @samples = DNALC::Pipeline::Sample->get_by_type( $t);
 			$cached_samples = \@samples;
-			$m->cache->set($key, $cached_samples, '15 min');# if @samples;
+			$m->cache->set($key, $cached_samples, '15 min') if @samples;
 		}
 	}
 

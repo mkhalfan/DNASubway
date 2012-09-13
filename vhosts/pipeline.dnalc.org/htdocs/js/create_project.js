@@ -100,8 +100,6 @@ function populate_fields(src) {
 	}
 	else {
 		var o = sel.options[sel.selectedIndex];
-		var clade = o.hasAttribute('clade') ? o.getAttribute('clade') : 'o';
-		var clade_o = $('g' + clade);
 		var full_name = o.text;
 		organism.value = full_name.replace(/\s*\(.*/,'');
 		var m = full_name.match(/\((.*)\)/);
@@ -110,9 +108,12 @@ function populate_fields(src) {
 		}
 		organism.readOnly = true;
 		common_name.readOnly = true;
+
+		/*var clade = o.hasAttribute('clade') ? o.getAttribute('clade') : 'o';
+		var clade_o = $('g' + clade);
 		if (clade_o) {
 			clade_o.checked = true;
-		}
+		}*/
 	}
 }
 
@@ -172,10 +173,7 @@ function set_organism_typewe(type) {
 
 function get_samples(type) {
 	// remove current samples
-	var ssamples = $('specie').options;
-	while(ssamples.length) {
-		ssamples[0].remove();
-	}
+	clear_sample_list();
 
 	new Ajax.Request('/project/get_samples',{
 		method:'get',
@@ -197,26 +195,36 @@ function get_samples(type) {
 	});
 }
 //-------------
+function clear_sample_list() {
+	var ssamples = $('specie').options;
+	while(ssamples.length) {
+		ssamples[0].remove();
+	}
+}
+
+//-------------
 // keep this at the end
 Event.observe(window, isMSIE ? 'load' : 'dom:loaded', function() {
 
- //if ($('test2')) {
-		/*if ($('otypep').checked) {
-			$('clades').show();
-			['gm', 'gd', 'go', 'gu'].each(function(obj) {
-				$(obj).parentNode.show();
-			});
-			['ga', 'gf'].each(function(obj) {
-				$(obj).parentNode.hide();
-			});
-		}
-		else {
-			$('clades').hide();
-		}*/
-
+		var disable_inputs = true;
+		
+		// level_2 selection
+ 		$$('input[name=group]').each(function(obj) {
+			obj.observe('click', function(){ 
+					get_samples(obj.value);
+					
+					// enable fields
+					$$('#forma1 input,textarea,select').each(function(obj){
+					  if (obj.id.indexOf('otype')) obj.enable();
+					});
+				});
+		});
+		
+		// level_1 selection
 		$$('input[name=otype]').each(function(obj, idx) {
 			obj.observe('click', function(){ 
-				get_samples(obj.value);
+				clear_sample_list();
+				
 				$$('#conProject_newRight input[type=radio]').each(function(obj){obj.parentNode.hide()});
 				if (obj.value == "plants") {
 					$('animals_level_2').hide();
@@ -230,38 +238,45 @@ Event.observe(window, isMSIE ? 'load' : 'dom:loaded', function() {
 					$('animals_level_2').hide();
 					$('plants_level_2').hide();
 				}
-				
-				$$('#forma1 input,textarea,select').each(function(obj){
-				  if (obj.id.indexOf('otype')) obj.enable();
-				});
+
 				if ($('otypep').prototip){
 					$('otypep').prototip.remove();
 				}
+				
+				$$('#forma1 input[name=group]').each(function(obj){
+				  if (obj.id.indexOf('otype')) obj.enable();
+				});
 			});
 			//console.info(obj);
+			
+			// if we return with an error, re-enable the form inputs
+			if (obj.checked) {
+				$(obj.value + '_level_2').show();
+				var selector = "#" + obj.value + '_level_2 input[checked=checked]';
+				var sel_group = $$(selector);
+				if (sel_group && sel_group.length == 1) {
+					disable_inputs = false;
+				}
+			}
 		});
 		
-		$$('#forma1 input,textarea,select').each(function(obj){
-		  if (obj.id.indexOf('otype')) obj.disable();
-		});
-		
-		var tip = new Tip('otypep', " &nbsp;Start here!", {
-				//title: "Start here",
-				border: 5,
-				radius: 5,
-				style: 'red',
-                stem: 'leftMiddle',
-                hook: { mouse: false, tip: 'leftMiddle' },
-                offset: { x: 110, y: 5 },
-                width: 90,
-				hideAfter: 5,
-				hideOn: '',
+		if (disable_inputs) {
+			$$('#forma1 input,textarea,select').each(function(obj){
+			  if (obj.id.indexOf('otype')) obj.disable();
 			});
-		$('otypep').prototip.show();
-/*
+			
+			var tip = new Tip('otypep', " &nbsp;Start here!", {
+					//title: "Start here",
+					border: 5,
+					radius: 5,
+					style: 'red',
+					stem: 'leftMiddle',
+					hook: { mouse: false, tip: 'leftMiddle' },
+					offset: { x: 110, y: 5 },
+					width: 90,
+					hideAfter: 5,
+					hideOn: '',
+				});
+			$('otypep').prototip.show();
 	}
-	else {
-		//alert("no");
-		$('conProject_dispatcher').hide();
-	}*/
 });

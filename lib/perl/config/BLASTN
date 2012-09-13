@@ -31,6 +31,12 @@
 	gff3_file => 'output.gff',
 	species_map => {
 		default => 'unigene_viridiplantae_uniq',
-		a => 'unigene.bilateralia.uniq',
+
+		'♞' => 'unigene.bilateralia.uniq', # the horse char :p
+		h => 'unigene.bilateralia.uniq',
+		f => 'unigene.bilateralia.uniq',
+		i => 'unigene.bilateralia.uniq',
+		w => 'unigene.bilateralia.uniq',
+		x => 'unigene.bilateralia.uniq',
 	},
 }

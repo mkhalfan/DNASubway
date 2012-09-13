@@ -19,20 +19,21 @@
 				<input class="conRadiobox_align" type="radio" name="otype" id="otypea" value="animals" <% $otype eq "animals" ? "checked=\"checked\"" : ""%>/><label for="otypea"> Animals</label></span>
 				<span class="conNewPro_smallContainerx">
 				<input class="conRadiobox_align" type="radio" name="otype" id="otypep" value="plants" <% $otype eq "plants" ? "checked=\"checked\"" : ""%>/><label for="otypep"> Plants</label></span>
-				<span class="conNewPro_smallContainerx">
+<!--				<span class="conNewPro_smallContainerx">
 				<input class="conRadiobox_align" type="radio" name="otype" id="otypef" value="fungi" <% $otype eq "fungi" ? "checked=\"checked\"" : ""%>/><label for="otypef"> Fungi</label></span>
+-->
 			</div>
 			<div style="clear:both;height:5px;">&nbsp;</div>
 			<div style="height:18px;">
 				<div id="animals_level_2" style="display:none;background-color:#CFECEC;padding:1px 10px 1px 2px;margin-left:40px;font-size:0.9em;">
-					<input type="radio" id="mammals" name="animal_type" value="mammals" /><label for="mammals"> Mammals</label>
-					<input type="radio" id="fish" name="animal_type" value="fish" /><label for="fish"> Fish</label>
-					<input type="radio" id="insects" name="animal_type" value="insects" /><label for="insects"> Insects</label>
-					<input type="radio" id="nematodes" name="animal_type" value="nematodes" /><label for="nematodes"> Nematodes</label>
+					<input type="radio" id="mammals" name="group" value="♞" <% $group eq "♞" ? "checked=\"checked\"" : ""%> /><label for="mammals"> Mammals</label>
+					<input type="radio" id="fish" name="group" value="f" <% $group eq "f" ? "checked=\"checked\"" : ""%> /><label for="fish"> Fish</label>
+					<input type="radio" id="insects" name="group" value="i" <% $group eq "i" ? "checked=\"checked\"" : ""%> /><label for="insects"> Insects</label>
+					<input type="radio" id="nematodes" name="group" value="w" <% $group eq "w" ? "checked=\"checked\"" : ""%> /><label for="nematodes"> Nematodes</label>
 				</div>
 				<div id="plants_level_2" style="display:none;background-color:#CFECEC;padding:1px 10px 1px 2px;margin-left:40px;font-size:0.9em;">
-					<input type="radio" id="monocotyledons" name="plant_type" value="monocotyledons" /><label for="monocotyledons"> Monocotyledons</label>
-					<input type="radio" id="dicotyledons" name="plant_type" value="dicotyledons" /><label for="dicotyledons"> Dicotyledons</label>
+					<input type="radio" id="monocotyledons" name="group" value="m" <% $group eq "m" ? "checked=\"checked\"" : ""%> /><label for="monocotyledons"> Monocotyledons</label>
+					<input type="radio" id="dicotyledons" name="group" value="d" <% $group eq "d" ? "checked=\"checked\"" : ""%> /><label for="dicotyledons"> Dicotyledons</label>
 				</div>
 			</div>
 			<div style="clear:both;height:2px;">&nbsp;</div>
@@ -136,8 +137,8 @@
 	use Data::Dumper;
 	
 	my %clade_map = (
-		animals => [qw/a/],
-		fungi => [qw/f/],
+		animals => [qw/♞ f i w/],
+		fungi => [qw/x/],
 		plants => [qw/d m/],
 	);
 </%once>
@@ -151,8 +152,8 @@ my $pcf = $cf->cf('PIPELINE');
 my $seq_max_len = int(($pcf->{sequence_length} || 50_000) / 1_000);
 
 #my @samples = DNALC::Pipeline::Sample->search( active => 1, {order_by => "organism, segment, start"});
-my @samples = ($otype && defined $clade_map{$otype})
-				? DNALC::Pipeline::Sample->get_by_type( @{$clade_map{$otype}})
+my @samples = ($otype && defined $clade_map{$otype} && $group)
+				? DNALC::Pipeline::Sample->get_by_type( $group )
 				: (); 
 
 my @err = ();

@@ -27,7 +27,7 @@ use strict;
 
 			my $species_map = $self->{conf}->{species_map};
 			if (defined $species_map && %$species_map) {
-				unless ($clade && $clade =~ /^(?:a|f)$/) {
+				unless ($clade && $clade =~ /^(?:a|f|♞|h|f|i|w|x)$/) {
 					$clade = 'default';
 				}
 				$self->{clade} = $clade;
@@ -36,7 +36,6 @@ use strict;
 					push @{ $self->{work_options} }, ('-d', $db, '-i');
 				}
 			}
-
 		}
 
 		$ENV{BLASTMAT}=$self->{conf}{blastmat};

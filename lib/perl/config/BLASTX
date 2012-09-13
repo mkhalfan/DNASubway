@@ -32,7 +32,14 @@
 	gff3_file => 'output.gff',
 	species_map => {
 		default => 'uniprot_viridiplantae_sprot',
+
+		'♞' => 'uniprot.mamalia', # the horse char :p
 		a => 'uniprot.bilateria',
+		h => 'uniprot.mamalia',
+		f => 'uniprot.actinopterygii',
+		i => 'uniprot.insecta',
+		w => 'unigene.nematoda',
+		x => 'uniprot.fungi', # fungi
 	},
 
 }
