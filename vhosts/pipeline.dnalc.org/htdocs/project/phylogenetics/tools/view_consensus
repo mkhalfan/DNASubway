@@ -28,7 +28,7 @@
 		</div>
 		<div style="clear:both;height:0px">&nbsp;</div>
 		<div style="overflow: auto;" class="monospace">
-			<div id="labels" style="color:#996600">
+			<div id="labels" style="color:#996600;min-width:115px;">
 				<div id="seq1_name"></div>
 				<div id="seq2_name"></div>
 				<div id="consensus_div_name"></div>
