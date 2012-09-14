@@ -38,7 +38,7 @@
 		h => 'uniprot.mamalia',
 		f => 'uniprot.actinopterygii',
 		i => 'uniprot.insecta',
-		w => 'unigene.nematoda',
+		w => 'uniprot.nematoda',
 		x => 'uniprot.fungi', # fungi
 	},
 

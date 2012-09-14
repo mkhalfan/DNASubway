@@ -17,8 +17,15 @@
 <span class="small">Nomenclature</span>
 </label>
 <div style="float:left;">
-% for (qw/dicotyledons monocotyledons other/) {
+% for (('dicotyledons', 'monocotyledons', 'other plants', 'animals', 'fungi')) {
 %	my $i = substr $_, 0, 1;
+%	my $sel = $i eq $clade ? 'checked="checked"' : '';
+	<div><input type="radio" name="clade" value="<% $i %>" <%$sel%>/> <% $_ %></div>
+% }
+</div>
+<div style="float:left;">
+% for (('mamalia', 'actinopterygii', 'insecta', 'nematoda')) {
+%	my $i = exists $species_map{$_} ? $species_map{$_} : substr $_, 0, 1;
 %	my $sel = $i eq $clade ? 'checked="checked"' : '';
 	<div><input type="radio" name="clade" value="<% $i %>" <%$sel%>/> <% $_ %></div>
 % }
@@ -140,6 +147,13 @@
 	use Data::Dumper;
 	
 	my @browser_types = qw/gbrowse ensemble/;
+	
+	my %species_map = (
+			mamalia => '♞',
+			actinopterygii => 'f',
+			insecta => 'i',
+			nematoda => 'w',
+		);
 </%once>
 %#------------------------------------------------------------------------------
 <%init>
