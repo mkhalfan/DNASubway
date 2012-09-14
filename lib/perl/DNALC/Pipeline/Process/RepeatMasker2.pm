@@ -12,7 +12,7 @@ use base q(DNALC::Pipeline::Process);
 
 		my $species_map = $self->{conf}->{species_map};
 		if (defined $species_map && %$species_map) {
-			unless ($clade && $clade =~ /^(?:m|d|h|a|f)$/) {
+			unless ($clade && $clade =~ /^(?:m|d|h|♞|f|i|w)$/) {
 				$clade = 'default';
 			}
 			$self->{clade} = $clade;

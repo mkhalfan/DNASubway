@@ -14,7 +14,13 @@
 		d => [qw/-species eudicotyledons/], #must be ARRAY ref
 		m => [qw/-species monocotyledons/],
 		default => [qw/-species viridiplantae/],
-		a => [qw/-species bilateria/],
+
+		'♞' => [qw/-species mammals/], # the horse
+		h => [qw/-species mammals/],
+		i => [qw/-species insecta/],
+		f => [qw/-species actinopterygii/],
+		w => [qw/-species nematoda/],
+		x => [qw/-species fungi/],
 	},
 }
 
