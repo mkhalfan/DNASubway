@@ -1017,7 +1017,7 @@ color: #000;
 }
 
 
-/* BOLD related styles */
+/* BOLD/GB related styles */
 #BOLDbody {
 	margin: 20px;
 	font-family: arial, hervetica, san-serif;
@@ -1082,7 +1082,6 @@ table#details {
 	text-align: center;
 }
 
-
 p#message {
 	font-weight: bold;
 }
@@ -1095,6 +1094,18 @@ p.info {
 	color: green;
 }
 
+#codon_table_options{
+	display:none;
+	background-color:#E0E9F6;
+	padding:1px 10px 3px 10px;
+	margin-left:40px;
+	font-size:0.9em;
+}
+
+#codon_table_options form{
+	display:inline;
+}
+/* END BOLD/GB styles */
 .right_sidebar_container{
 	display:block;
 	width:200px;
