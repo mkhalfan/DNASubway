@@ -1,7 +1,10 @@
 package DNALC::Pipeline::Barcode::Annotation;
 
+use strict;
+use warnings;
+
 {
-	my %geneticCode = (
+	my %standardCode = (
 		'TCA' => 'S',    # Serine
 		'TCC' => 'S',    # Serine
 		'TCG' => 'S',    # Serine
@@ -68,16 +71,71 @@ package DNALC::Pipeline::Barcode::Annotation;
 		'GGT' => 'G',    # Glycine
 	);
 
+	my %invertebrateCode = (
+		'AGA' => 'S',	# Ser
+		'AGG' => 'S',	# Ser
+		'ATA' => 'M',	# Met
+		'TGA' => 'W',	# Trp
+	);
+
+	my %vertebrateCode = (
+		'AGA' => '*',	# Stop
+		'AGG' => '*',	# Stop
+		'ATA' => 'M',	# Met
+		'TGA' => 'W',	# Trp
+	);
+
+	 my %echinodermCode = (
+        'AGA' => 'S',   # Ser
+        'AGG' => 'S',   # Ser
+        'AAA' => 'N',   # Asn
+        'TGA' => 'W',   # Trp
+    );
+
+	sub getTransCode {
+		my ($trans_table) = @_;
+
+		my $geneticCode = \%standardCode;
+		
+ 		# Create hash %geneticCode conditionally based on what trans table to use
+        if ($trans_table == 2) {
+            $geneticCode = mergeHashes(\%standardCode, \%vertebrateCode);
+        }
+        elsif ($trans_table == 5) {
+            $geneticCode = mergeHashes(\%standardCode, \%invertebrateCode);
+        }
+        elsif ($trans_table == 9) {
+            $geneticCode = mergeHashes(\%standardCode, \%echinodermCode);
+        }
+
+		return $geneticCode;
+
+	}
+	
+	sub mergeHashes {
+		my ($hash1, $hash2) = @_;
+
+		my %new_hash = %$hash1;
+		foreach my $key2 (keys %$hash2){
+			$new_hash{$key2} = $hash2->{$key2};
+		}
+		return \%new_hash;
+	}
+
 	sub getGCode {
-		my($codon, $orf, $pos) = @_;
-
+		my($codon, $orf, $pos, $geneticCode) = @_;
+		
+		my %geneticCode = %$geneticCode;	
 		my $code = '';
-
+		
 		if(exists $geneticCode{$codon}) {
 			$code = $geneticCode{$codon};
 		}
 		elsif(length $codon < 3) {
 			$code = ' ';
+		}
+		else {
+			$code = "X";
 		}
 
 		return $code;
@@ -90,7 +148,7 @@ package DNALC::Pipeline::Barcode::Annotation;
 	#	$orf - reading frame (1,2 or 3)
 	#
 	sub translate {
-		my ($seq, $orf) = @_;
+		my ($seq, $orf, $trans_table) = @_;
 		
 		unless ($orf && $orf =~ /^[1-3]$/) {
 			print STDERR "ERR: Invalid orf: ", $orf, "\n";
@@ -103,9 +161,11 @@ package DNALC::Pipeline::Barcode::Annotation;
 		
 		my $pos = 0 + $orf - 1;
 		my $seq_len = length $seq;
+
+		my $geneticCode = getTransCode($trans_table);
 		while ($pos < $seq_len) {
 			my $codon = substr($seq, $pos, 3);
-			my $aa = getGCode($codon, $orf, $pos);
+			my $aa = getGCode($codon, $orf, $pos, $geneticCode);
 			
 			push @stop_codons, [$pos+1, $codon] if $aa eq '*';
 			push @start_codons, [$pos+1, $codon] if $aa eq 'M';
@@ -125,23 +185,27 @@ package DNALC::Pipeline::Barcode::Annotation;
 	}
 
 	# method for getting the rbcL/COI annotation
+	# param $seq		The sequence to be annotated
+	# param $primer		Currently supported primers: rbcL, coi
+	# param $organism	The name of the organism 
+	# $trans_table		The Translation Table number to use (ex: 5 - Invertebrate Mitochondrial)
 	sub annotate_barcode {
-		my ($seq, $primer) = @_;
+		my ($seq, $primer, $organism, $trans_table) = @_;
 		my ($orf, $translation) = (0, '');
 		
 		my $seq_len = length $seq;
 		
-		$seq =~ s/[^cgta]//ig;
+		$seq =~ s/[^cgtan]//ig;
 	
 		# find the 1st reading frame without a stop codon
-		for (1 .. 3) {
-			my ($ts, $start_codons, $stop_codons) = translate($seq, $_);
-			unless (@$stop_codons) {
-				$orf = $_;
-				$translation = $ts;
-				last;
+			for (1 .. 3) {
+				my ($ts, $start_codons, $stop_codons) = translate($seq, $_, $trans_table);
+				unless (@$stop_codons) {
+					$orf = $_;
+					$translation = $ts;
+					last;
+				}
 			}
-		}
 		
 		unless ($orf) {
 			print STDERR "ERR: can't build annotation?!\n";
@@ -150,32 +214,31 @@ package DNALC::Pipeline::Barcode::Annotation;
 		
 		my ($organelle, $product_full, $gene, $protein_id );
 		
-		$protein_id = 'PROT|EIN|_|ID';
 		if ($primer =~ /rbcl/i) {
 			$gene = 'rbcL';
-			$organelle = 'Chloroplast';
-			$product_full = 'Ribulose 1,5 bisphosphate carboxylase oxygenase large subunit I';
+			$organelle = 'plastid:chloroplast';
+			$product_full = 'ribulose-1,5-bisphosphate carboxylase/oxygenase large subunit';
 		}
 		elsif ($primer =~ /co(?:i|1)/i) {
-			$gene = 'co1';
+			$gene = 'COI';
 			$organelle = 'Mitochondria';
-			$product_full = 'Cytochrome c oxidase subunit I';
+			$product_full = 'cytochrome c oxidase subunit I';
 		}
 		
 		my $annotation = '';
 		$annotation .= "1	$seq_len	source\n";
-		$annotation .= "			/organism = ??\n";
-		$annotation .= "			/organelle = $organelle\n";
-		$annotation .= "			/mol_type = genomic DNA\n";
-		$annotation .= "			/isolation source = tissue biopsy\n";
-		$annotation .= "1	$seq_len	gene\n";
-		$annotation .= "			gene	$gene\n";
-		$annotation .= "1	$seq_len	cds\n";
-		$annotation .= "			gene	$gene\n";
-		$annotation .= "			codon_start	$orf\n";
-		$annotation .= "			product	$product_full\n";
-		$annotation .= "			protein_id	$protein_id\n";
-		$annotation .= "			translation	$translation\n";
+		$annotation .= "				organism	$organism\n";
+		$annotation .= "				organelle	$organelle\n";
+		$annotation .= "				mol_type	genomic DNA\n";
+		$annotation .= "				isolation_source	tissue biopsy\n";
+		$annotation .= "<1	>$seq_len	gene\n";
+		$annotation .= "				gene	$gene\n";
+		$annotation .= "<1	>$seq_len	CDS\n";
+		$annotation .= "				gene	$gene\n";
+		$annotation .= "				codon_start	$orf\n";
+		$annotation .= "				transl_table	$trans_table\n";
+		$annotation .= "				product	$product_full\n";
+		$annotation .= "				translation	$translation\n";
 		
 		return $annotation;
 	}
@@ -189,6 +252,7 @@ __END__
 package main;
 
 
-my $seq = "CGCCAGTATGTCACCACAAACAGAGACTAAAGCAAGTGTTGGATTCAAAGCTGGTGTTAAAGATTACAAATTGACTTATTATACTCCTGACTATGAAACCAAAGATACTGATATCTTGGCAGCATTCCGAGTAACTCCTCAACCTGGAGTTCCACCTGAAGAAGCGGGGGCCGCGGTAGCTGCCGAATCTTCTACTGGTACATGGACAACTGTGTGGACCGATGGACTTACCAGCCTTGATCGTTACAAAGGGCGATGCTACGGAATCGAGCCCGTTGCTGGAGAAGAAAATCAATTTATTGCTTATGTAGCTTACCCATTAGACCTTTTTGAAGAAGGTTCTGTTACTAACATGTTTACTTCCATTGTAGGTAATGTATTTGGGTTCAAAGCCCTGCGTGCTCTACGTCTGGAAGATCTGCGAATCCCTGTTGCTTATGTTAAAACTTTCCAAGGCCCGCCTCATGGCATCCAAGTTGAGAGAGATAAATTGAACAAGTATGGTCGTCCCCTGTTGGGATGTACTATTAAACCTAAATTGGGGTTATCTGCTAAAAACTACGGTAGAGCGGTTTATGAATGTCTCCGCGGTGGACTTGGATTTTACGTCATAGC";
+my $seq = "ATATTGGNGTTTTATATTTTATTTTTGNNGNTTNTNCAGGGATAATAGGAACNTTATTTTCAGTTTTCNTTAGAANTGAATTAAGTTGGCCAGGAAATCAAATTTTAGAAGGTAATCATCAATTATATAATGTTCTTGTTACTGCTCATGCTATTGTTATGATTTTTTTTATGGTTATGCCAGCAATGATCGGAGATTTGGTAATGTGTTTGTACCTTTAATGATTGGTGCACCAGATATGGCTTTTCCAAGATTAAATAATATTAGTTTTTGGTTATTGCCACCTTCTTTCATTTTATTATTACTTTCTGCTTTTGTAGAAGGTGGGGCTGGAACTGGTTGGACTATTTATCCACCATTATCTAGTATAGAAAATCATTCCGGAGGCGCGGTTGATTTAGCTATTTTTAGTTTACATTTATCAGGTGCTTCTTCATTATTAGGTGCTATTAATTTTATTACAACAATTATTAATATGAGAACACCTCAAATGACTTGGAATAGATTACCTTTATTTGTTTGGGCTATTTTTATTACAGCTTTTTTATTATTGCTTTCATTACCAGTTTTAGCTGGTGGGATTACTATGTTATTAACAGATCGTAATTTTAATACTACTTTTTTTGATCCATTGGGAGGTGGAGATCCTATCTTATTTCAACATCTTTTTTGATTTTTTGGTCACCCTGAAGTTTAGTCNTACGGGTTTTCCTGAA";
 
-print DNALC::Pipeline::Barcode::Annotation::annotate_barcode($seq, 'co1');
+print DNALC::Pipeline::Barcode::Annotation::annotate_barcode($seq, 'rbcL');
+

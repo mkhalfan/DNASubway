@@ -50,7 +50,7 @@
 % 	} else {
 	<td width="200" class="fb-lbl">
 %		if ($f->{label}) {
-		<label for=""><% $f->{label} %></label>\
+			<% $f->{label} %>\
 %		}
 	</td>
 	<td>&nbsp;\
@@ -74,7 +74,7 @@
 %		$value = ref $value ? $value : [$value]; my $idx = 0;
 %		for my $v (@{$f->{values}}) {
 %			my $chk = (defined $value && grep {/^$v$/} @$value) ? "checked=\"checked\"" : "";
-		<span>&nbsp;<input class="fb" type="radio" id="<% $f->{id}%>_<% $idx++ %>" name="<% $f->{id}%>" value="<% $v |html %>" <%$chk%>/> <% $v |html%></span>\
+		<span>&nbsp;<input class="fb" type="radio" id="<% $f->{id}%>_<% $idx %>" name="<% $f->{id}%>" value="<% $v |html %>" <%$chk%>/> <label for="<% $f->{id}%>_<% $idx++ %>"><% $v |html%></label></span>\
 %		}
 %	} elsif ($type eq "textarea") {
 		<textarea class="fb" rows="5" style="width: 90%" name="<% $f->{id}%>"><% $value |html %></textarea>
@@ -263,7 +263,7 @@ new Tip('longitude_help', "Longitude: Geographic Longitude (if you don't have th
 	if ($r->method eq "POST") {
 		
 		# clear old data
-		$bs->{spec_data} = {};
+		$bs->{spec_data} = {trans_table => $bs->{trans_table}};
 		
 		if ($ARGS{"authors"}){
 			@authors = split ("::", $ARGS{"authors"});
@@ -282,6 +282,7 @@ new Tip('longitude_help', "Longitude: Geographic Longitude (if you don't have th
 					push @err, "Author #$temp[2] last name not valid";
 					$error_monitor = 1;
 				}
+				
 				if ($error_monitor){
 					$author_errors{$temp[2]} = 'true';
 				}
@@ -338,17 +339,28 @@ new Tip('longitude_help', "Longitude: Geographic Longitude (if you don't have th
 				my ($num, $dir) = $val =~ qr/^($RE{num}{real})\s*([NSns])$/;
 				unless ($num >= 0 && $num <= 90) {
 					push @err, "Latitude must be between 0 and 90.";
+					$f->{err} = 1;
 				}
 				$dir = uc($dir);
 				$val = $num . $dir;
+				unless ($dir) {
+					push @err, "Latitude needs a direction: N or S";
+					$f->{err} = 1;
+				}
 			}
 			if ($f->{id} eq "longitude" && $val ne "") {
-				my ($num, $dir) = $val =~ qr/^($RE{num}{real})\s*([EWew])$/;
+				my ($num, $dir) = $val =~ qr/^($RE{num}{real})\s*([EWew])?$/;
 				unless ($num >= 0 && $num <= 180) {
 					push @err, "Longitude must be between 0 and 180.";
+					$f->{err} = 1;
 				}
 				$dir = uc($dir);
 				$val = $num . $dir;
+				unless ($dir) {
+					push @err, "Longitude needs a direction: E or W";
+					$f->{err} = 1;
+				}
+				
 			}
 			
 			if ($f->{id} eq "tax_email" && $val ne "" && !Email::Valid->address($val)) {
@@ -386,7 +398,8 @@ new Tip('longitude_help', "Longitude: Geographic Longitude (if you don't have th
 		}
 		else {
 			$m->comp("/_message_add", join ("<br/>", @err), "error");
-			$m->redirect("./step4.html");
+			# DO NOT ENABLE THE FOLLOWING LINE 
+			#$m->redirect("./step4.html");
 		}
 	}
 	else {

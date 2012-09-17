@@ -27,6 +27,7 @@ use DNALC::Pipeline::User ();
 use DNALC::Pipeline::Config ();
 use DNALC::Pipeline::Utils qw(random_string);
 use DNALC::Pipeline::App::Utils ();
+use DNALC::Pipeline::Barcode::Annotation;
 
 
 {
@@ -103,6 +104,9 @@ use DNALC::Pipeline::App::Utils ();
 		my $data = $self->_parse_json($record->data);
 		my $organism = $data->{genus} . ' ' . $data->{species};
 
+		# Get the translation table to be used
+		my $trans_table = $data->{trans_table};
+
 		# Get the sequence, then remove any dahses which may exist
 		my $seq = DNALC::Pipeline::Phylogenetics::Pair->retrieve($record->sequence_id)->consensus;
 		$seq =~ s/-//g;
@@ -111,7 +115,9 @@ use DNALC::Pipeline::App::Utils ();
 		my $fasta_file = $self->{work_dir} . "/$seq_id/$id.fsa";
 		my $outfile = IO::File->new;
 		if ($outfile->open($fasta_file, "w")){
-			print $outfile ">", $id, " [BioProject=PRJNA159485] [tech=barcode] [organism=$organism]", "\n";
+			print $outfile ">", $id, " [BioProject=PRJNA159485] [tech=barcode] [organism=$organism]";
+			print $outfile " [mgcode=$trans_table] [location=mitochondrion]" if ($trans_table != 1);
+			print $outfile "\n";
 			print $outfile $seq;
 			undef $outfile;
 			print STDERR "Fasta file created: ", $self->{work_dir}, "/$seq_id/$id.fsa\n";
@@ -192,7 +198,7 @@ use DNALC::Pipeline::App::Utils ();
 
 		# Populate the SMT file with the data gathered above
 		my @column_data_array = ($id, $id, $data->{isolation_source}, $data->{tax}, $names_new, 
-			$date_collected, "$data->{country}: $data->{state}, $data->{city}, $data->{site_desc}", 
+			$date_collected, "$data->{country}: " .  lc($data->{state}) . ", $data->{city}, $data->{site_desc}", 
 			$data->{latitude} . " " . $data->{longitude}, 
 			$data->{notes}, $data->{sex}, $data->{stage}, $f_primer_name,
 			$f_primer_seq, $r_primer_name, $r_primer_seq);
@@ -296,6 +302,62 @@ use DNALC::Pipeline::App::Utils ();
 		}
 	}
 	
+	# ---------------------------------------
+	# Create the Feature Table (annotations)
+	#
+	sub create_feature_table {
+		my ($self, $record) = @_;
+		my $seq_id = $record->sequence_id;
+		my $id = $record->specimen_id;
+		my $pid = $record->project_id;
+
+		my $pm = DNALC::Pipeline::App::Phylogenetics::ProjectManager->new($pid);
+		my $project_type = $pm->project->type;
+
+		my $primer = $project_type;
+		
+		my $seq = DNALC::Pipeline::Phylogenetics::Pair->retrieve($record->sequence_id)->consensus;
+        # remove any dashes from the sequence which may have been introduced by the aligner
+		$seq =~ s/-//g;
+
+		# Get the organism name, need it for the annotation
+        my $data = $self->_parse_json($record->data);
+        my $organism = $data->{genus} . ' ' . $data->{species};
+
+		# Get the translation table to be used
+		my $trans_table = $data->{trans_table};
+		print STDERR "trans_table: $trans_table\n";
+
+		# Create the annotation
+		my $annotation = DNALC::Pipeline::Barcode::Annotation::annotate_barcode($seq, $primer, $organism, $trans_table);
+
+		# Create and populate the Feature Table
+		# (only if you got defined output from the annotate_barcode function)
+		if ($annotation) {
+			my $feature_table = $self->{work_dir} . "/$seq_id/$id.tbl";
+			my $outfile = IO::File->new;
+			if ($outfile->open($feature_table, "w")){
+				print $outfile ">Feature $id Table1\n";
+				print $outfile $annotation;
+				undef $outfile;
+				print STDERR "Feature Table created: " . $self->{work_dir} . "/$seq_id/$id.tbl\n";
+				return {status => 'success'};
+			}
+			else {
+				print STDERR "FAILED to create Feature Table: ", $!, "\n";
+				$self->_email_admin($record, "FAILED to create Feature Table: $!");
+				return {status => 'error', 'message' =>  "FAILED to create Feature Table: $!" };
+			}
+		}
+		else {
+			print STDERR "FAILED to generate annotation: ", $!, "\n";
+		    $self->_email_admin($record, "FAILED to generate annotation: $!");
+			return {status => 'error', 'message' =>  "FAILED to generate annotation: $!" };
+
+		}
+
+	}
+
 	# ---------------------------------------
 	# Run tbl2asn
 	#
@@ -606,7 +668,7 @@ use DNALC::Pipeline::App::Utils ();
 		# Run create_dir (doesn't return anything)
 		$self->create_dir($id);
 
-    		# Run create_fasta
+    	# Run create_fasta
 		my $st = $self->create_fasta($id);
 
 		# Run create_smt
@@ -617,13 +679,21 @@ use DNALC::Pipeline::App::Utils ();
 			return $bail_out->("ID: $id ERROR: $st->{message}");
 		}
 
-    		# Run make_template
+    	# Run make_template
    		if ($st->{status} eq 'success'){
         		$st = $self->make_template($id);
 		}
 		else {
         		return $bail_out->("ID: $id ERROR: $st->{message}");
    	 	}
+ 
+		# Run create_feature_table
+        if ($st->{status} eq 'success'){
+                $st = $self->create_feature_table($id);
+        }
+        else {
+                return $bail_out->("ID: $id ERROR: $st->{message}");
+        }
 
 		# Run run_tbl2asn
 		if ($st->{status} eq 'success'){
