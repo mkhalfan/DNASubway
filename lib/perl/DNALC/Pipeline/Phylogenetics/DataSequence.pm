@@ -33,8 +33,8 @@ sub trim {
 
 	my $sequence = $self->seq;
 	
-	my $forward_total = _trim_sequence_string($sequence);
-	my $reverse_total = _trim_sequence_string(scalar reverse $sequence);
+	#my $forward_total = _trim_sequence_string($sequence);
+	#my $reverse_total = _trim_sequence_string(scalar reverse $sequence);
 
 	my ($qscore_trim_forward, $qscore_trim_reverse) = (0, 0);
 
@@ -42,11 +42,10 @@ sub trim {
 
 	if (@quality_values) {
 		eval {
-			# remove the appropriate numbers of qvalues
-			splice(@quality_values, @quality_values - $reverse_total, $reverse_total) if $reverse_total;
-			splice(@quality_values, 0, $forward_total) if $forward_total;
+			# remove the appropriate numbers of qvalues if you do any trimming before this step
+			#splice(@quality_values, @quality_values - $reverse_total, $reverse_total) if $reverse_total;
+			#splice(@quality_values, 0, $forward_total) if $forward_total;
 
-			# do the second trimming
 			$qscore_trim_forward = _trim_quality_scores(\@quality_values);
 			$qscore_trim_reverse = _trim_quality_scores([reverse @quality_values]);
 		};
@@ -55,12 +54,12 @@ sub trim {
 		}
 	}
 
-	#print STDERR "[", $self->project_id, "] forward_total: $forward_total, reverse_total: $reverse_total,\n\t",
-	#		"qscore_trim_forward: $qscore_trim_forward, qscore_trim_reverse: $qscore_trim_reverse\n";
+	my $forward_total = _trim_sequence_string(substr $sequence, $qscore_trim_forward);
+	my $reverse_total = _trim_sequence_string(substr scalar(reverse $sequence), $qscore_trim_reverse);
 
 	$forward_total += $qscore_trim_forward;
 	$reverse_total += $qscore_trim_reverse;
-
+	
 	my $trimmed_seq_length = length($sequence) - $reverse_total - $forward_total;
 	my $trimmed_sequence = substr($sequence, $forward_total, $trimmed_seq_length);
 	
