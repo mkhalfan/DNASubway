@@ -4,48 +4,33 @@
 <span style="color:red">
 <& /_messages &>
 </span>
-
-% if ($trans_table == 5){
-<p>We're checking to make sure your sequences are eligible for submission to genbank. We're using the <strong>Invertebrate Mitochondrial</strong> codon table to translate these sequences. If the sequence you wish to submit is from a Vertebrate or Echinoderm, please <a href="javascript:;" onclick="$('codon_table_options').setStyle({display: 'inline-block'});">click here to modify</a>. </p>
-<div id="codon_table_options">
-	<strong>Select codon table to use:</strong>
-	<form method="get">
-		<input type="radio" id="vertebrates" name="codon_table" value="2" /><label for="vertebrates"> Vertebrates</label>
-		<input type="radio" id="echinoderm" name="codon_table" value="9" /><label for="echinoderm"> Echinoderm</label>
-		<input type="submit" value="Apply" style="margin-left:10px" />
-		<input type="button" value="Cancel" onclick="$('codon_table_options').hide();"/>
-	</form>
-</div>
-% }
-% elsif ($trans_table == 2) {
-<p>You have selected the <strong>Vertebrate Mitochondrial</strong> codon table to translate these sequences. <a href="javascript:;" onclick="$('codon_table_options').setStyle({display: 'inline-block'});">modify</a> </p>
-<div id="codon_table_options">
-	<strong>Select codon table to use:</strong>
-	<form method="get">
-		<input type="radio" id="invertebrates" name="codon_table" value="5" /><label for="invertebrates"> Invertebrates</label>
-		<input type="radio" id="echinoderm" name="codon_table" value="9" /><label for="echinoderm"> Echinoderm</label>
-		<input type="submit" value="Apply" style="margin-left:10px" />
-		<input type="button" value="Cancel" onclick="$('codon_table_options').hide();"/>
-	</form>
-</div>
-% }
-% elsif ($trans_table == 9) {
-<p>You have selected the <strong>Echinoderm Mitochondrial</strong> codon table to translate these sequences. <a href="javascript:;" onclick="$('codon_table_options').setStyle({display: 'inline-block'});">modify</a> </p>
-<div id="codon_table_options">
-	<strong>Select codon table to use:</strong>
+%if ($trans_table == 0) {
+<p><strong>Please select the type of sample you wish to submit <img src='/images/question-12.png' align='top' id='trans_table_help' /></strong>
 	<form method="get">
 		<input type="radio" id="invertebrates" name="codon_table" value="5" /><label for="invertebrates"> Invertebrates</label>
 		<input type="radio" id="vertebrates" name="codon_table" value="2" /><label for="vertebrates"> Vertebrates</label>
+		<input type="radio" id="echinoderm" name="codon_table" value="9" /><label for="echinoderm"> Echinoderm</label>
+		<input type="submit" value="Proceed" style="margin-left:10px" />
+	</form>
+</p>
+% } else {
+<p>You have selected <strong><% $trans_table_types{$trans_table} %></strong> <img src='/images/question-12.png' align='top' id='trans_table_help' /> <a href="javascript:;" onclick="$('codon_table_options').setStyle({display: 'inline-block'});" style="font-size:10px">[modify]</a></p>
+<div id="codon_table_options">
+	<strong>Select codon table to use:</strong>
+	<form method="get">
+%		for my $t ( keys %trans_table_types) {
+%			if ($t != $trans_table) {
+				<input type="radio" id="<% $trans_table_types{$t} %>" name="codon_table" value="<% $t %>" /><label for="<% $trans_table_types{$t} %>"><% $trans_table_types{$t} %></label>
+%			}
+%		}
 		<input type="submit" value="Apply" style="margin-left:10px" />
 		<input type="button" value="Cancel" onclick="$('codon_table_options').hide();"/>
 	</form>
 </div>
-% }
-
 	<p>
 <form id="bform" method="POST">
 <input type="hidden" name="bstep" value="1" />
-		Select a sequence to submit:
+		<p>Select a sequence to submit:</p>
 		<div>
 %# Don't be allowed to chose a sequence if it doesn't have a consensus AND if you're already submitted that sequence??
 %# And on selecting a sequence to submit, we then check to ensure it has been paired correctly. 
@@ -84,7 +69,15 @@
 	<a href="#" onclick="top.phy.close_window('BOLD');">Cancel</a>&nbsp;
 	<a href="#" onclick="phy.next_bold_step();">Continue</a>
 </div>
+%} #end if-else
 
+<script type="text/javascript">
+Event.observe(window, Prototype.Browser.IE ? 'load' : 'dom:loaded', function() {
+new Tip('trans_table_help', "We'll check to ensure the sequence you want to submit has a valid amino acid translation. In order for us to do this, we need to know which type of organism you're working with.", {
+		className: 'blue_help',
+	});
+});
+</script>	
 <%args>
 	#$pid => 0
 	$bstep => undef
@@ -102,7 +95,9 @@
 	use DNALC::Pipeline::Barcode::Annotation ();
 	use DNALC::Pipeline::Utils qw/lcs_name/;
 	use Data::Dumper;
-	
+
+	# hash of trans table data
+	my %trans_table_types = (2 => 'Vertebrates', 5 => 'Invertebrates', 9=> 'Echinoderm');	
 </%once>
 <%init>
 	my $s = $m->session->{pipeline};
@@ -123,7 +118,7 @@
 	my $trans_table = 1;
 
 	if ($proj->type eq "COI") {
-		$trans_table = 5;
+		$trans_table = 0;
 		$trans_table = $codon_table if ($codon_table && $codon_table != 1);   
 	}
 

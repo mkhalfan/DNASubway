@@ -10,13 +10,13 @@
   <div>
     <input type="hidden" name="bstep" value="5" />
 	<div>
-		<input type="radio" name="ans" value="no" <% $bs->{has_photo} ne "yes" ? "checked=\"checked\"" : "" %> onclick="toggle_add_photos()" />
-		No, I don't have any photos of this specimen
+		<input type="radio" name="ans" id="no" value="no" <% $bs->{has_photo} ne "yes" ? "checked=\"checked\"" : "" %> onclick="toggle_add_photos()" />
+		<label for="no">No, I don't have any photos of this specimen</label>
 	</div>
 	<div>&nbsp;</div>
 	<div>
-		<input type="radio" name="ans" value="yes" <% $bs->{has_photo} eq "yes" ? "checked=\"checked\"" : "" %> onclick="toggle_add_photos(1)"/>
-		Yes, I have taken photos of this specimen
+		<input type="radio" name="ans" id="yes" value="yes" <% $bs->{has_photo} eq "yes" ? "checked=\"checked\"" : "" %> onclick="toggle_add_photos(1)"/>
+		<label for="yes">Yes, I have taken photos of this specimen</label>
 		<p></p>
 	</div>
 	<div id="bimage_upload" style="display:<% $bs->{has_photo} eq "yes" ? "block" : "none" %>">
