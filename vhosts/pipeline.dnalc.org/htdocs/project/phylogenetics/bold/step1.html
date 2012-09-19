@@ -14,6 +14,7 @@
 	</form>
 </p>
 % } else {
+%	if ($proj->type eq 'COI') {
 <p>You have selected <strong><% $trans_table_types{$trans_table} %></strong> <img src='/images/question-12.png' align='top' id='trans_table_help' /> <a href="javascript:;" onclick="$('codon_table_options').setStyle({display: 'inline-block'});" style="font-size:10px">[modify]</a></p>
 <div id="codon_table_options">
 	<strong>Select codon table to use:</strong>
@@ -27,6 +28,7 @@
 		<input type="button" value="Cancel" onclick="$('codon_table_options').hide();"/>
 	</form>
 </div>
+%	} #end if proj->type eq 'COI'
 	<p>
 <form id="bform" method="POST">
 <input type="hidden" name="bstep" value="1" />
