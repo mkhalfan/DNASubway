@@ -84,12 +84,16 @@
 % }		
 
 %# if ( $nt_evid ne "done" || $prot_evid ne "done") {
-		<span class="conRedline_ConCellAdd2">
+<%	$nt_evid eq "done" && $prot_evid eq "done" ? "<span class='conRedline_ConCellAddF'>" : "<span class='conRedline_ConCellAdd2'>" %>
+
+
+%#		<span class="conRedline_ConCellAdd2">
 			<span class="conIndicator_box"><div id="evidence_ind" class="conIndicator_<% $rm_status eq 'done' && $is_owner ? 'not-processed' : 'disabled' %>"></div></span>
 			<span class="bt_run">
 			
 			<span style="position:relative;">
 				<div id="add_evidence" class="popup">
+
 %# if ( $nt_evid ne "done" || $prot_evid ne "done") {
 				<form enctype="multipart/form-data" method="post">
 				<input type="hidden" name="notused" value="1" />
@@ -112,7 +116,7 @@
 % } else {
 				class="disabled"
 % }
-				>Upload Data</a>
+				><%	$nt_evid eq "done" && $prot_evid eq "done" ? "Replace Data" : "Upload Data" %></a>
 			</span>
 
 		</span><!--END of span class conRedline_ConCell-->
