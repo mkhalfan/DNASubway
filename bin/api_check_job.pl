@@ -7,6 +7,7 @@ use lib ("/var/www/lib/perl", "/home/gearman/dnasubway/lib/perl");
 use DNALC::Pipeline::NGS::Job ();
 use DNALC::Pipeline::NGS::JobTrack ();
 use DNALC::Pipeline::NGS::DataSource ();
+use DNALC::Pipeline::NGS::JobOutputFile ();
 use DNALC::Pipeline::NGS::DataFile ();
 use DNALC::Pipeline::User ();
 use iPlant::FoundationalAPI ();
@@ -32,7 +33,7 @@ while (my $jt = $jts->next) {
 	#$fapi->debug($debug);
 
 	if ($fapi->auth) { # if successfully authenticated 
-		my $pm = DNALC::Pipeline::App::NGS::ProjectManager->new({project => $job->project_id});
+		my $pm = DNALC::Pipeline::App::NGS::ProjectManager->new({project => $job->project_id, debug => $debug});
 		$pm->api_instance($fapi);
 
 		my $job_ep = $fapi->job;
@@ -58,7 +59,7 @@ while (my $jt = $jts->next) {
 
 				my $task = $job->task_id->name;
 
- 				print STDERR  '$task = ', $task, $/ if $debug;
+ 				print STDERR  'task = ', $task, $/ if $debug;
 
 				my $job_name = $job->attrs->{name};
 				my $app_conf = DNALC::Pipeline::Config->new->cf(uc $task);
@@ -82,9 +83,9 @@ while (my $jt = $jts->next) {
 				# mark output file are shared so $DNALCADMIN user be able to read them
 				my $ngs_cfg = DNALC::Pipeline::Config->new->cf('NGS');
 				for (@data_files) {
-					print STDERR  '++ sharing file ', $_->name, $/ if $debug;
+					print STDERR  ' ++ sharing file ', $_->name, $/ if $debug;
 					my $st = $io_ep->share($_->path, $ngs_cfg->{admin_user}, canRead => 1);
-					#print STDERR '++ shared: ', Dumper( $st ), $/;
+					$st = $io_ep->share($_->path, 'world', canRead => 1);
 				}
 
 				my $src_id;
@@ -95,50 +96,8 @@ while (my $jt = $jts->next) {
 					$pm->$output_handler($job, \@data_files);
 				}
 				else {
-					print STDERR  "No [on_success] handler defined for [", $app_conf->{id},"]\n" if $debug;
-					if (@data_files) {
-						#print STDERR Dumper( \@data_files ), $/ if $debug;
-						$src_id = DNALC::Pipeline::NGS::DataSource->create({
-									project_id => $job->project_id,
-									name => 'Output from ' . $task,
-									note => $job_name || '',
-								});
-						if ($!) {
-							print STDERR 'Can\'t add source: ', $! , $/;
-						}
-					}
-
-					if ($src_id) {
-						my $counter = 0;
-						my $base_name = '';
-						my @job_input_files = $job->input_files;
-						if (@job_input_files == 1) {
-							$base_name = $job_input_files[0]->file->file_name;
-							$base_name =~ s/\.(.*?)$//;
-						}
-
-						for my $df (@data_files)  {
-							my ($file_type) = $df->path =~ /\.(.*?)$/;
-							my $fname = $df->name;
-
-							# keep the same basename for the file
-							if ($app_conf->{_propagate_input_file_name}) {
-								if ($base_name) {
-									$fname = $base_name . sprintf("%s.%s", $counter > 1 ? $counter : '', $fname =~ /\.(.*?)$/);
-								}
-							}
-
-							print STDERR  'output file: ', $fname, $/ if $debug;
-							my $data_file = DNALC::Pipeline::NGS::DataFile->create({
-									project_id => $job->project_id,
-									source_id => $src_id,
-									file_name => $fname,
-									file_path => $df->path,
-									file_type => $file_type || '',
-								});
-							$counter++;
-						}
-					} # end if($src_id)
+					print STDERR  " ++ No [_on_success] handler defined for [", $app_conf->{id},"]\n" if $debug;
+					$pm->task_handle_default($job, \@data_files);
 				}
 			}
 			else { # KILLED|FAILED|STOPPED|ARCHIVING_FAILED

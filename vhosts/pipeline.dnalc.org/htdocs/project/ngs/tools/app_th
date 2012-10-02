@@ -109,7 +109,8 @@
 			$form->{callbackUrl} = $s->{user_email};
 		}
 
-		$form->{requestedTime} ||= '0:45:00';
+		$form->{query2} ||= '';
+		$form->{requestedTime} ||= '2:45:00';
 		#print STDERR "app_tophat: form = ", Dumper( $form ), $/;
 
 		$st = $pm->submit_job('ngs_tophat', $app, $form);

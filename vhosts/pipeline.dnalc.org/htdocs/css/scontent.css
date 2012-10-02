@@ -253,6 +253,28 @@
 	float: right;
 	position:relative;
 	}
+	
+#conProject_dispatcher {
+	margin: 120px 0px 0px 20px;
+}
+
+#conProject_dispatcher div.btn {
+	border: 1px solid black;
+	margin: 20px 0px 20px 20px;
+	padding: 30px;
+	font-size: 30px;
+	cursor: pointer;
+	text-align: center;
+}
+
+#conProject_dispatcher div.btn:hover {
+	background-color: yellow;
+}
+
+input[disabled="disabled"], input[disabled], textarea[disabled], select[disabled], textarea[disabled="disabled"],{
+	background: #e0e0e0;
+}
+	
 .conNewPro_title{
 	width: 300px;
 	height: 20px;
@@ -512,6 +534,46 @@
 
 .bt_projectInfo_edit a:hover {
 	background: url("/images/v2/bt_projectinfo_edit2.png") top no-repeat;
+
+}
+
+#conProjectInfo_edit {
+	width: 170px;
+	height: 30px;
+	margin-top: 5px;
+	margin-right: 20px;
+	float: right;
+	position: relative;
+}
+
+#conProjectInfo_clone {
+	width: 70px;
+	height: 30px;
+	margin-top: 5px;
+	margin-right: 20px;
+	float: right;
+}
+	
+.bt_projectInfo_clone {
+	width:100px;
+	height: 24px;
+	position: relative;	
+	float: right;	
+	display:block;
+
+}
+
+.bt_projectInfo_clone a {
+	width:100px;
+	height: 24px;
+	display: block;
+
+	background: url("/images/v2/bt_clone1.png") top no-repeat;
+	text-decoration: none;
+}
+
+.bt_projectInfo_clone a:hover {
+	background: url("/images/v2/bt_clone2.png") top no-repeat;
 
 }
 
