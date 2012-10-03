@@ -1,10 +1,9 @@
 <select class="<% $class %>" id="<% $element->{id} %>" name="<% $element->{id} %>">
 <option value="">-= Choose file =-</option>
 % for (@files) {
-%#	my $sel = $user_value && $user_value eq $_->file_path ? q{selected="selected"} : "";
-%#	<option value="<% $_->file_path %>" <% $sel %>><% $_->file_name |html%></option>
 %	my $sel = defined $user_value && $user_value eq $_->id ? q{selected="selected"} : "";
-	<option value="<% $_->id %>" <% $sel %>><% $_->file_name |html%></option>
+%#	<option value="<% $_->id %>" <% $sel %>><% $_->file_name |html%></option>
+	<option value="<% $_->id %>" <% $sel %>><% $_->trimmed_file ? $_->trimmed_file->file_name : $_->file_name |html %></option>
 % }
 </select>
 <%args>

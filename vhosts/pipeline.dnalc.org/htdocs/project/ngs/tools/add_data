@@ -5,18 +5,23 @@
 	top.ngs.close_window('data');
 </script>
 % } else {
+%	if ($path_to_read eq "/$username") {
+	<div><a href="/project/ngs/tools/add_data/shared?pid=<% $pid |html%>">Browse shared data</a></div>
+%	}
 	<div>Listing for path <strong><% $path_to_read %></strong>:</div>
 	<div>
 	<form id="form_add_data" method="post">
+		<p>
 % if ($dir_list && @$dir_list) {
 %#		<div><a href="#" onclick="" >select all files</a></div>
-	<p>
-	<div><a href="/project/ngs/tools/add_data<% $parent_dir %>?pid=<% $pid |html%>">Parent directory</a></div>
+		<div><a href="/project/ngs/tools/add_data<% $parent_dir %>?pid=<% $pid |html%>">Parent directory</a></div>
 %	for my $file ( @$dir_list ){
 		<& .display_file_info, file => $file, pid => $pid &>
 %	}
-	</p>
+% } else {
+		<div><a href="/project/ngs/tools/add_data<% $parent_dir %>?pid=<% $pid |html%>">Parent directory</a></div>
 % }
+		</p>
 
 	<input type="button" id="add" value="Add files" />
 	<input type="hidden" id="step" name="step" value="2" />
