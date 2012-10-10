@@ -207,14 +207,63 @@ use Data::Dumper;
 	
 	#--------------------------------------
 	sub data {
-		my ($self, $filters) = @_;
+		my ($self, %filters) = @_;
 
 		my %args = (
 				project_id => $self->project,
 			);
+		$args{is_input} = $filters{is_input} if defined $filters{is_input};
 		DataFile->search(%args, {order_by => 'id'});
 	}
 
+	#--------------------------------------
+	# returns status for two tasks: QC & trimming (later)
+	sub qc_status {
+		my ($self) = @_;
+		my $project = $self->project;
+
+		DataFile->get_qc_status($project);
+	}
+	#--------------------------------------
+	sub do_qc {
+		my ($self) = @_;
+		my $project = $self->project;
+
+		my $app;
+		my $st = $self->app("NGS_FASTQC");
+
+		if ($st->{status} eq "success") {
+			$app = $st->{app};
+		} else {
+			print STDERR  "NGS::do_QC::no NGS_FASTQC app found!!!", $/;
+			return;
+		}
+
+		my $job_options = {
+			archive => 'true',
+			input => '',
+			casava => 'false',
+			jobName => '',
+			format => 'fastq',
+			#callbackUrl => 'ghiban@cshl.edu',
+			nogroup => 'false',
+		};
+
+		my $data = $self->data(is_input => 1);
+		my $qc_jobs = 0;
+		while (my $f = $data->next) {
+			#print STDERR 'do_qc: ', $f->file_name, ' ', $f->is_input, ' ', $f->qc_file_id, $/;
+			next if $f->qc_file_id;
+
+			# set id, instead of file path so that we keep track of input files (in submit_job)
+			$job_options->{input} = $f->id; 
+			my $st = $self->submit_job($app->{conf}->{_task_name}, $app, $job_options);
+			print STDERR 'do_QC: new job status: ', $st->{status}, $/;
+			$qc_jobs++ if $st->{status} eq 'success';
+		}
+
+		$qc_jobs;
+	}
 	#--------------------------------------
 	sub auth {
 		my ($self, $user, $token) = @_;
@@ -387,7 +436,6 @@ use Data::Dumper;
 		# if there are the inputs with {display_type => 'show_files'}
 		#	- basically we replace the file id's when we send the data to the API
 		#	- we keep track of the replaced data, in case we hit an error
-		#my %input_files = ();
 		my @input_files = ();
 		for my $input (grep {defined $_->{display_type} && $_->{display_type} eq 'show_files'} @{$app->inputs}) {
 			if (defined $params->{$input->{id}} && $params->{$input->{id}} =~ /^\d+$/) {
@@ -407,6 +455,8 @@ use Data::Dumper;
 			}
 		}
 
+		# we need to get a response when the job finishes
+		#$params->{callbackUrl} = 'http://summercamps.dnalc.org/payment_notify.html?payer_email=&txn_id=0&';
 		print STDERR "ProjectManager::submit_job: params = ", Dumper($params), $/ if $self->debug;
 		my $jobdb; #
 
@@ -784,7 +834,7 @@ print STDERR  " -- dest dir: ", $dest_dir, $/ if $self->debug;
 		#		note => '',
 		#	});
 
-		my @project_files = $self->data;
+		#my @project_files = $self->data;
 		for my $f (@$api_files) {
 			my $file_path = $f->path;
 
@@ -875,9 +925,7 @@ print STDERR  " -- dest dir: ", $dest_dir, $/ if $self->debug;
 
 			}
 
-			if (-f $html_file) {
-				## file path relative to the website
-				#$html_file =~ s/$working_dir//;
+			if ($html_file && -f $html_file) {
 
 				#print STDERR  "HTML_FILE: ", $html_file, $/;
 				unlink $save_to_file; # remove the zip file

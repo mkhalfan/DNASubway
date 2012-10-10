@@ -8,6 +8,10 @@
 </div>
 % }
 
+<pre>
+<% Dumper($pm->qc_status)%>
+</pre>
+
 %#------------------------------------------
 <div class="colmask threecol">
 	<div class="colmid">
@@ -26,7 +30,15 @@
 				<!-- Column 2 start -->
 				<h2>Data management</h2>
 				<div>
-					<a href="#" onclick="javascript:ngs.launch('data');">Manage data</a>
+					<a href="javascript:;" onclick="javascript:ngs.launch('data');">Manage data</a>
+				</div>
+				<div>
+					<span class="conIndicator_box">
+						<div class="conIndicator_<% $qc_status %>"></div>
+					</span>
+					<span class="bt_run">
+						<a href="javascript:;" onclick="javascript:ngs.do_qc();">Do QC</a>
+					</span>
 				</div>
 				<!-- Column 2 end -->
 			</div>
@@ -141,6 +153,9 @@
 	# project`s owner
 	my $user = DNALC::Pipeline::User->retrieve($proj->user_id) if $proj;
 	my $is_owner = $s->{user_id} == $user->user_id if $proj;
+	
+	my $qc_status = $is_owner ? $pm->qc_status->{status} : 'disabled';
+
 </%init>
 
 <%method title>

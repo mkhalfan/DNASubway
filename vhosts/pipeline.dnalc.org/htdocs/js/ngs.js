@@ -73,8 +73,21 @@ NGS.prototype.do_trim = function(id) {
 	document.location.replace('/project/ngs/tools/app_fastxtr?pid=' + this.pid + ';f=' + id);
 };
 
-NGS.prototype.do_qc = function(id) {
+NGS.prototype.do_qc_old = function(id) {
 	document.location.replace('/project/ngs/tools/app_fastqc?pid=' + this.pid + ';f=' + id);
+};
+
+NGS.prototype.do_qc = function() {
+	new Ajax.Request('/project/ngs/tools/do_qc', {
+		method:'get',	
+		parameters: {'pid': this.pid},
+		onSuccess: function(transport){
+				alert(transport.responseText);
+			},
+		onFailure: function(){
+				alert('Something went wrong!\nAborting...');
+			}
+	});
 };
 
 var ngs, window;
