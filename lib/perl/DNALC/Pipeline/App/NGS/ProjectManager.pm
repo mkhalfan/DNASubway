@@ -8,7 +8,6 @@ use aliased 'DNALC::Pipeline::NGS::Job';
 use aliased 'DNALC::Pipeline::NGS::JobParam';
 use aliased 'DNALC::Pipeline::NGS::Project';
 use aliased 'DNALC::Pipeline::NGS::DataFile';
-use aliased 'DNALC::Pipeline::NGS::DataFileTrimmed';
 use aliased 'DNALC::Pipeline::NGS::DataSource';
 use aliased 'DNALC::Pipeline::NGS::JobTrack';
 
