@@ -1,9 +1,9 @@
-	<tbody id="app_info" style="background: #ccc;">
+	<tbody id="app_info">
 		<tr>
-			<td colspan="2" style="font-weight:bold;">Job options</td>
+			<td colspan="2" class="label_header">Job options</td>
 		</tr>
 		<tr>
-			<td><sup>*</sup>Job name:</td>
+			<td>Job name:</td>
 			<td><input type="text" id="jobName" name="jobName" value="<% $form->{jobName} |html %>" /></td>
 		</tr>
 % if (0) {
@@ -27,7 +27,7 @@
 		</tr>
 % }
 		<tr>
-			<td>Notify me when job ends :</td>
+			<td>Notify me when job ends:</td>
 			<td><input type="checkbox" id="notify_user" name="notify_user" <% $form->{notify_user} ne "yes" ? "" : "checked=\"checked\"" %> value="yes" /></td>
 		</tr>
 	</tbody>

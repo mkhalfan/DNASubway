@@ -1,0 +1,66 @@
+<div class="container_data1">
+	<div id="container_data_line">&nbsp;</div>
+<& /_messages &>
+
+	<div><a href="./app_<% $tool |html %>?pid=<% $pid |html%>" style="text-decoration:none"><input type="button" value="Launch New Job" /></a></div>
+	
+	<table id="jobs_table">
+		<thead>
+			<tr>
+				<th>#</th>
+				<th>Job Name</th>
+				<th>Start Time</th>
+				<th>End Time</th>
+				<th>Status</th>
+				<th>View Results</th>
+			</tr>
+		</thead>
+		<tbody>
+% my $i = 1;
+% while (my $job = $jobs->next) {
+%	my $attrs = $job->attrs;
+			<tr>
+				<td><% $i++ %></td>
+				<td>
+					<a href="./job_status?pid=<%$pid |html%>;jid=<% $job %>" style="color:black"><% $attrs->{name} |html%></a>
+				</td>
+				<td>$job->start_time</td>
+				<td><% $job->status eq "done" ? $job->end_time : "-" %></td>
+				<td><% $job->status %></td>
+%# -------- DIFFERENT VISUALIZATION OPTIONS BASED ON TOOL TYPE HERE --------- #%
+				<td>
+% if ($job->status eq 'done') {
+					<a href="./launch_igv?pid=<% $proj %>;jid=<% $job %>">view in IGV-static</a>
+		&nbsp;<a href="./launch_igv?pid=<% $proj %>;jid=<% $job %>">view in IGV-dynamic</a>
+%	}
+				</td>
+%# ------ END DIFFERENT VISUALIZATION OPTIONS BASED ON TOOL TYPE HERE ------- #%
+			</tr>
+% }
+
+		</tbody>
+	</table>
+</div> <!-- end container_data1 --> 
+
+%#-----------------------------------------------------------------
+<%args>
+	$pid => 0
+	$tool => ''
+</%args>
+<%once>
+	use Data::Dumper;
+	use DNALC::Pipeline::Utils qw(clean_query);
+	use DNALC::Pipeline::App::NGS::ProjectManager ();
+
+	use DNALC::Pipeline::User ();
+
+</%once>
+<%init>
+	$m->session->{pipeline} ||= {};
+	my $s = $m->session->{pipeline};
+	
+	my $pm = DNALC::Pipeline::App::NGS::ProjectManager->new({project => $pid, debug => 0});
+	my $proj = $pm->project;
+	
+	my $jobs = $pm->get_jobs_by_task('ngs_' . $tool); # show non-deleted jobs only
+</%init>

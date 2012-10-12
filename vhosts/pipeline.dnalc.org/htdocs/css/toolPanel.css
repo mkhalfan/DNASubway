@@ -1156,3 +1156,53 @@ background-color: yellow;
    -webkit-transition: opacity 1.5s ease-in-out;
 }
 */
+
+/* -- Greenline */
+
+#jobs_table  {
+	margin-top:10px;
+	text-align:left;
+	width:100%;
+	border:0;
+	border-spacing:0;
+}
+
+#jobs_table thead {
+	background-color:#e8eef7;
+}
+
+#jobs_table thead th {
+	border-top:1px solid #989b9f;
+	border-bottom:1px solid #989b9f;
+	padding:5px 10px;
+}
+
+#jobs_table td {
+	padding:5px 10px;
+}
+
+#jobs_table tr.even {
+	background-color:#e8eef7;
+}
+
+#launch_job_table_holder{
+	width:100%;
+	border-top:1px solid black;
+	border-bottom:1px solid black;
+	margin:10px 0;
+	padding:10px 0 75px 0;
+}
+
+#launch_job_table{
+
+}
+	
+#launch_job_table td{
+	padding-left:10px;
+}
+
+#launch_job_table td.label_header {
+	padding-left:0px;
+	color:#3399cc;
+	font-weight:bold;
+}

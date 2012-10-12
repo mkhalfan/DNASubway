@@ -3,13 +3,15 @@
 <head>
 <link rel="icon" type="image/png" href="/images/favicon.png" />
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link type="text/css" rel="stylesheet" href="/css/toolPanel.css" />
+<link rel="stylesheet" type="text/css" href="/css/prototip.css" />
 <style type="text/css">
 tr.flagged {
 	background: pink;
 }
 
-#app_parameters {
-	display: none;
+/*#app_parameters {
+	display: none;*/
 }
 </style>
 </head>

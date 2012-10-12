@@ -1,5 +1,3 @@
-New Project
-
 % if (@err) {
 <div style="display:none" id="error_list">
 %	foreach (@err) {
@@ -9,34 +7,27 @@ New Project
 % }
 
 <form method="post" id="forma1">
-	<div id="conRedlineLeft1">
+	<div id="conGreenlineLeft1">
 		<div id="conProject_newLeft"> 
 
 		<div class="conNewPro_title">Select Project Type*</div>
 
 		<div class="conNewPro_label" id="project_types">
 			<div style="padding-left: 20px;">
-				<div><input class="" type="radio" name="type" id="gd" value="type1" <% $type eq "type1" ? "checked=\"checked\"" : ""%> /><label for="gd">&nbsp; transcript quantification</label></div>
-				<div><input class="" type="radio" name="type" id="gp" value="type2" <% $type eq "type2" ? "checked=\"checked\"" : ""%> /><label for="gp">&nbsp; differential expression</label></div>
-				<div><input class="" type="radio" name="type" id="gm" value="type3" <% $type eq "type3" ? "checked=\"checked\"" : ""%> /><label for="gm">&nbsp; transcriptome assembly</label></div>
-				<div><input class="" type="radio" name="type" id="gx" value="type4" <% $type eq "type4" ? "checked=\"checked\"" : ""%> /><label for="gx">&nbsp; variant detection</label></div>
+				<div><input class="" type="radio" name="type" id="gd" value="type1" checked="checked" /><label for="gd">&nbsp; Transcriptome Analysis</label></div>
 			</div>
 		</div>  
 
 		<div style="clear: both;">&nbsp;</div> 
-        <div class="conNewPro_title">Description</div>
-        <div class="conNewPro_label">Total characters (max.140): &nbsp;<span id="desc_len"><% length $description %></span></div>
-		<div>
-			<textarea id="description" name="description" cols="40" class="conStylized_box5" onkeyup="check_description_length(event);"
-				style="width:300px; margin-left: 0px"><% $description |html %></textarea>
-		</div>
-		
+        <div class="conNewPro_title">Select an Organism *</div>   
+		<div class="conNewPro_label1">
+			<!--<label>Scientific name (genus species):</label>-->
+			<& .select_genomes, genomes => $genomes, selected => $organism &>
+		</div>       
         <div style="clear: both;">&nbsp;</div>
-		<div id="con_star"><b>*</b> Required information</div>
-              <div style="clear: both;">&nbsp;</div>
 		</div>
 	</div>
-	<div id="conRedlineRight1">
+	<div id="conGreenlineRight1">
 	<div id="conProject_newRight"> 
 		<div class="conNewPro_title">Name Your Project *</div>   
 		<div class="conNewPro_label1">
@@ -44,12 +35,15 @@ New Project
 			<input class="conStylized_box4" type="text" name="name" id="name" value="<% $name|html%>" maxlength="40" />
 		</div>
 		<div style="clear: both;">&nbsp;</div>
-		<div class="conNewPro_title">Organism *</div>   
-		<div class="conNewPro_label1">
-			<label>Scientific name (genus species):</label>
-			<& .select_genomes, genomes => $genomes, selected => $organism &>
-		</div>        
-		<div style="clear: both;">&nbsp;</div> <div style="clear: both;">&nbsp;</div> 
+		 <div class="conNewPro_title">Description</div>
+        <div class="conNewPro_label">Total characters (max.140): &nbsp;<span id="desc_len"><% length $description %></span></div>
+		<div>
+			<textarea id="description" name="description" cols="40" class="conStylized_box5" onkeyup="check_description_length(event);"
+				style="width:280px; margin-left: 0px; height:62px;"><% $description |html %></textarea>
+		</div>
+		  <div style="clear: both;">&nbsp;</div>
+		<div id="con_star"><b>*</b> Required information</div>
+		<div style="clear: both;">&nbsp;</div> 
 		<div class="conBT_continue"><a id="step_one_btn" href="javascript:void(0);" onclick="javascript:$('forma1').submit();"></a></div>
 		<div style="clear: both;">&nbsp;</div>
 	</div><!--END of ID conProject_newRight-->
@@ -85,14 +79,15 @@ New Project
 	if ($r->method eq "POST") {
 		$name = clean_query($name);
 		if ($type eq "") {
-			push @err, "Project Type is missing";
-		}
-		if ($name eq "") {
-			push @err, "Name is missing";
+			push @err, "Please select a Projct Type";
 		}
 		if ($organism eq "") {
-			push @err, "Organism is missing";
+			push @err, "Please select an organism";
 		}
+		if ($name eq "") {
+			push @err, "Please give your project a title";
+		}
+
 		
 		unless (@err) {
 			my $pm = DNALC::Pipeline::App::NGS::ProjectManager->new({debug => 1});
@@ -123,8 +118,8 @@ Create new project \
 	$genomes => {}
 	$selected => ''
 </%args>
-<select name="organism" id="organism">
-	<option value=""> -= choose organism =-</option>
+<select name="organism" id="organism" size="6" style="width:350px">
+
 % for my $species (sort keys %$genomes) {
 % 	my $name = ucfirst $species; $name =~ s/_+/ /g;
 %	my $sel = $selected && $selected eq $species ? q{selected="selected"} : "";

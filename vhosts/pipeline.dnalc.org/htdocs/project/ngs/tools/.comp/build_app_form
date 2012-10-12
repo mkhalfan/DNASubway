@@ -1,5 +1,5 @@
 			<tr>
-				<td colspan="2" style="font-weight:bold;background-color: #eee;">Input(s)</td>
+				<td colspan="2" class="label_header">Input(s)</td>
 			</tr>
 			<tbody id="app_inputs">
 			<tr>
@@ -9,7 +9,7 @@
 % 		for my $i (@{$app->inputs}) {
 %			next if $i->{hidden};
 			<tr<% $flagged->{$i->{id}} ? ' class="flagged"' : ''%>>
-				<td><% $i->{required} ? "<sup>*</sup>" : "&nbsp;" %><% $i->{label} %></td>
+				<td><% $i->{required} ? "<sup>*</sup>" : "" %><% $i->{label} %></td>
 				<td>
 %				if ($i->{id} eq q{genome} ) {
 					include genomes - <% $form->{genome} || $i->{value} |html%>
@@ -26,15 +26,15 @@
 %		}
 			</tbody>
 				<tr>
-					<td colspan="2" style="font-weight:bold;background-color: #eee;">Parameters
-						<a href="#" onclick="var p=$('app_parameters');p.style.display='table-row-group';this.update('')">+</a>
+					<td colspan="2" class="label_header">Parameters
+						<a href="javascript:;" onclick="NGS.prototype.toggle_params();" style="text-decoration:none"><span id="show_params">+</span><span id="hide_params" style="display:none">-</span></a>
 					</td>
 				</tr>
-			<tbody id="app_parameters">
+			<tbody id="app_parameters" style="display:none;">
 % 		for my $p (@{$app->parameters}) {
 %				next if $p->{hidden};
 				<tr<% $flagged->{$p->{id}} ? ' class="flagged"' : ''%>>
-					<td title="<% $p->{type} %>"><% $p->{required} ? "<sup>*</sup>" : "&nbsp;" %><% $p->{label} |html%></td>
+					<td title="<% $p->{type} %>"><% $p->{required} ? "<sup>*</sup>" : "" %><% $p->{label} |html%></td>
 					<td><input type="text" id="<% $p->{id} %>" name="<% $p->{id} %>" req="<% $p->{required}%>" value="<% $form->{$p->{id}} |html%>"/>
 					<!-- d_type: [<% $p->{display_type}%>] -->
 					</td>

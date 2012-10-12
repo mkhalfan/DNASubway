@@ -1,6 +1,6 @@
 
-<input type="hidden" id="pid" value="<% $pid |html%>"/>
-%#<input type="hidden" id="isowner" value="<% $is_owner %>"/>
+<input type="hidden" id="pid" value="<% $pid %>"/>
+%# <input type="hidden" id="isowner" value="<% $is_owner %>"/>
 
 % if (exists $m->session->{messages}) {
 <div style="display:none" id="error_list">	
@@ -8,51 +8,64 @@
 </div>
 % }
 
-<pre>
-<% Dumper($pm->qc_status)%>
-</pre>
+<!--Left Content Start--------------> 
+<div id="conGreenlineLeft2"> 
+     <span class="conGreenline_ConColumn">
+     		<span class="conGreenline_ConCell">
+            	<span class="conIndicator_box"><div class="conIndicatorGL_not-processed"></div></span>
+     			<span class="bt_runGreenline"><a href="javascript:;"onclick="javascript:ngs.launch('data');">Manage data</a></span>
+            </span><!--END of span class conGreenline_ConCell-->     
+			<span class="conGreenline_ConCell">
+            	<span class="conIndicator_box"></span>
+				<span class="bt_Rungreenline_grey">FastX Toolkit</span>
+			 </span><!--END of span class conGreenline_ConCell-->
+			 <span class="conGreenline_keys"></span>
+     </span><!--END of span class conGreenline_ConColumn-->
+	 
+    <span class="conGreenline_ConColumn">
+     	<!--sapce for second column-->
+        <!--sapce for second column-->
+        <!--sapce for second column-->
+        <!--sapce for second column-->   
+    </span><!--END of class conGreenline_ConColumn-->
+    
+    <span class="conGreenline_ConColumn1">
+		<span class="conGreenline_ConCell">
+			<span class="conIndicator_box"><div class="conIndicatorGL_disabled"></div></span>
+     		<span class="bt_runGreenline"><a href="javascript:;" onclick="javascript:ngs.launch('tophat');">TopHat</a></span>
+        </span><!--END of span class conGreenline_ConCell-->
+        <span class="conGreenline_ConCell">
+            <span class="conIndicator_box"><div class="conIndicatorGL_disabled"></div></span>
+     		<span class="bt_runGreenline"><a href="javascript:;" onclick="javascript:ngs.launch('cufflinks');">CuffLinks</a></span>
+        </span><!--END of span class conGreenline_ConCelll-->
+        <span class="conGreenline_ConCell">
+            <span class="conIndicator_box"><div class="conIndicatorGL_disabled"></div></span>
+     		<span class="bt_runGreenline"><a href="javascript:;" onclick="javascript:ngs.launch('cufflinks');">CuffMerge</a></span>
+        </span><!--END of span class conGreenline_ConCell-->
+        <span class="conGreenline_ConCell">
+            <span class="conIndicator_box"><div class="conIndicatorGL_disabled"></div></span>
+     		<span class="bt_runGreenline"><a href="javascript:;"onclick="javascript:ngs.launch('cuffdiff');">CuffDiff</a></span>
+        </span><!--END of span class conGreenline_ConCell-->
+	</span><!--END of class conGreenline_ConColumn1-->
+         
+</div><!--END of ID conGreenlineLeft2-->
 
-%#------------------------------------------
-<div class="colmask threecol">
-	<div class="colmid">
-		<div class="colleft">
-			<div class="col1">
-				<!-- Column 1 start -->
-				<h2>TH + CL</h2>
-				<!-- Column 1 end -->
-				<div style="float:left; width: 50%;"><a onclick="javascript:ngs.launch('tophat');" href="#../tools/app_th?pid=<% $pid|html%>">Tophat</a></div>
-				<div style="float:left; width: 50%;">
-					<a href="#" onclick="javascript:ngs.launch('cufflinks');">Cufflinks</a>
-					<a href="#" onclick="javascript:ngs.launch('cuffdiff');">Cuffdiff</a>
-				</div>
-			</div>
-			<div class="col2">
-				<!-- Column 2 start -->
-				<h2>Data management</h2>
-				<div>
-					<a href="javascript:;" onclick="javascript:ngs.launch('data');">Manage data</a>
-				</div>
-				<div>
-					<span class="conIndicator_box">
-						<div class="conIndicator_<% $qc_status %>"></div>
-					</span>
-					<span class="bt_run">
-						<a href="javascript:;" onclick="javascript:ngs.do_qc();">Do QC</a>
-					</span>
-				</div>
-				<!-- Column 2 end -->
-			</div>
-			<div class="col3">
-				<!-- Column 3 start -->
-				<h2>View??</h2>
-				
-				<!-- Column 3 end -->
-			</div>
-		</div>
-	</div>
-</div>
-%#------------------------------------------
+ <!--right Content Start--------------> 
+<div id="conGreenlineRight2">
+    <span id="conGreenline_ConColumnR1">
+        <!--sapce for second column-->
+        <!--sapce for second column-->
+        <!--sapce for second column-->
+        <!--sapce for second column-->
+    </span>
 
+	<span id="conGreenline_ConColumnR2">
+		<span class="conIndicator_box"></span>
+		<span class="bt_browserGreen"><a href="#">Export<br/>to Redline</a></span>
+	</span>
+</div><!--END of ID conGreenlineRight2-->
+
+<div id="conRunAll_empty"></div>
 
 <div id="conProjectInfo">
 	<div id="conProjectInfo_header">
@@ -63,17 +76,16 @@
 		</div>
 % }
 		<div id="conProjectInfo_projecttitle" origtitle="">\
-%#	<!--<small><% $proj->id %>.</small>-->
 			<% $proj->name |html%>
 		</div>
 		<div id="conProjectInfo_projectlog">Description</div>
 	</div>
 
 	<span class="conProjectInfo_column1">
-%#		<div class="conProjectInfo_Row">
-%#			<span class="conProjectInfo_Cell1">Project ID</span>
-%#			<span class="conProjectInfo_Cell2">: <% $proj->id %></span>
-%#		</div>
+		<div class="conProjectInfo_Row">
+			<span class="conProjectInfo_Cell1">Project ID</span>
+			<span class="conProjectInfo_Cell2">: <% $proj->id %></span>
+		</div>
 		<div class="conProjectInfo_Row">
 			<span class="conProjectInfo_Cell1">User</span>
 			<span class="conProjectInfo_Cell2">: <% $user ? $user->full_name : "" |html%></span>
@@ -109,13 +121,18 @@
 	 <span class="conProjectInfo_column3">
 		<div id="desc_limit_label" class="conNewPro_label" style="display: none;">Total characters (max.140): &nbsp;<span id="desc_len"><% length $proj->description %></span></div>
 		<div id="description_container" origdesc="" class="conProjectInfo_description"><% $proj->description |html %></div>
-	</span> <!--END of span conProjectInfo_column3-->
+
 </div><!--END of ID conProjectInfo-->
 
-%#-----------------------------------------------------------------
+
+
+%#-------------------------------------------------
+
 <%args>
 	$pid => 0
+	$debug => 0
 </%args>
+%#-------------------------------------------------
 <%once>
 	use Data::Dumper;
 	use DNALC::Pipeline::Utils qw(clean_query);
@@ -124,11 +141,9 @@
 	#use iPlant::FoundationalAPI ();
 	#use iPlant::FoundationalAPI::Constants ':all';
 	use DNALC::Pipeline::User ();
-	
-	my %clades = ();
 </%once>
+%#-------------------------------------------------
 <%init>
-
 	$m->session->{pipeline} ||= {};
 	my $s = $m->session->{pipeline};
 
@@ -155,9 +170,13 @@
 	my $is_owner = $s->{user_id} == $user->user_id if $proj;
 	
 	my $qc_status = $is_owner ? $pm->qc_status->{status} : 'disabled';
-
 </%init>
+%#-------------------------------------------------
+<%attr>
+	js => ['ngs.js']
+	load_window_ui => 1
+	current_section => 'green'
+	#show_glossary => 1
+</%attr>
 
-<%method title>
-Project panel
-</%method>
+

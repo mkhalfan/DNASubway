@@ -41,7 +41,8 @@ do_qc: change R into blinking R and remove link from QC button
 		print STDERR "do_QC: LOCKED\n";
 
 		#launch qc_job
-		my $qc_jobs = eval { $pm->do_qc; };
+		#my $qc_jobs = eval { $pm->do_qc; };
+		my $qc_jobs = $pm->do_qc;
 
 		# remove the lock
 		$m->cache->remove($lock_key);

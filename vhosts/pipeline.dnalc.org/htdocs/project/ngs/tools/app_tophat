@@ -1,0 +1,144 @@
+<div class="container_data1">
+	<div id="container_data_line_bg" style="background-color:#C2DBF3;padding:2px;font-size:10px;margin-bottom:10px;"><a href="#" style="text-decoration:none">< Back</a></div>
+% if ($app) {
+<div>New job using application <strong><% $app %></strong>:</div>
+
+%#	--------------------------- DEBUG ---------------------------------------
+%#		<& ./.comp/app_debug, app => $app &>
+%#	--------------------------- /DEBUG --------------------------------------
+<form method="post">
+	<div id="launch_job_table_holder">	
+		<table id="launch_job_table">
+			<& ./.comp/job_options, form => $form &>
+			<& ./.comp/build_app_form, pm => $pm, app => $app, form => $form, flagged => $flagged &>
+		</table>
+	</div>
+	<p style="text-align:center"><input type="button" value="Cancel" /> | <input type="submit" value="Submit" /></p>
+</form>
+<!--	
+<pre style="float:left">
+	<div>
+		status: <% $st->{status} %> <% $st->{message} ? " » " . $st->{message} : "" %>
+	</div>
+	<% Dumper($form) %>
+</pre>
+-->
+% } else {
+	No application found for conf file: '<% $app_cf_file |html %>'.
+% }
+</div> <!-- end container_data1 --> 
+%#-----------------------------------------------------------------
+<%args>
+	$pid => 0
+</%args>
+<%once>
+	use Data::Dumper;
+	use DNALC::Pipeline::Utils qw(clean_query);
+	use DNALC::Pipeline::App::NGS::ProjectManager ();
+
+	use DNALC::Pipeline::User ();
+
+</%once>
+<%init>
+
+	$m->session->{pipeline} ||= {};
+	my $s = $m->session->{pipeline};
+
+	#my $path_info = $r->path_info;
+	#if ($r->path_info =~ /\/(\d+)$/) {
+	#	$pid = $1;
+	#}
+
+	my $apif = iPlant::FoundationalAPI->new(
+			user => $s->{username},
+			token => $s->{api_token},
+			debug => 0,
+		);
+	my $pm = DNALC::Pipeline::App::NGS::ProjectManager->new({project => $pid, debug => 1});
+	$pm->api_instance($apif) if $apif;
+	my $proj = $pm->project;
+
+	# project's owner
+	my $is_owner = $s->{user_id} == $proj->user_id if $proj;
+
+	my $app;
+	my $app_cf_file = "NGS_TOPHAT";
+	my $st = $pm->app($app_cf_file);
+
+	if ($st->{status} eq "success") {
+		$app = $st->{app};
+	}
+	else {
+		print STDERR $st->{status}, " ", $st->{message}, $/;
+	}
+
+	print STDERR Dumper($app), $/;
+
+	my $form = {};
+	my $flagged = {}; # to report errors
+
+	if ($r->method eq "POST") {
+		$form = \%ARGS;
+		
+		$form->{jobName} =~ s|/+||g;
+		
+		for my $p (@{$app->parameters}) {
+			if ($p->{hidden} && !defined $form->{$p->{id}}) {
+				$form->{$p->{id}} = $p->{value} || $p->{defaultValue};
+			}
+			if ($p->{id} eq "mate_inner_dist") {
+				print STDERR "app_tophat: p = ", $p->{validator}, $/;
+			}
+		}
+
+		# TODO - default input files should not be set?!
+		#for my $p (@{$app->inputs}) {
+		#	unless (defined $form->{$p->{id}}) {
+		#		$form->{$p->{id}} = $p->{value};
+		#	}
+		#}
+		
+		# what do we do when we don`t get the paths?!
+		$form->{genome} = $pm->project_genome_path;
+		$form->{annotation} = $pm->project_annotation_path;
+		$form->{processors} ||= 4;
+
+		unless (defined $form->{archive}) {
+            $form->{archive} = "true";
+        }
+
+		if ($form->{notify_user}) {
+			$form->{callbackUrl} = $s->{user_email};
+		}
+
+		$form->{requestedTime} ||= '0:45:00';
+		#print STDERR "app_tophat: form = ", Dumper( $form ), $/;
+
+		$st = $pm->submit_job('ngs_tophat', $app, $form);
+		print STDERR "app_tophat: JOB status = ", Dumper( $st ), $/;
+
+		if ($st->{status} ne "success") {
+			if ($st->{message} =~ /missing required/i && $st->{data} && %{$st->{data}}) {
+				for (keys %{$st->{data}}) {
+					$flagged->{$_} = 1;
+				}
+			}
+		}
+		else {
+			if ($st->{data}) {
+				# redirect to our job list page
+				print STDERR "JOB ID: ", $st->{data}->id, "//", $st->{data}->api_job_id, $/;
+				$m->comp('/_message_add', 'Job submitted!');
+				$m->redirect("./tophat_list?pid=" . $pid);
+			}
+		}
+	}
+	else {
+		for my $p (@{$app->parameters}) {
+			unless ($p->{hidden}) {
+				$form->{$p->{id}} = defined $p->{value} ? $p->{value} : $p->{defaultValue};
+			}
+		}
+	}
+</%init>
+

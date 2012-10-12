@@ -951,6 +951,53 @@ input[disabled="disabled"], input[disabled], textarea[disabled], select[disabled
 	background: url("/images/v2/indicatorBL_X.png") bottom left no-repeat;
 }
 
+/* Greenline indicators */
+
+.conIndicatorGL_not-processed{
+	width: 18px;
+	height: 18px;
+	display: block;
+	position: relative;
+	background: url("/images/v2/indicatorR_green.png") bottom left no-repeat;
+
+}
+
+.conIndicatorGL_processing{
+	width: 18px;
+	height: 18px;
+	display: block;
+	position: relative;
+	background: url("/images/v2/indicator_running.gif") bottom left no-repeat;
+
+}
+
+.conIndicatorGL_done{
+	width: 18px;
+	height: 18px;
+	display: block;
+	position: relative;
+	background: url("/images/v2/indicatorV_green.png") bottom left no-repeat;
+}
+
+.conIndicatorGL_error{
+	width: 18px;
+	height: 18px;
+	display: block;
+	position: relative;
+	background: url("/images/v2/indicatorE_green.png") bottom left no-repeat;
+}
+
+.conIndicatorGL_disabled {
+	width: 18px;
+	height: 18px;
+	display: block;
+	display: block;
+	position: relative;
+	background: url("/images/v2/indicatorX_green.png") bottom left no-repeat;
+}
+
+/* End Greenline Indicators */
+
 .conIndicator_Rb {
 	width: 18px;
 	height: 18px;
@@ -1634,6 +1681,163 @@ input[disabled="disabled"], input[disabled], textarea[disabled], select[disabled
   display: block;
   float: left;
 }
+
+/*---- Greenline Project Creation Screen ----*/
+
+#conGreenlineLeft1 {
+	width: 470px;
+	height: auto;
+	background: url("/images/v2/map-greenline_L1.jpg") top left no-repeat;
+	float: left;
+	position: relative;
+}
+
+#conGreenlineRight1 {
+	width: 380px;
+	height:auto;
+	min-height: 320px;
+	overflow: none;
+	background: url("/images/v2/map-greenline_R1.jpg") top left no-repeat;
+	float: right;
+	position: relative;
+	margin-top: 24px;
+}
+
+/*--------- End Greenline Project Creation Screen ----------*/
+
+/*---- Greenline Console ----*/
+#conGreenlineLeft2 {
+	width: 439px;
+	height: 276px;
+	background: url("/images/v2/map-greenline_L2.jpg") top left no-repeat;
+	float: left;
+	position: relative;
+	padding-top: 100px;
+	padding-left: 31px;
+	z-index: 0;
+}
+
+.conGreenline_ConColumn{
+  width:124px;
+  height: 226px;
+  padding-right: 32px;
+  position: relative;
+  float:left;
+}
+  
+.conGreenline_ConColumn1{
+  width:124px;
+  height: 226px;
+  position: relative;
+  float:left;
+}
+
+.conGreenline_ConCell{
+  width: 124px;
+  height: 26px;
+  margin: 0px 0px 13px 0px;
+  position: relative;
+  float: left;
+}
+
+.bt_runGreenline {
+	width:100px;
+	height: 26px;
+	position: relative;
+	float: right;
+}
+
+.bt_runGreenline a {
+	width:100px;
+	height: 26px;
+	background: url("/images/v2/bt_runGreen.png") top no-repeat;
+	display: block;
+	position: relative;
+	float: right;
+	padding-top: 6px;
+	color: #555;
+	font-size: 0.75em;
+	text-align: center; text-decoration: none;
+}
+
+.bt_runGreenline a:hover {
+	background: url("/images/v2/bt_run2.png") top no-repeat;
+}
+#conGreenlineRight2 {
+	width: 378px;
+	height: 248px;
+	background: url("/images/v2/map-greenline_R2.jpg") top left no-repeat;
+	float: left;
+	position: relative;
+	margin-top:24px;
+	padding: 76px 0px 0px 0px;
+}
+#conGreenline_ConColumnR1{
+  width:124px;
+  height: 226px;
+  padding-right: 32px;
+  padding-left: 32px;
+  position: relative;
+  float:left;
+}
+#conGreenline_ConColumnR2{
+	width:124px;
+	height: 34px;
+	margin: 70px 20px 70px 0px;
+	position: relative;
+	float: right;
+}
+
+.bt_browserGreen {
+	width:100px;
+	height: 34px;
+	position: relative;
+	float: right;
+	margin-top:10px;
+}
+
+.bt_browserGreen a {
+	width:100px;
+	height: 34px;
+	background: url("/images/v2/bt_browserRedline.png") top no-repeat;
+	display: block;
+	position: relative;
+	float: right;
+	padding-top: 6px;
+	color: #555;
+	font-size: 0.75em;
+	text-align: center; text-decoration: none; line-height: 0.95em;
+}
+
+.bt_browserGreen a:hover {
+	background: url("/images/v2/bt_browserBnY2.png") top no-repeat;
+}
+
+.bt_Rungreenline_grey{
+	width: 100px;
+	height: 26px;
+	background: url("/images/v2/bt_blueRun_grey.png") top no-repeat;
+	display: block;
+	position: relative;
+	float:left;
+	padding-top: 6px;
+	color: #555;
+	font-size: 0.75em;
+	text-align: center;
+	text-decoration: none;
+}
+
+.conGreenline_keys{
+  width: 92px;
+  height: 136px;
+  margin: 30px 0px 0px 20px;
+  background: url("/images/v2/keys_blue.jpg") bottom left no-repeat;
+  position: relative;
+  float: left;
+}
+/*---- End Greenline Console ----*/
+
+
 
 /*//----------PUBLIC PROJECT START here PUBLIC PROJECT  START  --- PUBLIC PROJECT  START ---- PUBLIC PROJECT  START----  PUBLIC PROJECT  START------------------*/
 

@@ -1,16 +1,23 @@
+<div class="container_data1">
+	<div id="container_data_line">&nbsp;</div>
 
-<a href="./add_data?pid=<% $proj->id %>">add data</a>
-<input type="hidden" id="pid" value="<% $pid |html%>"/>
+	
+	<div>
+		<a href="./add_data?pid=<% $proj->id %>" style="text-decoration:none;"><input type="button" value="Add Data" /></a><input type="hidden" id="pid" value="<% $pid |html%>"/>
+	</div>
 
 %#data = <% ref($data)%>
 
-<table>
-	<tr>
-		<th>File</th>
-		<th>Source</th>
-		<th>QC</th>
-		<th>Trimmed</th>
-	</tr>
+<table id="jobs_table">
+	<thead>
+		<tr>
+			<th>File</th>
+			<th>Size</th>
+			<th>Upload Date</th>
+			<th>QC</th>
+			<th>Description</th>
+		</tr>
+	</thead>
 % while (my $f = $data->next) {
 %	next unless $f->is_input;
 %#	TODO: need a better way of assessing if a file is fastq or not
@@ -18,7 +25,8 @@
 %	my $is_fastq = $f->file_path =~ /\.fastq$/;
 	<tr>
 		<td title="<% $f-> file_path |html %>"><% $f->file_name |html%></td>
-		<td style="min-width: 200px;"><% $f->source->name |html%></td>
+		<td>$f->size</td>
+		<td>$f->upload_date</td>
 %	if ($is_fastq) {
 		<& .fastq_options, f =>$f, pid => $pid, pm => $pm &>
 %	} else {
@@ -47,7 +55,7 @@
 	my $is_qcing = $pm->{_mc}->get($mc_key_qc);
 
 </%init>
-		<td><% $qc_report ? "<a href='$qc_report'>open</a>" : $is_qcing ? 'qcing' : '<a href="javascript:ngs.do_qc(' . $f->id . ')">do QC</a>'%></td>
+		<td><% $qc_report ? "<a href='$qc_report'>View</a>" : $is_qcing ? 'qcing' : '<a href="javascript:ngs.do_qc(' . $f->id . ')">Run</a>'%></td>
 %	if ($qc_report) {
 %#		<td title="<% $trimmed_file ? $trimmed_file->file_path : "do trimm" %>"><% $trimmed_file ? "yes" : "<a href=\"javascript:do_trim()\">Trim" %></td>
 		<td><% $trimmed_file ? "yes" : $is_trimming ? "trimming pending" : "<a href=\"javascript:ngs.do_trim(" . $f->id . ");\">do Trim" %></td>

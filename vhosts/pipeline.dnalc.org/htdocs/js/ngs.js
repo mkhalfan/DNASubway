@@ -8,14 +8,10 @@ function NGS (id) {
 
 NGS.prototype.launch = function(what, where, title) {  
 	var urls = {
-			viewer: ['/project/phylogenetics/tools/view_sequences.html?pid=', 'Sequence Viewer'],
-			phy_trim: ['/project/phylogenetics/tools/view_sequences.html?show_trimmed=1;pid=', 'Trimmed Sequence Viewer'],
-			pair: ['/project/phylogenetics/tools/pair?pid=', 'Pair Builder'],
-			blast: ['/project/phylogenetics/tools/blast.html?pid=', 'BLASTN'],
 			data: ['/project/ngs/tools/manage_data?pid=', 'Manage data'],
-			cufflinks: ['/project/ngs/tools/cufflinks_list?pid=', 'Cufflinks'],
-			cuffdiff: ['/project/ngs/tools/cuffdiff_list?pid=', 'Cuffdiff'],
-			tophat: ['/project/ngs/tools/tophat_list?pid=', 'TopHat'],
+			cufflinks: ['/project/ngs/tools/tool_job_list?tool=' + what + '&pid=', 'Cufflinks'],
+			cuffdiff: ['/project/ngs/tools/tool_job_list?tool=' + what + '&pid=', 'Cuffdiff'],
+			tophat: ['/project/ngs/tools/tool_job_list?tool=' + what + '&pid=' , 'TopHat'],
 			//manage_sequences: ['/project/phylogenetics/tools/manage_sequences?pid=', 'Select Data']
 		};
 
@@ -90,6 +86,12 @@ NGS.prototype.do_qc = function() {
 	});
 };
 
+NGS.prototype.toggle_params = function(){
+	$('app_parameters').toggle();
+	$('show_params').toggle();
+	$('hide_params').toggle();
+}
+
 var ngs, window;
 
 //Event.observe(top, Prototype.Browser.IE ? 'load' : 'dom:loaded', function() {
@@ -113,9 +115,12 @@ Event.observe(window, 'load', function() {
 			ngs.add_data();
 		});
 	}
-	else if (step == 3) {
-		$('app_parameters').toggle();
-	}
+	
+	
+	//Add alternating row colors for tables using prototype
+	$$('#jobs_table tbody tr:nth-child(even)').each(function(tr) {
+		tr.addClassName('even');
+	});
 });
 
 //alert("step = " + Prototype.Browser.IE);
