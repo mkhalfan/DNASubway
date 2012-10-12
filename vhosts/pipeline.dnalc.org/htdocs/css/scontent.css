@@ -958,7 +958,7 @@ input[disabled="disabled"], input[disabled], textarea[disabled], select[disabled
 	height: 18px;
 	display: block;
 	position: relative;
-	background: url("/images/v2/indicatorR_green.png") bottom left no-repeat;
+	background: url("/images/ngs/indicatorR_green.png") bottom left no-repeat;
 
 }
 
@@ -967,7 +967,7 @@ input[disabled="disabled"], input[disabled], textarea[disabled], select[disabled
 	height: 18px;
 	display: block;
 	position: relative;
-	background: url("/images/v2/indicator_running.gif") bottom left no-repeat;
+	background: url("/images/ngs/indicator_running.gif") bottom left no-repeat;
 
 }
 
@@ -976,7 +976,7 @@ input[disabled="disabled"], input[disabled], textarea[disabled], select[disabled
 	height: 18px;
 	display: block;
 	position: relative;
-	background: url("/images/v2/indicatorV_green.png") bottom left no-repeat;
+	background: url("/images/ngs/indicatorV_green.png") bottom left no-repeat;
 }
 
 .conIndicatorGL_error{
@@ -984,7 +984,7 @@ input[disabled="disabled"], input[disabled], textarea[disabled], select[disabled
 	height: 18px;
 	display: block;
 	position: relative;
-	background: url("/images/v2/indicatorE_green.png") bottom left no-repeat;
+	background: url("/images/ngs/indicatorE_green.png") bottom left no-repeat;
 }
 
 .conIndicatorGL_disabled {
@@ -993,7 +993,7 @@ input[disabled="disabled"], input[disabled], textarea[disabled], select[disabled
 	display: block;
 	display: block;
 	position: relative;
-	background: url("/images/v2/indicatorX_green.png") bottom left no-repeat;
+	background: url("/images/ngs/indicatorX_green.png") bottom left no-repeat;
 }
 
 /* End Greenline Indicators */
@@ -1687,7 +1687,7 @@ input[disabled="disabled"], input[disabled], textarea[disabled], select[disabled
 #conGreenlineLeft1 {
 	width: 470px;
 	height: auto;
-	background: url("/images/v2/map-greenline_L1.jpg") top left no-repeat;
+	background: url("/images/ngs/map-greenline_L1.jpg") top left no-repeat;
 	float: left;
 	position: relative;
 }
@@ -1697,7 +1697,7 @@ input[disabled="disabled"], input[disabled], textarea[disabled], select[disabled
 	height:auto;
 	min-height: 320px;
 	overflow: none;
-	background: url("/images/v2/map-greenline_R1.jpg") top left no-repeat;
+	background: url("/images/ngs/map-greenline_R1.jpg") top left no-repeat;
 	float: right;
 	position: relative;
 	margin-top: 24px;
@@ -1709,7 +1709,7 @@ input[disabled="disabled"], input[disabled], textarea[disabled], select[disabled
 #conGreenlineLeft2 {
 	width: 439px;
 	height: 276px;
-	background: url("/images/v2/map-greenline_L2.jpg") top left no-repeat;
+	background: url("/images/ngs/map-greenline_L2.jpg") top left no-repeat;
 	float: left;
 	position: relative;
 	padding-top: 100px;
@@ -1750,7 +1750,7 @@ input[disabled="disabled"], input[disabled], textarea[disabled], select[disabled
 .bt_runGreenline a {
 	width:100px;
 	height: 26px;
-	background: url("/images/v2/bt_runGreen.png") top no-repeat;
+	background: url("/images/ngs/bt_runGreen.png") top no-repeat;
 	display: block;
 	position: relative;
 	float: right;
@@ -1761,12 +1761,12 @@ input[disabled="disabled"], input[disabled], textarea[disabled], select[disabled
 }
 
 .bt_runGreenline a:hover {
-	background: url("/images/v2/bt_run2.png") top no-repeat;
+	background: url("/images/ngs/bt_run2.png") top no-repeat;
 }
 #conGreenlineRight2 {
 	width: 378px;
 	height: 248px;
-	background: url("/images/v2/map-greenline_R2.jpg") top left no-repeat;
+	background: url("/images/ngs/map-greenline_R2.jpg") top left no-repeat;
 	float: left;
 	position: relative;
 	margin-top:24px;
@@ -1831,7 +1831,7 @@ input[disabled="disabled"], input[disabled], textarea[disabled], select[disabled
   width: 92px;
   height: 136px;
   margin: 30px 0px 0px 20px;
-  background: url("/images/v2/keys_blue.jpg") bottom left no-repeat;
+  background: url("/images/ngs/keys_green.jpg") bottom left no-repeat;
   position: relative;
   float: left;
 }

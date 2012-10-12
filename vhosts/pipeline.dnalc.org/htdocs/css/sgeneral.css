@@ -757,7 +757,7 @@ h5{
 .bt_greenStart  a {
 	width:150px;
 	height: 40px;
-	background: url("/images/v2/bt_greenStart1.jpg") left no-repeat;
+	background: url("/images/ngs/bt_greenStart1.jpg") left no-repeat;
 	display: block;
 	position: relative;
 	float: left;
@@ -765,11 +765,11 @@ h5{
 }
 
 .bt_greenStart a:hover {
-	background: url("/images/v2/bt_greenStart2.jpg") left no-repeat;
+	background: url("/images/ngs/bt_greenStart2.jpg") left no-repeat;
 }
 
 .bt_greenStart a.current {
-	background: url("/images/v2/bt_greenStart3.jpg") left no-repeat;
+	background: url("/images/ngs/bt_greenStart3.jpg") left no-repeat;
 }
 /* --end green-- */
 
