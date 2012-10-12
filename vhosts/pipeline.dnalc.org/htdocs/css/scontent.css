@@ -967,7 +967,7 @@ input[disabled="disabled"], input[disabled], textarea[disabled], select[disabled
 	height: 18px;
 	display: block;
 	position: relative;
-	background: url("/images/ngs/indicator_running.gif") bottom left no-repeat;
+	background: url("/images/ngs/indicator_running_green.gif") bottom left no-repeat;
 
 }
 
