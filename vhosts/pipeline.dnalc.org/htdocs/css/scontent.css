@@ -1761,7 +1761,7 @@ input[disabled="disabled"], input[disabled], textarea[disabled], select[disabled
 }
 
 .bt_runGreenline a:hover {
-	background: url("/images/ngs/bt_run2.png") top no-repeat;
+	background: url("/images/v2/bt_run2.png") top no-repeat;
 }
 #conGreenlineRight2 {
 	width: 378px;

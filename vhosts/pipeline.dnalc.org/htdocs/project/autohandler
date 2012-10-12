@@ -6,6 +6,7 @@
 <link rel="icon" type="image/png" href="/images/favicon.png" />
 <link type="text/css" rel="stylesheet" href="/css/sgeneral.css" />
 <link type="text/css" rel="stylesheet" href="/css/scontent.css" />
+<link rel="stylesheet" type="text/css" href="/css/prototip.css" />
 <link href="/files/window/themes/window/window.css" rel="stylesheet" type="text/css" />
 <link href="/files/window/themes/window/alphacube.css" rel="stylesheet" type="text/css" />
 % if ($m->request_comp->attr_if_exists('css') && @{$m->request_comp->attr('css')}) {
@@ -47,6 +48,7 @@
 	<span class="bt_redStart"><a href="/project/create_project.html" class="<% $class_r %>"></a></span>
 	<span class="bt_yellowStart"><a href="/project/target/create" class="<% $class_y %>"></a></span>
 	<span class="bt_blueStart"><a href="/project/phylogenetics/create_project.html" class="<% $class_b %>"></a></span>
+	<span class="bt_greenStart"><a href="/project/ngs/create" class="<% $class_g %>"></a></span>
     <span class="spacer_btGlossary"></span> 
     <span class="spacer_btGlossary"></span>
      
@@ -122,7 +124,7 @@ pageTracker._trackPageview();
 		$m->redirect("/");
 	}
 	
-	my ($class_r, $class_y, $class_b) = ('', '', '');
+	my ($class_r, $class_y, $class_b, $class_g) = ('', '', '', '');
 	my $section = $m->request_comp->attr('current_section');
 
 	if ($section eq 'red') {
@@ -133,6 +135,9 @@ pageTracker._trackPageview();
 	}
 	elsif ($section eq 'blue') {
 		$class_b = 'current';
+	}
+	elsif ($section eq 'green') {
+		$class_g = 'current';
 	}
 	
 </%init>
