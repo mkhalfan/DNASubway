@@ -22,6 +22,8 @@
 	GEARMAN_SERVERS => ['127.0.0.1:7003'],
 	MEMCACHED_SERVERS => ['127.0.0.1:11211'],
 	LDAP_ENABLED => 0,
+	API_ENABLED => 1,
+	API_TOKEN_TTL => 10 * 60 * 60, # 10 hours
 
 	'user_evidence_upload_max_size' => 0,
 
