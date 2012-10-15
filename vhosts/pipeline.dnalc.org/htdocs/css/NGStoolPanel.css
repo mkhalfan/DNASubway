@@ -1,3 +1,44 @@
+/* THESE ARE ALSO IN toolPanel.css */
+.container_data1 {
+	width: 840px;
+	height: auto;
+	padding-top: 8px;
+	float: left;
+	position: relative;
+	padding-left: 20px;
+	font-family:  arial, monospace;
+}
+#container_data_line {
+	height: 8px;
+	margin-top: 14px;
+	position: relative;
+	border-top: 4px solid #C2DBF3;
+}
+#container_data_lineBottom {
+	height: 3px;
+	position: relative;
+	border-bottom: 1px solid #C2DBF3;
+}
+/* END THESE ARE ALSO IN toolPanel.css */
+
+.label_header {
+	color:#3399cc;
+	font-weight:bold;
+}
+
+#container_data_line_bg {
+	background-color:#C2DBF3;
+	padding:2px;
+	font-size:12px;
+	margin-bottom:10px;
+	font-weight:bold;
+}
+
+#container_data_line_bg  a{
+	text-decoration:none;
+	color:#123456
+}
+
 #jobs_table  {
 	margin-top:10px;
 	text-align:left;
@@ -44,4 +85,53 @@
 	padding-left:0px;
 	color:#3399cc;
 	font-weight:bold;
+}
+
+/* in Add Data */
+#folders {
+	float:left;
+	width:40%;
+	max-height:200px;
+	overflow:auto;
+}
+
+#folders div {
+	padding:2px 20px;
+	margin-left:5px;
+	background: url(/images/ngs/generic_folder.png) no-repeat left;
+}
+#folders div.up {
+	padding:2px 20px;
+	margin-left:5px;
+	background: url(/images/ngs/generic_folder_up.png) no-repeat left;
+}
+
+#folders a {
+	color:black;
+	text-decoration:none;
+}
+
+#files {
+	float:right;
+	width:59%;
+	padding-top:5px;
+	max-height:200px;
+	overflow:auto;
+}
+
+#files div {
+	padding:2px 0;
+	margin-left:5px;
+	background: url(/images/ngs/document_import.png) no-repeat 22px;
+}
+
+#files div input {
+	margin-right:27px;
+}
+
+#file_folder_divider {
+	background-color:lightgrey;
+	width:1px;
+	height:200px;
+	float:left;
 }
