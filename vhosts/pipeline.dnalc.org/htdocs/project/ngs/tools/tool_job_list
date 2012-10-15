@@ -3,7 +3,6 @@
 <& /_messages &>
 
 	<div><a href="./app_<% $tool |html %>?pid=<% $pid |html%>" style="text-decoration:none"><input type="button" value="Launch New Job" /></a></div>
-t=<% $tool |html%>
 
 	<table id="jobs_table">
 		<thead>
