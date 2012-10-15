@@ -96,8 +96,8 @@
 		#}
 		
 		# what do we do when we don`t get the paths?!
-		$form->{bias_fasta} = $pm->project_genome_path;
-		$form->{annotation} = $pm->project_annotation_path;
+		$form->{BIAS_FASTA} = $pm->project_genome_path;
+		$form->{ANNOTATION} = $pm->project_annotation_path;
 
 		unless (defined $form->{archive}) {
             $form->{archive} = "true";

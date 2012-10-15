@@ -4,15 +4,48 @@
 function NGS (id) {
 	this.pid = id;
 	this.windows = [];
-}
+	
+	this.titles = {
+		ngs_tophat : "TopHat",
+	};
+	
+};
+
+NGS.prototype.get_status = function(op) {
+	if (! $(op + '_st'))
+		return '';
+	var cname = $(op + '_st').className;
+	return cname.replace('conIndicatorGL_', '');
+};
+
+NGS.prototype.set_status = function(op, status) {
+		var b = $(op + '_btn');
+		var ind = $(op + '_st');
+		var title = this.titles[op] || '??';
+		ind.removeClassName(ind.className);
+
+		b.onclick = function(){ ngs.launch(op); };
+		if (status == 'processing') {
+			ind.addClassName('conIndicatorGL_processing');
+		}
+		else if (status == 'done') {
+			ind.addClassName('conIndicatorGL_done');
+		}
+		else if (status == 'not-processed') {
+			ind.addClassName('conIndicatorGL_not-processed');
+		}
+		else if (status == 'disabled') {
+			ind.addClassName('conIndicatorGL_disabled');
+			b.onclick = null;
+		}
+	};
 
 NGS.prototype.launch = function(what, where, title) {  
 	var urls = {
 			data: ['/project/ngs/tools/manage_data?pid=', 'Manage data'],
-			cufflinks: ['/project/ngs/tools/tool_job_list?tool=' + what + '&pid=', 'Cufflinks'],
-			cuffdiff: ['/project/ngs/tools/tool_job_list?tool=' + what + '&pid=', 'Cuffdiff'],
-			tophat: ['/project/ngs/tools/tool_job_list?tool=' + what + '&pid=' , 'TopHat'],
-			//manage_sequences: ['/project/phylogenetics/tools/manage_sequences?pid=', 'Select Data']
+			ngs_cufflinks: ['/project/ngs/tools/tool_job_list?tool=' + what + '&pid=', 'Cufflinks'],
+			ngs_cuffdiff: ['/project/ngs/tools/tool_job_list?tool=' + what + '&pid=', 'Cuffdiff'],
+			ngs_tophat: ['/project/ngs/tools/tool_job_list?tool=' + what + '&pid=' , 'TopHat'],
 		};
 
 	try {
@@ -29,22 +62,6 @@ NGS.prototype.launch = function(what, where, title) {
 	
 	
 	var options = null;
-	if (what == 'manage_sequences') {
-		options = {
-			width: 900, 
-			height: 496,
-			shadow: false,
-			draggable: true,
-			resizable: true,
-			url: uri, 
-			close : function() {
-				if (what && this.windows[what]) {
-					this.windows[what].destroy(); 
-					return true;  
-				}
-			}
-		};
-	}
 	
 	this.windows[what] = openWindow( uri, window_title, options);
 };

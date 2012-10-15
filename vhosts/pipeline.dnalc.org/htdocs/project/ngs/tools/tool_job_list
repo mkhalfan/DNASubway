@@ -25,13 +25,13 @@
 					<a href="./job_status?pid=<%$pid |html%>;jid=<% $job %>" style="color:black"><% $attrs->{name} |html%></a>
 				</td>
 				<td>$job->start_time</td>
-				<td><% $job->status eq "done" ? $job->end_time : "-" %></td>
+				<td><% $job->status eq "done" ? '$job->end_time' : "-" %></td>
 				<td><% $job->status %></td>
 %# -------- DIFFERENT VISUALIZATION OPTIONS BASED ON TOOL TYPE HERE --------- #%
 				<td>
-% if ($job->status eq 'done') {
+% if ($tool eq "ngs_tophat" && $job->status eq 'done') {
 					<a href="./launch_igv?pid=<% $proj %>;jid=<% $job %>">view in IGV-static</a>
-		&nbsp;<a href="./launch_igv?pid=<% $proj %>;jid=<% $job %>">view in IGV-dynamic</a>
+%#		&nbsp;<a href="./launch_igv?pid=<% $proj %>;jid=<% $job %>">view in IGV-dynamic</a>
 %	}
 				</td>
 %# ------ END DIFFERENT VISUALIZATION OPTIONS BASED ON TOOL TYPE HERE ------- #%
@@ -62,5 +62,5 @@
 	my $pm = DNALC::Pipeline::App::NGS::ProjectManager->new({project => $pid, debug => 0});
 	my $proj = $pm->project;
 	
-	my $jobs = $pm->get_jobs_by_task('ngs_' . $tool); # show non-deleted jobs only
+	my $jobs = $pm->get_jobs_by_task($tool); # show non-deleted jobs only
 </%init>

@@ -208,10 +208,14 @@ use Data::Dumper;
 	sub data {
 		my ($self, %filters) = @_;
 
+		my %allowed_filters = map {$_ => 1 } grep {!/^_|^project_id/} DataFile->columns;
 		my %args = (
-				project_id => $self->project,
+				project_id => $self->project->id,
 			);
-		$args{is_input} = $filters{is_input} if defined $filters{is_input};
+		for (keys %filters) {
+			next unless defined $allowed_filters{$_} && defined $filters{$_};
+			$args{$_} = $filters{$_};
+		}
 		DataFile->search(%args, {order_by => 'id'});
 	}
 
@@ -645,6 +649,68 @@ use Data::Dumper;
 		}
 
 		$self->{api_instance};
+	}
+
+	#--------------------------------------
+	# returns status for these routines: tophat, cufflinks, cuffdiff
+	#	for all of them or only for the specified one 
+	sub get_status {
+		my ($self, $task_name) = @_;
+
+		#$task_name ||= 'all';
+
+		#unless (defined $self->{task_name_to_id}->{ $task_name }) {
+		#	print STDERR  "__GET_STATUS__: unknown task: ", $task_name, $/;
+		#	return;
+		#}
+
+		## TODO - use memcached
+
+		# $running_jobs is a hashref like
+		# {
+		#	'ngs_tophat' => { 'done' => '1', 'error' => '2' },
+		#	'ngs_fastqc' => { 'done' => '1' },
+		# }
+
+		my $running_jobs = Job->get_jobs_status($self->project, $self->{task_name_to_id}->{ngs_tophat});
+
+		my %stats = map {$_ => 'disabled'} keys %{$self->{task_name_to_id}};
+
+		# tophat
+		#	we need at least one input file (fastq)
+		my @data = $self->data(is_input => 1);
+		$stats{ngs_tophat} = @data ? 'not-processed' : 'disabled';
+		if ($stats{ngs_tophat} ne 'disabled') {
+			if ($running_jobs->{ngs_tophat}->{processing}) {
+				$stats{ngs_tophat} = 'processing';
+			}
+			elsif ($running_jobs->{ngs_tophat}->{done} || $running_jobs->{ngs_tophat}->{error}) {
+				$stats{ngs_tophat} = 'done';
+			}
+		}
+
+		# cufflinks
+		unless ( defined $running_jobs->{ngs_cufflinks}) {
+			if ($running_jobs->{ngs_tophat} && exists $running_jobs->{ngs_tophat}->{done}) {
+				$stats{ngs_cufflinks} = 'not-processed';
+			}
+		}
+		else {
+			if ($running_jobs->{ngs_cufflinks}->{processing}) {
+				$stats{ngs_cufflinks} = 'processing';
+			}
+			elsif ($running_jobs->{ngs_cufflinks}->{done} || $running_jobs->{ngs_cufflinks}->{error}) {
+				$stats{ngs_cufflinks} = 'done';
+			}
+		}
+
+		# cuffdiff
+		# TODO
+
+		# cuffdiff
+		# TODO
+
+		%stats;
 	}
 
 	#--------------------------------------

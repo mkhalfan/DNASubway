@@ -80,4 +80,31 @@ sub status {
 	return $status_id_to_name{$self->{status_id}};
 }
 
+# AND task_id = (SELECT task_id FROM task WHERE name IN ('ngs_tophat'))
+__PACKAGE__->set_sql(jobs_status => q{
+			SELECT task.name AS task_name, task_status.name AS status_name, count(*) AS num
+			FROM task 
+			LEFT JOIN ngs_job ON ngs_job.task_id = task.task_id
+			LEFT JOIN task_status ON ngs_job.status_id = task_status.status_id
+			WHERE project_id = ?
+			GROUP BY task_status.name, task.name
+			ORDER BY task_name
+	});
+
+sub get_jobs_status {
+	my ($class, $pid) = @_;
+
+	my %job_stats = ();
+
+	my $sth = $class->sql_jobs_status;
+	$sth->execute($pid);
+	while (my $r = $sth->fetchrow_hashref) {
+		$job_status{$r->{task_name}}->{$r->{status_name}} = $r->{num};
+	}
+	$sth->finish;
+
+	wantarray ? %job_status : \%job_status;
+}
+
+
 1;
