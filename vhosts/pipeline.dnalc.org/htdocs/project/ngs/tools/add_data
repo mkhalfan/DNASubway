@@ -1,42 +1,95 @@
-
-<div id="content" style="padding-left: 20px;">
 % if ($files_added) {
-<script type="text/javascript">
-	top.ngs.close_window('data');
+	<script type="text/javascript">
+	//top.ngs.close_window('data');
 	if (top.ngs.get_status('ngs_tophat') == 'disabled') {
 		top.ngs.set_status('ngs_tophat', 'not-processed');
 	}
-</script>
+	</script>
 % } else {
-%	if ($path_to_read eq "/$username") {
-	<div><a href="/project/ngs/tools/add_data/shared?pid=<% $pid |html%>">Browse shared data</a></div>
+	<div class="container_data1">
+		<div id="container_data_line_bg">
+			<a href="#">< Back</a>
+		</div>
+	
+%	if ($browse_path eq '') {	
+		<div style="padding-left:100px;padding-bottom:20px;">
+			<span class="label_header" style="padding-right:20px;">Import Data From:</span>
+			<input id="sample" name="import_from" type="radio" /><label for="sample" style="padding-right:20px">Sample Data</label>
+			<input id="data_store" name="import_from" type="radio" /><label for="data_store">Data Store</label>
+		</div>
 %	}
-	<div>Listing for path <strong><% $path_to_read %></strong>:</div>
-	<div>
-	<form id="form_add_data" method="post">
-		<p>
-% if ($dir_list && @$dir_list) {
-%#		<div><a href="#" onclick="" >select all files</a></div>
-		<div><a href="/project/ngs/tools/add_data<% $parent_dir %>?pid=<% $pid |html%>">Parent directory</a></div>
-%	for my $file ( @$dir_list ){
-		<& .display_file_info, file => $file, pid => $pid &>
-%	}
-% } else {
-		<div><a href="/project/ngs/tools/add_data<% $parent_dir %>?pid=<% $pid |html%>">Parent directory</a></div>
-% }
-		</p>
 
-	<input type="button" id="add" value="Add files" />
+% 	if($browse_path ne '') {
+		<div>Listing for path <strong><% $path_to_read %></strong>:</div>
+%	}
+% 	else {
+		<div>Select your path:</div>
+%	}
+
+		<div style="border-top:1px solid #C2DBF3;border-bottom: 1px solid #C2DBF3;margin:10px 0;">&nbsp;</div>
+		
+%	if ($browse_path eq '') {
+		<div id="folders">
+			<div>
+				<a href="/project/ngs/tools/add_data/<% $username |html%>?pid=<% $pid |html%>">
+					<% $username |html%>
+				</a>
+			</div>
+			<div>
+				<a href="/project/ngs/tools/add_data/shared?pid=<% $pid |html%>">
+					Shared Data
+				</a>
+			</div>
+		</div>
+		<div id="file_folder_divider"></div>
+		<div style="clear:both;height:3px;"></div>
+		<div id="container_data_lineBottom"></div>
+	
+%	} else {
+	<form id="form_add_data" method="post">
+% 		if ($dir_list && @$dir_list) {
+		<div id="folders">
+			<div class="up">
+				<a href="/project/ngs/tools/add_data<% $parent_dir %>?pid=<% $pid |html%>">
+					..
+				</a>
+			</div>
+%			for my $file ( @$dir_list ){
+%				if ($file->type eq "dir") {	
+					<& .display_file_info, file => $file, pid => $pid &>
+%				}
+%			}
+		</div>
+		<div id="file_folder_divider"></div>
+		<div id="files">
+%			for my $file ( @$dir_list ){
+%				if ($file->type ne "dir") {	
+					<& .display_file_info, file => $file, pid => $pid &>
+%				}
+%			}
+		</div>
+		
+% 		} else {
+		<div>
+			<a href="/project/ngs/tools/add_data<% $parent_dir %>?pid=<% $pid |html%>">
+				Parent directory
+			</a>
+		</div>
+% 		}
+		<div style="clear:both;height:3px;"></div>
+		<div id="container_data_lineBottom"></div>
+		<p style="text-align:center">
+			<input type="button" id="add" value="Add files" />
+		</p>
+% 	}
 	<input type="hidden" id="step" name="step" value="2" />
 	<input type="hidden" id="current_path" name="current_path" value="<% $path_to_read |html %>" />
 	</form>
-	</div>
 % }
-<pre>
+	<pre>
 %#	<% Dumper($s) %>
-</pre>
-<hr />
-</div>
+	</pre>
+	</div>
 
 
 <%args>
@@ -57,6 +110,8 @@
 	$m->session->{pipeline} ||= { username => "", logged_in => 0};
 	my $s = $m->session->{pipeline};
 	
+	my $browse_path = "";
+			
 	my $username = $s->{username};
 	my $apif = iPlant::FoundationalAPI->new(
 		user => $username,
@@ -86,27 +141,23 @@
 		print STDERR "files_added: $files_added", $/;
 	}
 	else {
-
-		my $browse_path;
 		my $path_info = $r->path_info;
 		if ($path_info =~ /\/(.*)$/) {
 			$browse_path = $1
 		}
 
-		if ($browse_path eq "aha") {
-			$browse_path = "/shared";
-		}
-
-		$path_to_read = $browse_path ? $browse_path : $username;
-		$path_to_read = "/" . $path_to_read unless $path_to_read =~ m|^/|;
-		#print STDERR "PATH: $path_to_read", $/;
 		
-		$parent_dir = $path_to_read;
-		$parent_dir =~ s|/[^\/]*$||;
+		if ($browse_path) {
+			$path_to_read = $browse_path ? $browse_path : $username;
+			$path_to_read = "/" . $path_to_read unless $path_to_read =~ m|^/|;
+			#print STDERR "PATH: $path_to_read", $/;
+			
+			$parent_dir = $path_to_read;
+			$parent_dir =~ s|/[^\/]*$||;
 
-		my $io = $apif->io;
-		$dir_list = $io->readdir($path_to_read);
-
+			my $io = $apif->io;
+			$dir_list = $io->readdir($path_to_read);
+		}
 	}
 
 </%init>
@@ -125,8 +176,14 @@
 	}
 </%init>
 %	if ($file->type eq "dir") {
-<div><a href="/project/ngs/tools/add_data<% $file_full_path %>?pid=<% $pid |html%>"><% $file->name %></a></div>
+		<div>
+			<a href="/project/ngs/tools/add_data<% $file_full_path %>?pid=<% $pid |html%>">
+				<% $file->name %>
+			</a>
+		</div>
 % } else {
-<div><input type="checkbox" name="files" value="<% $file->name |html %>" /> &nbsp;<% $file->name %></div>
+		<div>
+			<input type="checkbox" name="files" value="<% $file->name |html %>" id="<% $file->name |html %>" /><label for="<% $file->name |html %>"><% $file->name %>
+		</div>
 % }
 </%def>

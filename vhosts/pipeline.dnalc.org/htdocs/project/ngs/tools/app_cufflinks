@@ -1,5 +1,5 @@
 <div class="container_data1">
-	<div id="container_data_line_bg" style="background-color:#C2DBF3;padding:2px;font-size:10px;margin-bottom:10px;"><a href="#" style="text-decoration:none">< Back</a></div>
+	<div id="container_data_line_bg" style="background-color:#C2DBF3;padding:2px;font-size:12px;margin-bottom:10px;font-weight:bold;"><a href="#" style="text-decoration:none;color:#123456">< Back</a></div>
 % if ($app) {
 <div>New job using application <strong><% $app %></strong>:</div>
 
