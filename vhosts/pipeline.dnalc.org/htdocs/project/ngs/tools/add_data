@@ -3,6 +3,9 @@
 % if ($files_added) {
 <script type="text/javascript">
 	top.ngs.close_window('data');
+	if (top.ngs.get_status('ngs_tophat') == 'disabled') {
+		top.ngs.set_status('ngs_tophat', 'not-processed');
+	}
 </script>
 % } else {
 %	if ($path_to_read eq "/$username") {

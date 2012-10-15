@@ -229,7 +229,8 @@ use Data::Dumper;
 	}
 	#--------------------------------------
 	sub do_qc {
-		my ($self) = @_;
+		my ($self, $file_id) = @_;
+
 		my $project = $self->project;
 
 		my $app;
@@ -255,14 +256,19 @@ use Data::Dumper;
 		my $data = $self->data(is_input => 1);
 		my $qc_jobs = 0;
 		while (my $f = $data->next) {
-			#print STDERR 'do_qc: ', $f->file_name, ' ', $f->is_input, ' ', $f->qc_file_id, $/;
+			next if $file_id && $file_id != $f->id;
 			next if $f->qc_file_id;
 
 			# set id, instead of file path so that we keep track of input files (in submit_job)
 			$job_options->{input} = $f->id; 
 			my $st = $self->submit_job($app->{conf}->{_task_name}, $app, $job_options);
-			print STDERR 'do_QC: new job status: ', $st->{status}, $/;
-			$qc_jobs++ if $st->{status} eq 'success';
+			print STDERR 'do_QC: new job status: ', $st->{status}, $/ if $self->debug;
+			if ($st->{status} eq 'success') {
+				$qc_jobs++;
+				my $mc_key = sprintf("ngs-%d-%s-%d", $self->project->id, "ngs_fastqc", $f->id);
+				print STDERR "doQC/mc_key: ", $mc_key, $/ if $self->debug;
+				$self->{_mc}->set($mc_key, 'pending', 7200);
+			}
 		}
 
 		$qc_jobs;
@@ -293,7 +299,7 @@ use Data::Dumper;
 		my ($self, $app_conf_file) = @_;
 
 		unless ($app_conf_file) {
-			return {status => 'fail', message => 'sub app: config file is missong the app id'};
+			return {status => 'fail', message => 'sub app: config file is missing the app id'};
 		}
 
 		my $app_cf = DNALC::Pipeline::Config->new->cf($app_conf_file);

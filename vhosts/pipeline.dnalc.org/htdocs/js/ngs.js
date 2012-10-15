@@ -90,12 +90,18 @@ NGS.prototype.do_qc_old = function(id) {
 	document.location.replace('/project/ngs/tools/app_fastqc?pid=' + this.pid + ';f=' + id);
 };
 
-NGS.prototype.do_qc = function() {
+NGS.prototype.do_qc = function(id) {
 	new Ajax.Request('/project/ngs/tools/do_qc', {
 		method:'get',	
-		parameters: {'pid': this.pid},
+		parameters: {'pid': this.pid, 'f': id},
 		onSuccess: function(transport){
-				alert(transport.responseText);
+				var r = transport.responseText.evalJSON();
+				if (r && r.status == 'success') {
+					$('qcst_' + id).update('QCing');
+				}
+				else {
+					alert("QC was not launched");
+				}
 			},
 		onFailure: function(){
 				alert('Something went wrong!\nAborting...');
