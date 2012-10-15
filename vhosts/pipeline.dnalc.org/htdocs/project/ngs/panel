@@ -13,7 +13,7 @@
      <span class="conGreenline_ConColumn">
      		<span class="conGreenline_ConCell">
             	<span class="conIndicator_box"><div class="conIndicatorGL_not-processed"></div></span>
-     			<span class="bt_runGreenline"><a href="javascript:;"onclick="javascript:ngs.launch('data');">Manage data</a></span>
+     			<span class="bt_runGreenline"><a href="javascript:;" onclick="javascript:ngs.launch('data');">Manage data</a></span>
             </span><!--END of span class conGreenline_ConCell-->     
 			<span class="conGreenline_ConCell">
             	<span class="conIndicator_box"></span>
@@ -31,20 +31,20 @@
     
     <span class="conGreenline_ConColumn1">
 		<span class="conGreenline_ConCell">
-			<span class="conIndicator_box"><div class="conIndicatorGL_disabled"></div></span>
-     		<span class="bt_runGreenline"><a href="javascript:;" onclick="javascript:ngs.launch('tophat');">TopHat</a></span>
+			<span class="conIndicator_box"><div id="ngs_tophat_st" class="conIndicatorGL_<% $status{ngs_tophat} %>"></div></span>
+     		<span class="bt_runGreenline"><a id="ngs_tophat_btn" href="javascript:;" onclick="<% $status{ngs_tophat} ne "disabled" ? "javascript:ngs.launch('ngs_tophat');" : "" %>">TopHat</a></span>
         </span><!--END of span class conGreenline_ConCell-->
         <span class="conGreenline_ConCell">
-            <span class="conIndicator_box"><div class="conIndicatorGL_disabled"></div></span>
-     		<span class="bt_runGreenline"><a href="javascript:;" onclick="javascript:ngs.launch('cufflinks');">CuffLinks</a></span>
+            <span class="conIndicator_box"><div id="ngs_cufflinks_st" class="conIndicatorGL_<% $status{ngs_cufflinks} %>"></div></span>
+     		<span class="bt_runGreenline"><a id="ngs_cufflinks_btn" href="javascript:;" onclick="<% $status{ngs_cufflinks} ne "disabled" ? "javascript:ngs.launch('ngs_cufflinks');" : "" %>">CuffLinks</a></span>
         </span><!--END of span class conGreenline_ConCelll-->
         <span class="conGreenline_ConCell">
-            <span class="conIndicator_box"><div class="conIndicatorGL_disabled"></div></span>
-     		<span class="bt_runGreenline"><a href="javascript:;" onclick="javascript:ngs.launch('cufflinks');">CuffMerge</a></span>
+            <span class="conIndicator_box"><div id="ngs_cuffmerge_st" class="conIndicatorGL_disabled"></div></span>
+     		<span class="bt_runGreenline"><a id="ngs_cuffmerge_btn" href="javascript:;" onclick="//javascript:ngs.launch('ngs_cuffmerge');">CuffMerge</a></span>
         </span><!--END of span class conGreenline_ConCell-->
         <span class="conGreenline_ConCell">
-            <span class="conIndicator_box"><div class="conIndicatorGL_disabled"></div></span>
-     		<span class="bt_runGreenline"><a href="javascript:;"onclick="javascript:ngs.launch('cuffdiff');">CuffDiff</a></span>
+            <span class="conIndicator_box"><div id="ngs_cuffdiff_st" class="conIndicatorGL_disabled"></div></span>
+     		<span class="bt_runGreenline"><a id="ngs_cuffdiff_btn" href="javascript:;"onclick="//javascript:ngs.launch('ngs_cuffdiff');">CuffDiff</a></span>
         </span><!--END of span class conGreenline_ConCell-->
 	</span><!--END of class conGreenline_ConColumn1-->
          
@@ -151,8 +151,7 @@
 		$pid = $1;
 	}
 	#print STDERR $pid, $/;
-	my %status = ();
-	my ($history, $rm_status, $trimmed_common_name, $institution, $sample, $is_public);
+	my ($institution, $sample, $is_public);
 
 	#my $pcf = DNALC::Pipeline::Config->new->cf("PIPELINE");
 	my $pm = DNALC::Pipeline::App::NGS::ProjectManager->new({project => $pid, debug => 0});
@@ -169,7 +168,10 @@
 	my $user = DNALC::Pipeline::User->retrieve($proj->user_id) if $proj;
 	my $is_owner = $s->{user_id} == $user->user_id if $proj;
 	
-	my $qc_status = $is_owner ? $pm->qc_status->{status} : 'disabled';
+	#my $qc_status = $is_owner ? $pm->qc_status->{status} : 'disabled';
+	
+	my %status = $pm->get_status;
+	print STDERR "status: ", Dumper(\%status), $/;
 </%init>
 %#-------------------------------------------------
 <%attr>

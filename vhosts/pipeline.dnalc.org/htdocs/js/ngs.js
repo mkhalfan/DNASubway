@@ -40,12 +40,18 @@ NGS.prototype.set_status = function(op, status) {
 		}
 	};
 
-NGS.prototype.launch = function(what, where, title) {  
+NGS.prototype.launch = function(what, where, title) {
+
+	var tool = what;
+	var re = /^ngs_/;
+	if (tool && re.test(tool)) {
+		tool = tool.replace(re, '');
+	}
 	var urls = {
 			data: ['/project/ngs/tools/manage_data?pid=', 'Manage data'],
-			ngs_cufflinks: ['/project/ngs/tools/tool_job_list?tool=' + what + '&pid=', 'Cufflinks'],
-			ngs_cuffdiff: ['/project/ngs/tools/tool_job_list?tool=' + what + '&pid=', 'Cuffdiff'],
-			ngs_tophat: ['/project/ngs/tools/tool_job_list?tool=' + what + '&pid=' , 'TopHat'],
+			ngs_cufflinks: ['/project/ngs/tools/tool_job_list?tool=' + tool + '&pid=', 'Cufflinks'],
+			ngs_cuffdiff: ['/project/ngs/tools/tool_job_list?tool=' + tool + '&pid=', 'Cuffdiff'],
+			ngs_tophat: ['/project/ngs/tools/tool_job_list?tool=' + tool + '&pid=' , 'TopHat'],
 		};
 
 	try {
@@ -59,7 +65,6 @@ NGS.prototype.launch = function(what, where, title) {
 					? 'http://' + host + urls[what][0] + $('pid').value
 					: where;
 	var window_title = title ? title : urls[what] ? urls[what][1] : null;
-	
 	
 	var options = null;
 	
