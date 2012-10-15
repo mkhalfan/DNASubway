@@ -129,7 +129,7 @@
 				# redirect to our job list page
 				print STDERR "JOB ID: ", $st->{data}->id, "//", $st->{data}->api_job_id, $/;
 				$m->comp('/_message_add', 'Job submitted!');
-				$m->redirect("./tophat_list?pid=" . $pid);
+				$m->redirect("./tool_job_list?tool=tophat;launched=1;pid=" . $pid);
 			}
 		}
 	}

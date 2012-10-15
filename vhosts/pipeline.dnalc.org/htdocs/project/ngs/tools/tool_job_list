@@ -3,7 +3,8 @@
 <& /_messages &>
 
 	<div><a href="./app_<% $tool |html %>?pid=<% $pid |html%>" style="text-decoration:none"><input type="button" value="Launch New Job" /></a></div>
-	
+t=<% $tool |html%>
+
 	<table id="jobs_table">
 		<thead>
 			<tr>
@@ -29,7 +30,7 @@
 				<td><% $job->status %></td>
 %# -------- DIFFERENT VISUALIZATION OPTIONS BASED ON TOOL TYPE HERE --------- #%
 				<td>
-% if ($tool eq "ngs_tophat" && $job->status eq 'done') {
+% if ($tool eq "tophat" && $job->status eq 'done') {
 					<a href="./launch_igv?pid=<% $proj %>;jid=<% $job %>">view in IGV-static</a>
 %#		&nbsp;<a href="./launch_igv?pid=<% $proj %>;jid=<% $job %>">view in IGV-dynamic</a>
 %	}
@@ -40,12 +41,18 @@
 
 		</tbody>
 	</table>
+% if ($launched) {
+<script typed="text/javascript">
+	top.ngs.set_status('ngs_<% $tool |html %>', 'processing');
+</script>
+% }
 </div> <!-- end container_data1 --> 
 
 %#-----------------------------------------------------------------
 <%args>
 	$pid => 0
 	$tool => ''
+	$launched => ''
 </%args>
 <%once>
 	use Data::Dumper;
