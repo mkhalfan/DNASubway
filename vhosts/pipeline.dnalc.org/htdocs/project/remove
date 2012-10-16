@@ -8,6 +8,7 @@
 	use DNALC::Pipeline::MasterProject ();
 	use DNALC::Pipeline::App::ProjectManager ();
 	use DNALC::Pipeline::App::Phylogenetics::ProjectManager ();
+	use DNALC::Pipeline::App::NGS::ProjectManager ();
 	use DNALC::Pipeline::TargetProject ();
 	use DNALC::Pipeline::Config ();
 	use DNALC::Pipeline::App::Utils ();
@@ -63,6 +64,14 @@ elsif ($mp->project_type eq "phylogenetics") {
 		$m->comp('/_message_add', 'Project removed!', 'error');
 	}
 }
+elsif ($mp->project_type eq "NGS") {
+	my $pm = DNALC::Pipeline::App::NGS::ProjectManager->new({project => $mp->project_id, debug => 1});
+	if ($pm->project) {
+		warn "Removing NGS project: ", $pm->project, $/;
+		$pm->remove_project;
+		$m->comp('/_message_add', 'Project removed!');
+	}
+}
 
 $m->redirect('/project/browsemy/' . $p);
 
@@ -71,5 +80,3 @@ $m->redirect('/project/browsemy/' . $p);
 <%flags>
 	inherit => undef
 </%flags>
-%#--------------------------------------------------------
-<% $mp? $mp->project_type : '??' %>
