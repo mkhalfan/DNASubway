@@ -18,6 +18,23 @@ __PACKAGE__->add_trigger(before_update => sub {
 	$_[0]->updated( POSIX::strftime "%Y-%m-%d %H:%M:%S", localtime(+time) );
 });
 
+#
+# TODO: how many days do we go back?
+__PACKAGE__->set_sql ( update_recently_expired => q{
+	UPDATE ngs_job_track
+	SET token = ?
+	WHERE user_id = ?
+		AND tracker_status = ''
+		AND token = ''
+		AND date(now()) - date(updated) < 14
+	});
+
+# update recently expired to be able to get the data
+sub update_traker {
+	my ($class, $user_id, $token) = @_;
+	my $sth = $class->sql_update_recently_expired;
+	$sth->execute($token, $user_id);
+}
 
 1;
 

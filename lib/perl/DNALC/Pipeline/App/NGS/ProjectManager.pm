@@ -659,16 +659,8 @@ use Data::Dumper;
 
 	#--------------------------------------
 	# returns status for these routines: tophat, cufflinks, cuffdiff
-	#	for all of them or only for the specified one 
 	sub get_status {
-		my ($self, $task_name) = @_;
-
-		#$task_name ||= 'all';
-
-		#unless (defined $self->{task_name_to_id}->{ $task_name }) {
-		#	print STDERR  "__GET_STATUS__: unknown task: ", $task_name, $/;
-		#	return;
-		#}
+		my ($self) = @_;
 
 		## TODO - use memcached
 
@@ -697,11 +689,13 @@ use Data::Dumper;
 
 		# cufflinks
 		unless ( defined $running_jobs->{ngs_cufflinks}) {
+			print STDERR  "ngs_cufflinks: not defined", $/;
 			if ($running_jobs->{ngs_tophat} && exists $running_jobs->{ngs_tophat}->{done}) {
 				$stats{ngs_cufflinks} = 'not-processed';
 			}
 		}
 		else {
+			print STDERR  "ngs_cufflinks: defined", $/;
 			if ($running_jobs->{ngs_cufflinks}->{processing}) {
 				$stats{ngs_cufflinks} = 'processing';
 			}

@@ -200,6 +200,7 @@ new Tip('tt_blue4', "Perform multiple sequence alignments using MUSCLE", {
 	use DNALC::Pipeline::Config ();
 	use Time::Duration qw/duration/;
 	use DNALC::Pipeline::Log ();
+	use DNALC::Pipeline::NGS::JobTrack ();
 	use iPlant::FoundationalAPI ();
 </%once>
 %#-------------------------------------------------------------------
@@ -326,6 +327,11 @@ if ($r->method eq "POST") {
 					warn 'te: ', $s->{api_token_expiration}, $/;
 					warn 't : ', time(), $/;
 					warn 'delta: ', $s->{api_token_expiration} - time(), $/;
+					
+					# update traker with new tokens
+					#  - see how far back we check for these jobs?
+					#  - what if the API status never changes?
+					DNALC::Pipeline::NGS::JobTrack->update_traker($user->id, $apif->token);
 				}
 				else {
 					warn "API loggin: system error?!\n";
