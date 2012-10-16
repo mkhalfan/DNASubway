@@ -86,7 +86,7 @@
 			$cutils->gbrowse_chado_conf($proj->id);
 		}
 
-		$m->redirect(($pcf->{GBROWSE2_URL} || $pcf->{GBROWSE_URL}) . '/' . $pm->username . '_db_' . $proj->id . '/');
+		$m->redirect((defined $pcf->{GBROWSE2_CONF_DIR} ? $pcf->{GBROWSE2_URL} : $pcf->{GBROWSE_URL}) . '/' . $pm->username . '_db_' . $proj->id . '/');
 	}
 	
 </%init>
