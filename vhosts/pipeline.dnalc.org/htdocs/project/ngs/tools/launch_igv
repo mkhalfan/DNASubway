@@ -33,8 +33,8 @@
 		<argument><% $stream %></argument>
 % } else {
 <argument>http://pipeline-dev.dnalc.org<& "../../.comp/filepath_to_web", file => $stream &>\
-% 	if ($junc_bed) {
-,http://pipeline-dev.dnalc.org<& "../../.comp/filepath_to_web", file => $junc_bed->file->file_path &>\
+% 	for (@bed_files) {
+,http://pipeline-dev.dnalc.org<& "../../.comp/filepath_to_web", file => $_->file->file_path &>\
 %	}
 </argument>
 % }
@@ -80,8 +80,8 @@ file = <% $jf->file->file_path %>
 	my @th_out_files = DNALC::Pipeline::NGS::JobOutputFile->search(job_id => $jid, project_id => $pid);
 
 	my @jfiles = grep {$_->file->is_local && $_->file->file_path =~ /\.bam$/} @th_out_files;
-	my ($junc_bed) = grep {$_->file->is_local && $_->file->file_path =~ /\.bed$/} @th_out_files;
-	print STDERR "local: [$junc_bed]", $/;
+	my @bed_files = grep {$_->file->is_local && $_->file->file_path =~ /\.bed$/} @th_out_files;
+	#print STDERR "local: [$junc_bed]", $/;
 	print STDERR "local: [@jfiles]", $/;
 	my $jf = $jfiles[0];
 
