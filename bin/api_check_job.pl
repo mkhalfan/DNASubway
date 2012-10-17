@@ -71,13 +71,14 @@ while (my $jt = $jts->next) {
 				my ($data_dir)   = $out_dir_re ? grep {$_->path =~ /$out_dir_re/} @$all_files : @$all_files;
 				print STDERR 'data_dir: ', $data_dir->path, $/ if ($debug && $data_dir);
 
+				my @data_files;
+				if ($data_dir) {
+					@data_files = $out_files_re 
+						? grep { $_->path =~ /$out_files_re/ } @{$io_ep->ls($data_dir->path)}
+						: @{$io_ep->ls($data_dir->path)};
+				}
 
-				#print STDERR  'data_dir: ', $api_job->{archivePath}, $/;
-
-				my @data_files = grep { $_->path =~ /$out_files_re/ } @{$io_ep->ls($data_dir->path)}
-					if $data_dir;
-
-				print STDERR 'data_files: ', "@data_files", $/ if $debug;
+				print STDERR "data_files:\n\t", join ("\n\t", @data_files), $/ if $debug;
 
 				#
 				# mark output file are shared so $DNALCADMIN user be able to read them
@@ -89,7 +90,7 @@ while (my $jt = $jts->next) {
 				}
 
 				my $src_id;
-				
+
 				if ($app_conf->{_on_success} && $pm->can('task_' . $app_conf->{_on_success})) {
 					my $output_handler = 'task_' . $app_conf->{_on_success};
 					print STDERR  ' ++ output_handler: ', $output_handler, $/ if $debug;

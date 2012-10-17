@@ -1,6 +1,7 @@
 {
-	id => 'cufflinks-ranger-1.0.3',
+	#id => 'cufflinks-ranger-1.0.3',
 	#id => 'cufflinks-trestles-1.0.3',
+	id => 'dnalc-cufflinks-lonestar-2.0.2',
 	name => 'cufflinks',
 
 	inputs => [
@@ -35,6 +36,6 @@
 	_task_name => 'ngs_cufflinks',
 	_input_file_filter => qr/\.bam$/,
 	_output_dir => qr/\/cufflinks_out$/,
-	_output_files => qr/\.(gtf|fpkm_tracking)$/,
-
+	_output_files => qr/\.(:?gtf|fpkm_tracking)$/,
+	_on_success => 'handle_cufflinks_output',
 }

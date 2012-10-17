@@ -102,10 +102,10 @@ NGS.prototype.do_qc = function(id) {
 		onSuccess: function(transport){
 				var r = transport.responseText.evalJSON();
 				if (r && r.status == 'success') {
-					$('qcst_' + id).update('QCing');
+					$('qcst_' + id).update('Running');
 				}
 				else {
-					alert("QC was not launched");
+					alert("QC was not launched :(");
 				}
 			},
 		onFailure: function(){

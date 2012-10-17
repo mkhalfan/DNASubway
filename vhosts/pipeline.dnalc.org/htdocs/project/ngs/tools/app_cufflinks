@@ -98,6 +98,8 @@
 		# what do we do when we don`t get the paths?!
 		$form->{BIAS_FASTA} = $pm->project_genome_path;
 		$form->{ANNOTATION} = $pm->project_annotation_path;
+		
+		$form->{requestedTime} ||= '3:45:00';
 
 		unless (defined $form->{archive}) {
             $form->{archive} = "true";
@@ -120,7 +122,8 @@
 				# redirect to our job list page
 				print STDERR "JOB ID: ", $st->{data}->id, "//", $st->{data}->api_job_id, $/;
 				$m->comp('/_message_add', 'Job submitted!');
-				$m->redirect("./cufflinks_list?pid=" . $pid);
+				#$m->redirect("./cufflinks_list?pid=" . $pid);
+				$m->redirect("./tool_job_list?tool=cufflinks;launched=1;pid=" . $pid);
 			}
 		}
 	}

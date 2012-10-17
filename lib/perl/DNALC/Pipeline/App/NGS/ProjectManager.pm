@@ -836,7 +836,7 @@ use Data::Dumper;
 		my $job_name = $job->attrs->{name};
 		$src_id = DNALC::Pipeline::NGS::DataSource->create({
 					project_id => $job->project_id,
-					name => 'Local files from ' . $task,
+					name => substr(sprintf('Local files from %s', $task), 0, 32),
 					note => sprintf("%d/%s", $job->id, $job_name || ''),
 				});
 		if ($!) {
@@ -911,6 +911,99 @@ use Data::Dumper;
 	}
 
 	#--------------------------------------
+	# TODO this method should be incorporated into task_handle_default
+	#		a parameter in the config should determine if the output files should be downloaded or not.
+	sub task_handle_cufflinks_output {
+		my ($self, $job, $api_files) = @_;
+
+		return unless @$api_files;
+
+		my $src_id;
+		my $task = $job->task_id->name;
+		my $app_conf = DNALC::Pipeline::Config->new->cf(uc $task);
+
+		$self->task_handle_default($job, $api_files);
+
+		# create a data_source_file entry
+		#
+		my $job_name = $job->attrs->{name};
+		$src_id = DNALC::Pipeline::NGS::DataSource->create({
+					project_id => $job->project_id,
+					name => substr(sprintf('Local files from %s', $task), 0, 32),
+					note => sprintf("%d/%s", $job->id, $job_name || ''),
+				});
+		if ($!) {
+			print STDERR 'Can\'t add source: ', $! , $/;
+		}
+
+
+		my $dest_dir = File::Spec->catfile($self->work_dir, $task);
+		unless (-d $dest_dir) {
+			unless (make_path($dest_dir)) {
+				print STDERR  " oo unable to create $task directory: ", $!, $/;
+			}
+		}
+
+		print STDERR  " -- dest dir: ", $dest_dir, $/ if $self->debug;
+
+		if ($src_id) {
+			my $counter = 0;
+			my $base_name = '';
+			my @job_input_files = $job->input_files;
+			if (@job_input_files == 1) {
+				$base_name = $job_input_files[0]->file->file_name;
+				$base_name =~ s/\.(.*?)$//;
+			}
+
+			# download the files
+			#
+			my $io = $self->api_instance->io;
+
+			for my $df (@$api_files)  {
+				my ($file_type) = $df->path =~ /\.(.*?)$/;
+				my $fname = $df->name;
+
+				# keep the same basename for the file
+				if ($app_conf->{_propagate_input_file_name}) {
+					if ($base_name) {
+						$fname = $base_name . sprintf("%s.%s", $counter > 1 ? $counter : '', $fname =~ /\.(.*?)$/);
+					}
+				}
+
+				my $save_to_file = File::Spec->catfile($dest_dir, sprintf("%d.%s", $job, $fname));
+				if ($io) {
+					unless (-f $save_to_file) {
+						my $data = $io->stream_file($df->path, save_to => $save_to_file);
+						print STDERR  " oo saved: ", $data, " ", $save_to_file, $/;
+					}
+				}
+
+
+				if (-f $save_to_file) {
+					print STDERR  'output file: ', $fname, $/ if $self->debug;
+					my $data_file = DNALC::Pipeline::NGS::DataFile->create({
+							project_id => $job->project_id,
+							source_id => $src_id,
+							file_name => $fname,
+							file_path => $save_to_file,
+							file_type => $file_type || '',
+							is_local => 1,
+						});
+					if ($data_file) {
+						my $outfile = DNALC::Pipeline::NGS::JobOutputFile->create({
+								file_id => $data_file,
+								job_id => $job,
+								project_id => $job->project_id,
+							});
+					}
+					$counter++;
+				}
+			} # end for (@$api_files)
+		} # end if($src_id)
+
+	}
+	#--------------------------------------
+	#
 	sub task_handle_trimmed_file {
 		my ($self, $job, $api_files) = @_;
 
