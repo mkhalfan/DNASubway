@@ -144,13 +144,14 @@
 </%once>
 %#-------------------------------------------------
 <%init>
+	$r->no_cache(1);
 	$m->session->{pipeline} ||= {};
 	my $s = $m->session->{pipeline};
 
 	if ($r->path_info =~ m|/(\d+)/?|) {
 		$pid = $1;
 	}
-	#print STDERR $pid, $/;
+
 	my ($institution, $sample, $is_public);
 
 	#my $pcf = DNALC::Pipeline::Config->new->cf("PIPELINE");
@@ -171,7 +172,7 @@
 	#my $qc_status = $is_owner ? $pm->qc_status->{status} : 'disabled';
 	
 	my %status = $pm->get_status;
-	print STDERR "status: ", Dumper(\%status), $/;
+	#print STDERR "status: ", Dumper(\%status), $/;
 </%init>
 %#-------------------------------------------------
 <%attr>

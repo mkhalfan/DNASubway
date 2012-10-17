@@ -94,7 +94,7 @@ __PACKAGE__->set_sql(jobs_status => q{
 sub get_jobs_status {
 	my ($class, $pid) = @_;
 
-	my %job_stats = ();
+	my %job_status = ();
 
 	my $sth = $class->sql_jobs_status;
 	$sth->execute($pid);

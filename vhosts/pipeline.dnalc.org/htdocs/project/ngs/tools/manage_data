@@ -55,7 +55,7 @@
 	my $is_qcing = $pm->{_mc}->get($mc_key_qc);
 
 </%init>
-		<td id="qcst_<% $f %>"><% $qc_report ? "<a href='$qc_report'>View</a>" : $is_qcing ? 'QCing' : '<a href="javascript:;" onclick="javascript:ngs.do_qc(' . $f->id . ');">Run</a>'%></td>
+		<td id="qcst_<% $f %>"><% $qc_report ? "<a href='$qc_report'>View</a>" : $is_qcing ? 'Running' : '<a href="javascript:;" onclick="javascript:ngs.do_qc(' . $f->id . ');">Run</a>'%></td>
 %	if ($qc_report) {
 %#		<td title="<% $trimmed_file ? $trimmed_file->file_path : "do trimm" %>"><% $trimmed_file ? "yes" : "<a href=\"javascript:do_trim()\">Trim" %></td>
 		<td><% $trimmed_file ? "yes" : $is_trimming ? "trimming pending" : "<a href=\"javascript:ngs.do_trim(" . $f->id . ");\">do Trim" %></td>
