@@ -24,7 +24,7 @@
 % }
 </div>
 <div style="float:left;">
-% for (('mamalia', 'actinopterygii', 'insecta', 'nematoda')) {
+% for (('mamalia', 'birds', 'fish', 'insecta', 'nematoda')) {
 %	my $i = exists $species_map{$_} ? $species_map{$_} : substr $_, 0, 1;
 %	my $sel = $i eq $clade ? 'checked="checked"' : '';
 	<div><input type="radio" name="clade" value="<% $i %>" <%$sel%>/> <% $_ %></div>
@@ -85,7 +85,8 @@
 	
 	my %species_map = (
 			mamalia => '♞',
-			actinopterygii => 'f',
+			birds => 'b',
+			fish => 'f',
 			insecta => 'i',
 			nematoda => 'w',
 		);

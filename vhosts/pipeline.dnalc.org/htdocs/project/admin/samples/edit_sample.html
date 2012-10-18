@@ -24,7 +24,7 @@
 % }
 </div>
 <div style="float:left;">
-% for (('mamalia', 'actinopterygii', 'insecta', 'nematoda')) {
+% for (('mamalia', 'birds', 'fish', 'insecta', 'nematoda')) {
 %	my $i = exists $species_map{$_} ? $species_map{$_} : substr $_, 0, 1;
 %	my $sel = $i eq $clade ? 'checked="checked"' : '';
 	<div><input type="radio" name="clade" value="<% $i %>" <%$sel%>/> <% $_ %></div>
@@ -33,10 +33,11 @@
 <div class="spacer"></div>
 <label>Sequence data<span class="small">paste the sequence<br/>max 100kbp</span></label>
 <div style="float:left;padding: 5px 0px 5px 10px;">
-%#<a href="<& '../../.comp/filepath_to_web', file => $sample->sample_dir,just_return => 0 &>" target="_blank">view</a>
-<a href="#" onclick="$('sequence_data').show();$('sequence_message').hide();">update</a>
 <br/>
-<div id="sequence_message">Not shown</div>
+<div id="sequence_message">
+	Not shown
+	<a href="#" onclick="$('sequence_data').show();$('sequence_message').toggle();$('sequence_data').focus()">update</a>
+</div>
 <textarea style="display:none; float:none"
 	name="sequence_data" id="sequence_data" value="<% $sequence_data|html%>"></textarea>
 </div>
@@ -150,7 +151,8 @@
 	
 	my %species_map = (
 			mamalia => '♞',
-			actinopterygii => 'f',
+			birds => 'b',
+			fish => 'f',
 			insecta => 'i',
 			nematoda => 'w',
 		);

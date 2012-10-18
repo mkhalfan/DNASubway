@@ -29,6 +29,7 @@ function check_status (pid, op, h) {
 		return;
 	var params = { 'pid' : pid, 't' : op, 'h' : h};
 	sent = params;
+
 	new Ajax.Request('/project/check_status',{
 		method:'get',
 		parameters: params, 
@@ -39,15 +40,7 @@ function check_status (pid, op, h) {
 			//dbg = r;
 			if (r.status == 'success') {
 				var file = r.output || '#';
-				/*if (r.running == 0 && r.known == 1) {
-					//s.update(' Job waiting in line.');
-				}
-				else if (r.running == 1 && r.known == 1) {
-					//s.update(new Element('img', {'src' : '/images/ajax-loader.gif'}));
-					//s.addClassName('processing');
-					//s.update(' Job running.');
-				}
-				else*/
+
 				if (r.running == 0 && !r.known) {
 					//b.removeClassName('processing');
 					b.removeClassName('disabled');
@@ -64,6 +57,11 @@ function check_status (pid, op, h) {
 						for (var i = 0; i < routines.length; i++) {
 							var rt = $(routines[i] + '_btn');
 							var rt_ind = $(routines[i] + '_st');
+							
+							// some routines may be disabled
+							if (rt_ind && rt_ind.hasAttribute('rdisabled')) {
+								continue;
+							}
 							
 							if (rt_ind && rt_ind.className == 'conIndicator_disabled') {
 								rt_ind.removeClassName('conIndicator_disabled');
