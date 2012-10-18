@@ -35,8 +35,9 @@
 
 		'♞' => 'uniprot.mamalia', # the horse char :p
 		a => 'uniprot.bilateria',
+		b => 'uniprot.aves',
 		h => 'uniprot.mamalia',
-		f => 'uniprot.actinopterygii',
+		f => 'uniprot.fish',
 		i => 'uniprot.insecta',
 		w => 'uniprot.nematoda',
 		x => 'uniprot.fungi', # fungi

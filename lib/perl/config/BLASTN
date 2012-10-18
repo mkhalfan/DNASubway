@@ -34,6 +34,7 @@
 
 		'♞' => 'unigene.bilateralia.uniq', # the horse char :p
 		h => 'unigene.bilateralia.uniq',
+		b => 'unigene.bilateralia.uniq',
 		f => 'unigene.bilateralia.uniq',
 		i => 'unigene.bilateralia.uniq',
 		w => 'unigene.bilateralia.uniq',

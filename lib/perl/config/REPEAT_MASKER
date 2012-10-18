@@ -23,6 +23,7 @@
 
 		'♞' => [qw/-species mammals/], # the horse
 		h => [qw/-species mammals/],
+		b => [qw/-species aves/],
 		i => [qw/-species insecta/],
 		f => [qw/-species actinopterygii/],
 		w => [qw/-species nematoda/],
