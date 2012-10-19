@@ -18,8 +18,9 @@
 
 		'♞' => '--species=human', # the horse char :p
 		h => '--species=human',
-		f => '--species=human',
+		f => '--species=elephant_shark',
 		i => '--species=fly',
+		b => '',
 		w => '--species=caenorhabditis',
 	},
 

@@ -15,7 +15,7 @@ use strict;
 
 		my $species_map = $self->{conf}->{species_map};
 		if (defined $species_map && %$species_map) {
-			unless ($clade && $clade =~ /^(?:m|d|h|f|a)$/) {
+			unless ($clade && $clade =~ /^(?:m|d|h|a|♞|f|b|w|i)$/) {
 				$clade = 'default';
 			}
 			$self->{clade} = $clade;

@@ -11,8 +11,15 @@
 	species_map => {
 		d => '/usr/local/fgenesh/Dicots',
 		m => '/usr/local/fgenesh/Monocots',
+
 		h => '/usr/local/fgenesh/Human',
+		'♞' => '/usr/local/fgenesh/Human', # the horse char :p
 		a => '/usr/local/fgenesh/Human',
+
+		f => '/usr/local/fgenesh/Fish',
+		b => '/usr/local/fgenesh/CHIKEN',
+		w => '/usr/local/fgenesh/C_elegans',
+		i => '/usr/local/fgenesh/Drosophila',
 		default => '/usr/local/fgenesh/Dicots',
 	},
 	RUN_LIMIT_PER_DAY => 20,
