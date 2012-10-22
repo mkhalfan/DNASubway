@@ -1,10 +1,13 @@
 <div id="BOLDstep">Step 3 of 5</div>
 <div id="BOLDmain">
-
-<h2>Specimen info</h2>
 <div>
+
+%#<& /_dumper_pre, $data &>
+
 <& /_messages &>
 </div>
+<h2 style="padding-left:3px">Author Info</h2>
+
 <p>
 	<form id="bform" method="POST">
 	<input type="hidden" name="bstep" value="4" />
@@ -15,25 +18,71 @@
 %if (@authors) {
 %	my $ac = 0;
 %	for (@authors) {
+<script type="text/javascript">
+console.info("<% $_ %>");
+</script>
 %		my @temp = split ("#", $_);
 		<tr class="author_row" id="row<%++$ac%>">
-		<td>Collector/Author <% $ac == 1 ? "<img src='/images/question-icon.png' align='top' id='collectors' />" : "" %></td>
-		<td>&nbsp;&nbsp;<input class="fb" type="text" style="width:145px" id="collector_first" name="collector_first" value="<% $temp[0] |html %>"  onfocus="if(this.value=='First Name'){this.value=''};" onblur="if(this.value==''){this.value='First Name'};"/>&nbsp;<input class="fb" type="text" style="width:145px" id="collector_last" name="collector_last" value="<% $temp[1] |html %>" onfocus="if(this.value=='Last Name'){this.value=''};" onblur="if(this.value==''){this.value='Last Name'};" /><% exists $author_errors{$ac} ? "<strong style='color: red;'> * </strong>" : "" %><span id="add_author_link<%$ac%>"></span>
+			<td>Collector/Author <% $ac == 1 ? "<img src='/images/question-icon.png' align='top' id='collectors' />" : "" %></td>
+			<td>&nbsp;&nbsp;<input class="fb" type="text" style="width:145px" id="collector_first" name="collector_first" value="<% $temp[1] |html %>"  onfocus="if(this.value=='First Name'){this.value=''};" onblur="if(this.value==''){this.value='First Name'};"/>&nbsp;<input class="fb" type="text" style="width:145px" id="collector_last" name="collector_last" value="<% $temp[2] |html %>" onfocus="if(this.value=='Last Name'){this.value=''};" onblur="if(this.value==''){this.value='Last Name'};" /><% exists $author_errors{$ac} ? "<strong style='color: red;'> * </strong>" : "" %><span id="add_author_link<%$ac%>"></span>
 %			if ($ac > 1){
-<span><a href="javascript:;" onclick="phy.addAuthor(<%$ac%>, 'remove')" style="text-decoration:none;font-weight:bold;color:black;" /><img src="/images/minus.jpg" border=0 width="12px" height="12px" />   Remove</a></span>
+	<span><a href="javascript:;" onclick="phy.addAuthor(<%$ac%>, 'remove')" style="text-decoration:none;font-weight:bold;color:black;" /><img src="/images/minus.jpg" border=0 width="12px" height="12px" />   Remove</a></span>
 %			}
-		</td></tr>	
+			</td>
+		</tr>
+		<tr class="author_affil_row" id="author_affil_row_<%$ac%>">
+			<td>Affiliation</td>
+			<td>
+				&nbsp;&nbsp;<input class="fb" type="text" style="width:145px" id="author_affil" name="author_affil" id="author_affil" value="<% $temp[0] ne "" ? $temp[0] : "" |html%>" /><% exists $author_affil_errors{$ac} ? "<strong style='color: red;'> * </strong>" : "" %>
+			</td>
+		</tr>
+		
 %	}
 	<input type="hidden" id="step" value="30" />
 	<input type="hidden" id="num" value="<%$ac%>" />
 %} 
 %else {
 <tr class="author_row">
-<td>Collector/Author <img src='/images/question-icon.png' align='top' id='collectors' /></td><td>&nbsp;&nbsp;<input class="fb" type="text" style="width:145px" id="collector_first" name="collector_first" value="First Name"  onfocus="if(this.value=='First Name'){this.value=''};" onblur="if(this.value==''){this.value='First Name'};"/>&nbsp;<input class="fb" type="text" style="width:145px" id="collector_last" name="collector_last" value="Last Name" onfocus="if(this.value=='Last Name'){this.value=''};" onblur="if(this.value==''){this.value='Last Name'};" />
-<span id="add_author_link1"><a href="javascript:;" onclick="phy.addAuthor(1);" style="text-decoration:none;font-weight:bold;color:black"><img src="/images/plus.jpg" border=0 width="12px" height="12px" /> Add Another</a></span></td>
+	<td>
+		Collector/Author <img src='/images/question-icon.png' align='top' id='collectors' />
+	</td>
+	<td>
+		&nbsp;&nbsp;<input class="fb" type="text" style="width:145px" id="collector_first" name="collector_first" value="First Name"  onfocus="if(this.value=='First Name'){this.value=''};" onblur="if(this.value==''){this.value='First Name'};"/>&nbsp;<input class="fb" type="text" style="width:145px" id="collector_last" name="collector_last" value="Last Name" onfocus="if(this.value=='Last Name'){this.value=''};" onblur="if(this.value==''){this.value='Last Name'};" />
+		<span id="add_author_link1">
+			<a href="javascript:;" onclick="phy.addAuthor(1);" style="text-decoration:none;font-weight:bold;color:black">
+				<img src="/images/plus.jpg" border=0 width="12px" height="12px" /> Add Another</a>
+		</span>
+	</td>
+</tr>
+<tr class="author_affil_row">
+	<td>Affiliation</td>
+	<td>
+		&nbsp;&nbsp;<input class="fb" type="text" style="width:145px" id="author_affil" name="author_affil" />
+	</td>
 </tr>
 %}
 <tr id="new_row"><td></td></tr>
+<tr id="new_row_1"><td></td></tr>
+
+<tr>
+	<td><h2>Project Info</h2></td>
+</tr>
+<tr>
+	<td>Project: </td>
+	<td>
+	<select name="project" id="project">
+		<option value="">Select</option>
+% 	for my $p (keys %$projects) {
+			<option value="<% $p %>" id="<% $p %>"><% $p %></option>
+% 		}
+	</select>
+	<% $project_err ? "<strong style='color: red;'> * </strong>" : "" %>
+	</td>
+</tr>
+
+<tr>
+<td><h2>Specimen Info</h2></td>
+</tr>
 
 % for my $f (@fields) {
 %	my $value = $data->{$f->{id}} || $ARGS{$f->{id}} || "";
@@ -128,7 +177,7 @@
 <% $r_primer_err == 1 ? "<strong style='color: red;'> * </strong>" : "" %>
 </td>
 </tr>
-	
+
 </tbody>
 </table>
 % if ($data->{"f_primer"}){
@@ -139,6 +188,11 @@
 % if ($data->{"r_primer"}){
 	<script type="text/javascript">
 		$('<% $data->{"r_primer"} %>').selected = true;
+	</script>	
+% }
+% if ($data->{"project"}){
+	<script type="text/javascript">
+		$('<% $data->{"project"} %>').selected = true;
 	</script>	
 % }
 
@@ -198,6 +252,7 @@ new Tip('longitude_help', "Longitude: Geographic Longitude (if you don't have th
 	
 	my $cf = DNALC::Pipeline::Config->new;
 	my $primers = $cf->cf("PRIMERS");
+	my $projects = $cf->cf("BARCODING_PROJECTS");
 	
 	my @fields = (
 
@@ -251,9 +306,12 @@ new Tip('longitude_help', "Longitude: Geographic Longitude (if you don't have th
 	
 	my @authors;
 	my %author_errors;
+	my %author_affil_errors;
 	
 	my $f_primer_err;
 	my $r_primer_err;
+	
+	my $project_err;
 	
 	{
 		my $project = DNALC::Pipeline::Phylogenetics::Project->retrieve($pid);
@@ -267,29 +325,47 @@ new Tip('longitude_help', "Longitude: Geographic Longitude (if you don't have th
 		
 		if ($ARGS{"authors"}){
 			@authors = split ("::", $ARGS{"authors"});
+			
+			#print STDERR Dumper(\@authors), $/;
 			my $x = 1;
 			for (@authors){
 				my @temp = split ("#", $_);
 				# "temp[0] = first name"
 				# "temp[1] = last name"
 				# "temp[2] = row number"
+				# "temp[3] = author affiliation"
+				
+				# "temp[0] = affiliation"
+				# "temp[1] = first name"
+				# "temp[2] = last name"
+				# "temp[3] = row number"		
 				my $error_monitor;
-				if ($temp[0] eq "First Name" || clean_query($temp[0]) eq ""){
-					push @err, "Author #$temp[2] first name not valid";
+				my $error_monitor_affil;
+				if ($temp[1] eq "First Name" || clean_query($temp[1]) eq ""){
+					push @err, "Author #$temp[3] first name not valid";
 					$error_monitor = 1;
 				}
-				if ($temp[1] eq "Last Name" || clean_query($temp[1]) eq ""){
-					push @err, "Author #$temp[2] last name not valid";
+				if ($temp[2] eq "Last Name" || clean_query($temp[2]) eq ""){
+					push @err, "Author #$temp[3] last name not valid";
 					$error_monitor = 1;
+				}
+				if ($temp[0] eq "" || clean_query($temp[0]) eq ""){
+					push @err, "Please enter an affiliation for Author #$temp[3]";
+					$error_monitor_affil = 1;
 				}
 				
 				if ($error_monitor){
-					$author_errors{$temp[2]} = 'true';
+					$author_errors{$temp[3]} = 'true';
 				}
-				$bs->{spec_data}->{"author_first" . $x} = $temp[0];
-				$bs->{spec_data}->{"author_last" . $x} = $temp[1];
-				$data->{"author_first" . $x} = $temp[0];
-				$data->{spec_data}->{"author_last" . $x} = $temp[1];
+				if ($error_monitor_affil){
+					$author_affil_errors{$temp[3]} = 'true';
+				}
+				$bs->{spec_data}->{"author_first" . $x} = $temp[1];
+				$bs->{spec_data}->{"author_last" . $x} = $temp[2];
+				$bs->{spec_data}->{"author_affil" . $x} = $temp[0];
+				$data->{"author_first" . $x} = $temp[1];
+				$data->{"author_last" . $x} = $temp[2];
+				$data->{"author_affil" . $x} = $temp[0];
 				$x++;
 			}
 		}
@@ -391,6 +467,15 @@ new Tip('longitude_help', "Longitude: Geographic Longitude (if you don't have th
 			$data->{"f_primer"} = $ARGS{"f_primer"};
 		}
 		
+		if (defined $ARGS{"project"}){
+			if ($ARGS{"project"} eq ""){
+				push @err, "Please select your project type";
+				$project_err = 1;
+			}
+			$bs->{spec_data}->{"project"} = $ARGS{"project"};
+			$data->{"project"} = $ARGS{"project"};
+		}
+		
 		
 		unless (@err) {
 			$bs->{step4} = 1;
@@ -405,11 +490,9 @@ new Tip('longitude_help', "Longitude: Geographic Longitude (if you don't have th
 	else {
 		$data = $bs->{spec_data} || {};
 		
-		
-		#my @auth = ();
-        for (sort keys %$data) {
-            if ($_ =~ /author_(first|last)(\d+)$/) {
-                $authors[$2 - 1] .= $data->{$_} . "#";
+        for my $a (sort grep {/^author_/} keys %$data) {
+            if ($a =~ /author_(:?first|last|affil)(\d+)$/) {
+                $authors[$2 - 1] .= $data->{$a} . "#";
             }
         }
 

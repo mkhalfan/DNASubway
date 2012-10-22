@@ -31,79 +31,87 @@ top.show_messages("GenBank submission processed successfully. Your ID for this s
 % my $ac = 1;
 % while (exists $bs->{spec_data}->{"author_first$ac"}) {
 <tr>
-<td width="150">Author/Collector <% $ac |html %>:</td>
-<td><%$bs->{spec_data}->{"author_first$ac"} |html %> <%$bs->{spec_data}->{"author_last$ac"} |html %></td>
+	<td width="150">Author/Collector <% $ac |html %>:</td>
+	<td><% $bs->{spec_data}->{"author_first$ac"} |html %> <% $bs->{spec_data}->{"author_last$ac"} |html %></td>
+</tr>
+<tr>
+	<td>Affiliation:</td>
+	<td><% $bs->{spec_data}->{"author_affil$ac"} |html %></td>
 </tr>
 %   $ac++;
 % }
 <tr>
-<td>Institution Storing:</td>
-<td><% $bs->{spec_data}->{institution_storing} |html %></td>
+	<td>Project:</td>
+	<td><% $bs->{spec_data}->{project} |html %></td>
 </tr>
 <tr>
-<td>Identified By:</td>
-<td><% $bs->{spec_data}->{tax} |html %></td>
+	<td>Institution Storing:</td>
+	<td><% $bs->{spec_data}->{institution_storing} |html %></td>
 </tr>
 <tr>
-<td>Identifier's email:</td>
-<td><% $bs->{spec_data}->{tax_email} |html %></td>
+	<td>Identified By:</td>
+	<td><% $bs->{spec_data}->{tax} |html %></td>
+</tr>
+<tr>
+	<td>Identifier's email:</td>
+	<td><% $bs->{spec_data}->{tax_email} |html %></td>
 </tr>
 <tr>
 <tr>
-<td>Genus:</td>
-<td><% $bs->{spec_data}->{genus} |html %></td>
+	<td>Genus:</td>
+	<td><% $bs->{spec_data}->{genus} |html %></td>
 </tr>
 <tr>
-<td>Species:</td>
-<td><% $bs->{spec_data}->{species} |html %></td>
+	<td>Species:</td>
+	<td><% $bs->{spec_data}->{species} |html %></td>
 </tr>
 <tr>
-<td>Date Collected:</td>
-<td><% $bs->{spec_data}->{date_collected} |html %></td>
+	<td>Date Collected:</td>
+	<td><% $bs->{spec_data}->{date_collected} |html %></td>
 </tr>
 <tr>
-<td>Country:</td>
-<td><% $bs->{spec_data}->{country} |html %></td>
+	<td>Country:</td>
+	<td><% $bs->{spec_data}->{country} |html %></td>
 </tr>
 <tr>
-<td>State:</td>
-<td><% $bs->{spec_data}->{state} |html %></td>
+	<td>State:</td>
+	<td><% $bs->{spec_data}->{state} |html %></td>
 </tr>
 <tr>
-<td>Exact Site:</td>
-<td><% $bs->{spec_data}->{site_desc} |html %></td>
+	<td>Exact Site:</td>
+	<td><% $bs->{spec_data}->{site_desc} |html %></td>
 </tr>
 <tr>
-<td>Isolation Source:</td>
-<td><% $bs->{spec_data}->{isolation_source} |html %></td>
+	<td>Isolation Source:</td>
+	<td><% $bs->{spec_data}->{isolation_source} |html %></td>
 </tr>
 <tr>
-<td>Latitutide:</td>
-<td><% $bs->{spec_data}->{latitude} |html %></td>
+	<td>Latitutide:</td>
+	<td><% $bs->{spec_data}->{latitude} |html %></td>
 </tr>
 <tr>
-<td>Longitude:</td>
-<td><% $bs->{spec_data}->{longitude} |html %></td>
+	<td>Longitude:</td>
+	<td><% $bs->{spec_data}->{longitude} |html %></td>
 </tr>
 <tr>
-<td>Notes:</td>
-<td><% $bs->{spec_data}->{notes} |html %></td>
+	<td>Notes:</td>
+	<td><% $bs->{spec_data}->{notes} |html %></td>
 </tr>
 <tr>
-<td>Sex:</td>
-<td><% $bs->{spec_data}->{sex} |html %></td>
+	<td>Sex:</td>
+	<td><% $bs->{spec_data}->{sex} |html %></td>
 </tr>
 <tr>
-<td>Life Stage:</td>
-<td><% $bs->{spec_data}->{stage} |html %></td>
+	<td>Life Stage:</td>
+	<td><% $bs->{spec_data}->{stage} |html %></td>
 </tr>
 <tr>
-<td>Forward Primer:</td>
-<td><% $bs->{spec_data}->{f_primer} |html %></td>
+	<td>Forward Primer:</td>
+	<td><% $bs->{spec_data}->{f_primer} |html %></td>
 </tr>
 <tr>
-<td>Reverse Primer</td>
-<td><% $bs->{spec_data}->{r_primer} |html %></td>
+	<td>Reverse Primer</td>
+	<td><% $bs->{spec_data}->{r_primer} |html %></td>
 </tr>
 </table>
 

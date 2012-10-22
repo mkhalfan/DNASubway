@@ -9,12 +9,20 @@
 </tr>
 % my $ac = 1;
 % while (exists $data->{"author_first$ac"}){
-	<tr>
+<tr>
 	<td width="150">Author/Collector <% $ac |html %>:</td>
 	<td><% $data->{"author_first$ac"} |html %> <% $data->{"author_last$ac"} |html %></td>
-	</tr>
+</tr>
+<tr>
+	<td>Affiliation:</td>
+	<td><% $data->{"author_affil$ac"} |html %></td>
+</tr>
 % $ac++;
 %}
+<tr>
+	<td>Project:</td>
+	<td><% $data->{project} |html %></td>
+</tr>
 <tr>
 <td>Institution Storing:</td>
 <td><% $data->{institution_storing} |html %></td>
