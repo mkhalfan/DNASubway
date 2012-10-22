@@ -2233,21 +2233,23 @@
 	phy.addAuthor = function(num, action){
 		if (action == 'remove'){
 				$('row' + num).remove();
+				$('author_affil_row_' + num).remove();
 		}
 		else{
 			num++;
-			$('new_row').replace('<tr id="row' + num + '" class="author_row"><td>Collector/Author</td><td>&nbsp;&nbsp;<input class="fb" type="text" style="width:145px" id="collector_first_" name="collector_first_" value="First Name" onfocus="if(this.value==\'First Name\'){this.value=\'\'};" onblur="if(this.value==\'\'){this.value=\'First Name\'};"/>&nbsp;<input class="fb" type="text" style="width:145px" id="collector_last_" name="collector_last_" value="Last Name" onfocus="if(this.value==\'Last Name\'){this.value=\'\'};" onblur="if(this.value==\'\'){this.value=\'Last Name\'};"/> <span><a href="javascript:;" onclick="phy.addAuthor(' + num + ', \'remove\')" style="text-decoration:none;font-weight:bold;color:black"><img src="/images/minus.jpg" border=0 width="12px" height="12px" />  Remove</a></span></td></tr><tr id="new_row"></tr>');
+			$('new_row').replace('<tr id="row' + num + '" class="author_row"><td>Collector/Author</td><td>&nbsp;&nbsp;<input class="fb" type="text" style="width:145px" id="collector_first_" name="collector_first_" value="First Name" onfocus="if(this.value==\'First Name\'){this.value=\'\'};" onblur="if(this.value==\'\'){this.value=\'First Name\'};"/>&nbsp;<input class="fb" type="text" style="width:145px" id="collector_last_" name="collector_last_" value="Last Name" onfocus="if(this.value==\'Last Name\'){this.value=\'\'};" onblur="if(this.value==\'\'){this.value=\'Last Name\'};"/> <span><a href="javascript:;" onclick="phy.addAuthor(' + num + ', \'remove\')" style="text-decoration:none;font-weight:bold;color:black"><img src="/images/minus.jpg" border=0 width="12px" height="12px" />  Remove</a></span></td></tr>');
 			$('add_author_link1').update('<a href="javascript:;" onclick="phy.addAuthor(' + num + ');" style="text-decoration:none;font-weight:bold;color:black"> <img src="/images/plus.jpg" border=0 width="12px" height="12px" /> Add Another</a>');
+			$('new_row_1').replace('<tr id="author_affil_row_' + num + '" class="author_affil_row"><td>Affiliation</td><td>&nbsp;&nbsp;<input class="fb" type="text" style="width:145px" id="author_affil" name="author_affil" /></td></tr><tr id="new_row"></tr><tr id="new_row_1"></tr>');
 		}
 	}
 	phy.collect_authors = function(){
 		var firstNames = [];
 		var lastNames = [];
 		var fullNames = "";
+		var affils = [];
 		$$('tr[class="author_row"]').each(function(e){
 			e.descendants().each(function(el){
 				if (el.id.indexOf("collector_first") == 0) {
-					//console.info(el.value);
 					firstNames.push(el.value);
 				}
 				if (el.id.indexOf("collector_last") == 0) {
@@ -2255,8 +2257,15 @@
 				}
 			});
 		});
+		$$('tr[class="author_affil_row"]').each(function(e){
+			e.descendants().each(function(el){
+				if (el.id.indexOf("author_affil") == 0) {
+					affils.push(el.value);
+				}
+			});
+		});
 		for (var i = 0; i < lastNames.length; i++){
-			fullNames = fullNames + firstNames[i] + "#" + lastNames[i] + "#" + (i + 1) + "::";
+			fullNames = fullNames + affils[i] + "#" + firstNames[i] + "#" + lastNames[i] + "#" + (i + 1) + "::";
 		}
 		//console.info(fullNames);
 		$('new_row').update('<input type="hidden" id="authors" name="authors" value="' + fullNames + '" />');
