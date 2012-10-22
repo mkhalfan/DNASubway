@@ -107,6 +107,11 @@ use DNALC::Pipeline::Barcode::Annotation;
 		# Get the translation table to be used
 		my $trans_table = $data->{trans_table};
 
+		# Get the Project type (ex: UBP, BLI), need it for the FASTA file header (bioproject ID)
+		my $bioproject_name = $data->{project};
+		my $bioproject_list = DNALC::Pipeline::Config->new->cf('BARCODING_PROJECTS');
+		my $bioproject_id = $bioproject_list->{$bioproject_name}; 
+
 		# Get the sequence, then remove any dahses which may exist
 		my $seq = DNALC::Pipeline::Phylogenetics::Pair->retrieve($record->sequence_id)->consensus;
 		$seq =~ s/-//g;
@@ -115,7 +120,7 @@ use DNALC::Pipeline::Barcode::Annotation;
 		my $fasta_file = $self->{work_dir} . "/$seq_id/$id.fsa";
 		my $outfile = IO::File->new;
 		if ($outfile->open($fasta_file, "w")){
-			print $outfile ">", $id, " [BioProject=PRJNA159485] [tech=barcode] [organism=$organism]";
+			print $outfile ">", $id, " [BioProject=$bioproject_id] [tech=barcode] [organism=$organism]";
 			print $outfile " [mgcode=$trans_table] [location=mitochondrion]" if ($trans_table != 1);
 			print $outfile "\n";
 			print $outfile $seq;
@@ -227,8 +232,7 @@ use DNALC::Pipeline::Barcode::Annotation;
 	#
 	sub _get_primer_sequence {
 		my ($self, $strand, $primer_id) = @_;
-		my $cf = DNALC::Pipeline::Config->new;
-		my $primers = $cf->cf('PRIMERS');
+		my $primers = DNALC::Pipeline::Config->new->cf('PRIMERS');
 
 		my ($primer_seq) = 
 				map { $_->{$primer_id}}
