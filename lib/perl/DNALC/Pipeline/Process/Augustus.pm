@@ -62,8 +62,14 @@ use strict;
 			elsif ($line =~ /AUGUSTUS\ttranscript\t/) {
 				$line =~ s/transcript/mRNA/;
 			}
+			elsif ($line =~ /AUGUSTUS\tfive_prime_utr\t/) {
+                                $line =~ s/five_prime_utr/exon/;
+                        }
+			elsif ($line =~ /AUGUSTUS\tthree_prime_utr\t/) {
+                                $line =~ s/three_prime_utr/exon/;
+                        }
 			print $out $line;
-			if ($self->{clade} eq 'm' && $line =~ /\tCDS\t/) {
+			if ($self->{clade} ne 'd' && $line =~ /\tCDS\t/) {
 				$line =~ s/\tCDS\t/\texon\t/;
 				print $out $line;
 			}
