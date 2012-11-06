@@ -335,6 +335,32 @@ use Bio::Trace::ABIF ();
 					push @errors, sprintf("File %s is not an FASTA file!", $filename);
 					next;
 				}
+				
+				# check if file is in FASTA format. BIO::SeqIO fails otherwise
+				my $ffh = IO::File->new;
+				if ($ffh->open($f)) {
+					my $not_FASTA = 0;
+					while (my $line = <$ffh>) {
+						$line =~ s/\s//g;
+						next if $line =~ m/^$/;
+						next if $line =~ m/^[;#]/;
+						unless ($line =~ />/) {
+							my $warning;
+							if ($filename) {
+								$warning = sprintf("File %s is not an FASTA file!", $filename);
+							}
+							else {
+								$warning = sprintf("Sequence is not in FASTA format!");
+							}
+							push @warnings, $warning;
+							$not_FASTA = 1;
+						}
+						last;
+					}
+
+					undef $ffh;
+					next if $not_FASTA;
+				}
 
 				my $fa_seq_cnt  = 0;
 				my $max_seq_cnt = $self->config->{MAX_SEQ_COUNT} || 100;
