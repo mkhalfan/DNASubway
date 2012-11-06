@@ -261,9 +261,12 @@ if ($r->method eq 'POST') {
 	my ($pm, $proj);
 	unless (@err) {
 		$pm = DNALC::Pipeline::App::ProjectManager->new;
-		my $proj = $pm->search(user_id => $s->{user_id}, name => $name);
+		my ($proj) = $pm->search(user_id => $s->{user_id}, name => $name);
 		if ($proj) {
-			push @err, "You already have a project named [$name]";
+			my $mp = $proj->master_project;
+			unless ($mp->archived) {
+				push @err, "You already have a project named [$name]";
+			}
 		}
 		else {
 			my $conflicts = $pm->get_organism_conflicts({

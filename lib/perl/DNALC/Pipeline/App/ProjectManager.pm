@@ -46,7 +46,7 @@ sub new {
 sub search {
 	my ($self, %args) = @_;
 
-	DNALC::Pipeline::Project->search(%args);
+	DNALC::Pipeline::Project->search(%args, { order_by => 'created DESC'});
 }
 #-----------------------------------------------------------------------------
 sub config {
@@ -76,12 +76,8 @@ sub create_project {
 	my $seq_length = $seq->length;
 	my $crc = $self->compute_crc($seq);
 
-	my $proj = DNALC::Pipeline::Project->search(user_id => $user_id, name => $name);
-	if ($proj) {
-		return {status => 'fail', msg => "There is already a project named \"$name\"."};
-	}
 	# create project
-	$proj = eval { DNALC::Pipeline::Project->create({
+	my $proj = eval { DNALC::Pipeline::Project->create({
 						user_id => $user_id,
 						name => $name,
 						organism => $organism,
