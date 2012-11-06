@@ -350,7 +350,7 @@ use Bio::Trace::ABIF ();
 								$warning = sprintf("File %s is not an FASTA file!", $filename);
 							}
 							else {
-								$warning = sprintf("Sequence is not in FASTA format!");
+								$warning = sprintf("Sequence is not in FASTA format! Skipping it.");
 							}
 							push @warnings, $warning;
 							$not_FASTA = 1;
