@@ -209,28 +209,28 @@ console.info("<% $_ %>");
 
 <script type="text/javascript">
 Event.observe(window, Prototype.Browser.IE ? 'load' : 'dom:loaded', function() {
-new Tip('collectors', "Name of person(s) who collected the sample. One author per row.", {
+new Tip('collectors', "Name of person(s) who collected the sample, one author per row.", {
 		className: 'blue_help',
 	});
-new Tip('institution', "Name of the institution where your sample is stored.", {
+new Tip('institution', "Name of the institution where the sample is stored (e.g. a museum or school).", {
 		className: 'blue_help'
 	});
-new Tip('identifier', "Name of the specialist that identified the species of your sample.", {
+new Tip('identifier', "Name of the specialist (e.g. botanist, entomologist, curator, etc.) that identified the species of your sample.", {
 		className: 'blue_help'
 	});
-new Tip('exact_site_help', "Specify the type of location or habitat where the samples was found (e.g. store, park, pond, etc.)", {
+new Tip('exact_site_help', "Type of location or habitat where the sample was found (e.g. store, park, pond, etc.)", {
 		className: 'blue_help',
 	});
-new Tip('notes_help', "Write down all relevant information pertaining your sample that help to get a clear idea what are the most important characteristics of it (e.g. muscle tissue obtained from the market, or sample was frozen when it was collected, etc.)", {
+new Tip('notes_help', "Describe the characteristics of the actual sample you extracted DNA from (e.g. from tissue that was frozen, preserved in alcohol, freshly collected, dried, etc.)", {
 		className: 'blue_help'
 	});
 new Tip('isolation_source_help', "Specify the organism's tissue or part from where the DNA was extracted (e.g. muscle, leave, bark, blood, insect leg, etc.)", {
 		className: 'blue_help'
 	});
-new Tip('latitude_help', "Geographic Latitude (if you don't have this information, use Google Earth for locating the geographic coordinates of your sample's collection site.)", {
+new Tip('latitude_help', "Geographic Latitude (you may use Google Earth for locating the geographic coordinates of your sample's collection site.)", {
 		className: 'blue_help'
 	});
-new Tip('longitude_help', "Longitude: Geographic Longitude (if you don't have this information, use Google Earth for locating the geographic coordinates of your sample's collection site.)", {
+new Tip('longitude_help', "Geographic Longitude (you may use Google Earth for locating the geographic coordinates of your sample's collection site.)", {
 		className: 'blue_help'
 	});
 });
