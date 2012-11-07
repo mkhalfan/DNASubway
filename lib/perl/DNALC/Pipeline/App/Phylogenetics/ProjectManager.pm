@@ -87,14 +87,9 @@ use Bio::Trace::ABIF ();
 		my ($status, $msg) = ('fail', '');
 		my $name = $params->{name};
 		my $user_id = $params->{user_id};
-		#my $data = $params->{data};
 
-		my $proj = $self->search(user_id => $user_id, name => $name);
-		if ($proj) {
-			return {status => 'fail', msg => "There is already a project named \"$name\"."};
-		}
 		# create project
-		$proj = eval { Project->create({
+		my $proj = eval { Project->create({
 					user_id => $user_id,
 					name => $name,
 					type => $params->{type},
@@ -1611,7 +1606,7 @@ use Bio::Trace::ABIF ();
 	sub search {
 		my ($self, %args) = @_;
 
-		Project->search(%args);
+		Project->search(%args, {order_by => 'created DESC'});
 	}
 
 	#-----------------------------------------------------------------------------

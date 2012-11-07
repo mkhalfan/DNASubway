@@ -271,9 +271,12 @@ if ($r->method eq "POST") {
 	
 	unless (@err) {
 		
-		my $proj = $pm->search(user_id => $s->{user_id}, name => $name);
+		my ($proj) = $pm->search(user_id => $s->{user_id}, name => $name);
 		if ($proj) {
-			push @err, "You already have a project named [$name]";
+			my $mp = $proj->master_project;
+			unless ($mp->archived) {
+				push @err, "You already have a project named [$name]";
+			}
 		}
 	}
 
