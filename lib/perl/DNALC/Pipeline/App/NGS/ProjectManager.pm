@@ -356,8 +356,8 @@ use Data::Dumper;
 		#print STDERR  $app_cf->{id}, " eq ",  $app->id, $/;
 		# do we want to make sure we have exact version of the app?!
 		unless ($app_cf->{id} eq $app->id) {
-			print STDERR  "Version mismatch for: ", $app->id, $/;
-			return;
+			print STDERR  "Version mismatch for $app_cf->{id}: ", $app->id, $/;
+			#return;
 		}
 
 		my $app_inputs = $app->inputs;
@@ -689,13 +689,11 @@ use Data::Dumper;
 
 		# cufflinks
 		unless ( defined $running_jobs->{ngs_cufflinks}) {
-			print STDERR  "ngs_cufflinks: not defined", $/;
 			if ($running_jobs->{ngs_tophat} && exists $running_jobs->{ngs_tophat}->{done}) {
 				$stats{ngs_cufflinks} = 'not-processed';
 			}
 		}
 		else {
-			print STDERR  "ngs_cufflinks: defined", $/;
 			if ($running_jobs->{ngs_cufflinks}->{processing}) {
 				$stats{ngs_cufflinks} = 'processing';
 			}
@@ -705,9 +703,24 @@ use Data::Dumper;
 		}
 
 		# cuffdiff
-		# TODO
+		unless ( defined $running_jobs->{ngs_cuffdiff}) {
+			print STDERR  "ngs_cuffdiff: not defined", $/;
+			if ($running_jobs->{ngs_tophat} && $running_jobs->{ngs_tophat}->{done} > 1) {
+				$stats{ngs_cuffdiff} = 'not-processed';
+			}
+		}
+		else {
+			print STDERR  "ngs_cuffdiff: defined", $/;
+			if ($running_jobs->{ngs_cuffdiff}->{processing}) {
+				$stats{ngs_cuffdiff} = 'processing';
+			}
+			elsif ($running_jobs->{ngs_cuffdiff}->{done} || $running_jobs->{ngs_cuffdiff}->{error}) {
+				$stats{ngs_cuffdiff} = 'done';
+			}
+		}
+	
 
-		# cuffdiff
+		# cuffmerge
 		# TODO
 
 		%stats;

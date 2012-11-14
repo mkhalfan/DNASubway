@@ -43,8 +43,8 @@
      		<span class="bt_runGreenline"><a id="ngs_cuffmerge_btn" href="javascript:;" onclick="//javascript:ngs.launch('ngs_cuffmerge');">CuffMerge</a></span>
         </span><!--END of span class conGreenline_ConCell-->
         <span class="conGreenline_ConCell">
-            <span class="conIndicator_box"><div id="ngs_cuffdiff_st" class="conIndicatorGL_disabled"></div></span>
-     		<span class="bt_runGreenline"><a id="ngs_cuffdiff_btn" href="javascript:;"onclick="//javascript:ngs.launch('ngs_cuffdiff');">CuffDiff</a></span>
+            <span class="conIndicator_box"><div id="ngs_cuffdiff_st" class="conIndicatorGL_<% $status{ngs_cuffdiff}%>"></div></span>
+     		<span class="bt_runGreenline"><a id="ngs_cuffdiff_btn" href="javascript:;"onclick="javascript:<% $status{ngs_cuffdiff} ne "disabled" ? "ngs.launch('ngs_cuffdiff')" : "" %>;">CuffDiff</a></span>
         </span><!--END of span class conGreenline_ConCell-->
 	</span><!--END of class conGreenline_ConColumn1-->
          
