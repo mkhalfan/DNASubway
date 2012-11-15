@@ -25,7 +25,7 @@
 	my $tree = $pm->get_tree($tree_type)->{tree_file};
 	
 	$r->sendfile($tree);
-	$r->abort( Apache2::Const::HTTP_OK );
+	eval { $r->abort( HTTP_OK ); };
 </%init>
 %#----------------------------------------------------------------------------
 <%flags>
