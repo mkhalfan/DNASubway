@@ -66,6 +66,10 @@ top.show_messages("GenBank submission processed successfully. Your ID for this s
 	<td><% $bs->{spec_data}->{species} |html %></td>
 </tr>
 <tr>
+	<td>Common Name:</td>
+	<td><% $bs->{spec_data}->{common_name} |html %></td>
+</tr>
+<tr>
 	<td>Date Collected:</td>
 	<td><% $bs->{spec_data}->{date_collected} |html %></td>
 </tr>
@@ -110,13 +114,13 @@ top.show_messages("GenBank submission processed successfully. Your ID for this s
 	<td><% $bs->{spec_data}->{stage} |html %></td>
 </tr>
 <tr>
-	<td>Forward Primer:</td>
+	<td>Primer:</td>
 	<td><% $bs->{spec_data}->{f_primer} |html %></td>
 </tr>
-<tr>
-	<td>Reverse Primer</td>
-	<td><% $bs->{spec_data}->{r_primer} |html %></td>
-</tr>
+%#<tr>
+%#	<td>Reverse Primer</td>
+%#	<td><% $bs->{spec_data}->{r_primer} |html %></td>
+%#</tr>
 </table>
 
 <div id="bimage_list_uploaded" style="margin-left:160px">

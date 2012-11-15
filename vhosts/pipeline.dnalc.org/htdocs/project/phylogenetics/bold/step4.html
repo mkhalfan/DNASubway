@@ -69,7 +69,7 @@ console.info("<% $_ %>");
 </tr>
 <tr>
 	<td>Project: </td>
-	<td>
+	<td>&nbsp;
 	<select name="project" id="project">
 		<option value="">Select</option>
 % 	for my $p (keys %$projects) {
@@ -107,10 +107,10 @@ console.info("<% $_ %>");
 		<input class="fb" type="<% $type %>" style="width: 300px" id="<% $f->{id}%>" name="<% $f->{id}%>" value="<% $value |html %>" />\
 %	} elsif ($type eq "select") {
 		<select id="<% $f->{id}%>" name="<% $f->{id}%>">
-		<option value="">=Select=</option>
+			<option value="">Select</option>
 %		for my $v (@{$f->{values}}) {
 %			my $sel = defined $value && $v eq $value ? "selected=\"selected\"" : "";
-			<option value="<% $v |html %>" <% $sel %>><% $v|html %></option>\
+			<option value="<% $v |html %>" id="<% $v |html %>" <% $sel %>><% $v|html %></option>\
 %		}
 		</select>
 %	} elsif ($type eq "checkbox") {
@@ -141,60 +141,73 @@ console.info("<% $_ %>");
 <td><h2>Sequence Primer Info</h2></td>
 </tr>
 <tr>
-<td>Forward Primer: </td>
+<td>Primer Used: </td>
 <td>
 <select name="f_primer" id="f_primer">
 	<option value="">Select</option>
-% for my $i (@{$primers->{forward}}){
-% 	for my $key (grep {/^$project_type/i} keys %$i){
-		<optgroup label="<% $key %>">
-% 		for my $x (keys %{$i->{$key}}){
-			<option value="<% $x %>" id="<% $x %>"><% $x %></option>
-% 		}
-		</optgroup>
-% 	}
+% for my $key (grep {/^$project_type/i} keys %{$primers->{forward}}){
+	<option value="<% $key %>" id="<% $key %>"><% $key %></option>
 % }
 </select>
 <% $f_primer_err ? "<strong style='color: red;'> * </strong>" : "" %>
 </td>
 </tr>
-<tr>
-<td>Reverse Primer: </td>
-<td>
-<select name="r_primer" id="r_primer">
-	<option value="">Select</option>
-% for my $i (@{$primers->{reverse}}){
-% 	for my $key (grep {/^$project_type/i} keys %$i){
-		<optgroup label="<% $key %>">
-% 		for my $x (keys %{$i->{$key}}){
-%#			print $x, ": ", $i->{$key}->{$x}, "<br>";
-			<option value="<% $x %>" id="<% $x %>"><% $x %></option>
-% 		}
-		</optgroup>
-% 	}
-% }
-</select>
-<% $r_primer_err == 1 ? "<strong style='color: red;'> * </strong>" : "" %>
-</td>
-</tr>
+%#<tr>
+%#<td>Reverse Primer: </td>
+%#<td>
+%#<select name="r_primer" id="r_primer">
+%#	<option value="">Select</option>
+%# for my $key (grep {/^$project_type/i} keys %{$primers->{reverse}}){
+%# 	for my $key (grep {/^$project_type/i} keys %$i){
+%#		<option value="<% $key %>" id="<% $key %>"><% $key %></option>
+%# 	}
+%# }
+%#</select>
+%#<% $r_primer_err == 1 ? "<strong style='color: red;'> * </strong>" : "" %>
+%#</td>
+%#</tr>
 
 </tbody>
 </table>
-% if ($data->{"f_primer"}){
-	<script type="text/javascript">
-		$('<% $data->{"f_primer"} %>').selected = true;
-	</script>	
-% }
-% if ($data->{"r_primer"}){
-	<script type="text/javascript">
-		$('<% $data->{"r_primer"} %>').selected = true;
-	</script>	
-% }
+
+
+
+
+<script type="text/javascript">
+	function toggleOther(){
+		if ($('isolation_source').value == 'Other - please enter below') {
+			$('isolation_source_other_tr').show();
+		}
+		else {
+			$('isolation_source_other_tr').hide();
+		}
+	}
+	Event.observe(window, Prototype.Browser.IE ? 'load' : 'dom:loaded', function() {
+		$('isolation_source').onchange = function(){
+			toggleOther();
+		}		
+		
 % if ($data->{"project"}){
-	<script type="text/javascript">
 		$('<% $data->{"project"} %>').selected = true;
-	</script>	
 % }
+% if ($data->{"f_primer"}){
+		$('<% $data->{"f_primer"} %>').selected = true;
+% }
+%# if ($data->{"r_primer"}){
+%#		$('<% $data->{"r_primer"} %>').selected = true;
+%# }
+
+%# Set the primer to 'rbcL' by default if the project type is rbcl
+% if ($project_type eq 'rbcl') {
+		$('rbcL').selected = true;
+% }
+% if ($data->{"isolation_source_other"}) {
+		$("Other - please enter below").selected = true;
+% }
+		toggleOther();
+		
+	});
+</script>
 
 %#--------------------
 
@@ -266,7 +279,7 @@ new Tip('longitude_help', "Geographic longitude (you may use Google Earth for lo
 		#{id => "family", type => "", err_msg => "Family", label => "Family", re => qr/\w+/, len => 48, },
 		{id => "genus", type => "", err_msg => "Genus", label => "Genus", re => qr/\w+/, len => 48, },
 		{id => "species", type => "", err_msg => "Species", label => "Species", re => qr/\w+/, len => 48, },
-
+		{id => "common_name", type => "", err_msg => "Common name", label => "Common Name", re => qr/\w+/, len => 48, },
 		{id => "date_collected", type => "", err_msg => "Date collected", label => "Date collected (dd/mm/yyyy)", re => qr/^\d\d\/\d\d\/\d{4}$/,},
 		{id => "country", type => "component", err_msg => "Country", label => "Country", re => qr/\w+/, len => 48,
 			component => '../../.comp/countries'},
@@ -274,7 +287,10 @@ new Tip('longitude_help', "Geographic longitude (you may use Google Earth for lo
 			component => '../../.comp/_us_states'},
 		{id => "city", type=> "", err_msg => "City", label => "City", re => qr/\w+/, len => 48,},
 		{id => "site_desc", type => "", err_msg => "Exact Site", label => "Exact Site <img src='/images/question-icon.png' align='top' id='exact_site_help' />", re => qr/\w+/, len => 128, },
-		{id => "isolation_source", type => "", err_msg => "Isolation Source", label => "Isolation Source (optional) <img src='/images/question-icon.png' align='top' id='isolation_source_help' />", re => qr/\w*/, len => 128, },
+		{id => "isolation_source", type => "select", err_msg => "Isolation Source", label => "Isolation Source  <!--<img src='/images/question-icon.png' align='top' id='isolation_source_help' />-->", re => qr/\w+/, len => 128, 
+			values => ['Specimen traded in a market or store','Specimen collected in a park, natural habitat, or public area','Specimen collected in a house or building','Specimen obtained from a museum collection', 'Other - please enter below']
+		},
+		{id => "isolation_source_other", type=> "", err_msg => "Isolation Source - Other", label => "", len => 48,},
 		{id => "latitude", type => "", err_msg => "Latitude", label => "Latitude (ex: 40.77 N) <img src='/images/question-icon.png' align='top' id='latitude_help' />", re => qr/^$RE{num}{real}\s*[NSns]$/, len => 16, },
 		{id => "longitude", type => "", err_msg => "Longitude", label => "Longitude (ex: 73.98 W) <img src='/images/question-icon.png' align='top' id='longitude_help' />", re => qr/^$RE{num}{real}\s*[EWew]$/, len => 16, },
 
@@ -369,6 +385,15 @@ new Tip('longitude_help', "Geographic longitude (you may use Google Earth for lo
 				$x++;
 			}
 		}
+		
+		if (defined $ARGS{"project"}){
+			if ($ARGS{"project"} eq ""){
+				push @err, "Please select your project type";
+				$project_err = 1;
+			}
+			$bs->{spec_data}->{"project"} = $ARGS{"project"};
+			$data->{"project"} = $ARGS{"project"};
+		}
 
 		for my $f (@fields) { 
 			my $re = $f->{re};
@@ -400,6 +425,9 @@ new Tip('longitude_help', "Geographic longitude (you may use Google Earth for lo
 			else {
 				$f->{err} = 0;
 			}
+			
+
+			
 			if ($f->{id} eq "date_collected" && $val ne "") {
 				my ($d, $m, $y) = split '/', $val;
 				unless ($m > 0 && $m < 13) {
@@ -449,31 +477,39 @@ new Tip('longitude_help', "Geographic longitude (you may use Google Earth for lo
 			
 		}
 		
-		if (defined $ARGS{"r_primer"}){
-			if ($ARGS{"r_primer"} eq ""){
-				push @err, "Reverse primer missing";
-				$r_primer_err = 1;
-			}
-			$bs->{spec_data}->{"r_primer"} = $ARGS{"r_primer"};
-			$data->{"r_primer"} = $ARGS{"r_primer"};
-		}
+#		if (defined $ARGS{"r_primer"}){
+#			if ($ARGS{"r_primer"} eq ""){
+#				push @err, "Reverse primer missing";
+#				$r_primer_err = 1;
+#			}
+#			$bs->{spec_data}->{"r_primer"} = $ARGS{"r_primer"};
+#			$data->{"r_primer"} = $ARGS{"r_primer"};
+#		}
 
 		if (defined $ARGS{"f_primer"}){
 			if ($ARGS{"f_primer"} eq ""){
-				push @err, "Forward primer missing";
+				push @err, "Primer missing";
 				$f_primer_err = 1;
 			}
 			$bs->{spec_data}->{"f_primer"} = $ARGS{"f_primer"};
 			$data->{"f_primer"} = $ARGS{"f_primer"};
 		}
-		
-		if (defined $ARGS{"project"}){
-			if ($ARGS{"project"} eq ""){
-				push @err, "Please select your project type";
-				$project_err = 1;
+
+		if ($ARGS{"isolation_source"} eq "Other - please enter below" ) {
+			if ($ARGS{"isolation_source_other"} ne "") {
+				$bs->{spec_data}->{"isolation_source"} = $ARGS{"isolation_source_other"};
+				$data->{"isolation_source"} = $ARGS{"isolation_source_other"};
+			} else {
+				push @err, "Please specify your isolation source";
+				$fields[12]->{err} = 1; ## $fields[12] is 'isolation_source_other'
 			}
-			$bs->{spec_data}->{"project"} = $ARGS{"project"};
-			$data->{"project"} = $ARGS{"project"};
+		}
+		else {
+		# if isolation source was not "other" - clear anything that may have been entered into
+		# the "other" field because this field is what we use to check whether we show or 
+		# hide this field on post/refresh
+			$bs->{spec_data}->{"isolation_source_other"} = "";
+			$data->{"isolation_source_other"} = "";
 		}
 		
 		

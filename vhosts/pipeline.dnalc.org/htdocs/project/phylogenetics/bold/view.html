@@ -44,6 +44,10 @@
 <td><% $data->{species} |html %></td>
 </tr>
 <tr>
+<td>Common Name:</td>
+<td><% $data->{common_name} |html %></td>
+</tr>
+<tr>
 <td>Date Collected:</td>
 <td><% $data->{date_collected} |html %></td>
 </tr>
@@ -84,13 +88,13 @@
 <td><% $data->{stage} |html %></td>
 </tr>
 <tr>
-<td>Forward Primer:</td>
+<td>Primer:</td>
 <td><% $data->{f_primer} |html %></td>
 </tr>
-<tr>
-<td>Reverse Primer</td>
-<td><% $data->{r_primer} |html %></td>
-</tr>
+%#<tr>
+%#<td>Reverse Primer</td>
+%#<td><% $data->{r_primer} |html %></td>
+%#</tr>
 </table>
 
 <div id="bimage_list_uploaded" style="margin-left:160px">

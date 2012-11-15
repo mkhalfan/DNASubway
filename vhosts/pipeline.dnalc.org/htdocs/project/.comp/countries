@@ -7,7 +7,7 @@
 <%once>
 # from: http://www.iso.org/iso/country_codes/iso_3166_code_lists.htm
 my $countries = [
-	["UNITED STATES", "US"],
+	["USA", "US"],
 	["AFGHANISTAN", "AF"],
 	["ALAND ISLANDS", "AX"],
 	["ALBANIA", "AL"],

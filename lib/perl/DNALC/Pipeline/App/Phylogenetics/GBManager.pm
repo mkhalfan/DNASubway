@@ -178,10 +178,16 @@ use DNALC::Pipeline::Barcode::Annotation;
         }
 
 		# Get the primer sequences corresponding to the primer names
-		my $f_primer_name = $data->{f_primer};
-		my $r_primer_name = $data->{r_primer};
-		my $f_primer_seq = $self->_get_primer_sequence('forward', $f_primer_name);
-		my $r_primer_seq = $self->_get_primer_sequence('reverse', $r_primer_name);
+		#my $f_primer_name = $data->{f_primer};
+		#my $r_primer_name = $data->{r_primer};
+		#my $f_primer_seq = $self->_get_primer_sequence('forward', $f_primer_name);
+		#my $r_primer_seq = $self->_get_primer_sequence('reverse', $r_primer_name);
+
+		my $f_primer_name = $self->_get_primer_sequence('forward', $data->{f_primer})->{'name'};
+		my $r_primer_name = $self->_get_primer_sequence('reverse', $data->{f_primer})->{'name'};
+		my $f_primer_seq = $self->_get_primer_sequence('forward', $data->{f_primer})->{'seq'};
+		my $r_primer_seq = $self->_get_primer_sequence('reverse', $data->{f_primer})->{'seq'};
+
 
 		# Convert the date to the correct format
 		my %months = (
@@ -234,13 +240,19 @@ use DNALC::Pipeline::Barcode::Annotation;
 		my ($self, $strand, $primer_id) = @_;
 		my $primers = DNALC::Pipeline::Config->new->cf('PRIMERS');
 
-		my ($primer_seq) = 
-				map { $_->{$primer_id}}
-		    	grep { grep {/^$primer_id$/} keys %$_;}
-		    	map { my ($k, $v) = each %$_; $v;} 
-			@{$primers->{$strand}};
+		#my ($primer_seq) = 
+		#		map { $_->{$primer_id}}
+		#   	grep { grep {/^$primer_id$/} keys %$_;}
+		#   	map { my ($k, $v) = each %$_; $v;} 
+		#	@{$primers->{$strand}};
 
-		return $primer_seq;
+		#return $primer_seq;
+
+		my $name = $primers->{$strand}->{$primer_id}->{'name'};
+		my $seq  = $primers->{$strand}->{$primer_id}->{'seq'};
+
+		return {name => $name, seq => $seq};
+
 	}
 
 	# ---------------------------------------
@@ -332,8 +344,12 @@ use DNALC::Pipeline::Barcode::Annotation;
 		my $trans_table = $data->{trans_table};
 		print STDERR "trans_table: $trans_table\n";
 
+		# Get the organism common name and isolation source, need it for the annotation
+		my $common_name = $data->{common_name};
+		my $isolation_source = $data->{isolation_source};
+
 		# Create the annotation
-		my $annotation = DNALC::Pipeline::Barcode::Annotation::annotate_barcode($seq, $primer, $organism, $trans_table);
+		my $annotation = DNALC::Pipeline::Barcode::Annotation::annotate_barcode($seq, $primer, $organism, $trans_table,$common_name, $isolation_source);
 
 		# Create and populate the Feature Table
 		# (only if you got defined output from the annotate_barcode function)
@@ -698,7 +714,6 @@ use DNALC::Pipeline::Barcode::Annotation;
         else {
                 return $bail_out->("ID: $id ERROR: $st->{message}");
         }
-
 		# Run run_tbl2asn
 		if ($st->{status} eq 'success'){
 			$st = $self->run_tbl2asn($id);
