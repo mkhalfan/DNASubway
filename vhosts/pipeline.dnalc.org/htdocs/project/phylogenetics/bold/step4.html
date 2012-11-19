@@ -177,6 +177,7 @@ console.info("<% $_ %>");
 	function toggleOther(){
 		if ($('isolation_source').value == 'Other - please enter below') {
 			$('isolation_source_other_tr').show();
+			//isolation_source_other_tr is the id for the <tr> which holds the other text field
 		}
 		else {
 			$('isolation_source_other_tr').hide();
@@ -187,20 +188,26 @@ console.info("<% $_ %>");
 			toggleOther();
 		}		
 		
+		// Currently, we only have this one project setup (BioProject), so set this by default
+		// When we have other BioProjects setup (ex: BLI), get rid of this
+		$('Urban Barcode Project').selected = true;
+		
 % if ($data->{"project"}){
 		$('<% $data->{"project"} %>').selected = true;
 % }
 % if ($data->{"f_primer"}){
 		$('<% $data->{"f_primer"} %>').selected = true;
 % }
-%# if ($data->{"r_primer"}){
-%#		$('<% $data->{"r_primer"} %>').selected = true;
-%# }
 
-%# Set the primer to 'rbcL' by default if the project type is rbcl
+// Set the primer to 'rbcL' by default if the project type is rbcl
 % if ($project_type eq 'rbcl') {
 		$('rbcL').selected = true;
 % }
+
+// if there is data in the 'other' text field for isolation source, 
+// select the 'other' option in the isolation source drop down select list by default
+// then, when toggleOther() is called after this if statement, it checks to see if the 
+// 'other' option is the selected option for isolation source and acts accordingly
 % if ($data->{"isolation_source_other"}) {
 		$("Other - please enter below").selected = true;
 % }
