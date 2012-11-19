@@ -2,19 +2,19 @@ Submit-block ::= {
   contact {
     contact {
       name name {
-        last "Khalfan",
-        first "Mohammed"
+        last "Pineda-Catalan",
+        first "Oscar"
       },
       affil std {
         affil "Cold Spring Harbor Laboratory",
-        div "DNALC",
+        div "DNA Learning Center",
         city "Cold Spring Harbor",
         sub "NY",
         country "USA",
         street "1 Bungtown Rd.",
-        email "mkhalfan@cshl.edu",
+        email "dnas-submissions@cshl.edu",
         fax "",
-        phone "516-367-5162",
+        phone "516-367-5170",
         postal-code "11724"
       }
     }
@@ -26,14 +26,14 @@ Submit-block ::= {
       },
       affil std {
         affil "Cold Spring Harbor Laboratory",
-        div "DNALC",
+        div "DNA Learning Center",
         city "Cold Spring Harbor",
         sub "NY",
         country "USA",
         street "1 Bungtown Rd.",
-        email "mkhalfan@cshl.edu",
+        email "dnas-submissions@cshl.edu",
         fax "",
-        phone "516-367-5162",
+        phone "516-367-5170",
         postal-code "11724"
       }
     }
@@ -51,14 +51,14 @@ Seqdesc ::= pub {
         },
         affil std {
           affil "Cold Spring Harbor Laboratory",
-          div "DNALC",
+          div "DNA Learning Center",
           city "Cold Spring Harbor",
           sub "NY",
           country "USA",
           street "1 Bungtown Rd.",
-          email "mkhalfan@cshl.edu",
+          email "dnas-submissions@cshl.edu",
           fax "",
-          phone "516-367-5162",
+          phone "516-367-5170",
           postal-code "11724"
         }
       },
