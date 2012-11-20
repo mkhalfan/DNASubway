@@ -24,14 +24,15 @@
 				<td>
 					<a href="./job_status?pid=<%$pid |html%>;jid=<% $job %>" style="color:black"><% $attrs->{name} |html%></a>
 				</td>
-				<td>$job->start_time</td>
-				<td><% $job->status eq "done" ? '$job->end_time' : "-" %></td>
+				<td><& .nice_time, ts => $attrs->{submitTime} &></td>
+				<td><& .nice_time, ts => $job->status eq "done" ? $attrs->{endTime} : "" &></td>
 				<td><% $job->status %></td>
 %# -------- DIFFERENT VISUALIZATION OPTIONS BASED ON TOOL TYPE HERE --------- #%
 				<td>
 % if ($tool eq "tophat" && $job->status eq 'done') {
-					<a href="./launch_igv?pid=<% $proj %>;jid=<% $job %>">view in IGV-static</a>
-%#		&nbsp;<a href="./launch_igv?pid=<% $proj %>;jid=<% $job %>">view in IGV-dynamic</a>
+					<a href="./launch_igv?pid=<% $proj %>;jid=<% $job %>">view in IGV</a>
+%	} elsif ($tool eq "cufflinks" && $job->status eq 'done') {
+					<a href="./launch_igv_cufflinks?pid=<% $proj %>;jid=<% $job %>">view in IGV</a>
 %	}
 				</td>
 %# ------ END DIFFERENT VISUALIZATION OPTIONS BASED ON TOOL TYPE HERE ------- #%
@@ -55,6 +56,7 @@
 </%args>
 <%once>
 	use Data::Dumper;
+	use Time::Piece qw/localtime/;
 	use DNALC::Pipeline::Utils qw(clean_query);
 	use DNALC::Pipeline::App::NGS::ProjectManager ();
 
@@ -70,3 +72,15 @@
 	
 	my $jobs = $pm->get_jobs_by_task('ngs_' . $tool); # show non-deleted jobs only
 </%init>
+
+<%def .nice_time>
+<%args>
+	$ts => 0
+</%args>
+	<small><% $t->strftime("%D %T")%></small>
+<%init>
+	return unless $ts;
+	$ts /= 1000 if length($ts) > 10;
+	my $t = localtime($ts);
+</%init>
+</%def>

@@ -4,6 +4,7 @@
 function NGS (id) {
 	this.pid = id;
 	this.windows = [];
+	this.status_check_enabled = null;
 	
 	this.titles = {
 		ngs_tophat : "TopHat",
@@ -19,14 +20,19 @@ NGS.prototype.get_status = function(op) {
 };
 
 NGS.prototype.set_status = function(op, status) {
+
+		// when do we need to set the window title??
+		//var title = this.titles[op] || '??';
+
 		var b = $(op + '_btn');
 		var ind = $(op + '_st');
-		var title = this.titles[op] || '??';
+
 		ind.removeClassName(ind.className);
 
 		b.onclick = function(){ ngs.launch(op); };
 		if (status == 'processing') {
 			ind.addClassName('conIndicatorGL_processing');
+			ngs.enable_status_check();
 		}
 		else if (status == 'done') {
 			ind.addClassName('conIndicatorGL_done');
@@ -103,6 +109,7 @@ NGS.prototype.do_qc = function(id) {
 				var r = transport.responseText.evalJSON();
 				if (r && r.status == 'success') {
 					$('qcst_' + id).update('Running');
+					ngs.enable_status_check();
 				}
 				else {
 					alert("QC was not launched :(");
@@ -111,6 +118,53 @@ NGS.prototype.do_qc = function(id) {
 		onFailure: function(){
 				alert('Something went wrong!\nAborting...');
 			}
+	});
+	
+	$('qcst_' + id).update('');
+};
+
+NGS.prototype.enable_status_check = function() {
+	if (ngs.status_check_enabled != null)
+		return;
+	var pe = new PeriodicalExecuter(function(pe) {
+			ngs.check_status();
+		}, 30);
+	ngs.status_check_enabled = pe;
+};
+
+NGS.prototype.disable_status_check = function() {
+	if (ngs.status_check_enabled != null)
+		ngs.status_check_enabled.stop();
+};
+
+NGS.prototype.check_status = function() {
+	new Ajax.Request('/project/ngs/tools/tool_stats', {
+		method:'get',	
+		parameters: {'pid': this.pid},
+		onSuccess: function(transport){
+				var r = transport.responseText.evalJSON();
+				if (r && r.status == 'success') {
+					var processing = 0;
+					$H(r.tools).keys().each(function(t) {
+						if (t != 'ngs_fastqc' && t != 'ngs_fxtrimmer') {
+							//console.info(t + ' ' + ngs.get_status(t) + ' ' + r.tools[t]);
+							if (ngs.get_status(t) != r.tools[t]) {
+								console.info('  ++ =>' + t);
+								ngs.set_status(t, r.tools[t]);
+							}
+							if (tools[t] == 'processing')
+								processing += 1;
+						}
+					});
+					// no more status checking if nothing is processing
+					if (!processing)
+						ngs.disable_status_check();
+				}
+				else {
+					console.warn("Error: " + r.message);
+				}
+			},
+		onFailure: function(){ alert('Something went wrong!\nAborting...');}
 	});
 };
 
@@ -136,12 +190,14 @@ Event.observe(window, 'load', function() {
 	//alert("step = " + step);
 	
 	if (step == 1) {
-	
+		ngs.enable_status_check();
 	}
 	else if (step == 2) {
-		$('add').observe('click', function() {
-			ngs.add_data();
-		});
+		if ($('add')) {
+			$('add').observe('click', function() {
+				ngs.add_data();
+			});
+		}
 	}
 	
 	

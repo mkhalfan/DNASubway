@@ -77,6 +77,27 @@ sub get_qc_status {
 }
 
 
+__PACKAGE__->set_sql (local_output_files_of_parent_job => q{
+		SELECT * FROM ngs_data_file 
+		WHERE id IN (
+			SELECT file_id from ngs_job_output_file
+			WHERE job_id IN (
+				SELECT job_id from ngs_job_output_file
+					WHERE file_id IN (
+						SELECT file_id FROM ngs_job_input_file
+							WHERE job_id = ? AND project_id = ?
+						)
+				)
+		)
+		AND is_local = true
+	});
+
+sub get_local_output_files_of_parent_job {
+	my ($class, $job_id, $project_id) = @_;
+
+	return $class->search_local_output_files_of_parent_job($job_id, $project_id);
+}
+
 sub project {
 	$_[0]->project_id;
 }

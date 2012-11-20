@@ -1,5 +1,8 @@
 
 <input type="hidden" id="pid" value="<% $pid %>"/>
+% if (grep {/processing/} values %status) {
+<input type="hidden" id="step" value="1"/>
+% }
 %# <input type="hidden" id="isowner" value="<% $is_owner %>"/>
 
 % if (exists $m->session->{messages}) {

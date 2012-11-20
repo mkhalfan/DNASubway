@@ -674,9 +674,19 @@ use Data::Dumper;
 
 		my %stats = map {$_ => 'disabled'} keys %{$self->{task_name_to_id}};
 
-		# tophat
 		#	we need at least one input file (fastq)
 		my @data = $self->data(is_input => 1);
+
+		# fastqc
+		for (qw/processing done not-processed/) {
+			last unless @data;
+			if (exists $running_jobs->{ngs_fastqc}->{$_}) {
+				$stats{ngs_fastqc} = $_;
+				last;
+			}
+		}
+
+		# tophat
 		$stats{ngs_tophat} = @data ? 'not-processed' : 'disabled';
 		if ($stats{ngs_tophat} ne 'disabled') {
 			if ($running_jobs->{ngs_tophat}->{processing}) {
@@ -704,13 +714,11 @@ use Data::Dumper;
 
 		# cuffdiff
 		unless ( defined $running_jobs->{ngs_cuffdiff}) {
-			print STDERR  "ngs_cuffdiff: not defined", $/;
 			if ($running_jobs->{ngs_tophat} && $running_jobs->{ngs_tophat}->{done} > 1) {
 				$stats{ngs_cuffdiff} = 'not-processed';
 			}
 		}
 		else {
-			print STDERR  "ngs_cuffdiff: defined", $/;
 			if ($running_jobs->{ngs_cuffdiff}->{processing}) {
 				$stats{ngs_cuffdiff} = 'processing';
 			}

@@ -1,0 +1,32 @@
+{status: '<% $req_status %>', message: '<% $msg%>', tools: {<% join ',', map {my $v=$status{$_}; "$_:'$v'"} keys %status %>} }
+<%args>
+	$pid => 0
+</%args>
+<%once>
+	use DNALC::Pipeline::App::NGS::ProjectManager ();
+</%once>
+<%init>
+	$r->no_cache(1);
+	$m->session->{pipeline} ||= {};
+	my $s = $m->session->{pipeline};
+	
+	my %status = ();
+	
+	my ($req_status, $msg) = ('success', '');
+	my $pm = DNALC::Pipeline::App::NGS::ProjectManager->new({project => $pid, debug => 0});
+
+	my $proj = $pm->project;	
+	unless ($proj) {
+		$req_status = 'error';
+		$msg = 'Project not found!';
+	}
+	else {
+		## project`s owner
+		#my $is_owner = $s->{user_id} == $proj->user_id;
+
+		%status = $pm->get_status;
+	}
+</%init>
+<%flags>
+	inherit => undef
+</%flags>
