@@ -209,7 +209,7 @@ use DNALC::Pipeline::Barcode::Annotation;
 
 		# Populate the SMT file with the data gathered above
 		my @column_data_array = ($id, $id, $data->{isolation_source}, $data->{tax}, $names_new, 
-			$date_collected, "$data->{country}: " .  lc($data->{state}) . ", $data->{city}, $data->{site_desc}", 
+			$date_collected, "$data->{country}: " .  $data->{state} . ", $data->{city}, $data->{site_desc}", 
 			$data->{latitude} . " " . $data->{longitude}, 
 			$data->{notes}, $data->{sex}, $data->{stage}, $f_primer_name,
 			$f_primer_seq, $r_primer_name, $r_primer_seq);
