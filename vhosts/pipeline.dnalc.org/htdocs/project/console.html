@@ -163,7 +163,7 @@
 			<span class="bt_browserBlueAdd">
 				<a id="exporter_btn" href="javascript:;" \
 					class="<% $rm_status eq "done" ? '' : 'disabled'%>" \
-					onclick="<% $rm_status eq "done" ? "launch('exporter',null,'Phytozome Browser')" : "" %>">Phytozome<br/>Browser</a>
+					onclick="<% $rm_status eq "done" ? "launch('exporter',null,'Phytozome Browser')" : "" %>"><% $external_browser_name %><br/>Browser</a>
 			</span>
 		</div>
 	</div>
@@ -289,7 +289,7 @@
 			'trna_scan' => 'tRNA Scan',
 			'augustus' => 'Augustus',
 			'fgenesh' => 'FGenesH',
-			'snap' => 'Snap',
+			'snap' => 'SNAP',
 			'blastn' => 'BLASTN',
 			'blastx' => 'BLASTX',
 			'blastn_user' => 'User BLASTN',
@@ -401,6 +401,21 @@ else { # most likely is GET
 	$institution ||= "-";
 }
 
+## Get External Browser Name
+
+my $external_browser_name;
+if ($sample){
+	if (grep {$_->link_name =~ /phytozome/i} $sample->links){
+		$external_browser_name = "Phytozome";
+	}
+	elsif (grep {$_->link_name =~ /flybase/i} $sample->links){
+		$external_browser_name = "FlyBase";
+	}
+	elsif (grep {$_->link_name =~ /wormbase/i} $sample->links){
+		$external_browser_name = "WormBase";
+	}
+}
+
 </%init>
 %#-------------------------------------------------
 <%def .routine>
@@ -478,6 +493,8 @@ else {
 	}
 	$target = "";
 }
+
+
 
 </%init>
 <span class="bt_run"><a id="<% $routine %>_btn" href="<% $link %>" class="<% $class %>" <% $target %> \

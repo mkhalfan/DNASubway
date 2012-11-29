@@ -2454,3 +2454,28 @@ input.OK {
 	filter:progid:DXImageTransform.Microsoft.Gradient (GradientType=0,StartColorStr='#ffffffff',EndColorStr='#ffeeddaa'); /* IE */
 	outline: none;
 }
+
+/*---- Redline Gene Predictors Matrix Tables ---*/
+
+#matrix-table {
+	border-collapse:collapse;
+	margin-top:10px;
+}
+#matrix-table th{
+	font-weight:bold;
+	text-align:left;
+	border-bottom:2px solid black;
+	padding:2px 10px;
+}
+#matrix-table td{
+	padding:2px 10px;
+	border-bottom:1px solid grey;
+}
+#matrix-table .label{
+	font-weight:bold;
+	border-right:2px solid black;
+}
+
+/*---- End Redline Gene Predictors Matrix Tables ---*/
+
+

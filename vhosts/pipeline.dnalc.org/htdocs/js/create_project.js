@@ -229,10 +229,14 @@ Event.observe(window, isMSIE ? 'load' : 'dom:loaded', function() {
 				if (obj.value == "plants") {
 					$('animals_level_2').hide();
 					$('plants_level_2').setStyle({display: 'inline-block'});
+					$('plant-matrix').setStyle({display: 'inline-block'});
+					$('animals-matrix').setStyle({display: 'none'});
 				}
 				else if (obj.value == "animals") {
 					$('plants_level_2').hide();
 					$('animals_level_2').setStyle({display: 'inline-block'});
+					$('animals-matrix').setStyle({display: 'inline-block'});
+					$('plant-matrix').setStyle({display: 'none'});
 				}
 				else {
 					$('animals_level_2').hide();

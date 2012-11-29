@@ -16,26 +16,28 @@
 			<div class="conNewPro_title">Select Organism type *</div>
 			<div class="conNewPro_label1">
 				<span class="conNewPro_smallContainerx">
-				<input class="conRadiobox_align" type="radio" name="otype" id="otypea" value="animals" <% $otype eq "animals" ? "checked=\"checked\"" : ""%>/><label for="otypea"> Animals</label></span>
+				<input class="conRadiobox_align" type="radio" name="otype" id="otypea" value="animals" <% $otype eq "animals" ? "checked=\"checked\"" : ""%>/><label for="otypea"> Animal</label></span>
 				<span class="conNewPro_smallContainerx">
-				<input class="conRadiobox_align" type="radio" name="otype" id="otypep" value="plants" <% $otype eq "plants" ? "checked=\"checked\"" : ""%>/><label for="otypep"> Plants</label></span>
+				<input class="conRadiobox_align" type="radio" name="otype" id="otypep" value="plants" <% $otype eq "plants" ? "checked=\"checked\"" : ""%>/><label for="otypep"> Plant</label></span>
 <!--				<span class="conNewPro_smallContainerx">
 				<input class="conRadiobox_align" type="radio" name="otype" id="otypef" value="fungi" <% $otype eq "fungi" ? "checked=\"checked\"" : ""%>/><label for="otypef"> Fungi</label></span>
 -->
 			</div>
 			<div style="clear:both;height:5px;">&nbsp;</div>
 			<div style="height:18px;">
-				<div id="animals_level_2" style="display:none;background-color:#CFECEC;padding:1px 10px 1px 2px;margin-left:40px;font-size:0.9em;">
-					<input type="radio" id="mammals" name="group" value="♞" <% $group eq "♞" ? "checked=\"checked\"" : ""%> /><label for="mammals"> Mammals</label>
-					<input type="radio" id="birds" name="group" value="b" <% $group eq "b" ? "checked=\"checked\"" : ""%> /><label for="birds"> Birds</label>
+				<div id="animals_level_2" style="display:none;background-color:#CFECEC;padding:1px 5px 1px 2px;margin-left:40px;font-size:0.9em;">
+					<input type="radio" id="mammals" name="group" value="♞" <% $group eq "♞" ? "checked=\"checked\"" : ""%> /><label for="mammals"> Mammal</label>
+					<input type="radio" id="birds" name="group" value="b" <% $group eq "b" ? "checked=\"checked\"" : ""%> /><label for="birds"> Bird</label>
 					<input type="radio" id="fish" name="group" value="f" <% $group eq "f" ? "checked=\"checked\"" : ""%> /><label for="fish"> Fish</label>
-					<input type="radio" id="insects" name="group" value="i" <% $group eq "i" ? "checked=\"checked\"" : ""%> /><label for="insects"> Insects</label>
-					<input type="radio" id="nematodes" name="group" value="w" <% $group eq "w" ? "checked=\"checked\"" : ""%> /><label for="nematodes"> Nematodes</label>
+					<input type="radio" id="insects" name="group" value="i" <% $group eq "i" ? "checked=\"checked\"" : ""%> /><label for="insects"> Insect</label>
+					<input type="radio" id="nematodes" name="group" value="w" <% $group eq "w" ? "checked=\"checked\"" : ""%> /><label for="nematodes"> Nematode</label>
 				</div>
-				<div id="plants_level_2" style="display:none;background-color:#CFECEC;padding:1px 10px 1px 2px;margin-left:40px;font-size:0.9em;">
-					<input type="radio" id="monocotyledons" name="group" value="m" <% $group eq "m" ? "checked=\"checked\"" : ""%> /><label for="monocotyledons"> Monocotyledons</label>
-					<input type="radio" id="dicotyledons" name="group" value="d" <% $group eq "d" ? "checked=\"checked\"" : ""%> /><label for="dicotyledons"> Dicotyledons</label>
+				<img style="display:none;" src="/images/question-12.png" id="animals-matrix" />
+				<div id="plants_level_2" style="display:none;background-color:#CFECEC;padding:1px 5px 1px 2px;margin-left:40px;font-size:0.9em;">
+					<input type="radio" id="monocotyledons" name="group" value="m" <% $group eq "m" ? "checked=\"checked\"" : ""%> /><label for="monocotyledons"> Monocotyledon</label>
+					<input type="radio" id="dicotyledons" name="group" value="d" <% $group eq "d" ? "checked=\"checked\"" : ""%> /><label for="dicotyledons"> Dicotyledon</label>
 				</div>
+				<img style="display:none;" src="/images/question-12.png" id="plant-matrix" />
 			</div>
 			<div style="clear:both;height:2px;">&nbsp;</div>
 		 </div>
@@ -114,6 +116,20 @@
 </form>
 <input type="hidden" id="test2" value="1" />
 </div><!--END of ID container_rightContent-->
+
+<script type="text/javascript">
+	Event.observe(window, Prototype.Browser.IE ? 'load' : 'dom:loaded', function() {
+		new Tip('animals-matrix', "<table id='matrix-table'><tr><th class='label'>&nbsp;</th><th>Augustus</th><th>FGenesH</th><th>SNAP</th></tr><tr><td class='label'>Mammal</td><td>H Sapien</td><td>H Sapien</td><td>Mammal</td></tr><tr><td class='label'>Fish</td><td>C milii</td><td>F rubripes</td><td>n/a</td></tr><tr><td class='label'>Insect</td><td>D melanogaster</td><td>D melanogaster</td><td>D melanogaster</td></tr><tr><td class='label'>Bird</td><td>n/a</td> <td>G Gallus</td><td>n/a</td></tr><tr><td class='label'>Nematode</td><td>C elegans</td><td>C elegans</td><td>C elegans</td></tr></table><p style='padding:10px 15px;'>Gene predictors are optimized by using example data. This table shows the species used to train gene prediction algorithms for each class of organism. Training datasets are sparse as the number of fully sequenced genomes are limited. Choosing a category that is most closely related to your genome may yield better results. You may also rerun your data with alternative choices for comparison.</p>", {
+			className: 'blue_help_wide',
+			hook: {target:'bottomRight', tip:'topLeft'},
+		});
+		new Tip('plant-matrix', "<table id='matrix-table' style='width:407px;'><tr><th class='label'>&nbsp;</th><th>Augustus</th><th>FGenesH</th><th>SNAP</th></tr><tr><td class='label'>Monocotyledon</td><td>Z mays</td><td>Monocots</td><td>O Sativa</td></tr><tr><td class='label'>Dicotyledon</td><td>A Thaliana</td><td>A Thaliana</td><td>A Thaliana</td></tr> </table><p style='padding:10px 15px;'>Gene predictors are optimized by using example data. This table shows the species used to train gene prediction algorithms for each class of organism. Training datasets are sparse as the number of fully sequenced genomes are limited. Choosing a category that is most closely related to your genome may yield better results. You may also rerun your data with alternative choices for comparison.</p>", {
+			className: 'blue_help_wide',
+			hook: {target:'bottomRight', tip:'topLeft'},
+		});
+	});
+</script>
+
 %#-----------------------------------------------------------------
 <%args>
 	$name => ''

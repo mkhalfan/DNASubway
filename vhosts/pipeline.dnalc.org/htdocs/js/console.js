@@ -7,11 +7,11 @@ var routines = ['augustus', 'fgenesh', 'snap', 'trna_scan', 'blastn', 'blastx',
 				'gbrowse', 'apollo', 'exporter', 'target'
 				];
 var rnames = {
-			'repeat_masker' : 'Repeat Masker',
+			'repeat_masker' : 'RepeatMasker',
 			'trna_scan' : 'tRNA Scan',
 			'augustus' : 'Augustus',
 			'fgenesh' : 'FgenesH',
-			'snap' : 'Snap',
+			'snap' : 'SNAP',
 			'blastn' : 'BLASTN',
 			'blastx' : 'BLASTX',
 			'blastn_user' : 'User BLASTN',
