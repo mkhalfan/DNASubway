@@ -344,12 +344,11 @@ use DNALC::Pipeline::Barcode::Annotation;
 		my $trans_table = $data->{trans_table};
 		print STDERR "trans_table: $trans_table\n";
 
-		# Get the organism common name and isolation source, need it for the annotation
-		my $common_name = $data->{common_name};
+		# Get the isolation source, need it for the annotation
 		my $isolation_source = $data->{isolation_source};
 
 		# Create the annotation
-		my $annotation = DNALC::Pipeline::Barcode::Annotation::annotate_barcode($seq, $primer, $organism, $trans_table,$common_name, $isolation_source);
+		my $annotation = DNALC::Pipeline::Barcode::Annotation::annotate_barcode($seq, $primer, $organism, $trans_table, $isolation_source);
 
 		# Create and populate the Feature Table
 		# (only if you got defined output from the annotate_barcode function)
