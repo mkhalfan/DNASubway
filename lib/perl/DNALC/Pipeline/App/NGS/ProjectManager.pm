@@ -18,6 +18,7 @@ use DNALC::Pipeline::CacheMemcached ();
 use iPlant::FoundationalAPI ();
 use iPlant::FoundationalAPI::Constants ':all';
 
+use Time::Piece qw(localtime);
 use Archive::Zip ();
 use Archive::Zip qw( :ERROR_CODES :CONSTANTS );
 use File::Path qw/make_path/;
@@ -170,7 +171,15 @@ use Data::Dumper;
 		my $file_type = $params->{file_type} || '';
 
 		my $_no_remote_check = defined $options ? $options->{_no_remote_check} : 0;
-		if (!$_no_remote_check) {
+		unless (grep {/(?:file_size|modified)/} keys %$params) {
+			$_no_remote_check = undef;
+		}
+
+		if ($params->{is_local}) {
+			$_no_remote_check = 1;
+		}
+
+		unless ($_no_remote_check) {
 			print STDERR  "__add_data__: Checking remote site to see if files exists.", $/ if $self->debug;
 			my $io_api = $self->api_instance ? $self->api_instance->io : undef;
 			if ($io_api) {
@@ -180,6 +189,14 @@ use Data::Dumper;
 				# TODO - what action should be taken when the file is not in the repository?
 				unless (@$files) {
 					print STDERR  "__add_data__: File not found in the iRODS repository: ", $params->{file_path}, $/;
+				}
+				else {
+					my $file = $files->[0];
+					if ($file->is_file) {
+						my $t = localtime($file->last_modified/1000);
+						$params->{file_size} ||= $file->size;
+						$params->{last_modified} ||= $t->datetime;
+					}
 				}
 			}
 		}
@@ -200,6 +217,9 @@ use Data::Dumper;
 				file_name => $params->{file_name},
 				file_path => $params->{file_path},
 				file_type => $file_type,
+				file_size => $params->{file_size} || 0,
+				last_modified => $params->{last_modified} || undef,
+				is_local => $params->{is_local} || 0,
 				is_input => $params->{is_input} || 0,
 			});
 	}
@@ -446,7 +466,7 @@ use Data::Dumper;
 		#	- basically we replace the file id's when we send the data to the API
 		#	- we keep track of the replaced data, in case we hit an error
 		my @input_files = ();
-		for my $input (grep {defined $_->{display_type} && $_->{display_type} eq 'show_files'} @{$app->inputs}) {
+		for my $input (grep {defined $_->{display_type} && $_->{display_type} =~ /show_files/} @{$app->inputs}) {
 			if (defined $params->{$input->{id}} && $params->{$input->{id}} =~ /^\d+$/) {
 				my $input_file = DataFile->retrieve($params->{$input->{id}});
 				next unless $input_file;
@@ -699,7 +719,8 @@ use Data::Dumper;
 
 		# cufflinks
 		unless ( defined $running_jobs->{ngs_cufflinks}) {
-			if ($running_jobs->{ngs_tophat} && exists $running_jobs->{ngs_tophat}->{done}) {
+			if (defined $running_jobs->{ngs_tophat} && exists $running_jobs->{ngs_tophat}->{done}
+			) {
 				$stats{ngs_cufflinks} = 'not-processed';
 			}
 		}
@@ -714,7 +735,10 @@ use Data::Dumper;
 
 		# cuffdiff
 		unless ( defined $running_jobs->{ngs_cuffdiff}) {
-			if ($running_jobs->{ngs_tophat} && $running_jobs->{ngs_tophat}->{done} > 1) {
+			if (defined $running_jobs->{ngs_tophat} 
+				&& exists $running_jobs->{ngs_tophat}->{done}
+				&& $running_jobs->{ngs_tophat}->{done} > 1
+			) {
 				$stats{ngs_cuffdiff} = 'not-processed';
 			}
 		}
@@ -826,6 +850,8 @@ use Data::Dumper;
 						file_name => $fname,
 						file_path => $df->path,
 						file_type => $file_type || '',
+						file_size => $df->size,
+						last_modified => localtime($df->last_modified/1000)->datetime,
 					});
 				if ($data_file) {
 					my $outfile = DNALC::Pipeline::NGS::JobOutputFile->create({
@@ -915,6 +941,7 @@ use Data::Dumper;
 							file_name => $fname,
 							file_path => $save_to_file,
 							file_type => $file_type || '',
+							file_size => -s $save_to_file,
 							is_local => 1,
 						});
 					if ($data_file) {
@@ -1050,6 +1077,8 @@ use Data::Dumper;
 						file_name => $file_name,
 						file_path => $file_path,
 						file_type => 'fastq',
+						file_size => $f->size,
+						last_modified => $f->last_modified,
 					},
 					{_no_remote_check => 1},
 				);
@@ -1142,6 +1171,7 @@ use Data::Dumper;
 							file_name => 'FastQC report',
 							file_path => $html_file,
 							file_type => 'html',
+							file_size => -s $html_file,
 							is_local => 1,
 						},
 						{_no_remote_check => 1}

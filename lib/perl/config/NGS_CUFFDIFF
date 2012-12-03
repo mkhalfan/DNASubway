@@ -6,10 +6,17 @@
 		{ id => 'bias_fasta', display_type => 'genome', hidden => 1 },
 		{ id => 'annotation', hidden => 1 },
 		{ id => 'mask_gtf', display_type => '', hidden => 1, label => '' },
-		{ id => 'sam1', display_type => '', hidden => 0, label => '', display_type => 'show_files', },
-		{ id => 'sam2', display_type => '', hidden => 0, label => '', display_type => 'show_files', },
-		{ id => 'sam3', display_type => '', hidden => 0, label => '', display_type => 'show_files', },
-		{ id => 'sam4', display_type => '', hidden => 0, label => '', display_type => 'show_files', },
+
+		# id for the display_type : 'show_files_repl' must end in a digit
+		{ id => 'sam1_f1', hidden => 0, display_type => 'show_files_repl', label => 'Sample 1',},
+		{ id => 'sam2_f1', hidden => 0, display_type => 'show_files_repl', label => 'Sample 2',},
+
+		# these are replicate of the previous input files, we mark them as hidden, to trick the UI
+		{ id => 'sam1_f2', hidden => 1, display_type => 'show_files_repl', label => 'Sample 1',},
+		{ id => 'sam2_f2', hidden => 1, display_type => 'show_files_repl', label => 'Sample 2',},
+
+		#{ id => 'sam3_f1', hidden => 0, display_type => 'show_files_repl', label => 'label3',},
+		#{ id => 'sam4_f1', hidden => 0, display_type => 'show_files_repl', label => 'label4',},
 	],
 	parameters => [
 		{ id => 'labels', label => 'Comma-separated labels for SAM files 1-n', 'value' => '' },
@@ -28,5 +35,6 @@
 
 	_input_file_filter => qr/\.bam$/,
 	_output_dir => qr/\/cuffdiff_out$/,
-	_output_files => qr/\.(diff|fpkm_tracking)$/,
+	_output_files => qr/(?:\.diff|\.info|tracking)$/,
 }
+
