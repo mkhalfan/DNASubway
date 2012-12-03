@@ -176,6 +176,23 @@
 	padding: 5px;
 }
 
+/* green */
+.prototip .green {
+	width: 350px;
+	color: #000000;
+	font-size: .8em;
+}
+.prototip .green .toolbar {
+	background: #e0e0e0;
+	font-weight: bold;
+}
+.prototip .green .title { padding: 5px; }
+.prototip .green.content {
+	background: #ffffff;
+	padding: 5px;
+}
+
+
 /* black */
 .prototip .black {
 	width: 350px;

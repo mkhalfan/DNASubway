@@ -67,6 +67,14 @@ Prototip.Styles = {
     radius: 5,
     stem: { height: 12, width: 15 }
   },
+  
+  'green': {
+    className: 'green',
+    border: 5,
+    borderColor: '#068744',
+    radius: 5,
+    stem: { height: 12, width: 15 }
+  },
 
   'black': {
     className: 'blue',

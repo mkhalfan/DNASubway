@@ -176,7 +176,7 @@ h5{
 #home_intro {
 	width: 600px;
 	height: 126px;
-	padding: 20px 200px 0px 48px;
+	padding: 20px 0 0 200px;
 	background-color: #fff;
 	font-size: 1em;
 	font-family: helvetica, sans-serif;	
@@ -560,7 +560,7 @@ h5{
 
 #map_right {
 	width:850px;
-	height: 200px;
+	height: 260px;
 	background: url("/images/v2/subway-map-right-1.jpg") top left no-repeat;
 	float: right;
 	position: relative;
@@ -644,6 +644,7 @@ h5{
 	height: 40px;
 	position: relative;
 	float: left;
+	margin: 0px 0px 25px 0px;	
 }
 
 .bt_blueStart_home a {
@@ -709,6 +710,35 @@ h5{
 	float: left;
 	margin: 0px 0px 25px 0px;
 }
+
+/** Begin Green Start Buttons **/
+
+.bt_greenStart_home {
+	width:150px;
+	height: 40px;
+	position: relative;
+	float: left;
+	margin: 0px 0px 25px 0px;
+}
+
+.bt_greenStart_home a {
+	width:150px;
+	height: 40px;
+	background: url("/images/ngs/bt_greenStart1.jpg") left no-repeat;
+	display: block;
+	position: relative;
+	float: left;
+	margin: 0px 0px 0px 0px;
+}
+
+.bt_greenStart_home a:hover {
+	background: url("/images/ngs/bt_greenStart2.jpg") left no-repeat;
+}
+
+.bt_greenStart_home a.nohover {
+	background: url("/images/ngs/bt_greenStart1.jpg") left no-repeat;
+}
+/** End Green Start **/
 
 /*- inactive -*/
 .bt_yellowStart a:hover {

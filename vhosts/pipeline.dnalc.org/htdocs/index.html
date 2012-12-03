@@ -36,7 +36,16 @@ new Tip('tt_yellow1', "Input a gene or protein of up to 10,000 nucleotides/amino
 <script type="text/javascript" language="javascript">
 new Tip('tt_blue1', "Input up to 100 DNA Sequences to build phylogenetic trees, analyze DNA barcodes, and prepare DNA sequences for database submissions.", {
 		title: "Phylogenetic Analysis",
-		style: 'blue'
+		style: 'blue',
+	});
+</script>
+
+	<span class="bt_greenStart_home" id="tt_green1"><a href="<% $s->{logged_in} ? "/project/ngs/create" : "#" %>" 
+				style="cursor: <% $s->{logged_in} ? "pointer" : "default"%>;"<% $s->{logged_in} ? "" : " class=\"nohover\"" %>></a></span>
+<script type="text/javascript" language="javascript">
+new Tip('tt_green1', "Lorem Ipsum", {
+		title: "Next Generation Sequencing",
+		style: 'green',
 	});
 </script>
 
@@ -117,7 +126,7 @@ new Tip('tt_black1', "View analysis results and annotations in a genome browser.
 	<span class="conConsole_info_blue" id="tt_blue2"></span>
 <script type="text/javascript" language="javascript">
 new Tip('tt_blue2', "View sequences and sequence traces, pair forward and reverse strands and generate consensus sequences.", {
-		title: "Process Sequences",
+		title: "Assemble Sequences",
 		style: 'blue'
 	});
 </script>
@@ -131,20 +140,39 @@ new Tip('tt_blue3', "Add reference and other sequences to your analysis.", {
 <span class="conConsole_info_blue" id="tt_blue4"></span>
 <script type="text/javascript" language="javascript">
 new Tip('tt_blue4', "Perform multiple sequence alignments using MUSCLE", {
-		title: "Align Sequences",
+		title: "Analyze Sequences",
 		style: 'blue'
 	});
 </script>
-	
 	</div><!--END of CLASS containerHoz3-->
+	
+	<div class="containerHoz2">
+<span class="spacer1"></span>
+<span class="conConsole_info" id="tt_green2"></span>
+<script type="text/javascript" language="javascript">
+new Tip('tt_green2', "Lorem ipsum", {
+		title: "Manage Data",
+		style: 'green'
+	});
+</script>
+<span class="spacer1"></span>
+<span class="spacer1"></span>
+<span class="conConsole_info_blue" id="tt_green3"></span>
+<script type="text/javascript" language="javascript">
+new Tip('tt_green3', "Lorem ipsum", {
+		title: "Analyze Transcriptome",
+		style: 'green'
+	});
+</script>
+	</div><!--END of CLASS containerHoz4-->
 
 	</div><!--END of ID map_right-->
 	</div><!--END of ID home_map-->
-<div id="con_tour">
-	<!--<div class="bt_tour"><a href="#" onclick="javascript:launch_tour()" title="Launch tour"></a></div>
+<!--<div id="con_tour">
+	<div class="bt_tour"><a href="#" onclick="javascript:launch_tour()" title="Launch tour"></a></div>
 	<div class="bt_poster"><a href="/files/pdf/DNA_Subway_Poster.pdf" title="DNA Subway poster"></a></div>
-    <div class="bt_Guide"><a href="/files/pdf/DNA_Subway_Guide.pdf" title="DNA Subway guide"></a></div>-->
-</div>
+    <div class="bt_Guide"><a href="/files/pdf/DNA_Subway_Guide.pdf" title="DNA Subway guide"></a></div>
+</div>-->
     <div id="home_intro" class="container_text">This site ties together key bioinformatics tools and databases to assemble gene models, investigate genomes, work with phylogenetic trees and analyze DNA barcodes. Roll over the "stations" on the subway map to find out more about the analysis steps. Analyze your own data or sample data provided. To start a project, select one of the "lines" (red, yellow, blue). Register and login to be able to save and share your results.</div>
 <!-- footer rollover (training dates, barcode 101) -->
 <div id="centeredmenu">
