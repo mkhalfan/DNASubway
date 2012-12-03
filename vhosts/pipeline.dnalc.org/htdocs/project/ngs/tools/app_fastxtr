@@ -79,12 +79,16 @@
 
 	if ($r->method eq "POST") {
 		$form = \%ARGS;
-		
+		print STDERR $app->{conf}->{_task_name}, ": form = ", Dumper( $form ), $/;
 		$form->{jobName} =~ s|/+||g;
 		
 		for my $p (@{$app->parameters}) {
 			if ($p->{hidden} && !defined $form->{$p->{id}}) {
 				$form->{$p->{id}} = defined $p->{value} ? $p->{value} : $p->{defaultValue};
+			}
+			my $type = $p->{semantics} && $p->{semantics}->{ontology} ? join(",", map {$_=~s/xs://;$_;} @{$p->{semantics}->{ontology}}) : 'text';
+			if ($type =~ /boolean/ && !defined $form->{$p->{id}}) {
+				$form->{$p->{id}} = 'false';
 			}
 		}
 
@@ -96,7 +100,7 @@
 			$form->{callbackUrl} = $s->{user_email};
 		}
 		
-		$form->{requestedTime} ||= '0:45:00';
+		$form->{requestedTime} ||= '2:45:00';
 
 		$st = $pm->submit_job($app->{conf}->{_task_name}, $app, $form);
 		print STDERR $app->{conf}->{_task_name}, ": JOB status = ", Dumper( $st ), $/;
@@ -135,7 +139,7 @@
 				
 		# set the default file
 		if ($f && $f =~ /^\d+$/) {
-			$form->{input} = $f;
+			$form->{seq1} = $f;
 			
 			my $df = DNALC::Pipeline::NGS::DataFile->retrieve($f);
 			if ($df && (my $qc_report = $df->qc_report)) {
@@ -144,7 +148,7 @@
 				if ($qcr_fh) {
 					while (<$qcr_fh>) {
 						if (/^Sequence length\s+(\d+)/) {
-							$form->{lastBase} = $1;
+							$form->{last} = $1;
 							last;
 						}
 					}

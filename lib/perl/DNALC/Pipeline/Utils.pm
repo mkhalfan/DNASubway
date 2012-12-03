@@ -20,6 +20,7 @@ use vars qw(
                     isin
 					lcs_name
 					nicebasepairs
+					nicebytes
                     random_string
                     uri2args
                    );
@@ -44,6 +45,17 @@ sub nicebasepairs {
     return sprintf "%02.02f mb", $mega if $mega < 1000;
     my $giga = $mega / 1000;
     return sprintf "%02.02f gb", $giga;
+}
+
+sub nicebytes {
+    my $bytes = shift || 0;
+    return "$bytes B" if $bytes < 1000;
+    my $kilo = $bytes / 1000;
+    return sprintf "%02.02f KB", $kilo if $kilo < 1000;
+    my $mega = $kilo / 1000;
+    return sprintf "%02.02f MB", $mega if $mega < 1000;
+    my $giga = $mega / 1000;
+    return sprintf "%02.02f GB", $giga;
 }
 
 sub isin {
