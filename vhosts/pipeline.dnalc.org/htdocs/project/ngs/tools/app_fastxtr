@@ -1,4 +1,5 @@
-<div id="content">
+<div class="container_data1">
+	<div id="container_data_line_bg" style="background-color:#C2DBF3;padding:2px;font-size:12px;margin-bottom:10px;font-weight:bold;"><a href="#" style="text-decoration:none;color:#123456">< Back</a></div>
 % if ($app) {
 <div>New job using application <strong><% $app %></strong>:</div>
 	<p>
@@ -7,14 +8,16 @@
 %#	--------------------------- /DEBUG --------------------------------------
 		
 		<form method="post">
-		<table>
-			<& ./.comp/job_options, form => $form &>
-			<& ./.comp/build_app_form, pm => $pm, app => $app, form => $form, flagged => $flagged &>
-			<tr>
-				<td></td>
-				<td><input type="submit" value="Submit" /></td>
-			</tr>
-		</table>
+			<div id="launch_job_table_holder">
+				<table>
+					<& ./.comp/job_options, form => $form &>
+					<& ./.comp/build_app_form, pm => $pm, app => $app, form => $form, flagged => $flagged &>
+					<tr>
+						<td></td>
+					</tr>
+				</table>
+			</div>
+			<p style="text-align:center"><input type="button" value="Cancel" /> | <input type="submit" value="Submit" /></p>
 		</form>
 	</p>
 	<pre style="float:left">

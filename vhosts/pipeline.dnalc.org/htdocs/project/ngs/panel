@@ -20,7 +20,7 @@
             </span><!--END of span class conGreenline_ConCell-->     
 			<span class="conGreenline_ConCell">
             	<span class="conIndicator_box"><div class="conIndicatorGL_not-processed"></div></span>
-				<span class="bt_runGreenline"><a href="javascript:;" onclick="">FastX Toolkit</a></span>
+				<span class="bt_runGreenline"><a href="javascript:;" onclick="javascript:ngs.launch('ngs_fastxtr');">FastX Toolkit</a></span>
 			 </span><!--END of span class conGreenline_ConCell-->
 			 <span class="conGreenline_keys"></span>
      </span><!--END of span class conGreenline_ConColumn-->

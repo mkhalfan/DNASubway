@@ -58,6 +58,7 @@ NGS.prototype.launch = function(what, where, title) {
 			ngs_cufflinks: ['/project/ngs/tools/tool_job_list?tool=' + tool + '&pid=', 'Cufflinks'],
 			ngs_cuffdiff: ['/project/ngs/tools/tool_job_list?tool=' + tool + '&pid=', 'Cuffdiff'],
 			ngs_tophat: ['/project/ngs/tools/tool_job_list?tool=' + tool + '&pid=' , 'TopHat'],
+			ngs_fastxtr: ['/project/ngs/tools/tool_job_list?tool=' + tool + '&pid=' , 'FastX Toolkit'],
 		};
 
 	try {
@@ -192,6 +193,7 @@ Event.observe(window, 'load', function() {
 	if (step == 1) {
 		ngs.enable_status_check();
 	}
+	/* Step 2 is the add data screen */
 	else if (step == 2) {
 		if ($('add')) {
 			$('add').observe('click', function() {
