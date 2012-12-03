@@ -117,7 +117,7 @@
 			if ($st->{data}) {
 			
 				# cache status
-				my $mc_key = sprintf("ngs-%d-%s-%d", $pm->project->id, "ngs_fxtrimmer", $form->{input});
+				my $mc_key = sprintf("ngs-%d-%s-%d", $pm->project->id, "ngs_fxtrimmer", $form->{seq1});
 				print STDERR "mc_key: ", $mc_key, $/;
 				$pm->{_mc}->set($mc_key, 'pending', 9000);
 			

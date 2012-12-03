@@ -1069,8 +1069,9 @@ use Data::Dumper;
 		for my $f (@$api_files) {
 			my $file_path = $f->path;
 
-			my $file_name = basename($file_path);
-			$file_name =~ s/fastx_trimmer_(.*?)\.fastq/$1_trimmed.fastq/;
+			my $if = $job_input_file->file;
+			my $file_name = basename($if ? $if->file_path : $file_path);
+			$file_name =~ s/(.*?)\.f(?:ast)?q/$1_trimmed.fastq/;
 
 			my $tdf = $self->add_data({
 						source => join('/', 'job', $job->id, $task_name),
@@ -1078,7 +1079,7 @@ use Data::Dumper;
 						file_path => $file_path,
 						file_type => 'fastq',
 						file_size => $f->size,
-						last_modified => $f->last_modified,
+						last_modified => localtime($f->last_modified/1000)->datetime,
 					},
 					{_no_remote_check => 1},
 				);
