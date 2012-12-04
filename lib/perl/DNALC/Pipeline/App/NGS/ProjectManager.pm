@@ -706,6 +706,17 @@ use Data::Dumper;
 			}
 		}
 
+		# fxtrimmer
+		$stats{ngs_fxtrimmer} = @data ? 'not-processed' : 'disabled';
+		for (qw/processing done/) {
+			last unless @data;
+			if (exists $running_jobs->{ngs_fxtrimmer}->{$_}) {
+				$stats{ngs_fxtrimmer} = $_;
+				last;
+			}
+		}
+
+
 		# tophat
 		$stats{ngs_tophat} = @data ? 'not-processed' : 'disabled';
 		if ($stats{ngs_tophat} ne 'disabled') {

@@ -3,8 +3,9 @@
 	//top.ngs.close_window('data');
 	if (top.ngs.get_status('ngs_tophat') == 'disabled') {
 		top.ngs.set_status('ngs_tophat', 'not-processed');
+		top.ngs.set_status('ngs_fxtrimmer', 'not-processed');
 	}
-	document.location.replace("/project/ngs/tools/manage_data?pid=<% $pid |html %>");
+	document.location.replace("/project/ngs/tools/manage_data?pid=<% $pid |html %>;rnd=" + new Date().getTime());
 	</script>
 % } else {
 	<div class="container_data1">

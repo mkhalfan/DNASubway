@@ -58,14 +58,9 @@ NGS.prototype.launch = function(what, where, title) {
 			ngs_cufflinks: ['/project/ngs/tools/tool_job_list?tool=' + tool + '&pid=', 'Cufflinks'],
 			ngs_cuffdiff: ['/project/ngs/tools/tool_job_list?tool=' + tool + '&pid=', 'Cuffdiff'],
 			ngs_tophat: ['/project/ngs/tools/tool_job_list?tool=' + tool + '&pid=' , 'TopHat'],
-			ngs_fastxtr: ['/project/ngs/tools/tool_job_list?tool=' + tool + '&pid=' , 'FastX Toolkit'],
+			ngs_fxtrimmer: ['/project/ngs/tools/tool_job_list?tool=' + tool + '&pid=' , 'FastX Toolkit'],
+			ngs_cuffmerge: ['/project/ngs/tools/tool_job_list?tool=' + tool + '&pid=' , 'Cuffmerge']
 		};
-
-	try {
-		//$('add_evidence').hide();
-		//$('add_evidence_link').show();
-	}
-	catch (e) {}
 
 	var host = window.location.host;
 	var uri = what && urls[what]
@@ -90,16 +85,6 @@ NGS.prototype.add_data = function() {
 			$('form_add_data').submit();
 		}
 	});
-	//console.debug(data);
-};
-
-
-NGS.prototype.do_trim = function(id) {
-	document.location.replace('/project/ngs/tools/app_fastxtr?pid=' + this.pid + ';f=' + id);
-};
-
-NGS.prototype.do_qc_old = function(id) {
-	document.location.replace('/project/ngs/tools/app_fastqc?pid=' + this.pid + ';f=' + id);
 };
 
 NGS.prototype.do_qc = function(id) {
@@ -147,13 +132,14 @@ NGS.prototype.check_status = function() {
 				if (r && r.status == 'success') {
 					var processing = 0;
 					$H(r.tools).keys().each(function(t) {
-						if (t != 'ngs_fastqc' && t != 'ngs_fxtrimmer') {
+						//if (t != 'ngs_fastqc' && t != 'ngs_fxtrimmer') {
+						if (t != 'ngs_fastqc') {
 							//console.info(t + ' ' + ngs.get_status(t) + ' ' + r.tools[t]);
 							if (ngs.get_status(t) != r.tools[t]) {
 								console.info('  ++ =>' + t);
 								ngs.set_status(t, r.tools[t]);
 							}
-							if (tools[t] == 'processing')
+							if (r.tools[t] == 'processing')
 								processing += 1;
 						}
 					});
