@@ -9,6 +9,9 @@
 % 		for my $i (@{$app->inputs}) {
 %			next if $i->{hidden};
 			<tr<% $flagged->{$i->{id}} ? ' class="flagged"' : ''%>>
+%				if ($i->{id} eq "info") {
+					<td colspan="2" class="info"><% $i->{label} |html%></td>
+%				} else {
 				<td><% $i->{required} ? "<sup>*</sup>" : "" %><% $i->{label} %></td>
 				<td>
 %				if ($i->{id} eq q{genome} ) {
@@ -22,6 +25,7 @@
 					<input type="text" id="<% $i->{id} %>" name="<% $i->{id} %>" req="<% $i->{required} %>" value="<% defined $form->{$i->{id}} ? $form->{$i->{id}} : $i->{value} |html%>" />
 %				}
 				</td>\
+%				}
 			</tr>
 %		}
 			</tbody>
@@ -33,10 +37,18 @@
 			<tbody id="app_parameters" style="display:none;">
 % 		for my $p (@{$app->parameters}) {
 %				next if $p->{hidden};
-				<tr<% $flagged->{$p->{id}} ? ' class="flagged"' : ''%>>
-					<td title="<% $p->{type} %>"><% $p->{required} ? "<sup>*</sup>" : "" %><% $p->{label} |html%></td>
-					<td><input type="text" id="<% $p->{id} %>" name="<% $p->{id} %>" req="<% $p->{required}%>" value="<% $form->{$p->{id}} |html%>"/>
-					<!-- d_type: [<% $p->{display_type}%>] -->
+%				my $val  = $form->{$p->{id}};
+%				my $type = $p->{semantics} && $p->{semantics}->{ontology} ? join(",", map {$_=~s/xs://;$_;} @{$p->{semantics}->{ontology}}) : 'text';
+				<tr<% $flagged->{$p->{id}} ? ' class="flagged"' : ''%> title="<% $p->{details} ? $p->{details}->{description} : '' %>">
+					<td title="<% $p->{type} %>"><% $p->{required} ? "<sup>*</sup>" : "" %><% $p->{label}%></td>
+					<td>\
+% 				if (0 && $type =~ /boolean/) {
+					<input type="checkbox" id="<% $p->{id} %>" name="<% $p->{id} %>" req="<% $p->{required}%>"\
+					value="true" <% ($val =~ /true/ || $val eq "1") ? "checked=\"checked\"" : ""%> />
+%				} else {
+					<input type="text" id="<% $p->{id} %>" name="<% $p->{id} %>" req="<% $p->{required}%>" value="<% $val |html%>"/>
+%				}
+					<!-- d_type: [<% $type %>/<% $val %>] -->
 					</td>
 				</tr>
 %		}
