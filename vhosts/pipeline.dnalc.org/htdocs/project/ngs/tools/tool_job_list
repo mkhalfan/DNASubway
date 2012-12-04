@@ -26,7 +26,7 @@
 				</td>
 				<td><& .nice_time, ts => $attrs->{submitTime} &></td>
 				<td><& .nice_time, ts => $job->status eq "done" ? $attrs->{endTime} : "" &></td>
-				<td><% $job->status %></td>
+				<td><% $job->status eq "processing" ? "processing <img src='/images/ajax-loader-2.gif' width='16px;'>" : $job->status %></td>
 %# -------- DIFFERENT VISUALIZATION OPTIONS BASED ON TOOL TYPE HERE --------- #%
 				<td>
 % if ($tool eq "tophat" && $job->status eq 'done') {

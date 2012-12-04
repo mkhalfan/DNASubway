@@ -27,7 +27,7 @@
 			</tbody>
 				<tr>
 					<td colspan="2" class="label_header">Parameters
-						<a href="javascript:;" onclick="NGS.prototype.toggle_params();" style="text-decoration:none"><span id="show_params">+</span><span id="hide_params" style="display:none">-</span></a>
+						<span style="font-size:10px;font-weight:100;color:#006699;position:relative;bottom:2px;">[<a href="javascript:;" onclick="NGS.prototype.toggle_params();" style="font-size:10px;font-weight:100;color:#006699"><span id="show_params">show</span><span id="hide_params" style="display:none">hide</span></a>]</span>
 					</td>
 				</tr>
 			<tbody id="app_parameters" style="display:none;">
