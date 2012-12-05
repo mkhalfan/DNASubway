@@ -13,13 +13,14 @@
 			<a href="#">< Back</a>
 		</div>
 	
-%	if ($browse_path eq '') {	
-		<div style="padding-left:100px;padding-bottom:20px;">
+%#	if ($browse_path eq '') {	
+<!--		<div style="padding-left:100px;padding-bottom:20px;">
 			<span class="label_header" style="padding-right:20px;">Import Data From:</span>
 			<input id="sample" name="import_from" type="radio" /><label for="sample" style="padding-right:20px">Sample Data</label>
 			<input id="data_store" name="import_from" type="radio" /><label for="data_store">Data Store</label>
 		</div>
-%	}
+-->
+%#	}
 
 % 	if($browse_path ne '') {
 		<div>Listing for path <strong><% $path_to_read %></strong>:</div>
@@ -40,6 +41,11 @@
 			<div>
 				<a href="/project/ngs/tools/add_data/shared?pid=<% $pid |html%>">
 					Shared Data
+				</a>
+			</div>
+			<div>
+				<a href="/project/ngs/tools/add_data/samples/arabidopsis_thaliana?pid=<% $pid |html%>">
+					Sample Data
 				</a>
 			</div>
 		</div>
@@ -86,6 +92,7 @@
 % 	}
 	<input type="hidden" id="step" name="step" value="2" />
 	<input type="hidden" id="current_path" name="current_path" value="<% $path_to_read |html %>" />
+
 	</form>
 % }
 	<pre>
@@ -143,8 +150,12 @@
 		print STDERR "files_added: $files_added", $/;
 	}
 	else {
+	
 		my $path_info = $r->path_info;
-		if ($path_info =~ /\/(.*)$/) {
+		if ($path_info =~ /^\/samples\/arabidopsis_thaliana/) {
+			$browse_path = '/shared/iplant_DNA_subway/sample_data/fastq/arabidopsis_thaliana';
+		}
+		elsif ($path_info =~ /\/(.*)$/) {
 			$browse_path = $1
 		}
 
