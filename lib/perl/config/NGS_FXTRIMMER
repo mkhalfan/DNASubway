@@ -3,20 +3,17 @@
 	name => 'dnalc-fastx-lonestar',
 	desc => 'FASTQ/A short-reads pre-processing tools',
 	inputs => [
-		{ id => 'seq1', display_type => 'show_files', hidden => 0, label => 'File to trimm' },
+		{ id => 'seq1', display_type => 'show_files', hidden => 0, label => 'File to trim' },
 	],
 	parameters => [
-		{ id => 'fastx_trimmer', label => '<strong>Run fastx_trimmer</strong>', 'value' => 'false' },
-		{ id => 'first', label => 'First base to keep', 'value' => '1' },
-		{ id => 'last', label => 'Last base to keep', 'value' => '1' },
+		{ id => 'first', label => '<b>trimmer:</b> First base to keep', 'value' => '1' },
+		{ id => 'last', label => '<b>trimmer:</b> Last base to keep', 'value' => '200' },
 
-		{ id => 'fastq_quality_trimmer', label => '<strong>Run fastq_quality_trimmer</strong>', 'value' => 'true' },
-		{ id => 'quality_threshold', label => 'Minimum quality threshold for trimming', 'value' => '20' },
-		{ id => 'min_length', label => 'Minimum trimmed read length', 'value' => '20' },
+		{ id => 'quality_threshold', label => '<b>quality_trimmer:</b> Minimum quality', 'value' => '20' },
+		{ id => 'min_length', label => '<b>quality_trimmer:</b> Minimum trimmed read length', 'value' => '20' },
 
-		{ id => 'fastq_quality_filter', label => '<strong>Run fastq_quality_filter</strong>', 'value' => 'true' },
-		{ id => 'min_quality', label => 'Minimum quality threshold for filtering', 'value' => '20' },
-		{ id => 'percent_bases', label => 'Percent bases with minimum or greater quality score', 'value' => '50' },
+		{ id => 'min_quality', label => '<b>quality_filter:</b> Minimum quality', 'value' => '20' },
+		{ id => 'percent_bases', label => '<b>quality_filter:</b> &#37; bases with >= minimum quality &#32;', 'value' => '50' },
 
 	],
 	_task_name => 'ngs_fxtrimmer',
