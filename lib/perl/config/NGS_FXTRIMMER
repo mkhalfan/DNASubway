@@ -17,6 +17,7 @@
 
 	],
 	_task_name => 'ngs_fxtrimmer',
+	_input_only_files => 1,
 	_input_file_filter => qr/\.(fq|fastq)$/,
 	_output_dir => qr/fastx_out/,
 	_output_files => qr/processed_reads\.fq/,
