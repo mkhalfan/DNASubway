@@ -135,3 +135,12 @@
 	height:200px;
 	float:left;
 }
+
+#graphs .graph {
+	border: 1px solid orange;
+	display:block;
+	margin: 3px 0;
+}
+#graphs .graph.active {
+	border: 1px solid green;
+}
