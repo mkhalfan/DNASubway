@@ -28,6 +28,11 @@ sub _get_next_id {
 	$class->sql_next_id->select_val;
 }
 
+# alias for task_id
+sub task {
+	my ($self) = @_;
+	return $self->task_id;
+}
 
 sub attrs {
 	my ($self) = @_;

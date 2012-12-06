@@ -1022,6 +1022,8 @@ use Data::Dumper;
 				my ($file_type) = $df->path =~ /\.(.*?)$/;
 				my $fname = $df->name;
 
+				next if $fname eq "transcripts.gtf";
+
 				# keep the same basename for the file
 				if ($app_conf->{_propagate_input_file_name}) {
 					if ($base_name) {
@@ -1076,9 +1078,13 @@ use Data::Dumper;
 		#		note => '',
 		#	});
 
-		#my @project_files = $self->data;
+		#
+		# we only have one or two files here (fq and zip)
+		#
 		for my $f (@$api_files) {
 			my $file_path = $f->path;
+
+			next if $file_path =~ /\.zip$/;
 
 			my $if = $job_input_file->file;
 			my $file_name = basename($if ? $if->file_path : $file_path);
@@ -1104,20 +1110,30 @@ use Data::Dumper;
 				$self->{_mc}->set($mc_key, '', 1);
 			}
 		}
+
+		# now store the qc report for the trimmed file
+		if (grep {$_->path =~ /\.zip$/} @$api_files) {
+			$self->task_handle_qc($job, $api_files);
+		}
 	}
 
 	#--------------------------------------
+	# this stores the QC files from fastQC (and trimmer) jobs
+	#
 	sub task_handle_qc {
 		my ($self, $job, $api_files) = @_;
 
-		my @ifiles = $job->input_files;
-		#print STDERR Dumper( \@ifiles), $/;
-
 		# one input file for this task
-		#amy ($job_input_file) = map {$_->{value}} $job->input_files;
 		my ($job_input_file) = ($job->input_files);
+		my $ifile = $job_input_file->file;
 
-		#print STDERR  "** > ", $job_input_file, $/;
+		# when we call this method from the trimmer handle,
+		# the input file in this case is the trimmed file, not the original one
+		if ($job->task->name =~ /ngs_fxtrimmer/i) {
+			if ($job_input_file->file && $job_input_file->file->trimmed_file) {
+				$ifile = $job_input_file->file->trimmed_file;
+			}
+		}
 
 		my $working_dir =$self->work_dir;
 		my $qc_dir = File::Spec->catfile($working_dir, 'qc');
@@ -1127,15 +1143,12 @@ use Data::Dumper;
 
 		my ($archive) = grep {/\.zip$/ } map {$_->path} @$api_files;
 
-		my $save_to = File::Spec->catfile($qc_dir, sprintf("%d-QC-%s", $job->id, $job_input_file->file->file_name));
+		my $save_to = File::Spec->catfile($qc_dir, sprintf("%d-QC-%s", $job->id, $ifile->file_name));
 		my $save_to_file = sprintf("%s.zip", $save_to);
 
 		my $io = $self->api_instance->io;
 		if ($io) {
 			my $data = $io->stream_file($archive, save_to => $save_to_file);
-
-			#print STDERR "dest: ", $save_to, $/;
-			#print STDERR "data: ", $data, $/;
 
 			my $html_file;
 			if (-f $save_to_file) {
@@ -1148,8 +1161,6 @@ use Data::Dumper;
 				my @members = grep {$_->fileName !~ m|/\._|} $zip->members;
 				my ($root) = map {$_->fileName} grep {$_->fileName =~ m|_fastqc/$|} @members;
 
-				#print STDERR 'root: ', $root, $/;
-
 				mkdir($save_to);
 
 				# extract files
@@ -1161,8 +1172,6 @@ use Data::Dumper;
 					my $f = $m->fileName;
 					$f =~ s/$root//;
 					my $dest_f = File::Spec->catfile($save_to, $f);
-					#print "\t", $f, $/;
-					#print "\t", $dest_f, $/;
 					$zip->extractMember($m, $dest_f);
 
 					$html_file = $dest_f if $f =~ /fastqc_report\.html$/;
@@ -1190,10 +1199,10 @@ use Data::Dumper;
 					);
 
 				if ($hfile) {
-					my $ifile = $job_input_file->file;
 					$ifile->qc_file_id($hfile);
 					$ifile->update;
 
+					# do we still need this anywhere?!
 					my $mc_key_qc = sprintf("ngs-%d-%s-%d", $self->project->id, "ngs_fastqc", $ifile->id);
 					#print STDERR  $mc_key_qc, $/;
 					$self->{_mc}->set($mc_key_qc, '', 1);

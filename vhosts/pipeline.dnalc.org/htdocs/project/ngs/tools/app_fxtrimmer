@@ -127,7 +127,8 @@
 				# redirect to our job list page
 				print STDERR "JOB ID: ", $st->{data}->id, "//", $st->{data}->api_job_id, $/;
 				$m->comp('/_message_add', 'Job submitted!');
-				$m->redirect("./manage_data?pid=" . $pid);
+				#$m->redirect("./manage_data?pid=" . $pid);
+				$m->redirect("./tool_job_list?tool=fxtrimmer;launched=1;pid=" . $pid);
 			}
 		}
 	}

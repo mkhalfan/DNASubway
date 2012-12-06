@@ -31,9 +31,11 @@
 				<td>
 % if ($tool eq "tophat" && $job->status eq 'done') {
 					<a href="./launch_igv?pid=<% $proj %>;jid=<% $job %>">view in IGV</a>
-%	} elsif ($tool eq "cufflinks" && $job->status eq 'done') {
+% } elsif ($tool eq "cufflinks" && $job->status eq 'done') {
 					<a href="./launch_igv_cufflinks?pid=<% $proj %>;jid=<% $job %>">view in IGV</a>
-%	}
+% } elsif ($tool eq "fxtrimmer" && $job->status eq 'done') {
+		<& .fxtrimmer, job =>$job, pid => $pid, pm => $pm &>
+% }
 				</td>
 %# ------ END DIFFERENT VISUALIZATION OPTIONS BASED ON TOOL TYPE HERE ------- #%
 			</tr>
@@ -84,3 +86,24 @@
 	my $t = localtime($ts);
 </%init>
 </%def>
+%#---------------------------------------------------------
+<%def .fxtrimmer>
+<%args>
+	$job => undef
+	$pm => undef
+</%args>
+<%init>
+	my $f = 0;
+	return "" unless $job && $pm;
+	my $qc_report = 0;
+	my ($trimmed_file) = map {$_->file && $_->file->trimmed_file ? $_->file->trimmed_file :  undef} $job->input_files;
+	if ($trimmed_file) {
+		$qc_report = $trimmed_file->qc_file_id ? $m->comp("../../.comp/filepath_to_web", file => $trimmed_file->qc_report, just_return => 1) : 0;
+	}
+</%init>
+% if ($qc_report) {
+	<a href="<% $qc_report |uri%>">View</a>
+% }
+</%def>
+%#---------------------------------------------------------
+%#---------------------------------------------------------
