@@ -1,0 +1,26 @@
+{
+	id => 'dnalc-cuffmerge-lonestar-2.0.2',
+	name => 'dnalc-cuffmerge-lonestar',
+	desc => 'Merge GTF files for use by Cuffdiff',
+	inputs => [
+		{ id => 'ref_seq', display_type => 'genome', hidden => 1, label => '' },
+		{ id => 'ref_gtf', display_type => '', hidden => 1, label => '' },
+		{ id => 'query1', display_type => 'show_files', hidden => 0, label => 'GTF 1' },
+		{ id => 'query2', display_type => 'show_files', hidden => 0, label => 'GTF 2' },
+		{ id => 'query3', display_type => 'show_files', hidden => 0, label => 'GTF 3' },
+		{ id => 'query4', display_type => 'show_files', hidden => 0, label => 'GTF 4' },
+		{ id => 'query5', display_type => 'show_files', hidden => 0, label => 'GTF 5' },
+		{ id => 'query6', display_type => 'show_files', hidden => 0, label => 'GTF 6' },
+		#{ id => 'query7', display_type => '', hidden => 0, label => '' },
+		#{ id => 'query8', display_type => '', hidden => 0, label => '' },
+		#{ id => 'query9', display_type => '', hidden => 0, label => '' },
+		#{ id => 'query10', display_type => '', hidden => 0, label => '' },
+	],
+	parameters => [
+		{ id => 'min_isoform_Fraction', label => 'Minimum isoform fraction', 'value' => '0.1' },
+	],
+	_task_name => 'ngs_cuffmerge',
+	_input_file_filter => qr/_transcripts\.gtf$/,
+	_output_dir => 'cuffmerge_out',
+	_output_files => qr/merged_with_ref_ids\.gtf$/,
+}

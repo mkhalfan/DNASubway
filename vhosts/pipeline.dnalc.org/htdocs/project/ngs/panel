@@ -42,8 +42,8 @@
      		<span class="bt_runGreenline"><a id="ngs_cufflinks_btn" href="javascript:;" onclick="<% $status{ngs_cufflinks} ne "disabled" ? "javascript:ngs.launch('ngs_cufflinks');" : "" %>">CuffLinks</a></span>
         </span><!--END of span class conGreenline_ConCelll-->
         <span class="conGreenline_ConCell">
-            <span class="conIndicator_box"><div id="ngs_cuffmerge_st" class="conIndicatorGL_disabled"></div></span>
-     		<span class="bt_runGreenline"><a id="ngs_cuffmerge_btn" href="javascript:;" onclick="//javascript:ngs.launch('ngs_cuffmerge');">CuffMerge</a></span>
+            <span class="conIndicator_box"><div id="ngs_cuffmerge_st" class="conIndicatorGL_<% $status{ngs_cuffmerge} %>"></div></span>
+     		<span class="bt_runGreenline"><a id="ngs_cuffmerge_btn" href="javascript:;" onclick="<% $status{ngs_cuffmerge} ne "disabled" ? "javascript:ngs.launch('ngs_cuffmerge');" : "" %>">CuffMerge</a></span>
         </span><!--END of span class conGreenline_ConCell-->
         <span class="conGreenline_ConCell">
             <span class="conIndicator_box"><div id="ngs_cuffdiff_st" class="conIndicatorGL_<% $status{ngs_cuffdiff}%>"></div></span>

@@ -764,7 +764,23 @@ use Data::Dumper;
 	
 
 		# cuffmerge
-		# TODO
+		unless ( defined $running_jobs->{ngs_cuffmerge}) {
+			if (defined $running_jobs->{ngs_cufflinks} 
+				&& exists $running_jobs->{ngs_cufflinks}->{done}
+				&& $running_jobs->{ngs_cufflinks}->{done} > 1
+			) {
+				$stats{ngs_cuffmerge} = 'not-processed';
+			}
+		}
+		else {
+			if ($running_jobs->{ngs_cuffmerge}->{processing}) {
+				$stats{ngs_cuffmerge} = 'processing';
+			}
+			elsif ($running_jobs->{ngs_cuffmerge}->{done} || $running_jobs->{ngs_cuffmerge}->{error}) {
+				$stats{ngs_cuffmerge} = 'done';
+			}
+		}
+	
 
 		%stats;
 	}
