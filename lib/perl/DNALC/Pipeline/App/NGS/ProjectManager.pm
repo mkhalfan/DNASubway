@@ -466,7 +466,7 @@ use Data::Dumper;
 		#	- basically we replace the file id's when we send the data to the API
 		#	- we keep track of the replaced data, in case we hit an error
 		my @input_files = ();
-		for my $input (grep {defined $_->{display_type} && $_->{display_type} =~ /show_files/} @{$app->inputs}) {
+		for my $input (grep {defined $_->{display_type} && $_->{display_type} =~ /show_(gtf_)?files/} @{$app->inputs}) {
 			if (defined $params->{$input->{id}} && $params->{$input->{id}} =~ /^\d+$/) {
 				my $input_file = DataFile->retrieve($params->{$input->{id}});
 				next unless $input_file;

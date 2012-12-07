@@ -4,7 +4,7 @@
 	desc => 'Find significant changes in transcript expression, splicing, and promoter use.',
 	inputs => [
 		{ id => 'bias_fasta', display_type => 'genome', hidden => 1 },
-		{ id => 'annotation', hidden => 1 },
+		{ id => 'annotation', display_type => 'show_gtf_files', hidden => 0, label => 'Annotation file' },
 		{ id => 'mask_gtf', display_type => '', hidden => 1, label => '' },
 
 		# id for the display_type : 'show_files_repl' must end in a digit
@@ -34,7 +34,7 @@
 	],
 
 	_input_file_filter => qr/\.bam$/,
-	_output_dir => qr/\/cuffdiff_out$/,
-	_output_files => qr/(?:\.diff|\.info|tracking)$/,
+	#_output_dir => qr/\/cuffdiff_out$/,
+	_output_files => qr/(?:(?:gene|isoform)_exp\.diff|\.png)$/,
 }
 

@@ -101,21 +101,20 @@
 		
 		# what do we do when we don`t get the paths?!
 		$form->{bias_fasta} = $pm->project_genome_path;
-		$form->{annotation} = $pm->project_annotation_path;
+		if ($form->{annotation} eq "annotation" || $form->{annotation} eq "") {
+			$form->{annotation} = $pm->project_annotation_path;
+		}
 
-		unless (defined $form->{archive}) {
-            $form->{archive} = "true";
-        }
-		
 		if ($form->{notify_user}) {
 			$form->{callbackUrl} = $s->{user_email};
 		}
-		
-		$form->{requestedTime} ||= '2:45:00';
+
+		$form->{archive} = "true";
+		$form->{requestedTime} ||= '3:45:00';
 		
 		if ($form->{labels} eq "") {
-			my @file_ids = map {$form->{$_}} grep {$_ =~ /^sam/ && $form->{$_} ne ""} sort keys %$form;
-			print STDERR "app_cuffdiff: files = ", Dumper(\@file_ids), $/;
+			my @file_ids = map {$form->{$_}} grep {$_ =~ /^sam\d_f1/ && $form->{$_} ne ""} sort keys %$form;
+			#print STDERR "app_cuffdiff: files = ", Dumper(\@file_ids), $/;
 			my @files = $pm->data;
 			for my $fid (@file_ids) {
 				$form->{labels} .= "," . join("", map { my $n=$_->file_name; $n =~ s/\.bam$//;$n } grep {$_->id == $fid } @files);
@@ -126,7 +125,6 @@
 
 		$st = $pm->submit_job('ngs_cuffdiff', $app, $form);
 		print STDERR "app_cuffdiff: JOB status = ", Dumper( $st ), $/;
-		
 		print STDERR "app_cuffdiff: form = ", Dumper( $form ), $/;
 
 		if ($st->{status} ne "success") {
