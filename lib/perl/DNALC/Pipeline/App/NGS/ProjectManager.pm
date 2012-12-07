@@ -650,9 +650,8 @@ use Data::Dumper;
 		my $org = $self->project->organism;
 
 		my $genomes = DNALC::Pipeline::Config->new->cf('NGS_GENOMES');
-		my $genome_data = $genomes->{genomes}->{$org};
-		my $path = $genomes->{store} . '/' . $org . '/' . $genome_data->{sub_part} 
-			. '/' . $genome_data->{versions}->[0] . '/genome.fas';
+		return unless (defined $genomes->{genomes}->{$org});
+		my $path = $genomes->{store} . '/' . $org . '/genome.fas';
 
 		return $path;
 	}
@@ -661,10 +660,11 @@ use Data::Dumper;
 	sub project_annotation_path {
 		my ($self) = @_;
 
-		my $annotaion = $self->project_genome_path;
-		$annotaion =~ s/genome\.fas$/annotation.gtf/;
+		my $annotation = $self->project_genome_path;
+		return unless $annotation;
+		$annotation =~ s/genome\.fas$/annotation.gtf/;
 
-		return $annotaion;
+		return $annotation;
 	}
 	#--------------------------------------
 	sub api_instance {

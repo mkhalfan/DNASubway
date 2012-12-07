@@ -1,46 +1,18 @@
 {
-	store => '/shared/iplantcollaborative/genomeservices/legacy/0.30/genomes',
+	store => '/shared/iplant_DNA_subway/genomes',
+	# each entry in $genomes is a directory containing 2 files: 
+	#	annotation.gtf and genome.fas
 	genomes => {
-		arabidopsis_lyrata => {
-			sub_part => 'araly1',
-			versions => [qw/v1.0/],
-		},
-		arabidopsis_thaliana => {
-			sub_part => 'col-0',
-			versions => [qw/v10 v9/],
-		},
-		brachypodium_distachyon => {
-			sub_part => 'bd21',
-			versions => [qw/v1.0/],
-		},
-		oryza_indica => {
-			sub_part => 'bgi05',
-			versions => [qw/v1.0/],
-		},
-		oryza_japonica => {
-			sub_part => 'nipponbare',
-			versions => [qw/v6/],
-		},
-		physcomitrella_patens => {
-			sub_part => 'phypa1',
-			versions => [qw/v1.1/],
-		},
-		populus_trichocarpa => {
-			sub_part => 'nisqually1',
-			versions => [qw/v2.0/],
-		},
-		sorghum_bicolor => {
-			sub_part => 'bt623',
-			versions => [qw/v1/],
-		},
-		vitis_vinifera => {
-			sub_part => 'pn40024',
-			versions => [qw/v12x/],
-		},
-		zea_mays => {
-			sub_part => 'b73',
-			versions => [qw/v5a v2 v1/],
-		}
+		arabidopsis_lyrata => 1,
+		arabidopsis_thaliana => 1,
+		brachypodium_distachyon => 1,
+		oryza_indica => 1,
+		oryza_sativa => 1,
+		physcomitrella_patens => 1,
+		populus_trichocarpa => 1,
+		sorghum_bicolor => 1,
+		vitis_vinifera => 1,
+		zea_mays => 1,
 	}
 };
 
