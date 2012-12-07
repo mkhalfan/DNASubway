@@ -1022,7 +1022,10 @@ use Data::Dumper;
 				my ($file_type) = $df->path =~ /\.(.*?)$/;
 				my $fname = $df->name;
 
-				next if $fname eq "transcripts.gtf";
+				# we only download 'expressed_transcripts.gtf' to be displayed in IGV
+				if ($fname =~ /\.gtf/) {
+					next unless $fname eq "expressed_transcripts.gtf";
+				}
 
 				# keep the same basename for the file
 				if ($app_conf->{_propagate_input_file_name}) {
