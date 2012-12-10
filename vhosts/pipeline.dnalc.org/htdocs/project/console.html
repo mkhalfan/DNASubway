@@ -163,7 +163,7 @@
 			<span class="bt_browserBlueAdd">
 				<a id="exporter_btn" href="javascript:;" \
 					class="<% $rm_status eq "done" ? '' : 'disabled'%>" \
-					onclick="<% $rm_status eq "done" ? "launch('exporter',null,'Phytozome Browser')" : "" %>"><% $external_browser_name %><br/>Browser</a>
+					onclick="<% $rm_status eq "done" ? "launch('exporter',null,'" .  $external_browser_name . " Browser')" : "" %>"><% $external_browser_name %><br/>Browser</a>
 			</span>
 		</div>
 	</div>
