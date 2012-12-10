@@ -945,8 +945,11 @@ use Data::Dumper;
 				my $fname = $df->name;
 
 				# keep the same basename for the file
-				if ($app_conf->{_propagate_input_file_name}) {
-					if ($base_name) {
+				if ($app_conf->{_propagate_input_file_name} && $base_name) {
+					if ($fname =~ m/\.bam(?:.bai)?$/) {
+						$fname = $base_name . sprintf(".%s", $fname =~ /\.(.*?)$/);
+					}
+					else {
 						$fname = $base_name . sprintf("%s.%s", $counter > 1 ? $counter : '', $fname =~ /\.(.*?)$/);
 					}
 				}

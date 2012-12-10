@@ -65,21 +65,32 @@ while (my $jt = $jts->next) {
 				my $app_conf = DNALC::Pipeline::Config->new->cf(uc $task);
 
 				my $io_ep = $fapi->io;
-				my $all_files    = $io_ep->ls($api_job->{archivePath});
-				my $out_dir_re   = $app_conf->{_output_dir};
+				my $root_files   = $io_ep->ls($api_job->{archivePath});
 				my $out_files_re = $app_conf->{_output_files};
-				my ($data_dir)   = $out_dir_re ? grep {$_->path =~ /$out_dir_re/} @$all_files : @$all_files;
-				print STDERR 'data_dir: ', $data_dir->path, $/ if ($debug && $data_dir);
+				my $out_dir_res  = 'ARRAY' eq ref $app_conf->{_output_dir} ? $app_conf->{_output_dir} : [ $app_conf->{_output_dir} ];
+				my @data_dirs    = ();
+
+				for my $re (@$out_dir_res) {
+					my @dirs = $re
+								? grep {$_->is_folder && $_->path =~ /$re/} @$root_files 
+								: grep {$_->is_folder} @$root_files;
+					for my $out_dir (@dirs) {
+						push @$root_files, @{ $io_ep->ls($out_dir) };
+
+					}
+					push @data_dirs, @dirs;
+				}
+
 
 				my @data_files;
-				if ($data_dir) {
-					@data_files = $out_files_re 
-						? grep { $_->path =~ /$out_files_re/ } @{$io_ep->ls($data_dir->path)}
-						: @{$io_ep->ls($data_dir->path)};
+				for my $data_dir (@data_dirs) {
+					print STDERR 'data_dir: ', $data_dir->path, $/ if ($debug);
+					push @data_files, $out_files_re 
+						? grep { $_->is_file && $_->size && $_->path =~ /$out_files_re/ } @{$io_ep->ls($data_dir->path)}
+						: grep { $_->is_file } @{$io_ep->ls($data_dir->path)};
 				}
 
 				print STDERR "data_files:\n\t", join ("\n\t", @data_files), $/ if $debug;
-
 				#
 				# mark output file are shared so $DNALCADMIN user be able to read them
 				my $ngs_cfg = DNALC::Pipeline::Config->new->cf('NGS');
