@@ -549,8 +549,14 @@ new Tip('longitude_help', "Geographic longitude (you may use Google Earth for lo
 		
 		if ($ARGS{"host_exists"} eq "yes" ) {
 			if ($ARGS{"host"} ne "") {
-				$bs->{spec_data}->{"host"} = $ARGS{"host"};
-				$data->{"host"} = $ARGS{"host"};
+				if ($ARGS{"host"} =~ /\w+\s\w+/) { # check to ensure 2 words are being entered here
+					$bs->{spec_data}->{"host"} = ucfirst(lc($ARGS{"host"}));
+					$data->{"host"} = ucfirst(lc($ARGS{"host"}));
+				}
+				else {
+					push @err, "Please ensure you have entered the host organism correctly. Correct format is <i>Genus species</i>";
+					$fields[13]->{err} = 1; ## $fields[13] is 'host'
+				}
 			} else {
 				push @err, "Please specify the host organism";
 				$fields[13]->{err} = 1; ## $fields[13] is 'host'
@@ -559,7 +565,7 @@ new Tip('longitude_help', "Geographic longitude (you may use Google Earth for lo
 		else {
 		# if there is no host ("host_exists" = no) - clear anything that may have been 
 		# entered into the "host" field because this field is what we use to check whether 
-		# we show or hide this field on post/refresh
+		# we show or hide this field on post/refresh, or whether we use this field in the annotation
 			$bs->{spec_data}->{"host"} = "";
 			$data->{"host"} = "";
 		}
