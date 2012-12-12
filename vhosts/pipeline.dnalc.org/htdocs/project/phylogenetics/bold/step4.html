@@ -182,11 +182,25 @@ console.info("<% $_ %>");
 		else {
 			$('isolation_source_other_tr').hide();
 		}
+		//host_exists_0 is 'yes' (there is a host)
+		if ($('host_exists_0').checked == true) {
+			$('host_tr').show();
+			//host_tr is the id for the <tr> which holds the host text field
+		}
+		else {
+			$('host_tr').hide();
+		}
 	}
 	Event.observe(window, Prototype.Browser.IE ? 'load' : 'dom:loaded', function() {
 		$('isolation_source').onchange = function(){
 			toggleOther();
 		}		
+		$('host_exists_0').onchange = function(){
+			toggleOther();
+		}
+		$('host_exists_1').onchange = function(){
+			toggleOther();
+		}
 		
 		// Currently, we only have this one project setup (BioProject), so set this by default
 		// When we have other BioProjects setup (ex: BLI), get rid of this
@@ -294,9 +308,24 @@ new Tip('longitude_help', "Geographic longitude (you may use Google Earth for lo
 		{id => "city", type=> "", err_msg => "City", label => "City", re => qr/\w+/, len => 48,},
 		{id => "site_desc", type => "", err_msg => "Exact Site", label => "Exact Site <img src='/images/question-icon.png' align='top' id='exact_site_help' />", re => qr/\w+/, len => 128, },
 		{id => "isolation_source", type => "select", err_msg => "Isolation Source", label => "Isolation Source  <!--<img src='/images/question-icon.png' align='top' id='isolation_source_help' />-->", re => qr/\w+/, len => 128, 
-			values => ['Specimen traded in a market or store','Specimen collected in a park, natural habitat, or public area','Specimen collected in a house or building','Specimen obtained from a museum collection', 'Other - please enter below']
+			values => [
+				'Specimen collected in a public park',
+				'Specimen collected in a natural area',
+				'Specimen collected in a house',
+				'Specimen collected in a private garden', 
+				'Specimen collected in a school campus', 
+				'Specimen collected in a public building', 
+				'Specimen collected in a store', 
+				'Specimen collected in a supermarket', 
+				'Specimen collected in a farmers/open market', 
+				'Specimen obtained from a university collection', 
+				'Specimen obtained from a school collection', 
+				'Other - please enter below'
+			]
 		},
 		{id => "isolation_source_other", type=> "", err_msg => "Isolation Source - Other", label => "", len => 48,},
+		{id => "host_exists", type => "radio", err_msg => "Host", label => "Host?", values => ['yes', 'no'], re => qr/\w+/,},
+		{id => "host", type=> "", err_msg => "Host", label => "Specify host organism", len => 48,},
 		{id => "latitude", type => "", err_msg => "Latitude", label => "Latitude (ex: 40.77 N) <img src='/images/question-icon.png' align='top' id='latitude_help' />", re => qr/^$RE{num}{real}\s*[NSns]$/, len => 16, },
 		{id => "longitude", type => "", err_msg => "Longitude", label => "Longitude (ex: 73.98 W) <img src='/images/question-icon.png' align='top' id='longitude_help' />", re => qr/^$RE{num}{real}\s*[EWew]$/, len => 16, },
 
@@ -507,7 +536,7 @@ new Tip('longitude_help', "Geographic longitude (you may use Google Earth for lo
 				$data->{"isolation_source"} = $ARGS{"isolation_source_other"};
 			} else {
 				push @err, "Please specify your isolation source";
-				$fields[12]->{err} = 1; ## $fields[12] is 'isolation_source_other'
+				$fields[11]->{err} = 1; ## $fields[11] is 'isolation_source_other'
 			}
 		}
 		else {
@@ -516,6 +545,23 @@ new Tip('longitude_help', "Geographic longitude (you may use Google Earth for lo
 		# hide this field on post/refresh
 			$bs->{spec_data}->{"isolation_source_other"} = "";
 			$data->{"isolation_source_other"} = "";
+		}
+		
+		if ($ARGS{"host_exists"} eq "yes" ) {
+			if ($ARGS{"host"} ne "") {
+				$bs->{spec_data}->{"host"} = $ARGS{"host"};
+				$data->{"host"} = $ARGS{"host"};
+			} else {
+				push @err, "Please specify the host organism";
+				$fields[13]->{err} = 1; ## $fields[13] is 'host'
+			}
+		}
+		else {
+		# if there is no host ("host_exists" = no) - clear anything that may have been 
+		# entered into the "host" field because this field is what we use to check whether 
+		# we show or hide this field on post/refresh
+			$bs->{spec_data}->{"host"} = "";
+			$data->{"host"} = "";
 		}
 		
 		

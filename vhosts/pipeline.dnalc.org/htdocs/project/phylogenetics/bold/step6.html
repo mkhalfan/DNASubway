@@ -90,6 +90,10 @@ top.show_messages("GenBank submission processed successfully. Your ID for this s
 	<td><% $bs->{spec_data}->{isolation_source} |html %></td>
 </tr>
 <tr>
+	<td>Host Organism:</td>
+	<td><% $bs->{spec_data}->{host_exists} eq "yes" ? $bs->{spec_data}->{host} : "n/a" |html %></td>
+</tr>
+<tr>
 	<td>Latitutide:</td>
 	<td><% $bs->{spec_data}->{latitude} |html %></td>
 </tr>

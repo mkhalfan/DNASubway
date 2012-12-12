@@ -64,6 +64,10 @@
 <td><% $data->{site_desc} |html %></td>
 </tr>
 <tr>
+<td>Host Organism:</td>
+<td><% $data->{host_exists} eq "yes" ? $data->{host} : "n/a" |html %></td>
+</tr>
+<tr>
 <td>Latitutide:</td>
 <td><% $data->{latitude} |html %></td>
 </tr>
