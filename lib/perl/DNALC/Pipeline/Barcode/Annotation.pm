@@ -190,7 +190,7 @@ use warnings;
 	# param $organism	The name of the organism 
 	# $trans_table		The Translation Table number to use (ex: 5 - Invertebrate Mitochondrial)
 	sub annotate_barcode {
-		my ($seq, $primer, $organism, $trans_table, $isolation_source) = @_;
+		my ($seq, $primer, $organism, $trans_table, $isolation_source, $host) = @_;
 		my ($orf, $translation) = (0, '');
 		
 		my $seq_len = length $seq;
@@ -230,7 +230,7 @@ use warnings;
 		$annotation .= "				organism	$organism\n";
 		$annotation .= "				organelle	$organelle\n";
 		$annotation .= "				mol_type	genomic DNA\n";
-		$annotation .= "				host	$organism\n";
+		$annotation .= $host ne '' ? "				host	$host\n" : '';
 		$annotation .= "				isolation_source	$isolation_source\n";
 		$annotation .= "<1	>$seq_len	gene\n";
 		$annotation .= "				gene	$gene\n";
