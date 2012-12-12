@@ -258,7 +258,7 @@ new Tip('exact_site_help', "Type of location or habitat where the sample was fou
 new Tip('notes_help', "Describe the characteristics of the actual sample you extracted DNA from (e.g. from tissue that was frozen, preserved in alcohol, freshly collected, dried, etc.)", {
 		className: 'blue_help'
 	});
-new Tip('isolation_source_help', "Specify the organism's tissue or part from where the DNA was extracted (e.g. muscle, leave, bark, blood, insect leg, etc.)", {
+new Tip('host_help', "Format: Genus species", {
 		className: 'blue_help'
 	});
 new Tip('latitude_help', "Geographic latitude (you may use Google Earth for locating the geographic coordinates of your sample's collection site.)", {
@@ -324,8 +324,8 @@ new Tip('longitude_help', "Geographic longitude (you may use Google Earth for lo
 			]
 		},
 		{id => "isolation_source_other", type=> "", err_msg => "Isolation Source - Other", label => "", len => 48,},
-		{id => "host_exists", type => "radio", err_msg => "Host", label => "Host?", values => ['yes', 'no'], re => qr/\w+/,},
-		{id => "host", type=> "", err_msg => "Host", label => "Specify host organism", len => 48,},
+		{id => "host_exists", type => "radio", err_msg => "Host", label => "Sample Collected a from Host Organism?", values => ['yes', 'no'], re => qr/\w+/,},
+		{id => "host", type=> "", err_msg => "Host", label => "Specify host organism <img src='/images/question-icon.png' align='top' id='host_help' />", len => 48,},
 		{id => "latitude", type => "", err_msg => "Latitude", label => "Latitude (ex: 40.77 N) <img src='/images/question-icon.png' align='top' id='latitude_help' />", re => qr/^$RE{num}{real}\s*[NSns]$/, len => 16, },
 		{id => "longitude", type => "", err_msg => "Longitude", label => "Longitude (ex: 73.98 W) <img src='/images/question-icon.png' align='top' id='longitude_help' />", re => qr/^$RE{num}{real}\s*[EWew]$/, len => 16, },
 
