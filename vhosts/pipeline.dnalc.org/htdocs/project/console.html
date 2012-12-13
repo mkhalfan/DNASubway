@@ -417,6 +417,9 @@ if ($sample){
 	elsif (grep {$_->link_name =~ /zfin/i} $sample->links){
 		$external_browser_name = "ZFIN";
 	}
+	elsif (grep {$_->link_name =~ /modencode/i} $sample->links){
+		$external_browser_name = "modENCODE";
+	}
 }
 
 </%init>
