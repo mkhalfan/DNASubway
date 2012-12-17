@@ -15,14 +15,14 @@
 	</div>
 	<p style="text-align:center"><input type="button" value="Cancel" /> | <input type="submit" value="Submit" /></p>
 </form>
-<!--	
 <pre style="float:left">
 	<div>
 		status: <% $st->{status} %> <% $st->{message} ? " » " . $st->{message} : "" %>
 	</div>
+<!--	
 	<% Dumper($form) %>
-</pre>
 -->
+</pre>
 % } else {
 	No application found for conf file: 'CUFFDIFF'.
 % }
@@ -125,7 +125,7 @@
 
 		$st = $pm->submit_job('ngs_cuffdiff', $app, $form);
 		print STDERR "app_cuffdiff: JOB status = ", Dumper( $st ), $/;
-		print STDERR "app_cuffdiff: form = ", Dumper( $form ), $/;
+		#print STDERR "app_cuffdiff: form = ", Dumper( $form ), $/;
 
 		if ($st->{status} ne "success") {
 			if ($st->{message} =~ /missing required/i && $st->{data} && %{$st->{data}}) {
@@ -133,6 +133,7 @@
 					$flagged->{$_} = 1;
 				}
 			}
+
 		}
 		else {
 			if ($st->{data}) {

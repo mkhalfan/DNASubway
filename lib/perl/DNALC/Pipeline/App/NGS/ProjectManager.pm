@@ -327,7 +327,7 @@ use Data::Dumper;
 			return {status => 'fail', message => 'sub app: config file is missing the specified app'};
 		}
 
-		my ($app_id, $app_name) = ($app_cf->{name}, $app_cf->{id});
+		my ($app_id, $app_name) = ($app_cf->{id}, $app_cf->{name});
 		unless ($app_name) {
 			$app_name = $app_cf->{id};
 			$app_name =~ s/-[\d.]*$//;
@@ -339,22 +339,9 @@ use Data::Dumper;
 		my $api_instance = $self->api_instance;
 		return {status => 'fail', message => 'sub app: no api_instance object'} unless $api_instance;
 
-		my $app;
-
 		my $app_ep = $api_instance->apps;
-		my $apps = $app_ep->find_by_name($app_name);
-		if (@$apps) {
-			#print STDERR Dumper( $apps), $/;
-			# get by id
-			($app) = grep {$_->id eq $app_id} @$apps;
-
-			# get by name
-			unless ($app) {
-				($app) = grep {$_->name eq $app_name} @$apps;
-			}
-
-			# get the 1st one
-			$app ||= $apps->[0];
+		my $app = $app_ep->find_by_id($app_id);
+		if ($app) {
 
 			# TODO : find a better name for the next method
 			$self->apply_app_settings($app, $app_cf);
@@ -864,9 +851,10 @@ use Data::Dumper;
 				my $fname = $df->name;
 
 				# keep the same basename for the file
-				if ($app_conf->{_propagate_input_file_name}) {
-					if ($base_name) {
-						$fname = $base_name . sprintf("%s.%s", $counter > 1 ? $counter : '', $fname =~ /\.(.*?)$/);
+				if ($app_conf->{_propagate_input_file_name} && $base_name) {
+					my $p_re = $app_conf->{_propagate_input_file_name};
+					if ($df->path =~ /$p_re/) {
+						$fname = $base_name . sprintf(".%s", $fname =~ /\.(.*?)$/);
 					}
 				}
 
@@ -946,11 +934,9 @@ use Data::Dumper;
 
 				# keep the same basename for the file
 				if ($app_conf->{_propagate_input_file_name} && $base_name) {
-					if ($fname =~ m/\.bam(?:.bai)?$/) {
+					my $p_re = $app_conf->{_propagate_input_file_name};
+					if ($df->path =~ /$p_re/) {
 						$fname = $base_name . sprintf(".%s", $fname =~ /\.(.*?)$/);
-					}
-					else {
-						$fname = $base_name . sprintf("%s.%s", $counter > 1 ? $counter : '', $fname =~ /\.(.*?)$/);
 					}
 				}
 
@@ -1044,13 +1030,6 @@ use Data::Dumper;
 				# we only download 'expressed_transcripts.gtf' to be displayed in IGV
 				if ($fname =~ /\.gtf/) {
 					next unless $fname eq "expressed_transcripts.gtf";
-				}
-
-				# keep the same basename for the file
-				if ($app_conf->{_propagate_input_file_name}) {
-					if ($base_name) {
-						$fname = $base_name . sprintf("%s.%s", $counter > 1 ? $counter : '', $fname =~ /\.(.*?)$/);
-					}
 				}
 
 				my $save_to_file = File::Spec->catfile($dest_dir, sprintf("%d.%s", $job, $fname));

@@ -34,7 +34,7 @@
 	],
 
 	_input_file_filter => qr/\.bam$/,
-	#_output_dir => qr/\/cuffdiff_out$/,
+	_output_dir => [qr/\/cuffdiff_out$/, qr/\/cuffdiff_out\/graphs$/,],
 	_output_files => qr/(?:(?:gene|isoform)_exp\.diff|\.png)$/,
 }
 

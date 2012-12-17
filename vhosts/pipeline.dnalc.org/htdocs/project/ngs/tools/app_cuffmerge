@@ -15,14 +15,13 @@
 	</div>
 	<p style="text-align:center"><input type="button" value="Cancel" /> | <input type="submit" value="Submit" /></p>
 </form>
-<!--	
+
 <pre style="float:left">
 	<div>
-		status: <% $st->{status} %> <% $st->{message} ? " » " . $st->{message} : "" %>
+		status: <% $st->{status} %> <% $st->{message} ? "» " . $st->{message} : "" %>
 	</div>
-	<% Dumper($form) %>
+<!--		<% Dumper($form) %> -->
 </pre>
--->
 % } else {
 	No application found for conf file: 'CUFFMERGE'.
 % }

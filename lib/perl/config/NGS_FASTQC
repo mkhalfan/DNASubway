@@ -1,5 +1,5 @@
 {
-	id => 'fastqc-0.10.0',
+	id => 'fastqc-0.10.0u1',
 	name => 'fastqc',
 	inputs => [
 		{ id => 'input', display_type => 'show_files', hidden => 0, label => 'Select an input FASTQ/BAM/SAM file' },
