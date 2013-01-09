@@ -35,6 +35,8 @@
 					<a href="./launch_igv_cufflinks?pid=<% $proj %>;jid=<% $job %>">view in IGV</a>
 % } elsif ($tool eq "fxtrimmer" && $job->status eq 'done') {
 		<& .fxtrimmer, job =>$job, pid => $pid, pm => $pm &>
+% } elsif ($tool eq "cuffdiff" && $job->status eq 'done') {
+					<a href="./view_cuffdiff_graphs?pid=<% $proj %>;jid=<% $job %>">view graphs</a>
 % }
 				</td>
 %# ------ END DIFFERENT VISUALIZATION OPTIONS BASED ON TOOL TYPE HERE ------- #%
