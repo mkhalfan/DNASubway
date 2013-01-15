@@ -38,7 +38,7 @@ if ($op eq 'remove' && $lid) {
 }
 
 
-unless ($link_url && $link_url =~ /$RE{URI}{HTTP}/) {
+unless ($link_url && $link_url =~ /$RE{URI}{HTTP}{-scheme => qr(https?)}/) {
 	$m->comp('/_message_add', "Link url is missing or not well formatted", 'error');
 	$err = 1;
 }
