@@ -23,7 +23,7 @@ if ($proj) {
 		$proj = undef;
 	}
 	else {
-		@links = grep {$_->link_name =~ /phytozome|flybase|wormbase|zfin|modencode|animalgenome/i} $sample->links;
+		@links = grep {$_->link_name =~ /phytozome|flybase|wormbase|zfin|modencode|animalgenome|CBRG/i} $sample->links;
 		if (@links == 1) {
 			$m->redirect($links[0]->remote_link($pid));
 			return;
