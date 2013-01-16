@@ -2513,6 +2513,24 @@ pre.insert({top:spn});
 	else if (step == 8) {
 		phy.setColumnWidths(700);
 		$('seqops').style.display = 'block';
+
+		return;
+
+		// Add a 'blast all' button
+		var launched = 0;
+		$$('#seqops pre span a').each(function(a){
+			if (/results$/i.test(a.innerHTML)) {
+				launched = 1;
+				$break;
+			}
+		});
+		if (!launched) {
+			var pre = $$('#seqops pre').first();
+			// add 'blast all' link
+			var ball = new Element('a', {style:'color: red'}).update('blast all');
+			Event.observe(ball, 'click', function(){ phy.do_blast('all')});
+			pre.insert(new Element('span').update(ball));
+		}
 	}
 	
    /*
