@@ -202,9 +202,6 @@ console.info("<% $_ %>");
 			toggleOther();
 		}
 		
-		// Currently, we only have this one project setup (BioProject), so set this by default
-		// When we have other BioProjects setup (ex: BLI), get rid of this
-		$('Urban Barcode Project').selected = true;
 		
 % if ($data->{"project"}){
 		$('<% $data->{"project"} %>').selected = true;
