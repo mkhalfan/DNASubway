@@ -1148,7 +1148,7 @@ use Data::Dumper;
 		my $save_to_file = sprintf("%s.zip", $save_to);
 
 		my $io = $self->api_instance->io;
-		if ($io) {
+		if (defined $archive && $io) {
 			my $data = $io->stream_file($archive, save_to => $save_to_file);
 
 			my $html_file;

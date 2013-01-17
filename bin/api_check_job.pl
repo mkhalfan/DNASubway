@@ -14,6 +14,7 @@ use iPlant::FoundationalAPI ();
 use File::Basename;
 
 use DNALC::Pipeline::App::NGS::ProjectManager ();
+use DNALC::Pipeline::CacheMemcached ();
 
 use Data::Dumper;
 
@@ -21,6 +22,7 @@ my $debug = shift;
 
 #----------------------
 
+my $mc = DNALC::Pipeline::CacheMemcached->new;
 my $jts = DNALC::Pipeline::NGS::JobTrack->search(tracker_status => '');
 
 while (my $jt = $jts->next) {
@@ -28,7 +30,19 @@ while (my $jt = $jts->next) {
 
 	my $job = $jt->job_id;
 	my $user = DNALC::Pipeline::User->retrieve($jt->user_id);
-	print $jt, " ", $job, " ", $user->username, $/ if $debug;
+	print $jt, " ", $job, " ", $user->username, " ", $job->task->name, $/ if $debug;
+
+	my $mc_key = 'tracked-job-' . $job->id;
+
+	# see if we're already working on this job (maybe transfer its files..)
+	if ($mc->get($mc_key)) {
+		print STDERR  "Already working on this job", $/ if $debug;
+		next;
+	}
+
+	# set the cache flag 
+	$mc->set($mc_key, 1, 20 * 60); # set this for 20 minutes
+
 	my $fapi = iPlant::FoundationalAPI->new( user => $user->username, token => $jt->token );
 	#$fapi->debug($debug);
 
@@ -49,8 +63,8 @@ while (my $jt = $jts->next) {
 		print STDERR  $api_job->{status}, ' - ', $api_job->{message} || '', $/ if $debug;
 		$jt->api_status($api_status);
 
+		# the job hits a terminal stage: it will no longer change it's status
 		if ($api_status =~ /(?:FINISHED|KILLED|FAILED|STOPPED|ARCHIVING_FINISHED|ARCHIVING_FAILED)/) {
-			# the job hit a terminal stage: it will not change it's status
 
 			$jt->token('');
 			if ($api_status =~ /(?:FINISHED|ARCHIVING_FINISHED)/) {
@@ -70,6 +84,7 @@ while (my $jt = $jts->next) {
 				my $out_dir_res  = 'ARRAY' eq ref $app_conf->{_output_dir} ? $app_conf->{_output_dir} : [ $app_conf->{_output_dir} ];
 				my @data_dirs    = ();
 
+				# grab all possible output dirs where we can potentialy have needed files
 				for my $re (@$out_dir_res) {
 					my @dirs = $re
 								? grep {$_->is_folder && $_->path =~ /$re/} @$root_files 
@@ -82,6 +97,7 @@ while (my $jt = $jts->next) {
 				}
 
 
+				# grab all the files we need from the output directories
 				my @data_files;
 				for my $data_dir (@data_dirs) {
 					print STDERR 'data_dir: ', $data_dir->path, $/ if ($debug);
@@ -100,8 +116,7 @@ while (my $jt = $jts->next) {
 					$st = $io_ep->share($_->path, 'world', canRead => 1);
 				}
 
-				my $src_id;
-
+				# further data handling (possibly download them)
 				if ($app_conf->{_on_success} && $pm->can('task_' . $app_conf->{_on_success})) {
 					my $output_handler = 'task_' . $app_conf->{_on_success};
 					print STDERR  ' ++ output_handler: ', $output_handler, $/ if $debug;
@@ -127,6 +142,8 @@ while (my $jt = $jts->next) {
 		$jt->token('');
 	}
 
+	# remove the cache flag as we're done with this job
+	$mc->set($mc_key, 0, 5); # this will expire in 5 seconds
 #
 	$jt->update;
 
