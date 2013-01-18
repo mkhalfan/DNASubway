@@ -31,6 +31,6 @@
 	_output_dir => qr/\/tophat_out$/,   # folder to search for - here we have the output file(s)
 	_output_files => qr/(?:\.info|\.bed|sorted\.bam(:?\.bai)?)$/,  # output files we need to process
 	_propagate_input_file_name => qr/\.bam(:?\.bai)?$/,    # output file should have the same basename as the input
-	_on_success => 'handle_tophat_output',
+	_on_success => 'handle_download_output',
 
 }
