@@ -1,6 +1,12 @@
-<div class="con_BL_subTitle">Import sequence/trace files from DNALC</div>
+<div class="container_data1">
+	<div id="container_data_line_bg"><div id="pager_top"></div></div>
+
+<div class="" style="float:left;color:#77a5d4;font-weight:bold">Import sequence/trace files from DNALC</div>
+	<div id="dnalc_data_search" style="float:right;font-size:10px;"></div>
+	<div style="clear:both">&nbsp;</div>
 <div id="container0">
-	<div id="dnalc_container"></div>
+<div id="dnalc_container"></div>
+<div id="pager_bottom" style="text-align:right;margin-top:10px;text-decoration:none;"></div>
 	<div id="progress_bar" class="ui-progress-bar ui-container">
 	  <div class="ui-progress" style="width: 2%;">
 		<span class="ui-label" style="display:none;">Loading <b class="value">0%</b></span>
@@ -10,6 +16,7 @@
 <input type="button" id="add_btn" class="bluebtn" style="display:none;" onclick="phy.get_dnalc_files();" value="Add Selected Files" />
 <input type="hidden" value="7" id="step" />
 <input type="hidden" value="<% $pid |html%>" id="pid" />
+<div id="container_data_lineBottom" style="margin-top:20px;">&nbsp;</div>
 <%args>
 	$pid => 0
 </%args>

@@ -1,5 +1,6 @@
+<div id="container_data_line">&nbsp;</div>
+<div id="conbody" style="height:auto">
 
-<div id="conbody">
 % if (@err) {
 	<div style="display:block; color: red; font-weight: bold;" id="error_list">
 %	foreach (@err) {
@@ -88,7 +89,9 @@
 % }
 	<div id="dnalc_container" style="clear:both;"></div>
 	</form>
+
 </div>
+<div id="container_data_lineBottom" style="margin-top:40px;">&nbsp;</div>
 %#------------------------------------------------------------
 <%args>
 	$pid => 0

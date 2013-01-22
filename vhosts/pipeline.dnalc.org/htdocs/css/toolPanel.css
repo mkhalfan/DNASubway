@@ -221,8 +221,14 @@ THE SOFTWARE.
 
 
 #container0{
-	padding-left: 25px;
+	/*padding-left: 25px;*/
 }
+#container0 #pager_bottom a{
+	color:#3C679A;
+	text-decoration: none;
+}
+
+
 #progress_bar{
 	width: 600px;
 	height: 20px;
@@ -343,16 +349,24 @@ THE SOFTWARE.
 /* dnalc_container */
 #dnalc_container {
 	font-size: 0.9em;
-	clear:both;
+	/*clear:both;*/
 }
 
 #dnalc_container  table{
-	width: 760px;
+	min-width: 760px;
+	width:100%;
+	border-spacing:0;
+}
+
+#dnalc_container  table a{
+	text-decoration:none;
+	font-weight:bold;
+	color:#3C679A;
 }
 
 #dnalc_container tr td {
 	vertical-align: top;
-	padding: 2px;
+	padding: 3px 10px;
 	/*font-size: 0.9em;*/
 }
 
@@ -370,13 +384,28 @@ THE SOFTWARE.
 
 #dnalc_container tr.header td {
 	font-weight: bold;
-	border-bottom: 1px solid black;
+	background-color:#e8eef7;
+	border-bottom: 1px solid #989b9f;
+	border-top: 1px solid #989b9f;
+	white-space:nowrap;
 }
 
 #dnalc_container  div.halfdiv{
 	float:left;
 	width: 50%;
 }
+
+#dnalc_container tr.even {
+	background-color:#e8eef7;
+}
+
+#dnalc_data_search #filters {
+	padding-top:6px;
+}
+#dnalc_data_search #filters a {
+	color:#3C679A;
+}
+
 
 /*.tbl {border:solid thin red; width: 100%}*/
 .tbl {width: 100%}
@@ -516,8 +545,22 @@ span.rot { -moz-transform:rotate(90deg); font-size: smaller;}
 	margin-top: 14px;
 	position: relative;
 	border-top: 4px solid #C2DBF3;
-
 	}
+	
+#container_data_line_bg {
+	background-color:#C2DBF3;
+	padding:2px;
+	font-size:12px;
+	margin-bottom:10px;
+	font-weight:bold;
+	height:15px;
+}
+
+#container_data_line_bg  a{
+	text-decoration:none;
+	color:#3C679A;
+}
+	
 #container_data_lineBottom {
 	height: 3px;
 	position: relative;

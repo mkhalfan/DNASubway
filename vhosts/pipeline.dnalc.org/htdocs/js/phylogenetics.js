@@ -1913,6 +1913,7 @@
 	//
 	phy.get_dnalc_data = function (page, order_id, sort_by, sort_dir, query, get_all_data) {
 		$('add_btn').hide();
+		
 		var apiUri = "http://dnalc02.cshl.edu/genewiz/json";
 		var uri = apiUri + "?p=" + (page ? page : 1);
 		if (order_id) {
@@ -1964,6 +1965,8 @@
 		$$('head').first().insert(elem);
 
 		$('progress_bar').hide();
+		
+
 	};
 	
 	phy.parse_dnalc_data = function(meta, data) {
@@ -2005,7 +2008,9 @@
 			}
 			//tr = phy.build_tr([nav]);
 			//tr.cells[0].colspan = "3";
-			table.insert("<tr><td colspan=\"3\">" + nav + "</td></tr>");
+			//table.insert("<tr><td colspan=\"3\">" + nav + "</td></tr>");
+			$('pager_top').update(nav);
+			$('pager_bottom').update(nav);
 		}
 		
 		var filters = 	meta.f  
@@ -2015,8 +2020,8 @@
 					+     " href=\"javascript:;\">show all</a>"
 					+ "</div>"
 				: "";
-		$('dnalc_container').update(
-			new Element('div', {style: 'width: 760px'}).update(
+		$('dnalc_data_search').update(
+			new Element('div', {style: 'width: 500px'}).update(
 				filters
 			).insert(
 				new Element('input', {id:'q', value:meta.q, type:'search'})
@@ -2025,13 +2030,20 @@
 							phy.get_dnalc_data(1, $('q').value, meta.s, meta.d, null, 1);
 						}
 					})
-			).insert(new Element('input', {type: 'button', value:'Search', 'class': 'bluebtn'})
+			).insert(new Element('input', {type: 'button', value:'Search'})
 				.observe('click', function(){
 					phy.get_dnalc_data(1, $('q').value, meta.s, meta.d, null, 1);
 				})
 			)
 		);
+		$('pager_top').show();
+		$('pager_bottom').show();
+		$('dnalc_data_search').show(); //me below
+		$('dnalc_container').update('');
 		$('dnalc_container').insert(table);
+		$$('#dnalc_container tr:nth-child(odd)').each(function(tr) {
+			tr.addClassName('even');
+		});
 	};
 	phy.display_dnalc_files = function(meta, data) {
 		var table = new Element('table');
@@ -2042,7 +2054,7 @@
 		table.insert(tr);
 		
 		['number', 'name', 'institution'].each(function(el) {
-			tr = phy.build_tr([el + ':', data[el]], 'ucfirst');
+			tr = phy.build_tr(['<strong>' + el + ':</strong>', data[el]], 'ucfirst');
 			table.insert(tr);
 		});
 		if (data.files && data.files.length) {
@@ -2073,7 +2085,7 @@
 				if (el.qs != null) {
 					var iqs = parseInt(el.qs, 10);
 					if (!isNaN(iqs) && iqs > 0 && iqs < 20) {
-						img = new Element('img', {src :'/images/chart_curve_error.png', title: 'QScore = ' + el.qs});
+						img = new Element('img', {src :'/images/chart_curve_error.png', title: 'Low Quality Sequence'});
 					}
 				}
 
@@ -2084,11 +2096,16 @@
 				);
 				
 			});
-			tr = phy.build_tr(['Files:', f], 'vtop');
+			tr = phy.build_tr(['<strong>Files:</strong>', f], 'vtop');
 			table.insert(tr);
 		}
 		$('dnalc_container').update(table);
 		$('dnalc_container').insert(new Element('input', {type: 'hidden', value: meta.o, id: 'oid'}));
+		// me below
+			$('dnalc_data_search').hide();
+			$('pager_top').hide();
+			$('pager_bottom').hide();
+		// end me
 	};
 	phy.build_tr = function(data, _class, meta) {
 		var tr = new Element('tr');
