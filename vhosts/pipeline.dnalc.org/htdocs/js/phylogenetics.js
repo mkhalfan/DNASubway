@@ -1035,7 +1035,7 @@
 	phy.add_blast_data = function (bid) {
 		$('add_to_project_btn').disable();
 		var sel = [];
-		$$('div.tcell input[name=selected_results]').each(function(el) {
+		$$('input[name=selected_results]').each(function(el) {
 			if (el.checked)
 				sel.push(el.value);
 		});

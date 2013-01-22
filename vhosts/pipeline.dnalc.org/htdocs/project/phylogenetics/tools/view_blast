@@ -1,4 +1,5 @@
-<div id="add_blast_alert" class="blue_sidebar_box_container dark_blue_bg" style="position:fixed;display:none;z-index:1;width:98%;margin-top:-9px;">
+<div id="conbody">
+<div id="add_blast_alert" class="blue_sidebar_box_container dark_blue_bg" style="position:fixed;display:none;z-index:1;width:860px;margin-top:-5px;">
 	<!--	<div id="fade" class="solid" style="background:#C2DBF3;position:fixed;padding:8px 5px;width:98%">
 			<img src="/images/info.png" style="vertical-align: middle;padding:7px 9px 5px 5px;" />Once you have made your selection you must <strong><a href="javascript:;" onclick="javascript:phy.add_blast_data('<% $blast->id |html%>')" style="color:red;">Add BLAST Hits to Project</a></strong>
 		</div> 
@@ -10,19 +11,23 @@
 
 
 <div style="clear:both"></div>
-<div id="blast_hits_alert_padding" style="position:fixed;top:0px;width:100%;height:56px;display:none;background:#FFF;">&nbsp;</div>
-<h4><% $display_id |html %></h4>
+<div id="blast_hits_alert_padding" style="display:none;">&nbsp;</div>
+<div style="float:left;color:#77a5d4;font-weight:bold;padding-bottom:29px;padding-left:10px;"><% $display_id |html %></div>
+<div style="clear:both;height:1px">&nbsp;</div>
 % if ($blast) {
-<div class="tbl" style="margin-top:5px;">
-	<div class="theader">
-		<div class="tcell trownum">#</div> 
-		<div class="tcell">Name</div>
-		<div class="tcell">Details</div>
-		<div class="tcell">Aln. length</div>
-		<div class="tcell">Bit score</div>
-		<div class="tcell">e</div>
-		<div class="tcell" style="width:50px">Mis- matches</div>
-	</div>
+<table id="view_blast_results">
+	<thead>
+		<tr>
+			<th>#</th>
+			<th>Name</th>
+			<th>Details</th>
+			<th>Aln. Length</th>
+			<th>Bit Score</th>
+			<th>e</th>
+			<th>Mis- matches</th>
+		</tr>
+	</thead>
+	<tbody>
 %	my $num = 1;
 % 	while( my $res = $bsio_in->next_result ) {
 %		my @hits = $res->hits; my $hit_num = 0;
@@ -39,37 +44,40 @@
 %			my $species = join (' ', splice @tmp, 0, 2);
 %			my $desc = join (' ', splice @tmp, 2);
 %			my $mismatchcount = $hsp->length('total') - ($hsp->num_conserved + $hsp->gaps('total'));
-	<div class="trow">
-		<div class="tcell trownum"><% $num %>(<% $hit_num%>).<a name="<% $num %>"></a></div> 
-		<div class="tcell" id="tip_<% $num %>" desc="<% $hit->description |html %>">\
+
+		<tr>
+			<td class="trownum"><% $num %><!--(<% $hit_num%>)-->.<a name="<% $num %>"></a></td>
+			<td id="tip_<% $num %>">
 %	unless ($dsource) {
-			<input type="checkbox" name="selected_results" value="<% $name |html%>" class="checkbox_listener" />
+				<input type="checkbox" name="selected_results" value="<% $name |html%>" class="checkbox_listener" />
 % 	}
-			<% $name |html%>\
-		</div>
-		<div class="tcell"><a id="xtip_<% $num %>" href="#<% $num %>" onclick="phy.get_ggl_image(this);"><% $species |html%></a> - <% $desc |html%></div>
-		<div class="tcell"><% $hsp->length() |html%></div>
-		<div class="tcell"><% $hsp->bits |html%></div>
-		<div class="tcell"><% $hsp->evalue |html%></div>
-		<div class="tcell"><% $mismatchcount |html%></div>
-	</div>
+				<% $name |html%>
+			</td>
+			<td><a id="xtip_<% $num %>" href="#<% $num %>" onclick="phy.get_ggl_image(this);"><% $species |html%></a> - <% $desc |html%></td>
+			<td><% $hsp->length() |html%></td>
+			<td><% $hsp->bits |html%></td>
+			<td><% $hsp->evalue |html%></td>
+			<td><% $mismatchcount |html%></td>
+		</tr>
+	
 %			$num++;
 %			last if $skip_hsp;
 %		  }
 %		}
 % 	}
 %	$in_fh->close;
-</div>
+	</tbody>
+</table>
 %#	<div> &nbsp;&nbsp; <a href="javascript:void(0);" onclick="alert('will select all');">Select all</a></div>
 %	unless ($dsource) {
-<div style="text-align: center;margin: 20px">
+<div style="width:800px;text-align:center;margin:20px;">
 	<input type="button" id="add_to_project_btn" class="bluebtn" onclick="javascript:phy.add_blast_data('<% $blast->id |html%>')" value="Add BLAST hits to project"/>
 </div>
 <div id="content"></div>
 <input type="hidden" id="pid" value="<% $pid |html %>" />
 %	}
 % }
-
+</div><!-- end conbody -->
 <input type="hidden" id="step" value="3" />
 <script src="https://www.google.com/jsapi?key=ABQIAAAAoSwUiJBqXZvEx46Ti_il-xS7lxesUVAdImlxHuSb_YqL9ZAV0BTy1Vtknu258-haS18HJWNATVZZZg" type="text/javascript"></script>
 
@@ -84,6 +92,12 @@ google.load("search", "1");
 		$('add_blast_alert').show();
 		$('blast_hits_alert_padding').show();
 		Element.addClassName.delay(0.25, 'add_blast_alert', 'fade');
+	});
+	
+	Event.observe(window, 'load', function() {
+			$$('#view_blast_results tbody tr:nth-child(even)').each(function(tr) {
+			tr.addClassName('even');
+		});
 	});
 </script>
 %#----------------------------------------------------------------------------
