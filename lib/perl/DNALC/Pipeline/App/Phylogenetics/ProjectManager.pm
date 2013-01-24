@@ -1488,7 +1488,7 @@ use Bio::Trace::ABIF ();
 		($blast) = Blast->search( crc => $crc );
 		if ($blast) {
 			#make a new entry for this run
-			my $blast_new = DNALC::Pipeline::Phylogenetics::BlastRun->create({
+			my $blast_new = DNALC::Pipeline::Phylogenetics::BlastRun->find_or_create({
 				run_id => $args{run_id},
 				bid => $blast,
 			});
