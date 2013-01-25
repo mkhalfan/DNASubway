@@ -20,7 +20,7 @@
 		{ id => 'min_isoform_Fraction', label => 'Minimum isoform fraction', 'value' => '0.1' },
 	],
 	_task_name => 'ngs_cuffmerge',
-	_input_file_filter => qr/_transcripts\.gtf$/,
+	_input_file_filter => qr/(?<!expressed)_transcripts\.gtf$/,
 	_output_dir => 'cuffmerge_out',
 	_output_files => qr/merged_with_ref_ids\.gtf$/,
 }
