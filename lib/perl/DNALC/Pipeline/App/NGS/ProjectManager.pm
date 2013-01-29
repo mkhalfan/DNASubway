@@ -14,6 +14,7 @@ use aliased 'DNALC::Pipeline::NGS::JobTrack';
 use DNALC::Pipeline::Config ();
 use DNALC::Pipeline::Task ();
 use DNALC::Pipeline::CacheMemcached ();
+use DNALC::Pipeline::User ();
 
 use iPlant::FoundationalAPI ();
 use iPlant::FoundationalAPI::Constants ':all';
@@ -78,6 +79,11 @@ use Data::Dumper;
 		$self;
 	}
 
+	# -------------------------------------
+	sub project_user {
+		my ($self) = @_;
+		my $u = DNALC::Pipeline::User->retrieve( $self->project->user_id );
+	}
 	# -------------------------------------
 	sub create_project {
 		my ($self, $params) = @_;
@@ -411,32 +417,45 @@ use Data::Dumper;
 		$app->{conf} = $app_cf;
 	}
 	#--------------------------------------
-	sub job {
-		my ($self, $app_id, $form_arguments) = @_;
+	sub _build_job_archive_path {
+		my ($self, $jobdb, $jobname) = @_;
+
+		my $user = $self->project_user;
+		return unless $user;
+
+		my $username = $user->username;
+	
+		$jobname ||= '';
+
+		$jobname =~ s/^\s+//;
+		$jobname =~ s/\s+$//;
+		$jobname =~ s/[^\w\d_]/-/g;
+
+		# this is in the $HOME dir of each user
+		my $preset_path = $self->config->{archive_path} || 'DNASubway';
 		
-		my $api_instance = $self->api_instance;
-		return {status => 'fail', message => 'sub job: no api_instance object'} unless $api_instance;
-		
-		my %job_arguments = %$form_arguments;
-		my $apps = $api_instance->apps;
-		my ($app) = $apps->find_by_name($app_id);
-		print STDERR "APP: ", $app, $/;
-		
-		print STDERR "App ID: $app_id <br /> Annotation Field: $job_arguments{ANNOTATION} <br />";
-		
-		# adding additional 'hidden' arguments
-		$job_arguments{jobName} = $app_id . '-DNAS-' . int(rand(100));
-		$job_arguments{archive} = '1';
-		$job_arguments{processors} = '1';
-		$job_arguments{requested_time} = '11:11:11';
-		$job_arguments{softwareName} = $app_id;
-		
-		print STDERR Dumper (%job_arguments);
-		my $job_ep = $api_instance->job;
-		my $job = $job_ep->submit_job($app, %job_arguments);
-		#print STDERR "returned from submit_job: ", %$job, $/; 
+		#IO end point
+		$self->api_instance->debug(1);
+		my $io_ep = $self->api_instance->io;
+		my $dir_contents = $io_ep->readdir("/$username/");
+		if ('ARRAY' eq ref $dir_contents ) {
+			unless (grep {/$preset_path/} map {$_->name} @$dir_contents) {
+				print STDERR  "\n!!!! we don't have dir [$preset_path]!!!! But we can try creating it!!!!\n\n";
+				my $rc = $io_ep->mkdir("/$username", $preset_path);
+				if ( 'HASH' ne ref($rc) || $rc->{status} ne 'success' ) {
+					print STDERR  "rc = ", $rc, Dumper($rc), $/;
+					return;
+				}
+			}
+		}
+
+		my $path = join '/', '', $username, $preset_path, sprintf("job-%d-%s", $jobdb->id, $jobname);
+		$path =~ s/-+$//;
+
+		return $path;
 	}
 
+	#--------------------------------------
 	sub submit_job {
 		my ($self, $task_name, $app, $params) = @_;
 
@@ -473,8 +492,28 @@ use Data::Dumper;
 
 		# we need to get a response when the job finishes
 		#$params->{callbackUrl} = 'http://summercamps.dnalc.org/payment_notify.html?payer_email=&txn_id=0&';
+
+		# create the DB job entry, and update it later, as we need it
+		my $jobdb = eval {DNALC::Pipeline::NGS::Job->create({
+					project_id => $self->project,
+					user_id => $self->project->user_id,
+					task_id => $self->{task_name_to_id}->{ $task_name },  # TODO - check if task exists
+					status_id => $status_map{"not-processed"},
+				});
+		};
+		if ($@) {
+			my $msg = $@;
+			print STDERR  "Error: ", $msg, $/;
+			return _error($msg);
+		}
+
+
+		# TODO
+		# make sure the basedir($archivePath) exists
+		$params->{archivePath} = $self->_build_job_archive_path($jobdb, $params->{jobName});
+		print STDERR "archivePath: ", $params->{archivePath}, $/ if $self->debug;
 		print STDERR "ProjectManager::submit_job: params = ", Dumper($params), $/ if $self->debug;
-		my $jobdb; #
+
 
 		my $job_ep = $apif->job;
 		my $job_st = $job_ep->submit_job($app, %$params);
@@ -493,17 +532,13 @@ use Data::Dumper;
 			#print STDERR  Dumper($self->{task_name_to_id}), $/;
 			print STDERR  '**App name: ', $app->name, $/;
 
-			$jobdb = eval {DNALC::Pipeline::NGS::Job->create({
-						api_job_id => $api_job->{id},
-						project_id => $self->project,
-						user_id => $self->project->user_id,
-						task_id => $self->{task_name_to_id}->{ $task_name },  # TODO - check if task exists
-						status_id => $status_map{processing},
-					});
-				};
+			$jobdb->api_job_id( $api_job->{id} );
+			$jobdb->status_id( $status_map{processing} );
+
+			eval { $jobdb->update; };
 			if ($@) {
 				my $msg = $@;
-				print STDERR  "Error: ", $msg, $/;
+				print STDERR  "Error updating jobdb: ", $msg, $/;
 				return _error($msg);
 			}
 			else {
@@ -552,6 +587,7 @@ use Data::Dumper;
 			return {status => 'success', data => $jobdb};
 		}
 		else {
+			$jobdb->delete;
 			_error($job_st ? $job_st->{message} : 'Could not submit job.', $job_st ? $job_st->{data} : undef);
 		}
 	}
