@@ -47,7 +47,7 @@
 
 		<tr>
 			<td class="trownum"><% $num %><!--(<% $hit_num%>)-->.<a name="<% $num %>"></a></td>
-			<td id="tip_<% $num %>">
+			<td id="tip_<% $num %>" style="white-space:nowrap">
 %	unless ($dsource) {
 				<input type="checkbox" name="selected_results" value="<% $name |html%>" class="checkbox_listener" />
 % 	}

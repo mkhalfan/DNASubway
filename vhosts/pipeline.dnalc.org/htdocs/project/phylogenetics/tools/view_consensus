@@ -10,8 +10,8 @@
 %	for my $p (@pairs) {
 		<li>
 			<div class="pair-id-block<% ($cnt == $num ? " active" : "")%>" title="<% $p->name |html%>">
-				<a href="./view_consensus?pid=<%$pid |html%>;pair_id=<% $p->id %>;num=<% $cnt %>">Pair <% $cnt++ %><br />
-				<small><% $p->name |html%></small></a>
+				<a href="./view_consensus?pid=<%$pid |html%>;pair_id=<% $p->id %>;num=<% $cnt ++ %>">
+				<span> <% $p->name |html%></span></a>
 			</div>
 		</li>
 %	}
@@ -20,8 +20,13 @@
 	<div id="edit-panel">
 %	if ($pair) {
 		<div id="pair-title-block">
-			<div id="pair-title">Pair <% $num %>: <% $pair->name |html%></div>
-			<div id="edit-pair-title" style="float:left;padding-right:5px;display:none">Pair <% $num %>: <input type="text" name="pair-name" id="pair-name" value="<% $pair->name |html%>" maxlength="128"/></div>
+			<div id="pair-header">
+				<span style="font-weight:normal">Pair</span> 
+				<span id="pair-title"><% $pair->name |html%></span>
+				<span id="edit-pair-title" style="display:none"> 
+					<input type="text" name="pair-name" id="pair-name" value="<% $pair->name |html%>" maxlength="128"/>
+				</span>
+			</div>
 			<div id="edit-name-link" class="text-links">[<a href="javascript:;" onclick="phy.edit_pair_name();">Edit Name</a>]</div>
 			<div id="save-name-link" style="display:none;" class="text-links">[<a href="javascript:;" onclick="phy.save_pair_name($('pair-name').value, <% $num %>, <% $pair %>);">Save</a>] [<a href="javascript:;" onclick="phy.edit_pair_name();">Cancel</a>]</div>
 			<div style="clear:both;height:0px">&nbsp;</div>

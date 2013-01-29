@@ -1,12 +1,10 @@
 @charset "UTF-8";
-/* CSS Document */
 
 html,body { height:100%; }
 
 #conbody {
 	width: 650px;
 	height:450px;
-	/*background:url("/images/v2/bg_upload_import.jpg") no-repeat;*/
 	font-family: arial, hervetica, san-serif;
 }
 
@@ -32,6 +30,7 @@ html,body { height:100%; }
 	position: relative;
 	float: left;
 }
+
 .con_BL_subTitle{
 	width: 565px;
 	height: auto; 
@@ -52,14 +51,13 @@ html,body { height:100%; }
 	float: left;
 }
 
-
 .con_BL_menu_box{
     width: 300px;
 	height: auto;
 	padding-left: 25px;
 	position: relative;
 	float:left;
-	}
+}
 
 .con_BL_menu_box1 {
     width: 300px;
@@ -70,7 +68,8 @@ html,body { height:100%; }
 	color: #006699;
 	font-size: 0.8em;
 	text-align: left;
-	}
+}
+
 .con_BL_menu_box2 {
     width: 300px;
 	height: auto;
@@ -81,13 +80,13 @@ html,body { height:100%; }
 	font-size: 0.8em;
 	text-align: left;
 	font-style: italic;
-	}
+}
+
 .conStylized_input1 {
 	float:left;
 	padding: 2px;
 	border: .1em;
 	border-style: solid;
-	
 	width: 260px;
 	margin-bottom: 4px;
 	font-size:.8em; font-family: courier, monaco, monospace;
@@ -112,7 +111,6 @@ html,body { height:100%; }
 	float:left;
 	border: .1em;
 	border-style: solid;
-	
 	width: 260px;
 	height: 20px;
 	margin-bottom: 4px;
@@ -130,7 +128,7 @@ html,body { height:100%; }
 	text-align: left;
 	position: relative;
 	float: left;
-	}
+}
 
 .conNewPro_label1{
 	width: 300px;
@@ -142,7 +140,8 @@ html,body { height:100%; }
 	text-align: left;
 	position: relative;
 	float: left;
-	}
+}
+
 .conNewPro_label2{
 	width: 400px;
 	height: auto;
@@ -153,11 +152,11 @@ html,body { height:100%; }
 	text-align: left;
 	position: relative;
 	float: left;
-	}
+}
 
 .conRadiobox_align{
 	vertical-align: top;
-	}
+}
 
 .radioBT{
 	width: 22px;
@@ -165,7 +164,8 @@ html,body { height:100%; }
 	display:block;	
 	float: left;
 	position: relative;
-	}
+}
+
 .radioBT a{
 	width: 22px;
 	height: 22px;
@@ -173,61 +173,38 @@ html,body { height:100%; }
 	background: url("/images/v2/radio1.jpg") top left no-repeat;
 	float:left;
 	position: relative;
-	}
+}
+
 .radioBT a:hover{
 	background: url("/images/v2/radio1.jpg") top left no-repeat;
-	}
+}
+
 .radioBT a.current{
 	background: url("/images/v2/radio2.jpg") top left no-repeat;
-	}
+}
 
 .clear_empty{
-clear: both;
-height: 30px;
-width: 300px;
+	clear: both;
+	height: 30px;
+	width: 300px;
 }
 
 .blast_processing{
 	width: 18px;
-	/*height: 18px;*/
-	padding-top: 20px;
+	height: 18px;
 	background: url("/images/v2/indicatorBL_running.gif") top left no-repeat;
 }
 
-
-/*
-Copyright (c) 2010 Ivan Vanderbyl
-Originally found at http://ivan.ly/ui
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in
-all copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-THE SOFTWARE.
-
-*/
-
-
-#container0{
-	/*padding-left: 25px;*/
+/* import from DNALC window */
+.container_data1 #pager_bottom {
+	text-align:right;
+	margin-top:10px;
 }
-#container0 #pager_bottom a{
+
+.container_data1 #pager_bottom a{
 	color:#3C679A;
 	text-decoration: none;
 }
-
 
 #progress_bar{
 	width: 600px;
@@ -346,10 +323,9 @@ THE SOFTWARE.
   white-space: nowrap;
 }
 
-/* dnalc_container */
+/* dnalc_container is in dnalc_data (import from dnalc) */
 #dnalc_container {
 	font-size: 0.9em;
-	/*clear:both;*/
 }
 
 #dnalc_container  table{
@@ -367,7 +343,6 @@ THE SOFTWARE.
 #dnalc_container tr td {
 	vertical-align: top;
 	padding: 3px 10px;
-	/*font-size: 0.9em;*/
 }
 
 #dnalc_container tr td.forty5p {
@@ -406,25 +381,50 @@ THE SOFTWARE.
 	color:#3C679A;
 }
 
-/* this is a table */
+/* these are tables */
 #view_blast_results {
 	min-width: 860px;
 	width:100%;
 	border-spacing:0;
+	font-size: 0.8em;
 }
-#view_blast_results th{
+#blast_list {
+	width:100%;
+	border-spacing:0;
+	margin-top:25px;
+	font-size: 0.8em;
+}
+#view_blast_results th, #blast_list th{
 	text-align:left;
 	padding: 3px 10px;
 	background-color:#e8eef7;
 	border-bottom: 1px solid #989b9f;
 	border-top: 1px solid #989b9f;
 }
-#view_blast_results tr td{
+#view_blast_results tr td, #blast_list tr td{
 	padding: 3px 10px;
+	height:25px;
+}
+#view_blast_results tr td a, #blast_list tr td a{
+	text-decoration:none;
+	font-weight:bold;
+	color:#3C679A;
 }
 
-#view_blast_results tr.even{
+#view_blast_results tr.even, #blast_list tr.even{
 	background-color:#e8eef7;
+}
+#blast_list td div.seq {
+	max-width:512px;
+	overflow:hidden;
+	font-family:courier;
+}
+#blast_list #action{
+	width:100px;
+}
+#blast_list div.label{
+	max-width:150px;
+	overflow:hidden;
 }
 
 .tbl {
@@ -438,7 +438,6 @@ THE SOFTWARE.
 
 .theader {
 	display:table-row;
-	/*border-bottom: solid thin red; */
 	font-weight: bold;
 	background-color:#e8eef7;
 	border-top: 1px solid #989b9f;
@@ -463,36 +462,21 @@ span.rot { -moz-transform:rotate(90deg); font-size: smaller;}
 	position: relative;
 	padding-left: 20px;
 	font-family:  arial, monospace;
-	}
+}
 .container_data1 .seqids {
-	float:left; width: auto; max-width: 275px; font-family:arial; line-height: 1.2em; overflow-x:auto; color:#996600; 
-	}
+	float:left; 
+	width: auto; 
+	max-width: 275px; 
+	font-family:arial; 
+	line-height: 1.2em; 
+	overflow-x:hidden;
+}
 .container_data1 .seqs {
 	float:left; width:1px; margin-left:10px; overflow-x:auto; font-family:courier, monospace; line-height: 1.2em; text-transform: uppercase; 
-	/*display:none;*/
-	}
-.container_data1 #mini-trace-icons {
-	float:left; 
-	max-width: 24px; 
-	min-width: 15px; 
-	line-height: 1.2em; 
-	margin-left:10px;
-	padding-top:2px;
-	margin-right:10px;
-	}
-.container_data1 #mini-trace-icons  a img{
-	vertical-align: middle;
-	margin-right:5px;
-	border: none;
 }
-.container_data1 #q-score-alert {
-	float:left; 
-	width: 15px; 
-	line-height: 1.2em; 
-	margin-right:1px;
-	}	
+
 .container_data1 div.seq-rows { 
-	height: 20px; 
+	height: 22px; 
 	font-family: monospace;  
 	white-space: pre; 
 }
@@ -507,13 +491,13 @@ span.rot { -moz-transform:rotate(90deg); font-size: smaller;}
 	font-family:  arial, monospace;
 	}	
 	
-#phy-pair-builder #seqids, #phy-blast #seqids {
+#phy-pair-builder #seqids {
 	float:left; width: auto; max-width: 400px; font-family:arial, monospace; line-height: 1.2em;overflow-x:auto; color: #996600; min-height:200px;
 	}
-#phy-pair-builder #seqs, #phy-blast #seqs {
+#phy-pair-builder #seqs {
 	float:left;width:1px;margin-left:15px;overflow-x:hidden;font-family:courier;line-height: 1.2em;text-transform: uppercase; display:none;
 	}
-#phy-pair-builder #seqops, #phy-blast #seqops {
+#phy-pair-builder #seqops {
 	float:left; padding-left:15px; width: 30px;font-family:arial;line-height: 1.2em; color: #996600; display:none;
 	}
 #phy-pair-builder #seqops2 {
@@ -530,29 +514,6 @@ span.rot { -moz-transform:rotate(90deg); font-size: smaller;}
 #phy-pair-builder .reverse_strand_indicator{
 	color:red;
 }
-
-
-/*** not being used any more -> converted to #phy-pair-builder and #phy-blast (see above)	
-.container_data2 {
-	width: 840px;
-	height: auto;
-	padding-top: 8px;
-	float: left;
-	position: relative;
-	padding-left: 20px;
-	font-family:  arial, monospace;
-	}
-
-.container_data2 .seqids {
-	float:left; width: 165px;font-family:arial, monospace; line-height: 1.2em;overflow-x:auto; color: #996600; 
-	}
-.container_data2 .seqs {
-	float:left;width:585px;margin-left:15px;overflow-x:hidden;font-family:courier;line-height: 1.2em;text-transform: uppercase;
-	}
-.container_data2 .seqops {
-	float:left; padding-left:15px; width: 30px;font-family:arial;line-height: 1.2em; color: #996600;
-	}
-*/
 
 .container_data3 {
 	width: 840px;
@@ -603,32 +564,29 @@ span.rot { -moz-transform:rotate(90deg); font-size: smaller;}
 
 	}
 
+/*
+trying to eliminate this use
 .seqids a{
- 	
 	text-align: left;
 	color: #006699;
 	text-decoration:none;
 	font-weight:bold;
-	
-	}
+}
 .seqids a:hover{
 	color: #669966;
-	
-	}
+}
+*/
 	
 .seqops a{
- 	
 	text-align: left;
 	color: #006699;
 	text-decoration:none;
 	font-weight:bold;
 	text-transform:uppercase;
-	
-	}
+}
 .seqops a:hover{
 	color: #669966;
-	
-	}	
+}	
 
 .list_refdata{
     width: 400px;
@@ -639,7 +597,6 @@ span.rot { -moz-transform:rotate(90deg); font-size: smaller;}
 	color: #006699;
 	font-size: 0.8em;
 	text-align: left;
-  
 }
 
 /* //--------START View BLAST table ---PAGE----MENU ------------------ */
@@ -837,18 +794,20 @@ span.bold {
 }
 
 #view-consensus .pair-id-block{
-	padding-bottom:3px;
+	padding:3px 0;
 	border-top:1px solid #fdfdfd;
 	border-bottom:1px solid #fdfdfd;
 	overflow:hidden;
+	white-space:nowrap;
 }
 #view-consensus .pair-id-block a{
 	text-decoration:none;
 	display:block;
 	color:#006699;
 	font-weight:bold;
+	font-size:0.8em;
 }
-#view-consensus .pair-id-block a small{
+#view-consensus #pair-menu  small{
 	color:#996600;
 	font-weight:normal;
 }
@@ -873,7 +832,7 @@ span.bold {
 	color:#006699;
 }
 
-#view-consensus #pair-title{
+#view-consensus #pair-header{
 	float:left;
 	max-width:75%;
 	white-space:nowrap;
@@ -1047,6 +1006,43 @@ padding:10px 15px 10px 15px;
 color:#2e83ac;
 }
 
+/* .sequence_label is in View Sequences */
+.sequence_label {
+	font-size:0.8em;
+	display:inline-block;
+	overflow:hidden;
+	white-space:nowrap;
+	font-weight:bold;
+	color:#006699;
+	text-decoration:none;
+	margin-right:10px;
+	max-width:221px;
+}
+
+#seqids div.sequence_label_block {
+	border-top:1px solid #fdfdfd;
+	border-bottom:1px solid #fdfdfd;
+	line-height:1em;
+	padding:2px 0;
+	max-width:275px;
+}
+
+#seqids div.sequence_label_block.active {
+	background-color:#F8FAFC;
+	border-top:1px solid #e0e9f6;
+	border-bottom:1px solid #e0e9f6;	
+}
+
+#seqids div.sequence_label_block:hover {
+	background-color:#F8FAFC;
+	border-top:1px solid #e0e9f6;
+	border-bottom:1px solid #e0e9f6;
+}
+
+.mini-trace-icon {
+	float:right;
+	margin-right:5px;
+}
 
 #trace-viewer{
 margin-top:17px;
@@ -1073,6 +1069,7 @@ background-color:#f3f7fa;
 padding:5px;
 float:left;
 width: 194px;
+margin-bottom:10px;
 }
 
 canvas {
@@ -1231,13 +1228,5 @@ background-color: yellow;
 	height:49px;
 	background:#FFF;
 }
-
-/*
-#fade {
-   transition: opacity 1.5s ease-in-out;
-   -moz-transition: opacity 1.5s ease-in-out;
-   -webkit-transition: opacity 1.5s ease-in-out;
-}
-*/
 
 

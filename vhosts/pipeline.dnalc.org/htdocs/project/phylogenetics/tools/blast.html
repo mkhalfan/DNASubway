@@ -1,73 +1,70 @@
-
 <div id="phy-blast">
 	<input type="hidden" id="step" value="8" />
-	<div id="container_data_line"></div>
-	<div id="seqids">
-		<pre>
+<table id="blast_list">
+	<thead>
+		<th>Name</th>
+		<th>Sequence</th>
+		<th><div id="action">Action</div></th>
+	</thead>
+	<tbody>
 % for (@pairs) {
 %	my $name = $_->name;
-<span id="x<% $_ |html %>"><% $name |html%></span>
-% }
-% for (@sequences) {
-<span id="x<% $_ |html %>"><% $_->display_id |html%></span>
-% }
-</pre>
-	</div>
-	<div id="seqs">
-	
-		<pre>
-% for (@pairs) {
 %	my $consensus = $_->consensus;
+		<tr>
+			<td><div class="label" id="x<% $_ |html %>" title="<% $name |html%>"><% $name |html%></div></td>
 %	if ($consensus) {
-<span id="x<% $_ |html %>"><% $consensus |html%></span>
-%	} else {
-	<span>Consensus not built for this pair!</span>
-%	}
-% }
-% for (@sequences) {
-<span id="<%$_%>" ><% $_->seq|html %></span>
-% }
-</pre>
-	</div>
-
-	<div id="seqops" class="seqops">
-		<pre>
-% for (@pairs) {
-%	if ($_->consensus) {
+			<td><div class="seq" id="x<% $_ |html %>"><% $consensus |html%></div></td>
 %		my ($blast_run) = BlastRun->search(run_id=>$pid . '-p' . $_->id);
-%if ($blast_run){
-<span id ='p<%$_->id%>'><a href='/project/phylogenetics/tools/view_blast?bid=<%$blast_run->bid%>;pid=<%$pid%>;sid=p<%$_->id%>'>View Results</a></span>
-%}
-%else{
-<span id ='p<%$_->id%>'><span id='blp<%$_->id%>'><a href='#' onclick="phy.do_blast('p<%$_->id%>');">blast</a></span></span>
-%}
+%		if ($blast_run){
+			<td><div id ='p<%$_->id%>' class="hide"><a href='/project/phylogenetics/tools/view_blast?bid=<%$blast_run->bid%>;pid=<%$pid%>;sid=p<%$_->id%>'>View Results</a></div></td>
+%		}
+%		else {
+			<td><div id ='p<%$_->id%>' class="hide"><span id='blp<%$_->id%>'><a href='#' onclick="phy.do_blast('p<%$_->id%>');">BLAST</a></span></div></td>
+%		}
 %	}
 %	else {
+			<td><span>Consensus not built for this pair!</span></td>
+			<td>&nbsp;</td>
+%	}
+		</tr>
+% }
 
-%	}
-% }
 % for (@sequences) {
-%	my ($blast_run) = BlastRun->search(run_id=>$pid . '-s' . $_->id);
-%	if ($blast_run) {
-<span id ='s<%$_->id%>'><a href='/project/phylogenetics/tools/view_blast?bid=<%$blast_run->bid%>;pid=<%$pid%>;sid=s<%$_->id%>'>View Results</a></span>
-%	}
-%	elsif ($_->seq) {
-<span id ='s<%$_->id%>'><span id='blp<%$_->id%>'><a href='#' onclick="phy.do_blast('s<%$_->id%>');">blast</a></span></span>
-%	} else {
-<span></span>
-%	}
+		<tr>
+			<td><div class="label"id="x<% $_ |html %>" title="<% $_->display_id |html%>"><% $_->display_id |html%></div></td>
+			<td><div class="seq" id="<%$_%>" ><% $_->seq ne "" ? $_->seq : "(no sequence)" |html %></div></td>
+%		my ($blast_run) = BlastRun->search(run_id=>$pid . '-s' . $_->id);
+%		if ($blast_run){
+			<td><div id ='s<%$_->id%>' class="hide"><a href='/project/phylogenetics/tools/view_blast?bid=<%$blast_run->bid%>;pid=<%$pid%>;sid=s<%$_->id%>'>View Results</a></div></td>
+%		}
+%		elsif ($_->seq) {
+			<td><div id ='s<%$_->id%>' class="hide"><span id='blp<%$_->id%>'><a href='#' onclick="phy.do_blast('s<%$_->id%>');">BLAST</a></span></div></td>
+%		}
+%		else {
+			<td>&nbsp;</td>
+%		}
+
+		</tr>
 % }
-</pre>
+	</tbody>
+</table>
 <input type="hidden" id="pid" value="<% $proj->id %>" />
 
-</div>
-
 <div style="clear: both;">&nbsp;</div>
-     <div id="container_data_lineBottom">&nbsp;</div>
+<div id="container_data_lineBottom">&nbsp;</div>
      
+</div> <!-- END of phy_blast-->
 
-</div> <!-- END of container_data2-->
-
+<script type="text/javascript">
+	Event.observe(window, 'load', function() {
+		$$("#blast_list div.seq").each(function(d){
+			d.update(d.innerHTML.replace(/-/g, "&#8209;"));
+		});
+		$$('#blast_list tbody tr:nth-child(even)').each(function(tr) {
+			tr.addClassName('even');
+		});
+	});
+</script>
 
 
 <%args>

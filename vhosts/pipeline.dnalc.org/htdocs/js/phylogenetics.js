@@ -983,8 +983,12 @@
 	
 	phy.do_blast = function (sid) {
 		var params = { sid : sid, pid: $('pid').value};
-		$$("#seqops pre")[0].hide();
-		$("seqops").addClassName('blast_processing');
+		
+		$$('#blast_list tbody td .hide').each(function(el) {
+			el.hide();
+		});
+		$(sid).update("&nbsp;").addClassName('blast_processing').show();
+		
 		new Ajax.Request('/project/phylogenetics/tools/do_blast',{
 			method:'post',
 			parameters: params, 
@@ -999,22 +1003,21 @@
 						document.location.href = '/project/phylogenetics/tools/view_blast'
 							+ '?bid=' + r.bid
 							+ ';pid=' + $('pid').value
-							+ ';sid=' + sid; 
-							
-						/*$$("#seqops pre")[0].show();
-						$("seqops").removeClassName('blast_processing');
-						$(sid).update("<a href='/project/phylogenetics/tools/view_blast?bid=" + r.bid + ";pid=" + $('pid').value + ";sid=" + sid + "' style='color:red'>View</a>");*/
-						
+							+ ';sid=' + sid;
 					}
 					else {
-						$$("#seqops pre")[0].show();
-						$("seqops").removeClassName('blast_processing');
+						$$('#blast_list tbody td span.hide').each(function(el) {
+							el.show();
+						});
+						$(sid).removeClassName('blast_processing');
 						alert("Some error occured " + r.message);	
 					}
 				}
 				else {
-					$$("#seqops pre")[0].show();
-					$("seqops").removeClassName('blast_processing');
+					$$('#blast_list tbody td span.hide').each(function(el) {
+						el.show();
+					});
+					$(sid).removeClassName('blast_processing');
 					alert("Error: " + r.message);
 					/*if (show_messages) {
 						show_messages(r.message);
@@ -1026,8 +1029,10 @@
 			},
 			onFailure: function(){
 				alert('Something went wrong!\nAborting...');
-				$$("#seqops pre")[0].show();
-				$("seqops").removeClassName('blast_processing');
+				$$('#blast_list tbody td span.hide').each(function(el) {
+					el.show();
+				});
+				$(sid).removeClassName('blast_processing');
 			}
 		});
 	};
@@ -1050,6 +1055,9 @@
 					top.phy.close_window('blast');
 					if (r.message) {
 						top.show_messages(r.message);
+					}
+					else {
+						top.show_messages("BLAST hits added to project.");
 					}
 				}
 				else {
@@ -1844,6 +1852,8 @@
 	 *
 	 */
 	phy.save_pair_name = function (name, num, pair_id) {
+		name = name.replace(/\s/g, "_");
+		console.info(name);
 		if (name == ''){
 			top.show_messages('Enter a name for your pair');
 			return;
@@ -1864,12 +1874,12 @@
 				var response = transport.responseText || "{'status':'error', 'message':'No response'}";
 				var r = response.evalJSON();
 				if (r.status == 'success') {
-					$('pair-title').update('Pair ' + num + ': ' + name);
+					$('pair-title').update(name);
 					$('edit-pair-title').toggle();
 					$('pair-title').toggle();
 					$('edit-name-link').toggle();
 					$('save-name-link').toggle();
-					$$('div.pair-id-block.active small').each(function(el) {
+					$$('div.pair-id-block.active span').each(function(el) {
 						el.update(name);
 					});
 					$$('.pair-id-block.active').each(function(el){
@@ -2418,7 +2428,7 @@ Event.observe(window, Prototype.Browser.IE ? 'load' : 'dom:loaded', function() {
 	// step 22 is from the sequence viewer before you select a trace to view
 	else if (step == 22) {
 		// attach tool tip for low quality score alerts
-		$$('#mini-trace-icons span[id^=low]').each(function(el) {
+		$$('.sequence_label_block span[id^=low]').each(function(el) {
 			var span_id = el.getAttribute('id');
 			debug("tip " + span_id);
 			new Tip(span_id, "The average error rate for this sequence is greater than 1%. This indicates that the sequence is of low quality and may produce erroneous analysis results.", {
@@ -2430,13 +2440,13 @@ Event.observe(window, Prototype.Browser.IE ? 'load' : 'dom:loaded', function() {
 			});
 		});	
 		// Set column widths and display columns
-		phy.setColumnWidths(795);
+		phy.setColumnWidths(837);
 	}
 	
 	// step 2 is from the sequence viewer, once you select a trace file to view
 	else if (step == 2) {
 		// attach tool tip for low quality score alerts
-		$$('#mini-trace-icons span[id^=low]').each(function(el) {
+		$$('.sequence_label_block span[id^=low]').each(function(el) {
 			var span_id = el.getAttribute('id');
 			debug("tip " + span_id);
 			new Tip(span_id, "The average error rate for this sequence is greater than 1%. This indicates that the sequence is of low quality and may produce erroneous analysis results.", {
@@ -2462,7 +2472,7 @@ Event.observe(window, Prototype.Browser.IE ? 'load' : 'dom:loaded', function() {
 		}
 		
 		// Set column widths and display columns
-		phy.setColumnWidths(795);
+		phy.setColumnWidths(837);
 		
 	}
 	else if (step == 3) {
@@ -2528,8 +2538,8 @@ pre.insert({top:spn});
 		phy.get_dnalc_data();
 	}
 	else if (step == 8) {
-		phy.setColumnWidths(700);
-		$('seqops').style.display = 'block';
+		//phy.setColumnWidths(700);
+		//$('seqops').style.display = 'block';
 
 		return;
 

@@ -1,4 +1,4 @@
-<div class="container_data3">
+<div class="container_data3" style="min-height:400px;">
 <div id="container_data_line">&nbsp;</div>
 <form method="post">
 %#	<input type="hidden" id="selection_changed" value="" />
@@ -38,7 +38,7 @@
 			</div>
 			<div style="padding:5px;color:#333;">
 				Once you have selected the sequences you wish to align, you must click save below.<br />
-				<input type="submit" id="save_selection" value="Save Selection" class="bluebtn"/>
+				<input type="submit" id="save_selection" value="Save Selections" class="bluebtn"/>
 			</div>
 		</div>
 		<div style="border:1px solid #C2DBF3;background: #F8FAFC;margin-top:5px;">
@@ -64,7 +64,7 @@
 % }
 
 <div style="clear: both;">&nbsp;</div>
-     <div id="container_data_lineBottom">&nbsp;</div>
+     <div id="container_data_lineBottom" style="position:absolute;bottom:10px;width:840px;">&nbsp;</div>
 </div>
 </div>
 <%args>
@@ -165,23 +165,25 @@
 		$source = "User data";
 	} elsif ($source =~ /^blast:(\d+)$/) {
 		$source = "Blast hits";
-		my $blast = DNALC::Pipeline::Phylogenetics::Blast->retrieve($1);
-		if ($blast) {
+		## Commented all the following out because it is not 100% functional
+		## for example: if you break a pair, the name of the pair is no longer there
+		#my $blast = DNALC::Pipeline::Phylogenetics::Blast->retrieve($1);
+		#if ($blast) {
 			# if there is a sequence id associated, it is a sequence (not a pair)
 			# and so get the source name this way
-			if ($blast->sequence_id) {
-				my $seq = DNALC::Pipeline::Phylogenetics::DataSequence->retrieve($blast->sequence_id);
-				$source .= " from " . $seq->display_id if $seq;
-			}
+			#if ($blast->sequence_id) {
+				#my $seq = DNALC::Pipeline::Phylogenetics::DataSequence->retrieve($blast->#sequence_id);
+				#$source .= " from " . $seq->display_id if $seq;
+			#}
 			# if there is no sequence id associated with this blast object, 
 			# that means it must be a pair, so we need to get the source name in this way
-			else {
-				my ($bid) = DNALC::Pipeline::Phylogenetics::BlastRun->search(bid => $blast);
-				my $pair_id = (split(/-p/, $bid))[1] if $bid;
-				my $pair = DNALC::Pipeline::Phylogenetics::Pair->retrieve($pair_id) if $pair_id;
-				$source .= " from " . $pair->name if $pair;
-			}
-		}
+			#else {
+				#my ($bid) = DNALC::Pipeline::Phylogenetics::BlastRun->search(bid => $blast);
+				#my $pair_id = (split(/-p/, $bid))[1] if $bid;
+				#my $pair = DNALC::Pipeline::Phylogenetics::Pair->retrieve($pair_id) if $pair_id;
+				#$source .= " from " . $pair->name if $pair;
+			#}
+		#}
 	} elsif ($source =~ /^ref:(.+)$/) {
 		$source = "Reference data set <strong>$1</strong>";
 	}
