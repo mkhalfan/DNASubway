@@ -194,7 +194,7 @@ new Tip('auto-pair-help', "Auto Pair will attempt to pair your sequences for you
 	
 	push @sequences, map {
 				{s => $_, type => "s"}
-			}  sort {$a->display_id cmp $b->display_id} $pm->initial_sequences;
+			} $pm->initial_sequences;
 	
 	if ($r->method eq "POST") {
 		$rm_pairs =~ s/,$//g;
