@@ -28,7 +28,7 @@ input[type="checkbox"] {
 	</div>
 %	}
 	<div id="seqids">
-		<pre>
+		<pre style="font-family:arial;font-size:0.8em;">
 % $cnt = 0;
 % for (@sequences) {
 %	my $class = $_->{type} eq "p" ? $pair_classes[$cnt++] : "";
