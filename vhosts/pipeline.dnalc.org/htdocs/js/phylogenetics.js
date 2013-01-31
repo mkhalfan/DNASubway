@@ -2440,7 +2440,7 @@ Event.observe(window, Prototype.Browser.IE ? 'load' : 'dom:loaded', function() {
 			});
 		});	
 		// Set column widths and display columns
-		phy.setColumnWidths(837);
+		phy.setColumnWidths(797);
 	}
 	
 	// step 2 is from the sequence viewer, once you select a trace file to view
@@ -2472,7 +2472,7 @@ Event.observe(window, Prototype.Browser.IE ? 'load' : 'dom:loaded', function() {
 		}
 		
 		// Set column widths and display columns
-		phy.setColumnWidths(837);
+		phy.setColumnWidths(797);
 		
 	}
 	else if (step == 3) {
