@@ -10,13 +10,13 @@
 % for (@files) {
 %	my $name = $_->file_name; $name =~ s/\..*?$//;
 		<div id="x<% $_ |html %>" class="sequence_label_block <% $fid == $_->id ? "active" : "" %>">
-			<div class="file_label"><a href="./view_sequences.html?pid=<% $pid |html%>;fid=<% $_->id %>;show_trimmed=<% $show_trimmed %>" title="<% $name |html%>" border=0><% $name |html%></a></div>
+			<div class="file_label"><a href="./view_sequences.html?pid=<% $pid |html%>;fid=<% $_->id %>;show_trimmed=<% $show_trimmed %>" title="<% $name |html%>"><% $name |html%></a></div>
 			<& .dlink, path => $_->file_path &>
 %	if ($_->has_low_q) {
 			<span id="low_qs_<% $_->id %>" class="mini-trace-icon"><a href="./view_sequences.html?pid=<% $pid |html%>;fid=<% $_->id %>;show_trimmed=<% $show_trimmed %>"><img src="/images/chart_curve_error.png" border=0 alt="Low Quality Score Alert" /></a></span>
 %	}
 %	else {
-			<span class="mini-trace-icon"><a href="./view_sequences.html?pid=<% $pid |html%>;fid=<% $_->id %>;show_trimmed=<% $show_trimmed %>" border=0><img src="/images/chart_curve.png" alt="View Trace" title="View Trace" /></a></span>
+			<span class="mini-trace-icon"><a href="./view_sequences.html?pid=<% $pid |html%>;fid=<% $_->id %>;show_trimmed=<% $show_trimmed %>"><img src="/images/chart_curve.png" alt="View Trace" title="View Trace" /></a></span>
 %	}
 		<div style="clear:both;height:0px"></div>
 		</div>
