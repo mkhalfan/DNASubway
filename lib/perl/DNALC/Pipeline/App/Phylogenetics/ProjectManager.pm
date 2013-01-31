@@ -15,6 +15,7 @@ use Carp;
 use Digest::MD5();
 use POSIX qw/strftime floor/;
 use Data::Dumper;
+use Sort::Key::Natural qw(natkeysort);
 
 #use DNALC::Pipeline::ProjectLogger ();
 use DNALC::Pipeline::Config ();
@@ -616,14 +617,8 @@ use Bio::Trace::ABIF ();
 			@files = DataFile->search(project_id => $self->project);
 		}
 
-		# sort numerically and alphabetically
-		my @sorted = map { $_->[0] }
-			sort { 
-				if ( defined $a->[1] && defined $b->[1] && $a->[1] =~ /^\d+$/ && $b->[1] =~ /^\d+$/) {
-					return $a->[1] <=> $b->[1];
-				}
-				return $a->[2] cmp $b->[2];
-			} map { my $fn = $_->file_name; $fn =~ s/\.ab1//; [$_, $fn =~ /(\d+)/ ? $1 : undef, uc($_->file_name)] } @files;
+		# use natural sort
+		my @sorted = natkeysort {$_->file_name} @files;
 
 		wantarray ? @sorted : \@sorted;
 	}
@@ -667,13 +662,7 @@ use Bio::Trace::ABIF ();
 		return unless $self->project;
 		
 		my @pairs = Pair->search(project_id => $self->project, { order_by => 'pair_id' });
-		my @sorted = map { $_->[0] }
-			sort { 
-				if ( defined $a->[1] && defined $b->[1] && $a->[1] =~ /^\d+$/ && $b->[1] =~ /^\d+$/) {
-					return $a->[1] <=> $b->[1];
-				}
-				return $a->[2] cmp $b->[2];
-			} map { [$_, $_->name =~ /(\d+)/ ? $1 : undef, uc($_->name)] } @pairs;
+		my @sorted = natkeysort { $_->name } @pairs;
 
 		wantarray ? @sorted : \@sorted;
 	}
@@ -685,14 +674,7 @@ use Bio::Trace::ABIF ();
 		my ($self) = @_;
 		my @np_seqs = DataSequence->search_non_paired_sequences($self->project);
 		
-		map { $_->[0] }
-			sort { 
-				if ( defined $a->[1] && defined $b->[1] && $a->[1] =~ /^\d+$/ && $b->[1] =~ /^\d+$/) {
-					return $a->[1] <=> $b->[1];
-				}
-				return $a->[2] cmp $b->[2];
-			} map { [$_, $_->display_id =~ /(\d+)/ ? $1 : undef, uc($_->display_id)] } @np_seqs;
-
+		natkeysort { $_->display_id } @np_seqs;
 	}
 	#-----------------------------------------------------------------------------
 	#
@@ -702,13 +684,9 @@ use Bio::Trace::ABIF ();
 		return unless $self->project;
 
 		my @sequences = DataSequence->search(project_id => $self->project);
-		my @sorted = map { $_->[0] }
-			sort { 
-				if ( defined $a->[1] && defined $b->[1] && $a->[1] =~ /^\d+$/ && $b->[1] =~ /^\d+$/) {
-					return $a->[1] <=> $b->[1];
-				}
-				return $a->[2] cmp $b->[2];
-			} map { [$_, $_->display_id =~ /(\d+)/ ? $1 : undef, uc($_->display_id)] } @sequences;
+		my @sorted = natkeysort { 
+				$_->display_id
+			} @sequences;
 
 		wantarray ? @sorted : \@sorted;
 	}
@@ -726,14 +704,9 @@ use Bio::Trace::ABIF ();
 			push @sequences, $s;
 		}
 
-		my @sorted = map { $_->[0] }
-			sort { 
-				if ( defined $a->[1] && defined $b->[1] && $a->[1] =~ /^\d+$/ && $b->[1] =~ /^\d+$/) {
-					return $a->[1] <=> $b->[1];
-				}
-				return $a->[2] cmp $b->[2];
-			} map { [$_, $_->display_id =~ /(\d+)/ ? $1 : undef, uc($_->display_id)] } @sequences;
-
+		my @sorted = natkeysort { 
+				$_->display_id
+			} @sequences;
 
 		wantarray ? @sorted : \@sorted;
 	}
