@@ -1016,6 +1016,7 @@ color:#2e83ac;
 	margin-right:10px;
 	max-width:221px;
 	display:inline-block;
+	float:left;
 }
 .file_label a{
 	color:#006699;
@@ -1051,9 +1052,10 @@ color:#2e83ac;
 	border-bottom:1px solid #e0e9f6;
 }
 
-.mini-trace-icon {
+.mini-trace-icon a {
 	float:right;
 	margin-right:5px;
+	border:0;
 }
 
 #trace-viewer{
