@@ -342,11 +342,21 @@ use Data::Dumper;
 		print STDERR  ' + app_name = ', $app_name, $/;
 		print STDERR  ' + app_id = ', $app_id, $/;
 
-		my $api_instance = $self->api_instance;
-		return {status => 'fail', message => 'sub app: no api_instance object'} unless $api_instance;
+		# use memcached to keep $app for a while
+		# get the app from our cache
+		my $app = $self->{_mc}->get("app-$app_id");
+		unless ($app) { # if not found, get it from the API
+		
+			my $api_instance = $self->api_instance;
+			return {status => 'fail', message => 'sub app: no api_instance object'} unless $api_instance;
 
-		my $app_ep = $api_instance->apps;
-		my $app = $app_ep->find_by_id($app_id);
+			my $app_ep = $api_instance->apps;
+			$app = $app_ep->find_by_id($app_id);
+
+			# cache our $app for a few hours
+			$self->{_mc}->set("app-$app_id", $app);
+		}
+
 		if ($app) {
 
 			# TODO : find a better name for the next method
@@ -494,7 +504,8 @@ use Data::Dumper;
 		#$params->{callbackUrl} = 'http://summercamps.dnalc.org/payment_notify.html?payer_email=&txn_id=0&';
 
 		# create the DB job entry, and update it later, as we need it
-		my $jobdb = eval {DNALC::Pipeline::NGS::Job->create({
+		my $jobdb = eval {
+				DNALC::Pipeline::NGS::Job->create({
 					project_id => $self->project,
 					user_id => $self->project->user_id,
 					task_id => $self->{task_name_to_id}->{ $task_name },  # TODO - check if task exists
