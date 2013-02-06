@@ -7,7 +7,7 @@ use base qw(DNALC::Pipeline::DBI);
 
 __PACKAGE__->table('ngs_job');
 __PACKAGE__->columns(Primary => qw/id/);
-__PACKAGE__->columns(Essential => qw/api_job_id project_id task_id user_id status_id deleted/);
+__PACKAGE__->columns(Essential => qw/api_job_id project_id task_id user_id status_id deleted is_basic/);
 __PACKAGE__->columns(Other => qw/duration created/);
 
 __PACKAGE__->sequence('ngs_job_id_seq');
