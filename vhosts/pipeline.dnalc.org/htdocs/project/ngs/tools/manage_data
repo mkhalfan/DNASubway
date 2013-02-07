@@ -90,5 +90,7 @@
 	# project's owner
 	my $is_owner = $s->{user_id} == $proj->user_id if $proj;
 	my $data = $pm->data;
+
+	$m->redirect('./add_data?no_data=1') unless $data->count;
 	
 </%init>
