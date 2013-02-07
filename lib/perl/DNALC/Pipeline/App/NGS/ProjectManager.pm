@@ -510,7 +510,7 @@ use Data::Dumper;
 					user_id => $self->project->user_id,
 					task_id => $self->{task_name_to_id}->{ $task_name },  # TODO - check if task exists
 					status_id => $status_map{"not-processed"},
-					is_basic => delete $params->{is_basic},
+					is_basic => delete $params->{is_basic} || "false",
 				});
 		};
 		if ($@) {
