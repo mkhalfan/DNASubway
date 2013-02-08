@@ -15,21 +15,23 @@
 	</div>
 	<p style="text-align:center"><input type="button" value="Cancel" /> | <input type="submit" value="Submit" /></p>
 </form>
-<!--	
+
 <pre style="float:left">
 	<div>
 		status: <% $st->{status} %> <% $st->{message} ? " » " . $st->{message} : "" %>
 	</div>
-	<% Dumper($form) %>
+%#	<% Dumper($form) %>
 </pre>
--->
+
 % } else {
 	No application found for conf file: '<% $app_cf_file |html %>'.
 % }
 </div> <!-- end container_data1 --> 
+
 %#-----------------------------------------------------------------
 <%args>
 	$pid => 0
+	$fid => 0
 </%args>
 <%once>
 	use Data::Dumper;
@@ -82,12 +84,17 @@
 		
 		$form->{jobName} =~ s|/+||g;
 		
+		## MOHAMMED's NEW CODE FOR BASIC RUNNING ##
+		if ($form->{basic_run} && $form->{basic_run} == 1) {
+			for my $p (@{$app->parameters}) {
+				$form->{$p->{id}} = $p->{value} || $p->{defaultValue};
+			}
+			$form->{is_basic} = "true";
+		}
+		
 		for my $p (@{$app->parameters}) {
 			if ($p->{hidden} && !defined $form->{$p->{id}}) {
 				$form->{$p->{id}} = $p->{value} || $p->{defaultValue};
-			}
-			if ($p->{id} eq "mate_inner_dist") {
-				print STDERR "app_tophat: p = ", $p->{validator}, $/;
 			}
 		}
 
@@ -99,6 +106,7 @@
 		#}
 		
 		# what do we do when we don`t get the paths?!
+		print STDERR "\n\npid: $pid\n\npm: $pm\n\ngenome: $pm->project_genome_path\n\n";
 		$form->{genome} = $pm->project_genome_path;
 		$form->{annotation} = $pm->project_annotation_path;
 		$form->{processors} ||= 4;
@@ -112,10 +120,10 @@
 		}
 
 		$form->{requestedTime} ||= '0:45:00';
-		#print STDERR "app_tophat: form = ", Dumper( $form ), $/;
+		print STDERR "app_tophat: form = ", Dumper( $form ), $/;
 
 		$st = $pm->submit_job('ngs_tophat', $app, $form);
-		print STDERR "app_tophat: JOB status = ", Dumper( $st ), $/;
+		#print STDERR "app_tophat: JOB status = ", Dumper( $st ), $/;
 
 		if ($st->{status} ne "success") {
 			if ($st->{message} =~ /missing required/i && $st->{data} && %{$st->{data}}) {
@@ -125,11 +133,14 @@
 			}
 		}
 		else {
-			if ($st->{data}) {
+			if ($form->{basic_run} == 1 && $st->{data}){
+				$m->redirect("./return_status?s=success&job_name=" . $st->{data}->attrs->{name}. "&job_status=" . $st->{data}->status . "&job_id=" . $st->{data}->id);
+			}
+			elsif ($st->{data}) {
 				# redirect to our job list page
 				print STDERR "JOB ID: ", $st->{data}->id, "//", $st->{data}->api_job_id, $/;
-				$m->comp('/_message_add', 'Job submitted!');
-				$m->redirect("./tool_job_list?tool=tophat;launched=1;pid=" . $pid);
+				#$m->comp('/_message_add', 'Job submitted!');
+				$m->redirect("./job_list_tophat?pid=" . $pid . "&jid=" . $st->{data}->id );
 			}
 		}
 	}
@@ -139,6 +150,10 @@
 				$form->{$p->{id}} = defined $p->{value} ? $p->{value} : $p->{defaultValue};
 			}
 		}
+		if ($fid && $fid =~ /^\d+$/) {
+			$form->{query1} = $fid;
+		}
 	}
 </%init>
+
 

@@ -112,4 +112,16 @@ sub get_jobs_status {
 }
 
 
+__PACKAGE__->set_sql(jobs_with_this_input_file => qq{
+	select ngs_job.*
+	from ngs_job_input_file, ngs_job
+	where ngs_job_input_file.job_id = ngs_job.id
+	and ngs_job.project_id = ?
+	and ngs_job_input_file.file_id = ?
+	and ngs_job.task_id = ?
+	order by ngs_job.id
+});
+
+
+
 1;

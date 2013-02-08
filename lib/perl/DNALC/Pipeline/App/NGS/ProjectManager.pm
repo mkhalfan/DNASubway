@@ -10,6 +10,7 @@ use aliased 'DNALC::Pipeline::NGS::Project';
 use aliased 'DNALC::Pipeline::NGS::DataFile';
 use aliased 'DNALC::Pipeline::NGS::DataSource';
 use aliased 'DNALC::Pipeline::NGS::JobTrack';
+use aliased 'DNALC::Pipeline::NGS::JobOutputFile';
 
 use DNALC::Pipeline::Config ();
 use DNALC::Pipeline::Task ();
@@ -917,7 +918,7 @@ use Data::Dumper;
 						last_modified => localtime($df->last_modified/1000)->datetime,
 					});
 				if ($data_file) {
-					my $outfile = DNALC::Pipeline::NGS::JobOutputFile->create({
+					my $outfile = JobOutputFile->create({
 							file_id => $data_file,
 							job_id => $job,
 							project_id => $job->project_id,

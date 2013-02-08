@@ -48,7 +48,7 @@
 }
 
 #jobs_table thead {
-	background-color:#e8eef7;
+	background-color:#989B9F;
 }
 
 #jobs_table thead th {
@@ -61,7 +61,7 @@
 	padding:5px 10px;
 }
 
-#jobs_table tr.even {
+#jobs_table tr.even, #jobs_table tr.file {
 	background-color:#e8eef7;
 }
 
@@ -143,4 +143,43 @@
 }
 #graphs .graph.active {
 	border: 1px solid green;
+}
+
+.text_submit{
+	/*background-color:#E8EEF7;*/
+	border:0;
+	/*cursor:pointer;*/
+	color:#3C679A;
+	font-weight:bold;
+	/*padding:0;*/
+	text-decoration:none;
+	font-size:16px;
+	/*font-family:arial;*/
+}
+.disabled_text_submit{
+	font-weight:bold;
+	padding:0;
+	font-size:16px;
+	color:#999999;
+}
+
+.alpha{
+	opacity:0.4;
+	filter:alpha(opacity=40); /* For IE8 and earlier */
+}
+
+tr.fade {
+  -transition-property: background-color;  
+  -transition-duration: 2s; 
+  -moz-transition-property: background-color;  
+  -moz-transition-duration: 2s; 
+  -webkit-transition-property: background-color;  
+  -webkit-transition-duration: 2s; 
+  -o-transition-property: background-color;  
+  -o-transition-duration: 2s;    
+  background-color: #fff;
+}
+
+.highlight {
+	background-color: pink;
 }

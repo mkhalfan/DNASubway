@@ -3,9 +3,10 @@
 % for (@files) {
 %	my $sel = defined $user_value && $user_value eq $_->id ? q{selected="selected"} : "";
 %#	<option value="<% $_->id %>" <% $sel %>><% $_->file_name |html%></option>
-	<option value="<% $_->id %>" <% $sel %>><% $_->trimmed_file ? $_->trimmed_file->file_name : $_->file_name |html %></option>
+	<option value="<% $_->id %>" id="<% $_->id %>" <% $sel %>><% $_->trimmed_file ? $_->trimmed_file->file_name : $_->file_name |html %></option>
 % }
 </select>
+
 <%args>
 	$pm => undef
 	$element => undef

@@ -1,0 +1,13 @@
+{status: '<% $s|js %>', job_name: '<% $job_name|js %>', job_status: '<% $job_status|js %>', job_id: '<% $job_id|js %>'}
+<%args>
+	$s => ''
+	$job_name => ''
+	$job_status => ''
+	$job_id => ''
+</%args>
+<%init>
+	$r->no_cache(1);
+</%init>
+<%flags>
+   inherit => undef
+</%flags>

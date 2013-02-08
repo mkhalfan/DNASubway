@@ -57,7 +57,7 @@ NGS.prototype.launch = function(what, where, title) {
 			data: ['/project/ngs/tools/manage_data?pid=', 'Manage data'],
 			ngs_cufflinks: ['/project/ngs/tools/tool_job_list?tool=' + tool + '&pid=', 'Cufflinks'],
 			ngs_cuffdiff: ['/project/ngs/tools/tool_job_list?tool=' + tool + '&pid=', 'Cuffdiff'],
-			ngs_tophat: ['/project/ngs/tools/tool_job_list?tool=' + tool + '&pid=' , 'TopHat'],
+			ngs_tophat: ['/project/ngs/tools/job_list_' + tool + '?pid=' , 'TopHat'],
 			ngs_fxtrimmer: ['/project/ngs/tools/tool_job_list?tool=' + tool + '&pid=' , 'FastX Toolkit'],
 			ngs_cuffmerge: ['/project/ngs/tools/tool_job_list?tool=' + tool + '&pid=' , 'Cuffmerge']
 		};
@@ -155,6 +155,45 @@ NGS.prototype.check_status = function() {
 	});
 };
 
+NGS.prototype.basic_run = function(tool, pid, fid, a) {
+	cell = a.up();
+	cell.update('<img src="/images/ajax-loader-2.gif" style="width:12px;padding-left:5px;" class="alpha">');
+	new Ajax.Request('/project/ngs/tools/app_' + tool, {
+		method:'post',	
+		parameters: {'pid': pid, 'query1': fid, 'basic_run': 1},
+		onSuccess: function(transport){
+				var r = transport.responseText.evalJSON();
+				if (r && r.status == 'success') {
+					// Default last row is the file row
+					lastRow = $('file' + fid);
+					// Get the last row in the current files' jobs listing
+					childRows = $$('[parent="file' + fid + '"]');
+					// If there are child rows, update last row to be 
+					// the last row of the child jobs of this file
+					if (childRows.length > 0) {
+						lastRow = childRows[childRows.length - 1];
+					}
+					// Add a processing icon only if the job status is 'processing'
+					processing_icon = "";
+					if (r.job_status == 'processing') {
+						processing_icon = ' <img src="/images/ajax-loader-2.gif" width="12px;">';
+					}
+					lastRow.insert({after:'<tr id="job-' + r.job_id + '" class="highlight" parent="file' + fid + '"><td></td><td>' + r.job_name + '</td><td></td><td></td><td>' + r.job_status + processing_icon + '</td><td></td></tr>'});
+					Element.addClassName.delay(0.15, 'job-' + r.job_id, 'fade');
+					cell.update('<span class="disabled_text_submit">Run</span>');
+				}
+				else {
+					console.warn("Error: " + r.message);
+					cell.upadte('<a onclick="javascript:ngs.basic_run("tophat", ' + pid + ', ' + fid + ', this)" href="javascript:;" class="text_submit">Run</a>');
+				}
+			},
+		onFailure: function(){ 
+			alert('Something went wrong!\nAborting...');
+			cell.upadte('<a onclick="javascript:ngs.basic_run("tophat", ' + pid + ', ' + fid + ', this)" href="javascript:;" class="text_submit">Run</a>');
+		}
+	});
+};
+
 NGS.prototype.toggle_params = function(){
 	$('app_parameters').toggle();
 	$('show_params').toggle();
@@ -187,12 +226,18 @@ Event.observe(window, 'load', function() {
 			});
 		}
 	}
+	/* Step 3 is TopHat Jobs window */
+	else if (step == 3) {
+		var jid = document.getElementById('jid').value;
+		$('job-' + jid).addClassName('highlight');
+		Element.addClassName.delay(0.15, 'job-' + jid, 'fade');
+	}
 	
 	
 	//Add alternating row colors for tables using prototype
-	$$('#jobs_table tbody tr:nth-child(even)').each(function(tr) {
-		tr.addClassName('even');
-	});
+	//$$('#jobs_table tbody tr:nth-child(even)').each(function(tr) {
+		//tr.addClassName('even');
+	//});
 });
 
 //alert("step = " + Prototype.Browser.IE);
