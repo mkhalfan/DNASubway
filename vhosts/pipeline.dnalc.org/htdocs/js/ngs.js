@@ -126,7 +126,7 @@ NGS.prototype.disable_status_check = function() {
 NGS.prototype.check_status = function() {
 	new Ajax.Request('/project/ngs/tools/tool_stats', {
 		method:'get',	
-		parameters: {'pid': this.pid},
+		parameters: {'pid': this.pid, 'x': new Date().getTime()},
 		onSuccess: function(transport){
 				var r = transport.responseText.evalJSON();
 				if (r && r.status == 'success') {
@@ -138,6 +138,15 @@ NGS.prototype.check_status = function() {
 							if (ngs.get_status(t) != r.tools[t]) {
 								console.info('  ++ =>' + t);
 								ngs.set_status(t, r.tools[t]);
+								if (ngs.windows[t]) {
+									try {
+										ngs.windows[t].iframe.contentDocument.location.reload();
+										console.info('  +- => reloaded "popup" window for ' + t);
+									} catch (e) {
+										console.info('  +- => unable to reloaded "popup" window for ' + t);
+										console.info('  +- => ' + e);
+									};
+								}
 							}
 							if (r.tools[t] == 'processing')
 								processing += 1;
@@ -155,8 +164,11 @@ NGS.prototype.check_status = function() {
 	});
 };
 
+// TODO should pass the name of the input form (which represents the file to be processed)
+// if you know the fid, do we really need the 'a' object?!
+//
 NGS.prototype.basic_run = function(tool, pid, fid, a) {
-	cell = a.up();
+	var cell = a.up();
 	cell.update('<img src="/images/ajax-loader-2.gif" style="width:12px;padding-left:5px;" class="alpha">');
 	new Ajax.Request('/project/ngs/tools/app_' + tool, {
 		method:'post',	
@@ -165,22 +177,25 @@ NGS.prototype.basic_run = function(tool, pid, fid, a) {
 				var r = transport.responseText.evalJSON();
 				if (r && r.status == 'success') {
 					// Default last row is the file row
-					lastRow = $('file' + fid);
+					var lastRow = $('file' + fid);
 					// Get the last row in the current files' jobs listing
-					childRows = $$('[parent="file' + fid + '"]');
+					var childRows = $$('[parent="file' + fid + '"]');
 					// If there are child rows, update last row to be 
 					// the last row of the child jobs of this file
 					if (childRows.length > 0) {
 						lastRow = childRows[childRows.length - 1];
 					}
 					// Add a processing icon only if the job status is 'processing'
-					processing_icon = "";
+					var processing_icon = "";
 					if (r.job_status == 'processing') {
 						processing_icon = ' <img src="/images/ajax-loader-2.gif" width="12px;">';
 					}
 					lastRow.insert({after:'<tr id="job-' + r.job_id + '" class="highlight" parent="file' + fid + '"><td></td><td>' + r.job_name + '</td><td></td><td></td><td>' + r.job_status + processing_icon + '</td><td></td></tr>'});
 					Element.addClassName.delay(0.15, 'job-' + r.job_id, 'fade');
 					cell.update('<span class="disabled_text_submit">Run</span>');
+
+					// inform the panel about this new job
+					top.ngs.set_status('ngs_' + tool, 'processing');
 				}
 				else {
 					console.warn("Error: " + r.message);
@@ -231,6 +246,7 @@ Event.observe(window, 'load', function() {
 		var jid = document.getElementById('jid').value;
 		$('job-' + jid).addClassName('highlight');
 		Element.addClassName.delay(0.15, 'job-' + jid, 'fade');
+		top.ngs.set_status('ngs_tophat' + tool, 'processing');
 	}
 	
 	
