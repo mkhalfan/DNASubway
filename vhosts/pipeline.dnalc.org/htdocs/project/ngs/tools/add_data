@@ -100,13 +100,15 @@
 	</pre>
 	</div>
 
+% if ($no_data) {
+	<script type="text/javascript">top.show_messages("Please add some FASTQ files to your lonely project..")</script>
+% }
 
 <%args>
 	$pid => 0
-	#$t => ''
-	#$action => ''
 	$current_path => ''
 	@files => ()
+	$no_data => undef
 </%args>
 <%once>
 	use DNALC::Pipeline::App::NGS::ProjectManager ();
@@ -129,10 +131,7 @@
 	my ($path_to_read, $parent_dir, $dir_list, $files_added);
 	
 	if ($r->method eq "POST") {
-		#print STDERR "curr_path: $current_path", $/;
-		#print STDERR Dumper(\@files), $/;
 		my $pm = DNALC::Pipeline::App::NGS::ProjectManager->new({project => $pid});
-		#print STDERR Dumper($pm), $/;
 		$files_added = 0;
 		if ($pm->project && @files) {
 			$pm->api_instance($apif) if $apif;
@@ -144,6 +143,7 @@
 						},
 						{_no_remote_check => 0} # do check if files exist
 					);
+				print STDERR  'ref($f) = ', ref($f), $/;
 				$files_added++ if ref($f) =~ //;
 			}
 		}
@@ -151,6 +151,8 @@
 	}
 	else {
 	
+		# TODO : we should have this point to the right sample data (if we have a 
+		#	rice project we can't offer A.thaliana sample data
 		my $path_info = $r->path_info;
 		if ($path_info =~ /^\/samples\/arabidopsis_thaliana/) {
 			$browse_path = '/shared/iplant_DNA_subway/sample_data/fastq/arabidopsis_thaliana';
