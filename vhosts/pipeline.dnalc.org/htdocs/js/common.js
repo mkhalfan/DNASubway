@@ -431,30 +431,6 @@ Event.observe(window, isMSIE ? 'load' : 'dom:loaded', function() {
 			return;
 		}
 	}
-	
-	// check messages
-	var mess = $("message_list") ? $("message_list").innerHTML : '';
-	try {
-		if (!get_cookie("javaChecked")) {
-			var needsUpgrade = false;
-			if (deployJava.versionCheck('1.5+') == false) {
-				mess += "<div>You need the latest Java Runtime Environment.</div>";
-				needsUpgrade = true;
-			}
-			if (deployJava.isWebStartInstalled("1.6+") == false) {
-				mess += "<div>You need the latest Java WebStart.</div>";
-				needsUpgrade = true;
-			}
-			if (needsUpgrade) {
-				mess += "<div><br/>Please <a href=\"#\" onclick=\"javascript:deployJava.installLatestJRE();\">install</a> the latest Java Runtime Environment.</div>";
-			}
-			set_cookie("javaChecked", "1", 1);
-		}
-	}
-	catch (e) {}
-	if (mess) {
-		w = show_messages(mess);
-	}
 });
 
 Event.observe(document, 'keypress', function(ev) {
