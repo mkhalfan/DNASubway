@@ -2,7 +2,6 @@
 use strict;
 
 # Import GFF into JBrowse
-
 use constant JB     => '/usr/local/tomcat7/webapps/WebApollo/jbrowse';
 
 chdir JB || die "I could not cd to ".JB." $!";
