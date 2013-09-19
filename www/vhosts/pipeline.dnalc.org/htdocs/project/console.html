@@ -211,14 +211,14 @@
           "done" ? 'Rb' : 'Rb_disabled' %>">
         </div>
       </span>
-
+    </span>
     <span class="bt_browserBlue">
 %   if ( $sample && $sample->links) {
       <a id="exporter_btn" href="javascript:;" \
         class="<% $rm_status eq "done" ? '' : 'disabled'%>" \
         onclick="<% $rm_status eq "done" ? 
-        "launch('exporter',null,'" .  $external_browser_name . "')" : "" %>">
-        <div style="margin-top:7px"><% $external_browser_name %></div>
+        "launch('exporter',null,'JBrowse')" : "" %>">
+        <div style="margin-top:7px">JBrowse</div>
       </a>
 % }   else {
       <a id="exporter_btn">No Browser<br>Available</a>
