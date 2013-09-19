@@ -1,0 +1,161 @@
+
+<div class="container_data1">
+	<div id="container_data_line">&nbsp;</div>
+%	if ($show_trimmed) {
+	<div id="showing-trimmed-notice"><img src="/images/info.png" style="vertical-align: middle;padding-right:7px;" />Your sequences have been trimmed</div>
+	<div style="clear: both;"></div>
+%	}	
+	<div id="seqids" class="seqids">
+
+% for (@files) {
+%	my $name = $_->file_name; $name =~ s/\..*?$//;
+		<div id="x<% $_ |html %>" class="sequence_label_block <% $fid == $_->id ? "active" : "" %>">
+			<div class="file_label"><a href="./view_sequences.html?pid=<% $pid |html%>;fid=<% $_->id %>;show_trimmed=<% $show_trimmed %>" title="<% $name |html%>"><% $name |html%></a></div>
+			<& .dlink, path => $_->file_path &>
+%	if ($_->has_low_q) {
+			<span id="low_qs_<% $_->id %>" class="mini-trace-icon"><a href="./view_sequences.html?pid=<% $pid |html%>;fid=<% $_->id %>;show_trimmed=<% $show_trimmed %>"><img src="/images/chart_curve_error.png" border=0 alt="Low Quality Score Alert" /></a></span>
+%	}
+%	else {
+			<span class="mini-trace-icon"><a href="./view_sequences.html?pid=<% $pid |html%>;fid=<% $_->id %>;show_trimmed=<% $show_trimmed %>"><img src="/images/chart_curve.png" alt="View Trace" title="View Trace" /></a></span>
+%	}
+		<div style="clear:both;height:0px"></div>
+		</div>
+% }
+% for (@sequences) {
+		<div id="x<% $_->display_id |html %>"class="sequence_label"><% $_->display_id |html%></div>
+% }
+	</div>
+	<div id="seqs" class="seqs">
+	
+% if ($file) {
+    <input type="hidden" id="step" value="2" />
+	<input type="hidden" id="seq_data" value="<% $file->seq |html%>" />
+	<input type="hidden" id="seq_A" value="<% join ",", $traces->{A} ? @{$traces->{A}} : () %>" />
+	<input type="hidden" id="seq_T" value="<% join ",", $traces->{T} ? @{$traces->{T}} : () %>" />
+	<input type="hidden" id="seq_C" value="<% join ",", $traces->{C} ? @{$traces->{C}} : () %>" />
+	<input type="hidden" id="seq_G" value="<% join ",", $traces->{G} ? @{$traces->{G}} : () %>" />
+	<input type="hidden" id="qvalues" value="<% join ",", @qvalues %>" />
+	<input type="hidden" id="b_locations" value="<% join ",", $file->base_locations %>" />
+	<input type="hidden" id="seq_display_id" value="<% $file->file_name %>" />
+	<input type="hidden" id="show_trimmed" value="<% $show_trimmed %>" />
+%	if ($show_trimmed) {
+%	my $seq_obj = $file->seq_object;
+	<input type="hidden" id="start" value="<% $seq_obj->start_pos %>" />
+	<input type="hidden" id="end" value="<% $seq_obj->end_pos %>" />
+% 	}
+	<div id="trace-viewer">
+		<canvas id="canvas1" height="200">
+			Your browser doesn't support this Trace Viewer.
+		</canvas>
+% 	if (@qvalues) {
+		<div id="view-seqs-help-bubble" title="What is this line?" onclick="$('view-seqs-help-message').toggle()"></div>
+		<div id="view-seqs-help-message" style="display:none">Bars depict quality scores for each nucleotide detected (called). The line marks a quality score of 20; bars below that line indicate low quality calls. <a href="http://en.wikipedia.org/wiki/Phred_quality_score" target="blank">More...</a></div>
+% 	}
+	</div>
+%	if ($file->has_low_q){
+	<div id="low-qs-alert-link">
+			<img src="/images/chart_curve_error.png" border=0 alt="Low Quality Score Alert" title="Low Quality Score Alert" style="vertical-align: middle; margin:5px" /><a href="http://en.wikipedia.org/wiki/Phred_quality_score" style="font-size:11px; font-family:'Tahoma'; color:#dd5326;" target="blank" title="The average error rate for this sequence is greater than 1%. This indicates that the sequence is of low quality and may produce erroneous analysis results.">Learn more about quality scores</a><a href="#" onclick="$('low-qs-alert-link').hide();"><img src="/images/x-orange.png" border=0 alt="Close" title="Close" style="vertical-align:top;cursor:pointer;float:right; margin:2px;" /></a>
+	</div>
+%	}
+	<div style="float:left; width: 100px;padding-left:10px;"><input type="button" id="zoom_reset" value=" Reset " onclick="phy.zoomReset()" class="bluebtn" /></div>
+	<div style="float:left; width: 200px; text-align: center;">
+		<span class="label">X: </span><input type="button" id="x_zoom_in" value="  +  " onclick="phy.zoomIn('x')" class="bluebtn" /><input type="button" id="x_zoom_out" value="  -  " onclick="phy.zoomOut('x')" class="bluebtn" />
+	</div>
+	<div style="float:left; width: 200px; text-align: right;">
+		<span class="label">Y: </span><input type="button" id="y_zoom_in" value="  +  " onclick="phy.zoomIn('y')" class="bluebtn" /><input type="button" id="y_zoom_out" value="  -  " onclick="phy.zoomOut('y')" class="bluebtn"/>
+	</div>
+%#	<pre><% Dumper($file)%></pre>
+% } else {
+<input type="hidden" id="step" value="22" />
+% unless ($show_trimmed) {
+% 	for (@files) {
+<div id="<%$_%>" class="seq-rows"><% $_->seq|html %></div>
+% 	}
+% 	for (@sequences) {
+<div id="<%$_%>" class="seq-rows"><% $_->left_trim|html %><% $_->seq|html %><% $_->right_trim|html %></div>
+% 	}
+% } else {
+% 	for (@files) {
+<div id="<%$_%>" class="seq-rows"><% $_->seq_object->seq|html %></div>
+% 	}
+% 	for (@sequences) {
+<div id="<%$_%>" class="seq-rows"><% $_->seq|html %></div>
+% 	}
+% }
+% }
+	 </div>
+%#     <div style="clear: both;">&nbsp;</div>
+
+	<div style="clear: both;">&nbsp;</div>
+     <div id="container_data_lineBottom">&nbsp;</div>
+</div> <!-- END of container_rightContent-->
+
+<%def .dlink>
+<%args>
+	$path => ''
+</%args>
+<%init>
+	my $fpath = $path =~ /^\// ? "" : "/files/projects_files/phylogenetics/" . $path;
+	return unless ($path && $fpath);
+	print qq{<span class="mini-trace-icon"><a href="$fpath"><img src="/images/download.png" alt="Download trace file" title="Download Trace File" /></a></span>};
+</%init>
+</%def>
+
+<%args>
+	$op => ''
+	$data => ''
+	$pid => 0
+	$fid => 0
+	$show_trimmed => 0
+</%args>
+<%once>
+	use File::Slurp qw/read_file/;
+	use DNALC::Pipeline::App::Phylogenetics::ProjectManager ();
+	use DNALC::Pipeline::Phylogenetics::DataSequence ();
+	use DNALC::Pipeline::Config ();
+	#use JSON::XS ();
+	use Data::Dumper;
+</%once>
+<%init>
+	$r->content_type("text/html");
+	my $pairs = undef;
+	
+	my @sequences = ();
+	my @qvalues = ();
+	my ($file, $traces);
+	my $display_id;
+
+	my $pm = DNALC::Pipeline::App::Phylogenetics::ProjectManager->new($pid);
+	my $proj = $pm->project;
+	unless ($proj) {
+		#$m->comp('/_message_add', 'Project not found!', 'error');
+		#$m->redirect('/project/');
+		print "Project not found!";
+		return;
+	}
+	
+	my @files = $pm->files("trace");
+	if (@files) {
+		#@sequences = DNALC::Pipeline::Phylogenetics::DataSequence->search_trace_sequences($pid);
+		#print STDERR "trace seq\n";
+		if ($fid && $fid =~ /^\d+$/) {
+			($file) = grep {$_->id == $fid } @files;
+			unless (-f $file->get_file_path) {
+				$file = undef;
+			}
+			if ($file) {
+				$traces = $file->trace;
+				@qvalues = $file->quality_values;
+			}
+		}
+	}
+	else {
+		#@sequences = $pm->sequences;
+	}
+	@sequences = DNALC::Pipeline::Phylogenetics::DataSequence->search_initial_non_trace_sequences($pid) unless $file;
+</%init>
+<%attr>
+	js => ['prototype-1.6.1.js', 'phylogenetics.js', 'prototip/prototip.js']
+	load_ie_canvas => 1
+</%attr>
+

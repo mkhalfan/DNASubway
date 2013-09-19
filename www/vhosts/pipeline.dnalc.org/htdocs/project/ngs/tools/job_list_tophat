@@ -1,0 +1,173 @@
+<div class="container_data1">
+<& /_messages &>
+	<table id="jobs_table">
+		<thead>
+			<tr>
+				<th class="col1">#</th>
+				<th class="col2">File Name</th>
+				<th class="col3">Basic</th>
+				<th class="col4">Advanced</th>
+				<th class="col5">Status</th>
+				<th class="col6">View Results</th>
+			</tr>
+		</thead>
+		<tbody>
+% my $i = 1;
+% for my $file (@files) {
+%# 32 is the task id for TopHat
+%	my $task_id = 32;
+%	my @jobs = DNALC::Pipeline::NGS::Job->search_jobs_with_this_input_file($pid, $file, $task_id);
+%	my $have_basic_run = grep {$_->is_basic} @jobs;
+%       # No more straight input file, fastx-first
+%       next if $file->is_input;
+%       my $file_name = $file->file_path;
+%       $file_name =~ s!\S+/!!;
+			<tr class="file" id="file<% $file %>">
+				<td><% $i++ %></td>
+				<td><% $file_name %></td>
+				<td><& .run_basic, file => $file, pid => $pid, have_basic_run => $have_basic_run &></td>
+				<td>
+%                               if ($public) {
+%                               	my $public_alert = 'Running of new analyses is not allowed on public projects';
+%                                       my $alert = qq(top.show_messages('$public_alert'));
+                                        <span class="disabled_text_submit" style="cursor:pointer" onclick="<% $alert %>">Run</span>
+% } else {
+					<a href="./app_tophat?pid=<% $pid |html%>&fid=<% $file %>" class="text_submit">Run</a>
+% }
+				</td>
+				<td></td>
+				<td></td>
+			</tr>
+			<& .jobs, file => $file, pid => $pid, jobs => \@jobs , username => $s->{username} &>
+% }
+
+		</tbody>
+	</table>
+% if ($jid) {
+	<input type="hidden" id="step" value="3" />
+	<input type="hidden" id="jid" value="<% $jid|html %>" />
+	<input type="hidden" id="tool" value="tophat" />
+% }
+</div> <!-- end container_data1 --> 
+%#-----------------------------------------------------------------
+<%def .run_basic>
+<%args>
+	$file => ''
+	$pid => 0
+	$have_basic_run => 0
+</%args>
+<%init>
+	return unless ($file);
+</%init>
+% my $pm = DNALC::Pipeline::App::NGS::ProjectManager->new({project => $pid, debug => 0});
+% my $fid = $file;
+% my $is_input = grep {$_->is_input} grep {$_->id == $fid} $pm->data;
+% my $public = $pm->is_public;
+
+% if (!$have_basic_run && !$public) {
+		<a onclick="javascript:ngs.basic_run('tophat', <% $pid %>, <% $file %>, this, <% $is_input %>)" 
+		   href="javascript:;" class="text_submit">Run</a>
+
+% } elsif ($public) {
+%               my $public_alert = 'Running of new analyses is not allowed on public projects';
+%               my $alert = qq(top.show_messages('$public_alert'));
+                <span class="disabled_text_submit" style="cursor:pointer" onclick="<% $alert %>">Run</span>
+% } else {
+                <span class="disabled_text_submit">Run</span>
+% }
+
+</%def>
+%#-----------------------------------------------------------------
+<%def .jobs>
+<%args>
+	$file => ''
+	$pid => 0
+	$jobs => []
+	$username => ''
+</%args>
+<%init>
+	return unless ($file && @$jobs);	
+        my $pm = DNALC::Pipeline::App::NGS::ProjectManager->new({project => $pid, debug => 0});
+        my $public = $pm->is_public;
+</%init>
+%	for my $job (@$jobs){
+		<tr parent="file<% $file %>" id="job-<% $job %>">
+			<td></td>
+			<td>
+			  <a href="./job_status?pid=<%$pid |html%>;jid=<% $job %>" style="color:black" target="_blank">
+                            <% $job->attrs->{name} |html%>
+                          </a>
+			</td>
+			<td></td>
+			<td></td>
+			<td><% $job->status eq "processing" ? "processing <img src='/images/ajax-loader-2.gif' width='12px;'>" : $job->status %></td>
+			<td>
+% if ($job->status eq 'done') {
+<a href="./launch_gbrowse?pid=<% $pid %>;jid=<% $job %>"><img src="/images/ngs/icon-gbrowse.png" title="View in GBrowse" alt="View in GBrowse" style="border:1px solid grey;\
+width:16px;"/></a><!--&nbsp;&nbsp;
+<a href="./launch_igv?pid=<% $pid %>;jid=<% $job %>"><img src="/images/ngs/icon-igv.png" title="View in IGV" alt="View in IGV" style="border:1px solid grey;width:16px;"/></a>-->&nbsp;&nbsp;
+%   my $path = $job->attrs->{archivePath};
+%   unless ($public) {
+%     $path =~ s/^\S+$username//;
+%     $path = "~$path";
+%   } else {
+%     $path =~ s!^\S+/!iplant/home/shared/iplant_DNA_subway/sample_data/public_projects/$pid/!;
+%   }
+
+<a href="https://data.iplantcollaborative.org/<% $path %>/" target="_blank">
+<img src="/images/ngs/generic_folder.png" title="View Output in iPlant Data Store" \
+alt="View Output in iPlant Data Store" style="border:0;width:16px;margin-left:5px;"/>
+</a>
+% }
+			</td>
+		</tr>
+%	}
+</%def>
+%#-----------------------------------------------------------------
+<%args>
+	$pid => 0
+	$tool => ''
+	$jid => 0
+</%args>
+<%once>
+	use Data::Dumper;
+	use Time::Piece qw/localtime/;
+	use DNALC::Pipeline::Utils qw(clean_query);
+	use DNALC::Pipeline::App::NGS::ProjectManager ();
+	use DNALC::Pipeline::NGS::Job();
+	use DNALC::Pipeline::User ();
+
+</%once>
+<%init>
+	$m->session->{pipeline} ||= {};
+	my $s = $m->session->{pipeline};
+	my $apif = iPlant::FoundationalAPI->new(
+		user => $s->{username},
+		token => $s->{api_token},
+		debug => 0,
+	);
+	
+	my $pm = DNALC::Pipeline::App::NGS::ProjectManager->new({project => $pid, debug => 0});
+	$pm->api_instance($apif) if $apif;
+	my $proj = $pm->project;
+	my $public = $pm->is_public;	
+
+	#my $jobs = $pm->get_jobs_by_task('ngs_tophat'); # show non-deleted jobs only
+		my $app;
+	my $app_cf_file = "NGS_TOPHAT";
+	my $st = $pm->app($app_cf_file);
+
+	if ($st->{status} eq "success") {
+		$app = $st->{app};
+	}
+	else {
+		print STDERR $st->{status}, " ", $st->{message}, $/;
+	}
+
+	my $input_files_only = $app->{conf}->{_input_only_files};
+	my $filter = $app->{conf}->{_input_file_filter};
+	my @files_all = $input_files_only ? grep {$_->is_input} $pm->data : $pm->data;
+	my @files = grep {$_->file_path =~ /$filter/ && !$_->is_local} @files_all if $filter;
+	#print STDERR join("\n", map {$_->id . " " . $_->file_path} @files), "\n";
+</%init>
+%#------------------------------------------------------------------------------------

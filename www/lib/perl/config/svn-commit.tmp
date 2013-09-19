@@ -1,0 +1,10 @@
+updating API apps and a few regex
+
+--This line, and those below, will be ignored--
+
+M    NGS_CUFFDIFF
+M    NGS_CUFFLINKS
+M    NGS_FASTQC
+M    NGS_FXTRIMMER
+M    NGS_GENOMES
+M    NGS_TOPHAT

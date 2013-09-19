@@ -1,0 +1,73 @@
+{"status":"<% $status %>"}
+%#-----------------------------------------------------
+<%args> 
+	$base_changes => '';
+	$pair_id => 0
+</%args>
+
+<%once>
+	use DNALC::Pipeline::Phylogenetics::Pair;
+	use Data::Dumper;
+	use JSON::XS ();
+</%once>
+
+<%init>
+	
+	my $status = "failed";
+
+	#1. make sure the user is logged in (session is active)
+	my $s = $m->session->{pipeline};
+	my $now = time();
+	if (!$s->{logged_in} || ($now - $s->{last} > 3600)) {
+		print '{"status":"failed", "message":"Your session expired. Please login again."}';
+		return;
+	}
+	
+	#2. make sure we get data, if not, don't even bother to search for the pair/project in the DB	
+	my $json = JSON::XS->new->ascii;
+	my $base_changes_array = eval {$json->decode($base_changes);};
+	
+	unless ($base_changes_array && ref($base_changes_array) eq "ARRAY") {
+		print '{"status":"failed", "message":"Invalid data!"}';
+		return;
+	}
+	
+	#3. make sure the project of this pair belongs to the right user
+	my $pair = DNALC::Pipeline::Phylogenetics::Pair->retrieve($pair_id);
+	my $proj = $pair->project_id if $pair;
+	
+	if (!$proj || $s->{user_id} != $proj->user_id) {
+		print '{"status":"failed", "message":"Project not found!"}';
+		return;
+	}
+	
+	
+	
+	my $consensus = $pair->consensus;
+	
+	# Make Changes In The Consensus Sequence
+	foreach (@$base_changes_array){
+		next unless ref($_) eq 'ARRAY' && @$_ == 2;
+		
+		# $_->[0] is the position to change
+		# $_->[1] is the new base
+		my ($pos, $base) = @$_;
+		
+		next unless $base =~ /[ACTG]/;
+		next unless ($pos =~ /^\d+$/ && $pos < length $consensus);
+		
+
+		substr($consensus, $pos, 1, $base);
+	}
+
+	# Update DB with new consensus
+	$pair->consensus($consensus);
+	if ($pair->update) {
+		$status = "success";
+	}
+
+</%init>
+
+<%flags>
+	inherit => undef
+</%flags>

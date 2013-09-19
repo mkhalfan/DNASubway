@@ -1,0 +1,119 @@
+<div class="container_data1">
+	<div id="container_data_line">&nbsp;</div>
+	<div>
+		<a <% $href %> style="text-decoration:none;"><input <% $disabled %> type="button" value="Add Fastq" /></a> 
+%	if ($genome_href) { 	
+		<a <% $genome_href %> style="text-decoration:none;"><input <% $disabled %> type="button" value="Add Reference Genome" /></a>
+%       } 
+%	if ($anno_href) {
+		<a <% $anno_href %> style="text-decoration:none;"><input <% $disabled %> type="button" value="Add Reference Annotation" /></a>
+%	}
+		<% $message %>
+        <input type="hidden" id="pid" value="<% $pid |html%>"/>
+	</div>
+
+<table id="manage_data">
+	<thead>
+		<tr>
+			<th>File</th>
+			<th>Size</th>
+			<th>Last modified</th>
+			<th style="width:20%">QC</th>
+		</tr>
+	</thead>
+	<tbody>
+% while (my $f = $data->next) {
+%	next unless $f->is_input;
+%	my $is_fastq = $f->file_path =~ /\.f(ast)?q(.gz|.bz2)?$/i;
+	<tr>
+		<td title="<% $f->file_path |html %>"><% $f->file_name |html%></td>
+		<td><small><% $f->file_size ? nicebytes($f->file_size) : "" %></small></td>
+		<td><small><% $f->last_modified %></small></td>
+%	if ($is_fastq) {
+		<& .fastq_options, f =>$f, pid => $pid, pm => $pm &>
+%	} else {
+		<td>&nbsp;</td>
+%	}
+	</tr>
+% }
+	</tbody>
+</table>
+
+<%def .fastq_options>
+<%args>
+	$f => undef
+	$pid => undef
+	$pm => undef
+</%args>
+<%init>
+	return "" unless $f && $pm;
+	my $task_id = 35;
+	my @jobs = DNALC::Pipeline::NGS::Job->search_jobs_with_this_input_file($pid, $f, $task_id);
+	my $job_status = $jobs[-1]->status if @jobs;
+</%init>
+		<td>
+% 	if (!@jobs) {
+			<a onclick="javascript:ngs.basic_run('fastqc', <% $pid %>, <% $f %>, this)" href="javascript:;" class="text_submit">Run</a>
+%	}
+%	else {
+%		if ($job_status eq "done") {
+			<a href="./view_fastqc_report?pid=<% $pid %>&f=<% $f %>&sender=manage_data" class="text_submit">View</a>
+%		}
+%		if ($job_status eq "error") {
+			<a href="./job_status?pid=<%$pid |html%>;jid=<% $jobs[-1] %>">Error</a> (<a onclick="javascript:ngs.basic_run('fastqc', <% $pid %>, <% $f %>, this)" href="javascript:;" class="text_submit" style="font-size:0.8em">try again</a>)
+%		}
+%		if ($job_status eq "processing") {
+			processing <img src="/images/ajax-loader-2.gif" width="12px;">
+%		}
+%	}
+		</td>	
+</%def>
+%#-----------------------------------------------------------------
+<%args>
+	$pid => 0
+</%args>
+<%once>
+	use Data::Dumper;
+	use DNALC::Pipeline::Utils qw(clean_query nicebytes);
+	use DNALC::Pipeline::App::NGS::ProjectManager ();
+	use DNALC::Pipeline::User ();
+</%once>
+<%init>
+	$m->session->{pipeline} ||= {};
+	my $s = $m->session->{pipeline};
+
+	#my $path_info = $r->path_info;
+	if ($r->path_info =~ /\/(\d+)$/) {
+		$pid = $1;
+	}
+
+	my $pm = DNALC::Pipeline::App::NGS::ProjectManager->new({project => $pid, debug => 0});
+	my $species = $pm->project->organism;
+	
+	my $href = qq(href="/project/ngs/tools/add_data?pid=$pid;type=fastq");
+	
+	my ($genome_href,$anno_href);
+	if ($species eq 'other') {
+		$genome_href = qq(href="/project/ngs/tools/add_data?pid=$pid;type=fasta");
+		$anno_href   = qq(href="/project/ngs/tools/add_data?pid=$pid;type=gtf");
+	}	
+	
+    my $disabled;
+    my $message = '';
+    if ($pm->is_public) {
+		$href     = q();
+        $disabled = q(disabled="true");
+        $message  = q(<span style="font-size:small">New data can not be added to public projects</span>);
+    }
+
+	my $proj = $pm->project;
+
+	# project's owner
+	my $is_owner = $s->{user_id} == $proj->user_id if $proj;
+	my $data = $pm->data;
+	
+	my %job_status = $pm->get_status;
+
+	$m->redirect('/project/ngs/tools/add_data?no_data=1;pid=' . $proj->id) unless $data->count;
+	
+</%init>

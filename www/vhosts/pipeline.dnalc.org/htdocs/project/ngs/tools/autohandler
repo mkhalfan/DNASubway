@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+<head>
+% unless ($s->{logged_in}) {
+<script type="text/javascript">top.document.location.replace("/");</script>
+% }
+<link rel="icon" type="image/png" href="/images/favicon.png" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link type="text/css" rel="stylesheet" href="/css/NGStoolPanel.css" />
+<link rel="stylesheet" type="text/css" href="/css/prototip.css" />
+<style type="text/css">
+tr.flagged {
+	background: pink;
+}
+
+/*#app_parameters {
+	display: none;*/
+}
+</style>
+% if ($m->request_comp->attr_if_exists('js') && @{$m->request_comp->attr('js')}) {
+%	foreach my $js (@{$m->request_comp->attr('js')}) {
+%		next unless $js;
+<script type="text/javascript" src="/js/<% $js %>"></script>
+%	}
+% }
+</head>
+<body>
+
+% $m->call_next;
+
+% unless ($ENV{DEVEL_SERVER}) {
+<script type="text/javascript">
+var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+</script>
+<script type="text/javascript">
+try { var pageTracker = _gat._getTracker("UA-1818773-7"); pageTracker._trackPageview(); } catch(err) {}
+</script>
+% }
+
+<script src="/js/prototype-1.6.1.js"></script>
+<script src="/js/ngs.js"></script>
+</body>
+</html>
+<%init>
+	$r->content_type("text/html");
+	
+	my $s = $m->session->{pipeline};
+
+	my $now = time();
+	if ($s->{logged_in} && ($now - $s->{last} > 3600)) {
+		$m->comp("/_message_add", "Your session has expired. Please login.");
+		$s->{logged_in} = 0;
+		delete $s->{logged_in};
+		delete $s->{user_id};
+	}
+	$s->{last} = $now;
+</%init>
+<%flags>
+	inherit => undef
+</%flags>

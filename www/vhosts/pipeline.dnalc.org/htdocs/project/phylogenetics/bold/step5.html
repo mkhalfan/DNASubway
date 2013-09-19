@@ -1,0 +1,241 @@
+<div id="BOLDstep">Step 4 of 5</div>
+<div id="BOLDmain">
+
+<h2>Add photos</h2>
+<h4>(Optional)</h4>
+<& /_messages &>
+
+	<p>
+<form id="bform" method="post" enctype="multipart/form-data">
+  <div>
+    <input type="hidden" name="bstep" value="5" />
+	<div>
+		<input type="radio" name="ans" id="no" value="no" <% $bs->{has_photo} ne "yes" ? "checked=\"checked\"" : "" %> onclick="toggle_add_photos()" />
+		<label for="no">No, I don't have any photos of this specimen</label>
+	</div>
+	<div>&nbsp;</div>
+	<div>
+		<input type="radio" name="ans" id="yes" value="yes" <% $bs->{has_photo} eq "yes" ? "checked=\"checked\"" : "" %> onclick="toggle_add_photos(1)"/>
+		<label for="yes">Yes, I have taken photos of this specimen</label>
+		<p></p>
+	</div>
+	<div id="bimage_upload" style="display:<% $bs->{has_photo} eq "yes" ? "block" : "none" %>">
+%  if (! $bs->{photos} || $max_photos > @{$bs->{photos}}) {
+		<p>
+			Add up to three images. File size of the image should not exeed <strong>1 MB</strong>.
+		</p>
+%	if (0) {
+		<div>
+			Name: <input type="text" name="photo_name" value="<% $bs->{_photo_name} |html%>" />
+		</div>
+%	}
+		<div>
+			Image: <input type="file" name="photo" />
+		</div>
+		<div style="margin-top: 4px;">
+			<input type="submit" name="add_img" value="Add image" />
+		</div>
+%  }
+	</div>
+  </div>
+  <div id="bimage_list_uploaded">
+	<ul>
+% if ($bs->{photos}) {
+%  my $index = 0;
+%  for my $ph (@{$bs->{photos}}) {
+%	next unless $ph->{"th_path"};
+	<li><img src="<% $m->comp("../../.comp/filepath_to_web", file => $ph->{"th_path"}, just_return => 1) |html %>" />\
+	<a href="javascript:;" onclick="rm_photo(<% $index++ %>)">remove</a>\
+	</li>
+%  }
+	</ul>
+% }
+  </div>
+  <br style="clear:both" />
+</form>
+	</p>
+
+</div>
+<div id="BOLDfooter">
+	<a href="./step4.html">Back</a>&nbsp;
+	<a href="#" onclick="phy.next_bold_step();">Continue</a>
+</div>
+
+<script type="text/javascript">
+function rm_photo(pos) {
+	if (pos == undefined || pos == null)
+		return;
+
+	var form = $('bform');
+	form.insert(new Element('input', {type: 'hidden', name: 'rm_photo', value: pos}));
+	form.submit();
+}
+
+function toggle_add_photos(st) {
+	if (st) {
+		$('bimage_upload').show();
+		$('bimage_list_uploaded').show();
+	}
+	else {
+		$('bimage_upload').hide();
+		$('bimage_list_uploaded').hide();
+	}
+}
+</script>
+
+<%once>
+	use Apache2::Upload;
+	use DNALC::Pipeline::Utils qw(random_string clean_query);
+	use DNALC::Pipeline::Config ();
+	use File::Spec();
+	use Image::Resize();
+	use GD::Image();
+
+	#use Data::Dumper;
+	
+	my $max_photos = 3;
+	my $max_photo_size = 1 * 1024 * 1024;
+
+	my @photo_sizes = (
+			{ size => 1024, prefix => ""},   # for regular images
+			{ size => 100, prefix => "th_"}, # for thumbnails
+		);
+</%once>
+<%args>
+	$bstep => undef
+	$ans => ''
+	$rm_photo => undef
+</%args>
+<%init>
+	$r->no_cache(1);
+
+	my $s = $m->session->{pipeline};
+	my $pid = $s->{boldpid};
+	$s->{"bold_$pid"} ||= {};
+	my $bs = $s->{"bold_$pid"};
+
+	#print STDERR "S5. PID = ", $pid, Dumper($s), $/;
+
+	unless ($bs->{step4} == 1) {
+		$m->comp('/_message_add', 'Step 4 is incomplete!', 'error');
+		$m->redirect("./step4.html");
+	}
+	
+	if ($r->method eq "POST") {
+		$bs->{has_photo} = $ans;
+
+		if ($ans eq "yes") {
+			my $phy_cfg = DNALC::Pipeline::Config->new->cf("PHYLOGENETICS");
+			my $photo_dir = $phy_cfg->{PHOTO_SUBMISSION_DIR};
+
+			#print STDERR "Error: ", Dumper($bs->{photos}), $/;
+			#--------------------------------------------
+			if (defined $rm_photo && $rm_photo =~ /^\d$/) { # must be single digit #
+				if ($bs->{photos} && $rm_photo < @{$bs->{photos}}) {
+					my $photo = splice @{$bs->{photos}}, $rm_photo, 1;
+					if ($photo && %$photo) {
+						for my $key (grep {/path/} keys %$photo) {
+							if ($photo->{$key} =~ /^$photo_dir/) {
+								#print STDERR "\tunlink(", $photo->{$key}, ");", $/;
+								unlink($photo->{$key});
+							}
+						}
+					}
+					$m->comp("/_message_add", "Image removed successfully!");
+				}
+				else {
+					$m->comp("/_message_add", "Nothing to remove!", "error");
+				}
+			}
+			elsif ($ARGS{"add_img"}) {
+				#$bs->{_photo_name} = clean_query($ARGS{"photo_name"});
+				#
+				#unless ($bs->{_photo_name}) {
+				#	$m->comp("/_message_add", "Name of the image is missing.", "error");
+				#}
+
+				if ($ARGS{"photo"}) {
+
+					my $photo = $ARGS{"photo"};
+					my $u = $r->upload("photo");
+
+					if ($u->type !~ m|image/jpe?g|) {
+						$m->comp("/_message_add", "Uploaded image must be in JPEG format.", "error");
+					}
+					elsif ($u->size < 1024) {
+						$m->comp("/_message_add", "Uploaded image size is too small.", "error");
+					}
+					elsif ($u->size > $max_photo_size) {
+						$m->comp("/_message_add", "Uploaded image size is too large.", "error");
+					}
+					else {
+						$photo =~ s|.*[/\\]||;
+						$photo =~ s|[^\w\d._-]+|_|g;
+						$photo = lc sprintf("%s-%s", random_string(6), $photo);
+
+						my $dest = File::Spec->catfile($photo_dir, "upload");
+
+						$bs->{photos} ||= [];
+						
+						my $gd = GD::Image->new($u->fh);
+						if ($gd) {
+							my $img_to_add = {};
+							for my $sz (@photo_sizes) {
+								my $photo_path = File::Spec->catfile($dest, $sz->{prefix} . $photo);
+
+								# resize only if necessary
+								my $img = Image::Resize->new($gd);
+								if ($img->width > $sz->{size} || $img->height > $sz->{size}) {
+									$gd = $img->resize($sz->{size}, $sz->{size}, 1); #retain proportions
+								}
+								undef $img;
+
+								my $fh = IO::File->new($photo_path, "w");
+								if (defined $fh) {
+									$fh->binmode;
+									print $fh $gd->jpeg;
+									$fh->close;
+									
+									$img_to_add->{$sz->{prefix} . "path"} = $photo_path;
+								}
+								else {
+									print STDERR "Unable to store image for project: [$pid], \n";
+								}
+							}
+							
+							#$img_to_add->{name} = delete $bs->{_photo_name};
+							push @{$bs->{photos}}, $img_to_add;
+							undef $gd;
+
+							$m->comp("/_message_add", "Image stored successfully!");
+							
+						}
+						else {
+							$m->comp("/_message_add", "Unable to store the image!", "error");
+						}
+					}
+				}
+				else {
+					$m->comp("/_message_add", "No image selected for upload!", "error");
+				}
+			}
+			elsif (! defined $bs->{photos} || @{$bs->{photos}} == 0) {
+				$m->comp("/_message_add", "No images were added!", "error");
+			}
+			else {
+				$bs->{step5} = 1;
+				$m->redirect("./step6.html");
+			}
+			#--------------------------------------------
+			
+			$m->redirect("./step5.html");
+		}
+		else {
+			delete $bs->{photos} if (defined $bs->{photos});
+
+			$bs->{step5} = 1;
+			$m->redirect("./step6.html");
+		}
+	}
+
+</%init>

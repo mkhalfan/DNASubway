@@ -1,0 +1,72 @@
+<%args>
+	$pid => 0
+</%args>
+<%once>
+	use DNALC::Pipeline::App::ProjectManager ();
+	use DNALC::Pipeline::Config ();
+	use DNALC::Pipeline::Sample ();
+	use Data::Dumper ();
+</%once>
+<%init>
+
+$r->content_type('text/html');
+
+my $pm = DNALC::Pipeline::App::ProjectManager->new($pid);
+my $proj = $pm->project if $pm;
+my $sample;
+my @links;
+
+if ($proj) {
+	my $trimmed_common_name = $pm->cleaned_common_name;
+	$sample = DNALC::Pipeline::Sample->new($proj->sample);
+
+
+	unless ($sample) {
+	    $proj = undef;
+	}
+	else {
+	    my $user_annot_file = $pm->work_dir . '/user_data.gff';
+	    print "<h1>$user_annot_file</h1>";		
+@links = grep {$_->link_name =~ /phytozome|flybase|wormbase|zfin|modencode|animalgenome|CBRG/i} $sample->links;
+		if (@links == 1) {
+
+			#$m->redirect($links[0]->remote_link($pid));
+			#return;
+		}
+	}
+}
+
+</%init>
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="author" content="Dolan DNA Learning Center" />
+</head>
+<body>
+<div id="">
+% if ($proj) {
+<div id="blurb">
+	<p>Access the .gff data file for the annotation results 
+	<a href="/project/prepare_gff?pid=<% $pid |html%>">here</a> and save it to the desktop.</p>
+	<p>Then, open the external browser at the website of:
+% for ($sample->links) {
+%	#print STDERR $_->remote_link($pid), $/;
+	<div><a href="<% $_->remote_link($pid) %>"><% $_->link_name %></a></div>
+% }
+	<p>To view the annotation results within any of the above browsers use the "Add your own tracks" 
+	facility at the bottom of that page.</p>
+</div>
+% } else {
+<p id="message" style="color: red">
+Project not found or project was not based on a sample we provided!
+</p>
+% }
+
+</div>
+</body>
+</html>
+<%flags>
+	inherit => undef
+</%flags>

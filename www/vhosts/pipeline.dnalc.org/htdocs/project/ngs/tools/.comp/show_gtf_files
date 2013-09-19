@@ -1,0 +1,25 @@
+<p>Select transcriptome annotations to merge:</p>
+% my $idx = 1;
+% for (sort @gtfs) {
+%       my ($fname, $id) = /(\S+)\|(\d+)/;
+	<input type="checkbox" name="<% qq(query$idx) %>" value="<% $id %>" />
+        &nbsp;<% $fname |html %> <br>
+%   $idx++;
+% }
+<br />
+
+<%args>
+	$pm => undef
+	$element => undef
+	$user_value => undef
+	$class => ''
+	$filter => undef;
+	$input_files_only => undef
+</%args>
+<%init>
+	#print STDERR "in show_gtf_files\n";
+	return unless $pm && $element;
+	
+	my @gtfs = map {join('|',$_->file_name,$_->id)} grep {$_->file_path =~ /\-cl\d+\.gtf$/} 
+		   $pm->data(is_input => 0, is_local => 0);
+</%init>

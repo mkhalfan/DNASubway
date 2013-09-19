@@ -1,0 +1,157 @@
+% if (@err) {
+<div style="display:none" id="error_list">
+%	foreach (@err) {
+<div><% $_ %></div>
+%	}
+</div>
+% }
+
+<form method="post" id="forma1">
+	<div id="conGreenlineLeft1">
+		<div id="conProject_newLeft"> 
+		<div style="margin-top:-10px">
+		<b style="color:green">&lArr; Click "Public Projects" for pre-computed data.</b><br /><br />
+		</div>
+		<div class="conNewPro_title">Select Project Type*</div>
+
+		<div class="conNewPro_label" id="project_types">
+			<div style="padding-left: 20px;">
+				<div><input class="" type="radio" name="type" id="gd" value="type1" checked="checked" /><label for="gd">&nbsp; Transcriptome Analysis</label></div>
+			</div>
+		</div>  
+
+		<div style="clear: both;">&nbsp;</div> 
+        <div class="conNewPro_title">Select an Organism *</div>   
+		<div class="conNewPro_label1">
+			<!--<label>Scientific name (genus species):</label>-->
+			<& .select_genomes, genomes => $genomes, selected => $organism &>
+		</div>       
+        <div style="clear: both;"><% $blurb  %></div>
+		</div>
+	</div>
+	<div id="conGreenlineRight1">
+	<div id="conProject_newRight"> 
+		<div class="conNewPro_title">Name Your Project *</div>   
+		<div class="conNewPro_label1">
+			<label>Project title:</label>
+			<input class="conStylized_box4" type="text" name="name" id="name" value="<% $name|html%>" maxlength="40" />
+		</div>
+		<div style="clear: both;">&nbsp;</div>
+		 <div class="conNewPro_title">Description</div>
+        <div class="conNewPro_label">Total characters (max.140): &nbsp;<span id="desc_len"><% length $description %></span></div>
+		<div>
+			<textarea id="description" name="description" cols="40" class="conStylized_box5" onkeyup="check_description_length(event);"
+				style="width:280px; margin-left: 0px; height:62px;"><% $description |html %></textarea>
+		</div>
+		  <div style="clear: both;">&nbsp;</div>
+		<div id="con_star"><b>*</b> Required information</div>
+		<div style="clear: both;">&nbsp;</div> 
+		<div class="conBT_continue"><a id="step_one_btn" href="javascript:void(0);" onclick="javascript:$('forma1').submit();"></a></div>
+		<div style="clear: both;">&nbsp;</div>
+	</div><!--END of ID conProject_newRight-->
+	</div>
+
+</form>
+
+
+%#-----------------------------------------------------------------
+<%args>
+	$name => ''
+	$organism => ''
+	#$common_name => ''
+	$description => ''
+	$type => ''
+</%args>
+<%once>
+	use Data::Dumper;
+	use DNALC::Pipeline::Utils qw(clean_query);
+	use DNALC::Pipeline::Config ();
+	use DNALC::Pipeline::App::NGS::ProjectManager ();
+	use iPlant::FoundationalAPI ();
+	#use iPlant::FoundationalAPI::Constants ':all';
+</%once>
+<%init>
+	$m->session->{pipeline} ||= { username => "", logged_in => 0};
+	my $s = $m->session->{pipeline};
+	my $cf = DNALC::Pipeline::Config->new;
+	my $genomes = $cf->cf('NGS_GENOMES')->{genomes};
+	#my $pcf = $cf->cf('PIPELINE');
+	my @err;
+
+	my $blurb = <<'END';
+<br><b style="color:green">The Green Line is currently in Beta testing.</b>
+<div style="margin-left:-3px;background:gainsboro;font-size:small;border:1px solid green;padding:10px;padding-left:0px;width:82%">
+<ul style="margin-left:-5px">
+<li> <a href="http://dnasubway.iplantcollaborative.org/files/pdf/DNA_Subway_Guide.pdf" target="_new">Quick-start manual</a></li>
+<li>
+This line is for RNA-Seq analysis with the 
+<a href="http://www.nature.com/nprot/journal/v7/n3/fig_tab/nprot.2012.016_F2.html" 
+target="_blank">Tuxedo protocol</a>, deployed 
+on the <a href="http://www.tacc.utexas.edu/resources/hpc" target="_blank">
+Stampede</a> supercomputer at the <a target="_blank" href="http://www.tacc.utexas.edu">
+Texas Advanced Computing Center</a>.
+</li>
+<li>Check back soon for new species and support for paired-end reads.</li>
+<li>
+RNA-Seq analysis is data intensive; steps in the workflow may require several hours to run
+</li>
+<li>
+Feedback, errors, and questions: <a href="mailto:DNALCAdmin@cshl.edu">DNALCAdmin@cshl.edu</a>
+</li>
+</ul>
+</div>
+END
+;
+
+	if ($r->method eq "POST") {
+		$name = clean_query($name);
+		if ($type eq "") {
+			push @err, "Please select a Projct Type";
+		}
+		if ($organism eq "") {
+			push @err, "Please select an organism";
+		}
+		if ($name eq "") {
+			push @err, "Please give your project a title";
+		}
+
+		
+		unless (@err) {
+			my $pm = DNALC::Pipeline::App::NGS::ProjectManager->new({debug => 1});
+			my $st = $pm->create_project({
+				user_id => $s->{user_id},
+				name => $name,
+				type => $type,
+				organism => $organism,
+				common_name => '',
+				description => clean_query($description),
+			});
+
+			if ($st->{status} eq 'fail') {
+				push @err, $st->{status} . " : " . $st->{message};
+			}
+			else {
+				$m->redirect("/project/ngs/panel/" . $pm->project->id);
+			}
+		}
+	}
+</%init>
+
+<%method title>
+Create new project \
+</%method>
+<%def .select_genomes>
+<%args>
+	$genomes => {}
+	$selected => ''
+</%args>
+<select name="organism" id="organism" size="6" style="width:350px">
+
+% my $sel = 'selected=selected';
+% for my $species (sort keys %$genomes) {
+% 	my $name = ucfirst $species; $name =~ s/_+/ /g;
+	<option value="<% $species %>" <% $sel %>><% $name %></option>
+%       $sel = '';
+% }
+</select>
+</%def>

@@ -1,0 +1,56 @@
+<html>
+	<head>
+		<link rel="icon" type="image/png" href="/images/favicon.png" />
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+		<link type="text/css" rel="stylesheet" href="/css/NGStoolPanel.css" />
+	</head>
+	<body>
+	        <div id="container_data_line_bg" style="padding-bottom:2px">
+                	<a href="javascript:;" onclick="document.location.replace('/project/ngs/tools/job_list_tophat?pid=<% $pid %>')">< Back</a>
+        	</div>
+		<iframe src="<% $url %>eurl=<% $subway_url %><& "../../.comp/filepath_to_web", file => $bam &>" 
+			style="width:100%;height:99%;border:none;padding-top:0">
+		</iframe>
+	</body>
+</html>
+%#-----------------------------------------------------------------
+<%args>
+	$pid => 0
+	$jid => 0
+	$d => 0
+</%args>
+<%once>
+	use Data::Dumper;
+	use DNALC::Pipeline::Utils qw(clean_query);
+	use DNALC::Pipeline::NGS::JobOutputFile ();
+	use DNALC::Pipeline::User ();
+	use DNALC::Pipeline::Config ();
+	use DNALC::Pipeline::App::NGS::ProjectManager ();
+</%once>
+<%init>
+
+	$r->content_type("text/html");
+
+        my $pm = DNALC::Pipeline::App::NGS::ProjectManager->new({project => $pid});
+        my $species = $pm->project->{organism};
+   	my $cf = DNALC::Pipeline::Config->new;
+        my $genomes = $cf->cf('NGS_GENOMES')->{genomes};
+        my $sample_seq = $genomes->{$species};
+	my $subway_url = $cf->cf('NGS')->{subway_url};
+	my $id = int(rand()*1000000);
+	my $remote_url = $cf->cf('NGS')->{remote_url};
+	my $url     = "$remote_url/$species?;id=$id;name=$sample_seq;";
+	my @files = DNALC::Pipeline::NGS::JobOutputFile->search(job_id => $jid, project_id => $pid);
+
+	my @bam_files = grep {$_->file->is_local && $_->file->file_path =~ /\.bam$/} @files;
+	my @bed_files = grep {$_->file->is_local && $_->file->file_path =~ /\.bed$/} @files;
+	my %once;
+	@bed_files = grep {++$once{$_} == 1} map {$_->file->file_path} @bed_files;
+	@bam_files = grep {++$once{$_} == 1} map {$_->file->file_path} @bam_files;
+
+	my $bam = $bam_files[0];
+	my $bed = $bed_files[0];
+</%init>
+<%flags>
+	inherit => undef
+</%flags>

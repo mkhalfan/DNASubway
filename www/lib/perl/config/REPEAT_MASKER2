@@ -1,0 +1,27 @@
+{
+	program => '/usr/local/RepeatMasker/RepeatMasker',
+	options => [
+				'-no_id',
+				'-qq',					# about 10% less sensitive, 4->10 times faster than default
+				'-engine', 'crossmatch',
+				#'-gff',					# Creates an additional GFF format output
+				'-nolow'
+			],
+	option_output_dir => '-dir',
+	output_dir => 'output',		# must be the same with options->{-dir}
+
+	species_map => {
+		d => [qw/-species eudicotyledons/], #must be ARRAY ref
+		m => [qw/-species monocotyledons/],
+		default => [qw/-species viridiplantae/],
+
+		'♞' => [qw/-species mammals/], # the horse
+		h => [qw/-species mammals/],
+		b => [qw/-species aves/],
+		i => [qw/-species insecta/],
+		f => [qw/-species actinopterygii/],
+		w => [qw/-species nematoda/],
+		x => [qw/-species fungi/],
+	},
+}
+

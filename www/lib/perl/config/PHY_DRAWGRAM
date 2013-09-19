@@ -1,0 +1,9 @@
+{
+	program => '/usr/local/bin/drawgram',
+	menu => {},
+	menu_options => "/usr/local/bin/font3\nV\nN\nY\n",
+
+	input_file => 'intree',
+	output_file => 'plotfile',
+	options => [],
+}

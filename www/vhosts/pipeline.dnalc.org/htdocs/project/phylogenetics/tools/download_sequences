@@ -1,0 +1,34 @@
+
+<%args>
+	$pid => 0
+</%args>
+<%once>
+	use Apache2::Const qw(HTTP_OK);
+	use DNALC::Pipeline::App::Phylogenetics::ProjectManager ();
+</%once>
+<%init>
+	$m->clear_buffer();
+	$r->content_type("text/plain");
+	my $s = $m->session->{pipeline};
+	
+	my $pm = DNALC::Pipeline::App::Phylogenetics::ProjectManager->new($pid);
+	my $proj = $pm->project;
+
+	if ($proj && $proj->user_id == $s->{user_id}) {
+		my $mc_key = "selected-seq-$pid";
+
+		my $fasta = $pm->alignable_sequences;
+		$r->headers_out->add("Content-Disposition" => "attachment;filename=$mc_key.fasta");
+		$r->headers_out->add("Content-Length" => length $fasta);
+		$r->headers_out->add("Cache-Control" => "max-age=0");
+		$m->print($fasta);
+		return;
+	}
+	else {
+		print "Error\n";
+	}
+	$r->abort( Apache2::Const::HTTP_OK );
+</%init>
+<%flags>
+	inherit => undef
+</%flags>

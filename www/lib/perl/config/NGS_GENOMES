@@ -1,0 +1,20 @@
+{
+	store => '/shared/iplant_DNA_subway/genomes',
+	# each entry in $genomes is a directory containing 2 files: 
+	#	annotation.gtf and genome.fas
+	genomes => {
+#		arabidopsis_lyrata => 1,
+		arabidopsis_thaliana => 'tair10',
+#		brachypodium_distachyon => 1,
+#		oryza_indica => 1,
+#		oryza_sativa => 1,
+#		physcomitrella_patens => 1,
+#		populus_trichocarpa => 1,
+#		sorghum_bicolor => 1,
+#		vitis_vinifera => 1,
+		zea_mays => 'B73',
+		caenorhabditis_elegans => 'WS220',
+		other => 1,
+	}
+};
+

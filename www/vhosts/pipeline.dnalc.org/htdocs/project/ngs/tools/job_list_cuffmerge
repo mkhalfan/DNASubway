@@ -1,0 +1,118 @@
+<div class="container_data1">
+	<div id="container_data_line">&nbsp;</div>
+<& /_messages &>
+
+%       my $href = qq(href="/project/ngs/tools/app_cuffmerge?pid=$pid");
+%       my $disabled;
+%       my $message = '';
+%       if ($public) {
+%               $href     = q();
+%               $disabled = q(disabled="true");
+%               $message  = q(<span style="font-size:small">New Cuffmerge analyses not be added to public projects</span>);
+%       }
+	<div>
+                <a <% $href %> style="text-decoration:none;">
+                <input <% $disabled %> type="button" value="Launch New Job" /></a> <% $message %>
+                <input type="hidden" id="pid" value="<% $pid |html%>"/>
+        </div>
+
+	<table id="jobs_table">
+		<thead>
+			<tr>
+				<th>#</th>
+				<th>Job Name</th>
+				<th>Start Time</th>
+				<th>End Time</th>
+				<th>Status</th>
+				<th>View Results</th>
+			</tr>
+		</thead>
+		<tbody>
+% my $i = 1;
+% while (my $job = $jobs->next) {
+%	my $attrs = $job->attrs;
+			<tr>
+				<td><% $i++ %></td>
+				<td>
+					<a href="./job_status?pid=<%$pid |html%>;jid=<% $job %>" style="color:black"><% $attrs->{name} |html%></a>
+				</td>
+				<td><& .nice_time, ts => $attrs->{submitTime} &></td>
+				<td><& .nice_time, ts => $job->status eq "done" ? $attrs->{endTime} : "" &></td>
+				<td><% $job->status eq "processing" ? "processing <img src='/images/ajax-loader-2.gif' width='16px;'>" : $job->status %></td>
+				<td>
+% 	if ($job->status eq 'done') {
+% 		my $username = $attrs->{owner};
+%   		my $path = $attrs->{archivePath};
+%   		unless ($public) {
+%     			$path =~ s!^/$username!!;
+%     			$path = "~$path";
+%	   	} else {
+%     			$path =~ s!^\S+/!iplant/home/shared/iplant_DNA_subway/sample_data/public_projects/$pid/!;
+%   		}
+	<a href="./launch_gbrowse_cufflinks?pid=<% $pid %>;jid=<% $job %>;app='cuffmerge'">
+	<img src="/images/ngs/icon-gbrowse.png" title="View in GBrowse" alt="View in GBrowse" style="border:1px solid grey;width:16px;"/></a>&nbsp;&nbsp;
+	<a href="https://data.iplantcollaborative.org/<% $path %>/" target="_blank">
+		<img src="/images/ngs/generic_folder.png" title="View Output in iPlant Data Store" 
+		alt="View Output in iPlant Data Store" style="border:0;width:16px;"/>
+	</a>
+%	}
+				</td>
+			</tr>
+% }
+
+		</tbody>
+	</table>
+
+%# note from MK: I believe launched only get's passed to this file if it's coming from a basic run, have to check how status is set for advanced runs
+% if ($launched) {
+<script type="text/javascript">
+	top.ngs.set_status('ngs_cuffmerge', 'processing');
+</script>
+% }
+</div> <!-- end container_data1 --> 
+
+%#-----------------------------------------------------------------
+<%args>
+	$pid => 0
+	$tool => ''
+	$launched => ''
+	$noredirect => ''
+</%args>
+<%once>
+	use Data::Dumper;
+	use Time::Piece qw/localtime/;
+	use DNALC::Pipeline::Utils qw(clean_query);
+	use DNALC::Pipeline::App::NGS::ProjectManager ();
+
+	use DNALC::Pipeline::User ();
+
+</%once>
+<%init>
+	$m->session->{pipeline} ||= {};
+	my $s = $m->session->{pipeline};
+	
+	my $pm = DNALC::Pipeline::App::NGS::ProjectManager->new({project => $pid, debug => 0});
+	my $proj = $pm->project;
+	
+	my $jobs = $pm->get_jobs_by_task('ngs_cuffmerge'); # show non-deleted jobs only
+
+	my $public = $pm->is_public;
+	$noredirect++ if $public;
+
+	$m->redirect("./app_cuffmerge?;pid=" . $proj->id) if ($jobs->count == 0 && !$noredirect);
+
+</%init>
+
+<%def .nice_time>
+<%args>
+	$ts => 0
+</%args>
+	<small><% $t->strftime("%D %T")%></small>
+<%init>
+	return unless $ts;
+	$ts /= 1000 if length($ts) > 10;
+	my $t = localtime($ts);
+</%init>
+</%def>
+%#---------------------------------------------------------
+

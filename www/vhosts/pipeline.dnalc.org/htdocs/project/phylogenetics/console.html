@@ -1,0 +1,396 @@
+<div id="container_rightContent">
+<input type="hidden" id="pid" value="<% $pid %>"/>
+<input type="hidden" id="ptype" value="<% $proj->type %>"/>
+<input type="hidden" id="isowner" value="<% $is_owner %>"/>
+%	if (exists $m->session->{messages}) {
+<div style="display:none" id="error_list">	
+	<& "/_messages" &>
+</div>
+% 	}
+<!--Left Content Start--------------> 
+<div id="conBluelineLeft2">
+	<span class="conBlueline_ConColumn1">
+	<span id="conBlueline_ConColumn1_1">
+		<span class="conBlueline_ConCell">
+			<span class="conIndicator_box">
+				<div class="conIndicatorBL_done"></div>
+			</span>
+			<span class="bt_Runblueline"><a href="javascript:;" onclick="phy.launch('viewer')">Sequence Viewer</a></span>
+        </span>
+% if ($proj->has_tools) {
+        <span class="conBlueline_ConCell">
+			<span class="conIndicator_box">
+				<div id="phy_trim_st" class="conIndicatorBL_<% $status{phy_trim} eq "done" ? "done" : $is_owner ? $status{phy_trim} : "disabled" %>"></div>
+			</span>
+%	if ($status{phy_trim} ne "done" && !$is_owner) {
+			<span class="bt_Runblueline">
+				<a id="phy_trim_btn" class="conIndicatorBL_disabled" status="disabled" href="javascript:;">Sequence Trimmer</a>
+			</span>
+%	} else {
+				<& '.routine', routine => 'phy_trim', pmanager => $pm, is_owner => $is_owner,
+					status => $status{phy_trim}, delay => 20, pid => $pid &>
+%	}
+        </span>
+
+        <span class="conBlueline_ConCell">
+			<span class="conIndicator_box">
+				<div id="phy_pair_st" class="conIndicatorBL_<% $status{phy_pair} eq "done" ? "done" : $is_owner ? $status{phy_pair} : "disabled" %>"></div>
+			</span>
+			<span class="bt_Runblueline"><a id="phy_pair_btn" href="javascript:;" <% $is_owner ? q{onclick="phy.launch('pair');"} : q{class="disabled"}%>>Pair Builder</a></span>
+        </span>
+        <span class="conBlueline_ConCell">
+			<span class="conIndicator_box">
+				<div id="phy_consensus_st" class="conIndicatorBL_<% $status{phy_pair} eq "done" ? $status{phy_consensus} eq "done" ? "done" : $status{phy_consensus} : "disabled" %>"></div>
+			</span>
+%	if ($status{phy_pair} ne "done" || !($is_owner|| $is_admin)) {
+			<span class="bt_Runblueline">
+				<a id="phy_consensus_btn" class="conIndicatorBL_disabled" status="disabled" href="javascript:;">Consensus Builder</a>
+			</span>
+%	} else {
+				<& '.routine', routine => 'phy_consensus', pmanager => $pm, is_owner => $is_owner,
+					status => $status{phy_consensus}, delay => 20, pid => $pid &>
+%	}
+        </span>
+% } else {
+%	for ("Sequence Trimmer", "Pair Builder", "Consensus Builder") {
+		<span class="conBlueline_ConCell">
+			<span class="conIndicator_box"><div class="conIndicatorBL_grey"></div></span>
+			<span class="bt_Runblueline_grey"><% $_ %></span>
+		</span>
+%	}
+% }
+	</span>
+	<span class="conBlueline_keys"></span>
+	</span><!--END of span conBlueline_ConColumn1-->
+
+	<span class="conBlueline_ConColumn2">
+		<span class="conBlueline_ConCell">
+			<span class="conIndicator_box">
+				<div class="conIndicatorBL_<%$is_owner ? "not-processed" : "disabled" %>"></div>
+			</span>
+			<span class="bt_Runblueline"><a href="javascript:;" <% $is_owner ? q{onclick="phy.launch('blast');"} : q{class="disabled"}%>>BLASTN</a></span>
+		</span>
+		<span class="conBlueline_ConCell">
+			<span class="conIndicator_box">
+				<div class="conIndicatorBL_<%$is_owner ? "not-processed" : "disabled" %>"></div>
+			</span>
+			<span class="bt_Runblueline"><a href="javascript:;" <% $is_owner ? q{onclick="phy.launch('data');"} : q{class="disabled"}%>>Upload Data</a></span>
+		</span>
+
+		<span class="conBlueline_ConCell">
+			<span class="conIndicator_box">
+				<div class="conIndicatorBL_<%$is_owner ? "not-processed" : "disabled" %>"></div>
+			</span>
+			<span class="bt_Runblueline"><a href="javascript:;" <% $is_owner ? q{onclick="phy.launch('ref');"} : ""%>>Reference Data</a></span>
+		</span>
+	</span><!--END of span conBlueline_ConColumn2-->
+
+	<span class="conBlueline_ConColumn3">
+        <span class="conBlueline_ConCell">
+			<span class="conIndicator_box">
+				<div class="conIndicatorBL_<%$is_owner ? "not-processed" : "disabled" %>"></div>
+			</span>
+			<span class="bt_Runblueline"><a href="javascript:;" <% $is_owner ? q{onclick="phy.launch('manage_sequences');"} : q{class="disabled"}%>>Select Data</a></span>
+		</span>
+
+		<span class="conBlueline_ConCell">
+			<span class="conIndicator_box">
+				<div id="phy_alignment_st" \
+				class="conIndicatorBL_<% $status{phy_alignment} eq "done" ? "done" : $is_owner ? $status{phy_alignment} : "disabled" %>"></div>
+			</span>
+				<& '.routine', routine => 'phy_alignment', pmanager => $pm, is_owner => $is_owner,
+					status => $status{phy_alignment}, delay => 20, pid => $pid &>
+		</span>
+        
+        
+        <span class="conBlueline_ConColumnPHYLIP"> 
+        
+		<span class="conBlueline_ConCell">
+			<span class="conIndicator_box">
+				<div id="phy_tree_st" class="conIndicatorBL_<% $status{phy_alignment} eq "done" ? $status{phy_tree} eq "done" ? "done" : $is_owner ? $status{phy_tree} : "disabled" : "disabled" %>"></div>
+			</span>
+%	if ($status{phy_alignment} ne "done") {
+			<span class="bt_Runblueline">
+				<a id="phy_tree_btn" class="conIndicatorBL_disabled" status="disabled" href="javascript:;">PHYLIP NJ</a>
+			</span>
+%	} else {
+			<& '.routine', routine => 'phy_tree', pmanager => $pm, is_owner => $is_owner,
+				status => $status{phy_tree}, delay => 20, pid => $pid &>
+%	}
+		</span>
+
+		<span class="conBlueline_ConCell">
+			<span class="conIndicator_box">
+				<div id="phy_tree_ml_st" class="conIndicatorBL_<% $status{phy_alignment} eq "done" ? $status{phy_tree_ml} eq "done" ? "done" : $is_owner ? $status{phy_tree_ml} : "disabled" : "disabled" %>"></div>
+			</span>
+%	if ($status{phy_alignment} ne "done") {
+			<span class="bt_Runblueline">
+				<a id="phy_tree_ml_btn" class="conIndicatorBL_disabled" status="disabled" href="javascript:;">PHYLIP ML</a>
+			</span>
+%	} else {
+			<& '.routine', routine => 'phy_tree_ml', pmanager => $pm, is_owner => $is_owner,
+				status => $status{phy_tree_ml}, delay => 20, pid => $pid &>
+        
+%	}
+		</span>
+        </span>
+
+     </span><!--END of span conBlueline_ConColumn3-->
+</div><!--END of ID conBluelineLeft2-->
+
+<!--right Content Start--------------> 
+<div id="conBluelineRight2">
+    
+<span class="conBlueline_ConColumn5">
+	<div class="con_browserBT ">
+		<span class="conIndicator_boxBrowse"><div class="conIndicatorBL_<%$is_owner && $export_is_on && $is_barcoding ? "not-processed" : "disabled" %>"></div> </span>
+		<span class="bt_browserBlue"><a href="javascript:;" onclick="<%$is_owner && $export_is_on && $is_barcoding ? "phy.launch('BOLD', '/project/phylogenetics/bold/?pid=$proj', 'Export to GenBank')" : "" %>">Export to<br/>GenBank</a></span>
+	</div>
+	<div id="spacer_Runblueline">&nbsp;</div> 
+</span>
+    
+</div>
+<!--END of ID conBluelineRight2--> 
+
+
+%#<div id="conRunAll_empty"></div>
+
+<!--  Project Information Panel START----------------------------------------------------------------  -->
+
+<div id="conProjectInfo"> 
+	<div id="conProjectInfo_header">
+		<div id="conProjectInfo_title">Project Information</div>
+		<div id="conProjectInfo_edit">
+			<div class="bt_projectInfo_edit"><a href="javascript:;" onclick="javascript:show_edit();"></a></div>
+		</div>
+% if (0&& ($is_owner || $is_public)) {
+		<div id="conProjectInfo_clone">
+			<div class="bt_projectInfo_clone"><a href="tools/clone_project?pid=<% $proj->id %>">&nbsp;</a></div>
+		</div>
+% }
+		<div id="conProjectInfo_projecttitle" origtitle=""><% $proj->name |html%></div>
+		<div id="conProjectInfo_projectlog">Description</div>
+	</div>
+
+	<span class="conProjectInfo_column1"><!--Start of CLASS conProjectInfo_column1-->
+	<div class="conProjectInfo_Row">
+			<span class="conProjectInfo_Cell1">Project ID</span>
+		<span class="conProjectInfo_Cell2">: <% $proj->id%></span>
+	</div>
+		<div class="conProjectInfo_Row">
+			<span class="conProjectInfo_Cell1">User</span>
+			<span class="conProjectInfo_Cell2">: <% $user->full_name |html%></span>
+		</div>
+		<div class="conProjectInfo_Row">
+			<span class="conProjectInfo_Cell1">Affiliation</span>
+			<span class="conProjectInfo_Cell2">: <% $institution |html%></span>
+		</div>
+% if ($is_owner) {
+        <div class="conProjectInfo_Row">
+			<div class="conProjectInfo_Cell1">Status</div>
+			<div class="conProjectInfo_Cell3">: &nbsp;<input type="radio" name="public" id="public_no" <% $is_public ? "" : "checked=\"checked\"" %> onclick="set_public(0);" /> &nbsp; Private</div>
+			<div class="conProjectInfo_Cell3"><input type="radio" name="public" id="public_yes" <% $is_public ? "checked=\"checked\"" : "" %> onclick="set_public(1);"/> &nbsp; Public</div>
+		</div>
+		<!--
+        <div class="conProjectInfo_Row">
+			<div class="conProjectInfo_Cell1">Clonable</div>
+			<div class="conProjectInfo_Cell3">: &nbsp;<input type="radio" name="clonable" id="clonable_no" > &nbsp; On</span></div>
+			<div class="conProjectInfo_Cell3"><input type="radio" name="clonable" id="clonable_no" > &nbsp; Off</span></div>
+		</div>
+		-->
+% }
+	</span><!--END of span conProjectInfo_column1-->
+
+	<span class="conProjectInfo_column2"><!--Start of CLASS conProjectInfo_column2-->
+		<div class="conProjectInfo_Row">
+			<span class="conProjectInfo_Cell1">Project type</span>
+			<span class="conProjectInfo_Cell2">: <% $proj->type %></span>
+		</div>
+		<div class="conProjectInfo_Row">
+			<span class="conProjectInfo_Cell1">Input seqs</span>
+			<span class="conProjectInfo_Cell2">: </span>
+		</div>
+%#		<div></div>
+		<div class="conProjectInfo_Row">
+			<span class="conProjectInfo_Cell1">Ref seqs</span>
+			<span class="conProjectInfo_Cell2">: </span>
+		</div>
+        <div class="conProjectInfo_Row">
+			<span class="conProjectInfo_Cell1">Parameters</span>
+			<span class="conProjectInfo_Cell2">: </span>
+		</div>
+	</span><!--END of span conProjectInfo_column2-->
+
+	 <span class="conProjectInfo_column3"><!--Start of CLASS conProjectInfo_column3-->
+<!--
+		 <div class="conHistorylist">
+			<ul>
+				<li ><strong>messages</strong></li>
+			</ul>
+			<span class="bt_more"><a href="#">more »</a></span>
+		</div>
+-->
+
+		<div id="desc_limit_label" class="conNewPro_label" style="display: none;">Total characters (max.140): &nbsp;<span id="desc_len">0</span></div>
+		<div id="description_container" origdesc="" class="conProjectInfo_description"><% $proj->description |html%></div>
+% if (0) {
+		<div>
+			Trees + alignments
+			<select>
+% for (@trees) {
+			<option <% basename($_)%>><% basename($_) %>
+% }
+			</select>
+		</div>
+% }
+	</span> <!--END of span conProjectInfo_column3-->
+    
+</div><!--END of ID conProjectInfo-->
+
+
+</div><!--END of ID container_rightContent-->  
+
+<%args>
+	$pid => 0
+	$debug => 0
+</%args>
+%#-------------------------------------------------
+
+<%once>
+	use Data::Dumper;
+	use File::Spec ();
+	use File::Basename qw/basename/;
+	use DNALC::Pipeline::App::Phylogenetics::ProjectManager ();
+	use DNALC::Pipeline::User ();
+	use DNALC::Pipeline::Config ();
+	use DNALC::Pipeline::UserProfile ();
+	use DNALC::Pipeline::Phylogenetics::DataSequence();
+	
+	my %routines = (
+			phy_pair => "Pair",
+			phy_trim => "Sequence Trimmer",
+			phy_consensus => "Consensus Editor",
+			phy_alignment => "MUSCLE",
+			phy_tree => "PHYLIP NJ",
+			phy_tree_ml => "PHYLIP ML",
+		);
+</%once>
+%#-------------------------------------------------
+<%init>
+
+$m->session->{pipeline} ||= {};
+my $s = $m->session->{pipeline};
+
+my $pm = DNALC::Pipeline::App::Phylogenetics::ProjectManager->new($pid);
+my $proj = $pm->project;
+if (!$proj || $proj->master_project->archived) {
+	$m->comp('/_message_add', 'Project not found!', 'error');
+	$m->redirect('/project/');
+}
+
+# project's owner
+my $user = DNALC::Pipeline::User->retrieve($proj->user_id);
+
+my %status = ();
+my ($institution);
+#my ($history, $rm_status, $trimmed_common_name, $institution, $sample);
+
+my $pcf = DNALC::Pipeline::Config->new->cf("PIPELINE");
+my $is_owner = $s->{user_id} == $user->user_id;
+my ($mp) = $proj->master_project;
+my $is_public = $mp ? $mp->public : 0;
+
+my $username = $s->{username};
+my $is_admin = grep {/^$username$/} @{$pcf->{ADMINS}};
+
+if (!$is_owner && !$is_public && !$is_admin) {
+	$m->comp('/_message_add', 'Project is not accessible!', 'error');
+	#print STDERR "Project not accesible...", $/;
+	$m->redirect('/project/browse');
+}
+
+$institution = $is_owner ? $s->{institution} : DNALC::Pipeline::UserProfile->get_user_institution($user->id);
+$institution ||= "-";
+
+for my $rt ( keys %routines ) {
+	my $status_name = $pm->get_task_status($rt)->name;
+	$status{$rt} = $status_name;
+}
+
+# turn on or off export to bold/GB button
+my $cf = DNALC::Pipeline::Config->new->cf('PHYLOGENETICS');
+my $export_is_on = $cf->{EXPORT_ON};
+
+#check if project is of type rbcL or COI, true if it is
+my $is_barcoding = ($proj->type eq "rbcL" or $proj->type eq "COI" ? 1 : 0);
+if ($export_is_on && $username =~ m/^guest_/) {
+	$export_is_on = 0;
+}
+
+my $tree_store = File::Spec->catfile($pm->work_dir, "trees");
+my @trees = sort {$b cmp $a} <$tree_store/*.nw>;
+
+
+</%init>
+%#-------------------------------------------------
+<%def .routine>
+<%args>
+	$routine => ""
+	$status => 'disabled'
+	$pmanager => undef
+	$is_owner => 0
+	$delay => 5
+	$pid => 0
+</%args>
+<%init>
+my $link   = 'javascript:;';
+my $target = 'target="_blank"';
+my $action = $is_owner ? qq{onclick="phy.run('$routine')"} : '';
+my $title  = '';
+my $class = "disabled";
+
+if ($status eq 'processing') {
+	$action = "";
+	$target = "";
+}
+elsif ($status eq 'done') {
+	my $uniq = time();
+	my $url = "/project/phylogenetics/tools/view_$routine?pid=$pid;u=$uniq;t=";
+	$url =~ s/phy_//;
+	$url =~ s/tree_ml/tree/;
+	my $win_title = $routines{$routine};
+	if ($win_title eq 'MUSCLE') {
+		$win_title = "Alignment Viewer";
+	}
+	$action = qq{onclick="phy.launch('$routine', '$url} . $routine . qq{', '$win_title')"};
+	$target = '';
+	$class = '';
+} 
+else {
+	if ($status eq 'error') {
+		$class = "";
+	}
+	else {
+		if ($is_owner) {
+			$class = '';
+		}
+	}
+	$target = "";
+}
+
+
+</%init>
+<span class="bt_Runblueline"><a id="<% $routine %>_btn" href="<% $link %>" class="<% $class %>" <% $target %> \
+% if ($is_owner) {
+status="<% $status %>" \
+% }
+<% $action %> delay="<% $delay %>"><% $routines{$routine} %></a></span>
+</%def>
+%#-------------------------------------------------
+<%attr>
+	js => ['phylogenetics.js']
+	css => []
+	load_window_ui => 1
+	current_section => 'blue'
+	show_glossary => 1
+</%attr>

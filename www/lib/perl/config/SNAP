@@ -1,0 +1,20 @@
+{
+	program => '/usr/local/snap/snap',
+	options => [
+				'-quiet',
+				'-gff',			#output in gff3 format
+			],
+	file_to_parse => qr/stdout\.txt$/,
+	gff3_file	=> 'snap.gff',
+	species_map => {
+		d => '/usr/local/snap/HMM/A.thaliana.hmm',
+		m => '/usr/local/snap/HMM/O.sativa.hmm',
+		default => '/usr/local/snap/HMM/A.thaliana.hmm',
+
+		'♞' => '/usr/local/snap/HMM/mam54.hmm', # the horse char :p
+		h => '/usr/local/snap/HMM/mam54.hmm',
+		f => '/usr/local/snap/HMM/mam54.hmm',
+		i => '/usr/local/snap/HMM/D.melanogaster.hmm',
+		w => '/usr/local/snap/HMM/worm',
+	},
+}

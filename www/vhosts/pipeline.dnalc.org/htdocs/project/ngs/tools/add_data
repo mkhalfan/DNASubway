@@ -1,0 +1,337 @@
+% if ($warning) {
+	<script type="text/javascript">
+		var warning = "<% $warning %>"; 
+		top.show_messages(top.warning_message(warning),1,150);	
+		window.location = "/project/ngs/tools/manage_data?pid=<% $pid %>";
+	</script>
+% }
+% elsif ($files_added) {
+	<script type="text/javascript">
+	if (top.ngs.get_status('ngs_tophat') == 'disabled') {
+		//top.ngs.set_status('ngs_tophat', 'not-processed');
+		top.ngs.set_status('ngs_fxtrimmer', 'not-processed');
+	}
+	document.location.replace("/project/ngs/tools/manage_data?pid=<% $pid |html %>;rnd=" + new Date().getTime());
+	</script>
+% }
+% else {
+	<div class="container_data1">
+		<div id="container_data_line_bg">
+			<a href="javascript:;" onClick="<% $no_data ? 'top.ngs.close_window(\'data\')' :  "document.location.replace(\'/project/ngs/tools/manage_data?pid=$pid\')" %>">< Back </a>
+		</div>
+% }
+
+% 	if($browse_path ne '') {
+		<div id="crumb-trail"><% $path_links %></div>
+%#               print STDERR "PATHS: $path_links$/";
+%	}
+% 	else {
+%	 	my $s = $file_type eq 'FASTQ' ? 's' : '';
+		<div id="crumb-trail">Select your <% $file_type %> file<% $s %> from the iPlant Data Store:</div>
+%	}
+
+		<div style="border-top:1px solid #C2DBF3;border-bottom: 1px solid #C2DBF3;margin:10px 0;text-align:right;font-size:14px;padding:2px;height:15px;">
+%	if (defined $sample_info) {
+		About this sample data <img style="left:5px;width:12px;" src="/images/question-12.png" id="sample-tip" />
+<div id="sample-info" style="display:none;"><% $sample_info %></div>
+<script type="text/javascript">
+	Event.observe(window, Prototype.Browser.IE ? 'load' : 'dom:loaded', function() {
+		new Tip("sample-tip", $('sample-info'), {
+			className: 'blue_help_wider',
+			hook: {target:'bottomLeft', tip:'topRight'},
+			hideAfter: 2,
+			hideOn: false,
+			closeButton:true
+		});
+	});
+
+</script>
+% 	}	
+
+		</div>
+		
+%	if ($browse_path eq '') {
+%       my $pmessage = 'ngs.replace_buttons()';
+		<div id="folders">
+			<div>
+				<a href="/project/ngs/tools/add_data/<% $username |html%>?pid=<% $pid |html%>" onclick="<% $pmessage %>">
+					<% $username |html%>
+				</a>
+			</div>
+			<div>
+				<a href="/project/ngs/tools/add_data/shared?pid=<% $pid |html%>" onclick="<% $pmessage %>">
+					Shared Data
+				</a>
+			</div>
+%	if ($species ne 'other') {
+			<div>
+				<a href="/project/ngs/tools/add_data/samples/<% $species %>?pid=<% $pid |html%>" onclick="<% $pmessage %>">
+					Sample Data
+				</a>
+			</div>
+%	}
+		</div>
+		<div id="file_folder_divider"></div>
+		<div style="clear:both;height:3px;"></div>
+		<div id="container_data_lineBottom"></div>
+%#	Just here so we can have the Processing... message
+		<div style="text-align:center" id="button_wrapper"></div>
+	
+%	} else {
+	<form id="form_add_data" method="post" >
+% 		if ($dir_list && @$dir_list) {
+		<div id="folders">
+			<div class="up">
+				<a href="/project/ngs/tools/add_data<% $parent_dir %>?pid=<% $pid |html%>">
+					..
+				</a>
+			</div>
+%			for my $file ( @$dir_list ){
+%				if ($file->type eq "dir") {	
+					<& .display_file_info, file => $file, pid => $pid &>
+%				}
+%			}
+		</div>
+		<div id="file_folder_divider"></div>
+		<div id="files">
+%			for my $file ( @$dir_list ){
+%				if ($file->type ne "dir") {	
+%					$have_files = 1;
+					<& .display_file_info, file => $file, pid => $pid &>
+%				}
+%			}
+		</div>
+		
+% 		} else {
+		<div>
+			<a href="/project/ngs/tools/add_data<% $parent_dir %>?pid=<% $pid |html%>">
+				Parent directory
+			</a>
+		</div>
+% 		}
+		<div style="clear:both;height:3px;"></div>
+		<div id="container_data_lineBottom"></div>
+		<p style="text-align:center" id="button_wrapper">
+%			if ($have_files) {
+				<input type="button" id="add_button" value="Add files" onclick="return ngs.check_add_data()" <% $disabled %> />
+%			}
+		</p>
+% 	}
+	<p style="text-align:center;display:none;" id="processing"> Processing... &nbsp;<img src="/images/ajax-loader-2.gif" style="width:12px;padding-left:5px;"></p>
+	<input type="hidden" id="step" name="step" value="2" />
+	<input type="hidden" id="current_path" name="current_path" value="<% $path_to_read |html %>" />
+
+	</form>
+
+%#	<pre>
+%#	<% Dumper($s) %>
+%#	</pre>
+	</div>
+
+
+
+<%args>
+	$pid => 0
+	$current_path => ''
+	@files => ()
+	$no_data => undef
+	$type => '';
+</%args>
+<%once>
+	use DNALC::Pipeline::App::NGS::ProjectManager ();
+	use DNALC::Pipeline::Config ();
+	use DNALC::Pipeline::MasterProject ();
+	use iPlant::FoundationalAPI ();
+	use File::Basename qw(basename);
+	use Data::Dumper;
+</%once>
+<%init>
+	# note if we have actual files to add
+	my $have_files;
+
+	# what type of file do we want?
+	my $file_type = $type eq 'fasta' ? 'Reference Genome' : $type eq 'gtf' ? 'Reference Annotation' : 'FASTQ';
+
+	# decide if we want verbose logging
+	my $debug = 0;
+
+	# which species are we working on here?
+	my $pm = DNALC::Pipeline::App::NGS::ProjectManager->new({project => $pid});
+	my $public = $pm->is_public;
+	my $species = $pm->project->{organism};
+
+	my $s = $m->session->{pipeline};
+
+	my $sample_info;
+
+	# "Add Data" button is disabled if it is a public project
+	my $disabled = $public ? q(disabled="true) : '';
+	
+	$r->content_type("text/html");
+	$m->session->{pipeline} ||= { username => "", logged_in => 0};
+	
+	my $browse_path = "";
+	my $path_links = "<a href='/project/ngs/tools/add_data?pid=$pid' onclick='ngs.replace_buttons()'>home</a>/";
+			
+	my $username = $s->{username};
+	my $apif = iPlant::FoundationalAPI->new(
+		user => $username,
+		token => $s->{api_token},
+	);
+	my ($path_to_read, $parent_dir, $dir_list, $files_added, $warning);
+	
+	if ($r->method eq "POST") {
+		$files_added = 0;
+		if ($pm->project && @files) {
+			$pm->api_instance($apif) if $apif;
+		        my %added = map {$_ => 1} grep {/.f(ast)?q$/i} map {$_->file_name} $pm->data;
+			my %path  = map {$_ => 1} grep {/.f(ast)?q$/i} map {$_->file_path} $pm->data;
+			my (@duplicates,@renamed,@illegal,@empty);
+			for my $file_to_add (@files) {
+				my $file_name = basename($file_to_add); 
+				my $file_path = $current_path . "/" . $file_name;
+	    			
+                                # We only want fastq files -- stop here
+                                if ($file_name !~ /f(ast)?q(\.gz|bz2)?$/i) {
+					print STDERR "Hey $file_name is not Fastq!\n";
+                                        push @illegal, $file_name;
+                                        next;
+                                }
+
+				# duplicate file name, different file path -- rename file alias
+				if ($added{$file_name} && !$path{$file_path}) {
+					# increment the file name
+					for (1..100) {
+						(my $iname = $file_name) =~ s/(\.[fastqFASTQ]+)$/_$_$1/;
+						if (!$added{$iname}) {
+							push @renamed, [$file_name,$iname];
+							$file_name = $iname;
+							last;
+						}
+					}
+                                }
+
+				# this file is already added -- stop here
+				elsif ($added{$file_name} && $path{$file_path}) {
+					push @duplicates, $file_name;
+					next;
+				}
+
+				my $f = $pm->add_data({
+							file_name => $file_name,
+							file_path => $file_path,
+							is_input => 1,
+						},
+						{_no_remote_check => 0} # do check if files exist
+					);
+				
+				if (!$f) {
+					print STDERR "Caught the warning!\n";
+					push @empty, $file_name;
+				}
+				elsif ($f && ref $f) {
+					$files_added++;
+				}	
+			}
+			
+			# process all warnings			
+
+			if (@empty > 0) {
+				for my $f (@empty) {
+					$warning .= "File $f is empty, declining to add to the project<br>" 
+				}
+			}	
+                        if (@illegal > 0) {
+                        	print STDERR "Illegal files @illegal \n";
+			        $warning .= "Warning: Non-Fastq files: ";
+                                $warning .= join(', ',@illegal) . '.<br>Please use a &#39;.fq&#39; or &#39;fastq file&#39; extension<br>';
+                        }
+			if (@duplicates > 0) {
+				$warning .= "Warning: The following files have already been added to the project: ";
+				$warning .= join(', ',@duplicates) . '<br>';
+				print STDERR "Duplicate files not added: " , Dumper \@duplicates;# if $debug;
+			}
+			if (@renamed > 0) {
+				$warning .= "Warning: non-unique file name";
+				$warning .= @renamed > 1 ? 's.<br>' : '.<br>';
+				for my $pair (@renamed) {
+					my ($old,$new) = @$pair;
+					$warning .= "$old renamed to ${new}<br>";
+				}
+				print STDERR "Duplicate	files renamed: " , Dumper \@renamed;# if $debug;
+				$files_added++;
+			}
+			print STDERR "WARNING $warning $/" if $warning;
+
+		}
+		#print STDERR "files_added: $files_added", $/ if $debug;
+	}
+	else {
+	
+		my $path_info = $r->path_info;
+		if ($path_info =~ /^\/samples\/$species/) {
+			$browse_path = "/shared/iplant_DNA_subway/sample_data/fastq/$species";
+			my $cf = DNALC::Pipeline::Config->new;
+			my $sd = $cf->cf('NGS_SAMPLE_DATA')->{sample_info};
+			$sample_info  = $sd->{$species} || "No information available for $species sample data";
+		}
+		elsif ($path_info =~ /\/(.*)$/) {
+			$browse_path = $1
+		}
+	
+		my @paths;
+		my $path_listing;
+		if ($browse_path) {
+			$path_to_read = $browse_path ? $browse_path : $username;
+			$path_to_read = "/" . $path_to_read unless $path_to_read =~ m|^/|;
+			#print STDERR "PATH: $path_to_read", $/;
+			
+			# This creates the hyperlinked path tree
+			@paths = split("/", $path_to_read);
+			#print STDERR "\nPaths: @paths\n";
+			foreach (@paths){
+				next if $_ eq '';
+				$path_listing .= "/" . $_;
+				#print STDERR "\n$path_listing\n";
+				$path_links .= "<a href='/project/ngs/tools/add_data$path_listing?pid=$pid' onclick='ngs.replace_buttons()'>$_</a>/";
+			}
+			
+			$parent_dir = $path_to_read;
+			$parent_dir =~ s|/[^\/]*$||;
+
+			my $io = $apif->io;
+			$dir_list = $io->readdir($path_to_read);
+	
+		}
+	}
+
+</%init>
+
+<%def .display_file_info>
+<%args>
+	$file => undef
+	$pid => 0
+</%args>
+<%init>
+	my ($file_full_path, $fpath);
+	$file_full_path = $file->path;
+
+	if ($file->type eq "dir" && $file->name eq ".." ) {
+		return;
+	}
+</%init>
+%	if ($file->type eq "dir") {
+		<div>
+			<a href="/project/ngs/tools/add_data<% $file_full_path %>?pid=<% $pid |html%>" onclick="ngs.replace_buttons()">
+				<% $file->name %>
+			</a>
+		</div>
+% } else {
+		<div>
+			<input type="checkbox" name="files" value="<% $file->name |html %>" id="<% $file->name |html %>" /><label for="<% $file->name |html %>"><% $file->name %>
+		</div>
+% }
+</%def>
+<%attr>
+	js => ['prototype-1.6.1.js', 'prototip/prototip.js']
+</%attr>

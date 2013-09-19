@@ -1,0 +1,150 @@
+{"status":"<% $status %>", "message":"<% $message %>"}
+<%args> 
+	$pid => 0;
+	$accession => 0
+</%args>
+<%once>
+	use DNALC::Pipeline::Config ();
+	use DNALC::Pipeline::Utils qw(random_string clean_query);
+	use DNALC::Pipeline::Phylogenetics::DataSequence ();
+	use DNALC::Pipeline::App::Phylogenetics::ProjectManager ();
+	use Data::Dumper;
+	use HTTP::Tiny ();
+	use XML::Simple;
+	use URI::Escape;
+</%once>
+<%init>
+	my $status = "error";
+	my $message = "";
+	my $utils = "http://www.ncbi.nlm.nih.gov/entrez/eutils";
+	my $s = $m->session->{pipeline};
+	my $cf = DNALC::Pipeline::Config->new;
+	my $pcf = $cf->cf('PIPELINE');
+	my $phy_cf = $cf->cf('PHYLOGENETICS');
+	my @err;
+	my $seq;
+	
+	my $pm = DNALC::Pipeline::App::Phylogenetics::ProjectManager->new($pid);
+	my $proj = $pm->project;
+	
+	unless ($proj && $s->{user_id} == $proj->user_id) {
+		$message = "Project not found!";
+		print "{'status': \"$status\" , 'message': \"$message\"}";
+		return;
+	}
+
+	my $db = "Nucleotide";
+	my $report = "fasta";
+	my $query = uri_escape(clean_query($accession));
+
+	# Check if query exists in the cache #
+	my $key = 'genbank_accession_' . lc $query;
+	if (defined $m->cache->get($key)) {
+
+		if ($m->cache->get($key) eq 'too-large') {
+			$message = 'Sequence too large, must be less than 10kb';
+			print "{'status': \"$status\", 'message': \"$message\"}";
+			print STDERR "Cached result: Sequence too large", $/;
+			return;
+		}
+		else {
+			$seq = $m->cache->get($key);
+			print STDERR "Retrieved cached sequence!", $/;
+		}
+	}
+	else { # data_not_cached
+		print STDERR "No cached data. Doing the esearch...", $/;
+		my $esearch = "$utils/esearch.fcgi?" . "db=$db&retmax=1&usehistory=y&email=dnalcadmin\@cshl.edu&tool=DNASubway&field=accn,uid&term=";
+		my $ht = HTTP::Tiny->new(timeout => 30);
+		my $response = $ht->get($esearch . $query);
+		
+		if ($response->{success} && length $response->{content}) {
+			my $esearch_result = $response->{content};
+			my $esearch_result_parsed = XMLin($esearch_result);
+			#print STDERR Dumper($esearch_result_parsed), $/;
+			if ($esearch_result_parsed->{Count} == 0){
+				if (ref($esearch_result_parsed->{WarningList}->{OutputMessage}) eq 'ARRAY') {
+					my $messages = $esearch_result_parsed->{WarningList}->{OutputMessage};
+					print "{'status': \"$status\", 'message': \"@$messages\"}";
+				}
+				else {
+					my $message = $esearch_result_parsed->{WarningList}->{OutputMessage};
+					print "{'status': \"$status\", 'message': \"$message\"}";
+				}
+				return;
+			}
+			
+			$esearch_result =~
+			  m|<Count>(\d+)</Count>.*<QueryKey>(\d+)</QueryKey>.*<WebEnv>(\S+)</WebEnv>|s;
+
+			my $Count    = $1;
+			my $QueryKey = $2;
+			my $WebEnv   = $3;
+			
+			my $retstart;
+			my $retmax=1;
+			
+			my $summary_url = $utils . "/esummary.fcgi?db=$db&query_key=$QueryKey&WebEnv=$WebEnv";
+			my $response = $ht->get($summary_url);
+			
+			my $summary = XMLin($response->{content});
+			#print Dumper($summary->{DocSum}->{Item}), "\n";
+			
+			my $max_length = $phy_cf->{MAX_SEQ_LEN} || 10_000;
+			my $info = $summary->{DocSum}->{Item};
+			if ($info && 'ARRAY' eq ref $info) {
+				my ($item) = grep {$_->{Name} eq 'Length'} @$info;
+				if ($item && $item->{content} > $max_length) {
+					$message = 'Sequence too large, must be less than 10kb';
+					print "{'status': \"$status\", 'message': \"$message\"}";
+					$m->cache->set($key, 'too-large', '2h');
+					return;
+				}			
+			}
+			
+			for($retstart = 0; $retstart < $Count; $retstart += $retmax) {
+				my $efetch = "$utils/efetch.fcgi?" .
+					"rettype=$report&retmode=text&retstart=$retstart&retmax=$retmax&" .
+					"db=$db&query_key=$QueryKey&WebEnv=$WebEnv&email=dnalcadmin\@cshl.edu&tool=DNASubway";
+
+				my $response2 = $ht->get($efetch);
+				if ($response2->{success} && length $response2->{content}){	
+					my $efetch_result = $response2->{content};
+					$seq = $efetch_result;
+					$m->cache->set($key, $seq, '2h');
+				}
+			}
+		}
+	} # end_else_if_data_not_cached
+	
+	if ($seq) {
+		my $file2process = $pcf->{upload_dir} . "/" . random_string(7,7);
+		my $out = IO::File->new;
+		if ($out->open($file2process, "w")) {
+			print $out $seq;
+			undef $out;
+		}
+
+		# add data to db
+		my $st = $pm->add_data({
+			source => 'GenBank',
+			files => [{path => $file2process, }],
+			type => 'fasta',
+			existing_project => 1,  # must be set every time we add data to an existing project
+		});
+
+		if ($st->{errors} && @{$st->{errors}}){
+			push @err, @{$st->{errors}};
+			print STDERR "Errors = @err";
+			$message = "@err";
+		}
+		else{
+			$status = 'success';
+			$message = join ", ", @{$st->{warnings}} if $st->{warnings};
+		}
+	}
+	
+</%init>
+<%flags>
+	inherit => undef
+</%flags>

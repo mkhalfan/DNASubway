@@ -1,0 +1,132 @@
+<%args>
+	$hn => ''
+</%args>
+%#-------------------------------------------------
+<%once>
+	#use DNALC::Pipeline::App::ProjectManager ();
+	use DNALC::Pipeline::TargetGenome ();
+	use DNALC::Pipeline::TargetProject ();
+	use Gearman::Client();
+	use DNALC::Pipeline::CacheMemcached ();
+	use DNALC::Pipeline::Utils qw(break_long_text);
+	use Data::Dumper;
+	use IO::File ();
+	use JSON;
+	my %phytosome_map = (
+		Al1       => 'lyrata',
+		At_pz5    => 'arabi',
+		Pt_pz5    => 'poplar',
+		Sb1       => 'sorghum',
+		Sm_pz5    => 'selaginella',
+		Bd_pz5    => 'brachy',
+		Cp4       => 'papaya',
+		Cr3       => 'chlamy',
+		Cs_pz5    => 'cucumber',
+		Gm_pz5    => 'soybean',
+		Me_pz5    => 'cassava',
+		Mt_pz5    => 'medicago',
+		Osj_v6    => 'rice',
+		Pp_pz5    => 'physcomitrella',
+		Rc_pz5    => 'castorbean',
+		Vv_pz5    => 'grape',
+		Zm_pseudo_a => 'maize',
+	);
+</%once>
+%#-------------------------------------------------
+<%init>
+	$r->no_cache(1);
+	$r->content_type("text/html");
+	
+	my ($tpid, $num, $gid, $tp, $genome, $gname);
+	my ($file, $header, $seq);
+	my ($ref, $start, $stop);
+
+	#if ($hn && $hn =~ /([a-z0-9_\s]+)\|(\d+)-(\d+)$/i) {
+	if ($hn && $hn =~ /([a-z0-9_\s]+)-(\d+)-(\d+)$/i) {
+		$tpid = $3;
+		$num = $2;
+		#$gid = $1;
+		$gname = $1;
+		$tp = DNALC::Pipeline::TargetProject->retrieve($tpid) if $tpid;
+	}
+	#if ($tp && $gid) {
+	if ($tp && $gname) {
+		#$gid =~ s/\s/_/g;
+		#($genome) = map { $_->genome_id } grep {$_->genome_id eq $gid} $tp->genomes;
+		$gname =~ s/_+/ /g;
+		($genome) = map { $_->genome_id } grep {$_->genome_id->organism eq $gname} $tp->genomes;
+		$gid = $genome->genome_id if $genome;
+		
+		my $work_dir = $tp->work_dir;
+		($file) = grep { $_ =~ /$gid/} <$work_dir/*>;
+
+		my $fh = IO::File->new;
+		if ($file && $fh->open($file)) {
+			my $flag = 0;
+			while (my $line = <$fh>) {
+				if ($line =~ /^>/) {
+					if ($flag)  {
+						$flag = 0;
+						next;
+					}
+					elsif ($line =~ />${num}_$gid/) {
+						chomp $line;
+						$header = $line;
+						if ($header) {
+							if ($header =~ /Sbjct:(.+?)\s/) {
+								$ref = $1;
+							}
+							#Location:(255597 - 257212)
+							if ($header =~ /Location:\((\d+)\s?-\s?(\d+)\)/) {
+								$start = $1 > 2000 ? $1 - 2000 : 1;
+								$stop = $2 + 2000;
+							}
+						}
+						$flag = 1;
+						next;
+					}
+				}
+				if ($flag) {
+					$seq .= $line;
+				}
+			}
+			$fh->close;
+			if ($seq) {
+				$seq = break_long_text($seq, 60);
+				$seq =~ s/\s/\n/g;
+			}
+			
+		}
+	}
+</%init>
+<html>
+<body>
+<!--
+<pre>
+	hn = <% $hn %>
+	tpid = <% $tpid |html%>
+	gid = [<% $gid |html%>]
+</pre>
+-->
+% if ($tp && $genome) {
+<p>Project name: <% $tp->name%><br/>
+	<div>Organism: <% $genome->organism %></div>
+</p>
+% if ($phytosome_map{$gid}) {
+<a href="http://www.phytozome.org/cgi-bin/gbrowse/<% $phytosome_map{$gid} %>?start=<% $start %>;stop=<% $stop %>;ref=<% $ref %>;width=800;cache=on;drag_and_drop=on;show_tooltips=on;grid=on;label=Transcripts">Launch Phytozome</a>
+% }
+<pre>
+<% $header %>
+<% $seq %>
+</pre>
+% } else {
+<p>The query sequence used to generate the alignment and/or tree view, can be accessed in the page for this project in DNA Subway.</p>
+Close this window to continue.
+% }
+</body>
+</html>
+
+%#-------------------------------------------------
+<%flags>
+	inherit => undef
+</%flags>

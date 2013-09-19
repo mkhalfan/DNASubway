@@ -1,0 +1,116 @@
+{
+	sample_info => {
+		arabidopsis_lyrata => '',
+                brachypodium_distachyon => '',
+                oryza_indica => '',
+                oryza_sativa => '',
+                physcomitrella_patens => '',
+                populus_trichocarpa => '',
+                sorghum_bicolor => '',
+                vitis_vinifera => '',
+		arabidopsis_thaliana => qq(
+<b><i>Genome-wide mapping of the HY5-mediated gene networks in Arabidopsis that involve 
+both transcriptional and post-transcriptional regulations: RNA-Seq</b></i> (NCBI Sequence Read Archive <a href="http://trace.ncbi.nlm.nih.gov/Traces/sra/?study=SRP003951">Accession SRP003951</a>)
+<br />
+<table id="matrix-table">
+<tr>
+<td class="label">File</td><td class="label">Sample</td><td class="label">SRR Accession</td></tr>
+<tr>
+<td>WT_rep1.fastq</td>
+<td>Wild-type whole seedlings, replicate 1</td>
+<td><a href="http://trace.ncbi.nlm.nih.gov/Traces/sra/sra.cgi?cmd=viewer&m=data&s=viewer&run=SRR070570">SRR70570</a></td>
+</tr><tr>
+<td>WT_rep1.fastq</td>
+<td>Wild-type whole seedling, replicate 2</td>
+<td><a href="http://trace.ncbi.nlm.nih.gov/Traces/sra/sra.cgi?cmd=viewer&m=data&s=viewer&run=SRR070571">SRR70570</a></td>
+</tr><tr>
+<td>hy5_rep2.fastq</td>
+<td>hy5-215 whole seedling, replicate 2</td>
+<td><a href="http://trace.ncbi.nlm.nih.gov/Traces/sra/sra.cgi?cmd=viewer&m=data&s=viewer&run=SRR070570">SRR70570</a></td>
+</tr><tr>
+<td>hy5_rep2.fastq</td>
+<td>hy5-215 whole seedling, replicate 2</td>
+<td><a href="http://trace.ncbi.nlm.nih.gov/Traces/sra/sra.cgi?cmd=viewer&m=data&s=viewer&run=SRR070570">SRR70573</a></td>
+</tr>
+</table>  
+),
+		caenorhabditis_elegans => qq(
+<center><b><i>Using RNA-seq to identify transcriptional targets of MAB-5 in C. elegans</i></b><br>
+(NCBI Sequence Read Archive <a href="http://trace.ncbi.nlm.nih.gov/Traces/sra/?study=SRP017621">Accession SRP017621</a>)</center>
+<table id="matrix-table">
+<tr>
+<td class="label">File</td><td class="label">Sample</td><td class="label">SRR Accession</td></tr>
+<td>mab-5_rep1.fastq</td>
+<td>Loss-of-function strain LE2662 (mab-5), early L1 larvae</td>
+<td><a href="http://trace.ncbi.nlm.nih.gov/Traces/sra/sra.cgi?cmd=viewer&m=data&s=viewer&run=SRR638942">SRR638942</a></td>
+</tr><tr>
+<td>mab-5_rep2.fastq</td>
+<td>Loss-of-function strain LE2662 (mab-5), early L1 larvae</td>
+<td><a href="http://trace.ncbi.nlm.nih.gov/Traces/sra/sra.cgi?cmd=viewer&m=data&s=viewer&run=SRR638971">SRR638971</a></td>
+</tr><tr>
+<td>mab-5_rep3.fastq</td>
+<td>Loss-of-function strain LE2662 (mab-5), early L1 larvae</td>
+<td><a href="http://trace.ncbi.nlm.nih.gov/Traces/sra/sra.cgi?cmd=viewer&m=data&s=viewer&run=SRR638920">SRR638920</a></td>
+</tr><tr>
+<td>WT_rep1.fastq</td>
+<td>Wild-type strain LE2544, early L1 larvae</td>
+<td><a href="http://trace.ncbi.nlm.nih.gov/Traces/sra/sra.cgi?cmd=viewer&m=data&s=viewer&run=SRR638982">SRR638982</a></td>
+</tr><tr>
+<td>WT_rep2.fastq</td>
+<td>Wild-type strain LE2544, early L1 larvae</td>
+<td><a href="http://trace.ncbi.nlm.nih.gov/Traces/sra/sra.cgi?cmd=viewer&m=data&s=viewer&run=SRR638987">SRR638987</a></td>
+</tr><tr>
+<td>WT_rep3.fastq</td>
+<td>Wild-type strain LE2544, early L1 larvae</td>
+<td><a href="http://trace.ncbi.nlm.nih.gov/Traces/sra/sra.cgi?cmd=viewer&m=data&s=viewer&run=SRR638989">SRR638989</a></td>
+</tr>
+</table>
+),
+		zea_mays => qq(	
+<center><b><i>Microarray versus RNA-Seq comparative analysis with diverse B73 tissues.</b></i> 
+(NCBI Sequence Read Archive <a href="http://trace.ncbi.nlm.nih.gov/Traces/sra/?study=SRP003951">Accession SRP003951</a>)</center>
+<table id="matrix-table">
+<tr>
+<td class="label">File</td><td class="label">Sample</td><td class="label">SRR Accession</td></tr>
+<tr>
+<td>root_rep1.fastq</td>
+<td>6DAS_GH primary root</td>
+<td><a href="http://trace.ncbi.nlm.nih.gov/Traces/sra/sra.cgi?cmd=viewer&m=data&s=viewer&run=SRR404141">SRR404141</a></td>
+</tr><tr>
+<td>root_rep2.fastq</td>
+<td>6DAS_GH primary root</td>
+<td><a href="http://trace.ncbi.nlm.nih.gov/Traces/sra/sra.cgi?cmd=viewer&m=data&s=viewer&run=SRR404143">SRR404143</a></td>
+</tr><tr>
+<td>root_rep3.fastq</td>
+<td>6DAS_GH primary root</td>
+<td><a href="http://trace.ncbi.nlm.nih.gov/Traces/sra/sra.cgi?cmd=viewer&m=data&s=viewer&run=SRR404144">SRR404144</a></td>
+</tr><tr>
+<td>seed_rep1.fastq</td>
+<td>24H germinating seed</td>
+<td><a href="http://trace.ncbi.nlm.nih.gov/Traces/sra/sra.cgi?cmd=viewer&m=data&s=viewer&run=SRR404131">SRR404131</a></td>
+</tr><tr>
+<td>seed_rep2.fastq</td>
+<td>24H germinating seed</td>
+<td><a href="http://trace.ncbi.nlm.nih.gov/Traces/sra/sra.cgi?cmd=viewer&m=data&s=viewer&run=SRR404139">SRR404139</a></td>
+</tr><tr>
+<td>seed_rep3.fastq</td>
+<td>24H germinating seed</td>
+<td><a href="http://trace.ncbi.nlm.nih.gov/Traces/sra/sra.cgi?cmd=viewer&m=data&s=viewer&run=SRR404140">SRR404140</a></td>
+</tr><tr>
+<td>stem_rep1.fastq</td>
+<td>V3 stem and SAM</td>
+<td><a href="http://trace.ncbi.nlm.nih.gov/Traces/sra/sra.cgi?cmd=viewer&m=data&s=viewer&run=SRR404145">SRR404145</a></td>
+</tr><tr>
+<td>stem_rep2.fastq</td>
+<td>V3 stem and SAM</td>
+<td><a href="http://trace.ncbi.nlm.nih.gov/Traces/sra/sra.cgi?cmd=viewer&m=data&s=viewer&run=SRR404147">SRR404147</a></td>
+</tr><tr>
+<td>stem_rep3.fastq</td>
+<td>V3 stem and SAM</td>
+<td><a href="http://trace.ncbi.nlm.nih.gov/Traces/sra/sra.cgi?cmd=viewer&m=data&s=viewer&run=SRR404148">SRR404148</a></td>
+</tr>
+</table>
+),
+	}
+};
+

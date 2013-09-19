@@ -1,0 +1,54 @@
+{'oid':'<%$oid|html%>', 'h': '<% $h%>', 'd':'<% $temp_dir %>'}
+<%args>
+	@ids => ()
+	$oid => 0
+</%args>
+<%once>
+	use DNALC::Pipeline::Config ();
+	use DNALC::Pipeline::Utils qw/random_string/;
+	use DNALC::Pipeline::CacheMemcached ();
+	use Gearman::Client ();
+	use Storable qw/nfreeze/;
+</%once>
+<%init>
+	$r->content_type("application/x-javascript; charset=utf-8");
+	$r->no_cache(1);
+
+	my $cf = DNALC::Pipeline::Config->new->cf('PHYLOGENETICS');
+	my $base_dir = $cf->{DNALC_TRANSFER_DIR} || "/tmp";
+	my $temp_dir = random_string(4, 8);
+	my $h;
+	if ($oid) {
+		my $path = $base_dir . '/' . $temp_dir;
+		if (mkdir $path) {
+			chmod 0777, $path;
+		}
+
+		my $arguments = nfreeze( {
+				o => $oid,
+				ids => [@ids],
+				dir => $temp_dir,
+			});
+
+		my $client = Gearman::Client->new;
+		my $pcf = DNALC::Pipeline::Config->new->cf('PIPELINE');
+		my $sx = $client->job_servers(@{$pcf->{GEARMAN_SERVERS}});
+
+		$h = $client->dispatch_background( dnalc_files => $arguments );
+		
+		if (0) {
+			# store the $temp_dir variable for later use
+			my $mc_key = "dnalc-" . $temp_dir;
+			my $cache_obj = {
+					gw_oid => $oid,
+					gw_temp_dir => $temp_dir,
+					gw_ids => [@ids],
+				};
+			my $memcached = DNALC::Pipeline::CacheMemcached->new;
+			$memcached->set($mc_key, $cache_obj); #expires in 1h
+		}
+	}
+</%init>
+<%flags>
+	inherit => undef
+</%flags>

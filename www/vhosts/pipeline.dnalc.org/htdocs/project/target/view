@@ -1,0 +1,257 @@
+<div id="container_rightContent"> 
+<div id="conYellowlineLeft2">
+<input type="hidden" id="tid" value="<% $tid %>" />
+<input type="hidden" id="tstatus" value="<% $tp ? $tp->status : "" %>" />
+% if ($is_owner) {
+<input type="hidden" id="isowner" value="<% $is_owner %>"/>
+% }
+ <span class="conYellowline_ConColumn1">
+	<span class="conYellowline_ConCellTitle">Mosses</span>
+%	for (sort {$a->{organism} cmp $b->{organism} } grep {$_->clade =~ /mosses/} @genomes) {
+%		my $gid = $_->id;
+	<span id="sg_<% $gid %>" class="conYellowline_ConCell1" cn="<% $_->common_name |html %>"><input class="conRadiobox_align" type="checkbox" name="g" id="g_<% $_->id %>" value="<% $_->id %>" <% (grep {$_ eq $gid } @tp_genomes)  ? "checked=\"checked\"" : "" %> />&nbsp; <% $_->organism %></span>
+%	}
+
+	<span class="conYellowline_ConCellTitle">Lycophytes</span>
+%	for (sort {$a->{organism} cmp $b->{organism} } grep {$_->clade =~ /lycophytes/} @genomes) {
+%		my $gid = $_->id;
+	<span id="sg_<% $gid %>" class="conYellowline_ConCell1" cn="<% $_->common_name |html %>"><input class="conRadiobox_align" type="checkbox" name="g" id="g_<% $_->id %>" value="<% $_->id %>" <% (grep {$_ eq $gid } @tp_genomes)  ? "checked=\"checked\"" : "" %> />&nbsp; <% $_->organism %></span>
+%	}   
+	<span class="conYellowline_ConCellTitle">Algae</span>
+%	for (sort {$a->{organism} cmp $b->{organism} } grep {$_->clade =~ /algi/} @genomes) {
+%		my $gid = $_->id;
+	<span id="sg_<% $gid %>" class="conYellowline_ConCell1" cn="<% $_->common_name |html %>"><input class="conRadiobox_align" type="checkbox" name="g" id="g_<% $_->id %>" value="<% $_->id %>" <% (grep {$_ eq $gid } @tp_genomes)  ? "checked=\"checked\"" : "" %> />&nbsp; <% $_->organism %></span>
+%	}
+<span class="conYellowline_keys"></span>
+ </span><!--END of CLASS conYellowline_ConColumn1-->
+ <span class="conYellowline_ConColumn1">
+	<span class="conYellowline_ConCellTitle">Dicotyledons</span>
+%	for (sort {$a->{organism} cmp $b->{organism} } grep {$_->clade =~ /dicotyledones/} @genomes) {
+%		my $gid = $_->id;
+	<span id="sg_<% $gid %>" class="conYellowline_ConCell1" cn="<% $_->common_name |html %>"><input class="conRadiobox_align" type="checkbox" name="g" id="g_<% $_->id %>" value="<% $_->id %>" <% (grep {$_ eq $gid } @tp_genomes)  ? "checked=\"checked\"" : "" %>/>&nbsp; <% $_->organism %></span>
+%	}
+</span><!--END of CLASS conYellowline_ConColumn1-->
+<span class="conYellowline_ConColumn1">
+	<span class="conYellowline_ConCellTitle">Monocotyledons</span>
+%	for (sort {$a->{organism} cmp $b->{organism} } grep {$_->clade =~ /monocotyledones/} @genomes) {
+%		my $gid = $_->id;
+	<span id="sg_<% $gid %>" class="conYellowline_ConCell1" cn="<% $_->common_name |html %>"><input class="conRadiobox_align" type="checkbox" name="g" id="g_<% $_->id %>" value="<% $_->id %>" <% (grep {$_ eq $gid } @tp_genomes)  ? "checked=\"checked\"" : "" %> />&nbsp; <% $_->organism %></span>
+%	}
+ </span><!--END of CLASS conYellowline_ConColumn2-->
+%#<div>Blast all: <input type="checkbox" name="g" id="g_unigene" value="unigene" /> Unigene</div>
+%#<div>Blast all: <input type="checkbox" name="g" id="g_uniprot" value="uniprot" /> UniProt</div>
+
+</div><!--END of ID conYellowlineLeft2-->
+
+<div id="conYellowlineRight2">
+  <div style="margin-left: -26px">
+    <div class="con_browserBT">
+		<span class="conIndicator_boxBrowse"><div id="alignment_ind" class="<% $files{fasta} ? "conIndicator_done" : "conIndicator_Rb_disabled"%>"></div></span>
+		
+%	if (defined $files{fasta}) {
+		<span class="bt_browserYellow" id="alignment_span"><a href="#" onclick="launch_jalview('<% $files{fasta} %>', '<% $files{nw} %>')">Alignment<br/>Viewer</a></span>
+%	} else {
+		<span class="bt_browserYellow" id="alignment_span"><a href="#" class="disabled">Alignment<br/>Viewer</a></span>
+%	}
+	</div>
+    
+	<div id="con_browserYellowSpacer"></div>
+	<div class="con_browserBT">
+		<span class="conIndicator_boxBrowse"><div id="tree_ind" class="<% $tree_url ? "conIndicator_done" : "conIndicator_Rb_disabled" %>"></div></span>
+		<span class="bt_browserYellow"><a href="javascript:;" id="tree_btn"\
+% 	if ( $tree_url) {
+		onclick="window.open('/files/phylowidget/bare.html?tree=<% $tree_url %>', 'target_tree', 'status=0,height=550,width=750')"
+% 	} else {
+		class="disabled"
+% 	}
+	>Tree<br/>Viewer</a></span>
+    
+    </div>
+  </div>
+</div><!--END of ID conYellowlineRight2--> 
+
+<br clear="both"/>
+
+% if ($tp) {
+<div id="conRun_yellowline">
+	<div class="con_browserBT">
+% if ($is_owner) {
+		<span class="conIndicator_boxBrowse"><div id="launch_btn_ind" class="<% $tp->status ne "processing" ? "conIndicator_Rb_disabled" : "conIndicator_processing"%>"></div></span>
+		<span class="bt_Runyellowline"><a id="launch_btn" href="javascript:;" onclick="launch_target()"class="<% $tp->status eq "processing" ? "disabled" : ""%>">RUN</a></span>
+% } else {
+		<span class="conIndicator_boxBrowse"><div id="launch_btn_ind" class="conIndicator_Rb_disabled"></div></span>
+		<span class="bt_Runyellowline"><a id="launch_btn" class="disabled" href="javascript:;">RUN</a></span>
+% }
+	</div><!--END of ID conRun_yellowline-->
+</div>
+% }
+
+<div id="message" style="color: #F47721;text-align:left; padding-top: 14px;font-size: small"><% $message %></div>
+
+<div id="conProjectInfo">
+	<div id="conProjectInfo_header">
+		<div id="conProjectInfo_title">Project Information</div>
+%#        <div class="bt_projectInfo"><a href="#">xxxx</a></div>
+% if ($is_owner) {
+		<div id="conProjectInfo_edit">
+	        <div class="bt_projectInfo_edit"><a href="javascript:;" onclick="show_edit();"></a></div>
+		</div>
+% }
+		<div id="conProjectInfo_projecttitle"><% $tp ? $tp->name : "" |html%></div>
+		<div id="conProjectInfo_projectlog">Description</div>
+	</div>
+
+	<span class="conProjectInfo_column1">
+	<!--
+		<div class="conProjectInfo_Row">
+			<span class="conProjectInfo_Cell1">Project ID</span>
+			<span class="conProjectInfo_Cell2">: <% $tp ? $tp->id : "" %></span>
+		</div>
+	-->
+		<div class="conProjectInfo_Row">
+			<span class="conProjectInfo_Cell1">User</span>
+			<span class="conProjectInfo_Cell2">: <% $user_fullname %></span>
+		</div>
+		<div class="conProjectInfo_Row">
+			<span class="conProjectInfo_Cell1">Affiliation</span>
+			<span class="conProjectInfo_Cell2">: <% $institution |html %></span>
+		</div>
+		<div class="conProjectInfo_Row">
+			<span class="conProjectInfo_Cell1"><a href="javascript:;" onclick="javascript:launch_viewseq('<% $tid %>')">Sequence</a></span>
+			<span class="conProjectInfo_Cell2"></span>
+%#			<span class="conProjectInfo_CellBT"><a href="javascript:;" onclick="javascript:launch_viewseq('<% $tid %>')">View</a></span>
+		</div>
+% if ($is_owner) {
+        <div class="conProjectInfo_Row">
+			<div class="conProjectInfo_Cell1">Status:</div>
+			<div class="conProjectInfo_Cell3"><span onclick="set_public(0);" style="cursor: pointer;"><input type="radio" name="public" id="public_no" <% $is_public ? "" : "checked=\"checked\"" %> onclick="set_public(0);" />&nbsp; Private</span></div>
+			<div class="conProjectInfo_Cell3"><span onclick="set_public(1);" style="cursor: pointer;"><input type="radio" name="public" id="public_yes" <% $is_public ? "checked=\"checked\"" : "" %> onclick="set_public(1);" />&nbsp; Public</span></div>
+		</div>
+% }
+	</span><!--END of span conProjectInfo_column1-->
+
+	<span class="conProjectInfo_column2">
+		<div class="conProjectInfo_Row">
+			<span class="conProjectInfo_Cell1">Organism</span>
+			<span class="conProjectInfo_Cell2">: <% $tp ? $tp->organism : "" %></span>
+		</div>
+		<div class="conProjectInfo_Row">
+			<span class="conProjectInfo_Cell1"><% $tp && $tp->type eq "p" ? "Protein" : "Gene"%> name</span>
+			<span class="conProjectInfo_Cell2">: <% $tp ? $tp->gp_name : "-" %></span>
+		</div>
+		<div class="conProjectInfo_Row">
+			<span class="conProjectInfo_Cell1">Class</span>
+			<span class="conProjectInfo_Cell2">: <% $tp ? $tp->class_name : "-" %></span>
+		</div>
+		<div class="conProjectInfo_Row">
+			<span class="conProjectInfo_Cell1">Function</span>
+			<span class="conProjectInfo_Cell2">: <% $tp ? $tp->function_name : "-" %></span>
+		</div>
+	</span><!--END of span conProjectInfo_column2-->
+	<span class="conProjectInfo_column3">
+		<div id="desc_limit_label" class="conNewPro_label" style="display: none;">Total characters (max.140): &nbsp;<span id="desc_len"><% $tp ? length $tp->description : 0 %></span></div>
+		<div id="description_container" origdesc="" class="conProjectInfo_description"><% $tp ? $tp->description : "" |html %></div>
+	</span> <!--END of span conProjectInfo_column2-->                   							
+
+</div><!--END of ID conProjectInfo-->  
+</div><!--END of ID container_rightContent-->     
+
+<%args>
+	$tid => 0
+</%args>
+<%once>
+	use DNALC::Pipeline::TargetGenome ();
+	use DNALC::Pipeline::TargetProject ();
+	use DNALC::Pipeline::User ();
+	use DNALC::Pipeline::UserProfile ();
+	use Data::Dumper;
+</%once>
+<%init>
+	$r->content_type("text/html");
+
+	$m->session->{pipeline} ||= {};
+	my $s = $m->session->{pipeline};
+	
+	my $path_info = $r->path_info;
+	my $tree_url = '';
+	my @tp_genomes = ();
+	my %files;
+	
+	my $is_owner = 0;
+	my $is_public = undef;
+	my $mp = undef;
+	my $institution = '';
+	
+	my $message = '';
+
+	if ($path_info =~ /\/(\d+)$/) {
+		$tid = $1;
+	}
+	my $user_fullname = '';
+	my @genomes = ();
+	#--------------------
+	{
+		my $genomes = $m->cache->get("target-genomes");
+		unless (defined $genomes) {
+				$genomes = [ grep {$_->active} DNALC::Pipeline::TargetGenome->retrieve_all ];
+				$m->cache->set("target-genomes", $genomes, "30m"); # set cache for 30 minutes
+		}
+		@genomes = @$genomes;
+	}
+	#--------------------
+	my $tp = DNALC::Pipeline::TargetProject->retrieve($tid);
+	unless ($tp) {
+		$message = "Project not found!";
+		$tid = 0;
+	}
+	else {
+		@tp_genomes = map {$_->genome_id->id } $tp->genomes;
+		if ($tp->status eq 'done-empty') {
+			$message = 'No homologs found. Search other genomes.';
+		}
+		elsif ($tp->status eq 'done') {
+			$message = "";#"Done. Check results.";
+			my $workdir = $tp->work_dir;
+			for (<$workdir/*>) {
+				my $file = $m->comp('../.comp/filepath_to_web', file => $_, just_return => 1);
+				if ($file =~ /\.(\w{2,5})$/) {
+					$files{$1} = $file;
+				}
+			}
+			if ($files{nw}) {
+				#$tree_url = "/files/phylowidget/bare.html?tree='http://<% $r->get_server_name . $files{nw} %>'";
+				$tree_url = "http://" . $r->get_server_name . "$files{nw}";
+			}
+		}
+		elsif ($tp->status eq 'processing') {
+			$message = '';
+		}
+		elsif ($tp->status eq 'failed') {
+			$message = "Failed to get the results from TARGeT.";
+		}
+		if ($tp->user_id != $s->{user_id}) {
+			my $user = DNALC::Pipeline::User->retrieve($tp->user_id);
+			$user_fullname = $user->full_name;
+			$institution = DNALC::Pipeline::UserProfile->get_user_institution($user->id);
+		}
+		else {
+			$user_fullname = $s->{full_name};
+			$institution = $s->{institution};
+			$is_owner = 1;
+		}
+
+		($mp) = DNALC::Pipeline::MasterProject->search(user_id => $tp->user_id, project_id => $tp->id);
+		$is_public = $mp->public;
+		$institution ||= "-";
+	}
+
+</%init>
+
+%#-----------------------------------------------------------------
+<%attr>
+	current_section => 'yellow'
+	js => ['target.js', 'prototip/prototip.js', 'deployJava.js']
+	css => ['prototip.css']
+	load_window_ui => 1
+	show_glossary => 1
+</%attr>

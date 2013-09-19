@@ -1,0 +1,120 @@
+
+<div id="" style="min-height: 300px">
+% if ($ok == 1) {
+<script type="text/javascript">
+	top.phy.set_status('phy_alignment', 'not-processed');
+	top.phy.close_window('add_ref');
+</script>
+% } elsif ($error) {
+	<div><% $error |html%></div>
+% }
+<div class="container_data1">
+<div id="container_data_line">&nbsp;</div>
+
+% if ($proj) {
+	<div style="width: 35%;float:left;">
+	<div class="con_BL_subTitle"><% $type %> reference data</div>
+	<form method="post" id="forma1">
+
+% 	for my $ref (@$refs) {
+%		my $disabled = $in_use_refs{$ref->{id}} ? "disabled=\"disabled\"" : "";
+	<div class="list_refdata">
+		<input type="radio" name="refid" id="r<% $ref->{id}%>" value="<% $ref->{id} |html%>" <% $disabled %> onchange="phy.show_ref_details('<%$ref->{id}%>')" /> 
+		<label for="r<% $ref->{id}%>"><% $ref->{id} %></label> \
+%		if ($in_use_refs{$ref->{id}}) {
+		<small>(Added already)</small>
+%		}
+		<div style="display:none;" id="rd<% $ref->{id} %>"><% $refs_det->{$ref->{id}}%></div>
+	</div>
+% 	}
+		<p>
+			<div class="list_refdata"><input type="button" id="buttonas" value="Add ref data" onclick="phy.do_add_ref()"/></div>
+		</p>
+		<input type="hidden" id="pid" value="<% $pid %>"/>
+		<input type="hidden" id="ref_id" name="ref_id" value="" />
+	</form>
+	</div>
+	<div class="list_refdata" style="float:left;width:50%;height:auto;color:#555;" id="ref_details"></div>
+% } else {
+	Unable to locate project <% $pid |html %>!
+% }
+
+<div style="clear: both;">&nbsp;</div>
+     <div id="container_data_lineBottom">&nbsp;</div>
+</div>
+</div>
+%#----------------------------------------------------------------------------
+<%args>
+	$pid => 0
+	$ref_id => 0
+	$ok => 0
+</%args>
+%#----------------------------------------------------------------------------
+<%once>
+	use DNALC::Pipeline::App::Phylogenetics::ProjectManager ();
+	#use DNALC::Pipeline::Utils qw(random_string);
+	use IO::File ();
+	use Data::Dumper;
+</%once>
+%#----------------------------------------------------------------------------
+<%init>
+	$r->content_type("text/html");
+	$pid =~ s/\D+//g;
+	my $pm = DNALC::Pipeline::App::Phylogenetics::ProjectManager->new($pid);
+	my $proj = $pm->project;
+	my $error = '';
+	my ($type, $refs, $refs_det);
+	my %in_use_refs = ();
+	if ($proj) {
+		$type = $proj->type;
+		my $ref_cf = DNALC::Pipeline::Config->new->cf('PHYLOGENETICS_REF');
+		$refs = defined $ref_cf->{$type} ? $ref_cf->{$type} : [];
+
+		%in_use_refs = map {$_ => 1} $pm->references;
+
+		if ($r->method eq "POST") {
+
+			if (@$refs && $ref_id) {
+				my ($ref) = grep {$_->{id} eq $ref_id} @$refs;
+				if ($ref) {
+					$pm->add_reference($ref->{id});
+					if ($pm->get_task_status("phy_alignment")->name eq "done") {
+						$pm->set_task_status("phy_alignment", "not-processed");
+					}
+					$m->redirect("./add_ref?pid=" . $pid . ";ok=1");
+				}
+				else {
+					$error = "Can't find reference with id=[$ref_id]";
+				}
+			}
+		}
+		else {	# get the details about the references
+
+			if ($refs && @$refs) {
+				$refs_det = $m->cache->get("ref-details-$type");
+				unless ($refs_det && %$refs_det) {
+					for my $ref (@$refs) {
+						my $fh = IO::File->new;
+						if ($fh->open($ref->{file})) {
+							my $details = "";
+							while(<$fh>) {
+								if ($_ =~ /^>/) {
+									$_ =~ s/[><]//g;
+									$details .= "<div>" . $_ . "</div>";
+								}
+							}
+							$refs_det->{$ref->{id}} = $details;
+							$fh->close;
+						}
+					}
+					$m->cache->set("ref-details-$type", $refs_det, "60m");
+				} # end unless
+
+			} #end if %$refs
+		}
+	}
+</%init>
+%#----------------------------------------------------------------------------
+<%attr>
+	js => ['prototype-1.6.1.js', 'phylogenetics.js']
+</%attr>

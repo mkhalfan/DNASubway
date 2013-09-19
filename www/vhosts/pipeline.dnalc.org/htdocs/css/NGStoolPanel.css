@@ -1,0 +1,268 @@
+/* THESE ARE ALSO IN toolPanel.css */
+.container_data1 {
+	width: 840px;
+	height: auto;
+	padding-top: 8px;
+	float: left;
+	position: relative;
+	padding-left: 20px;
+	font-family:  arial, monospace;
+}
+#container_data_line {
+	height: 8px;
+	margin-top: 14px;
+	position: relative;
+	border-top: 4px solid #C2DBF3;
+}
+#container_data_lineBottom {
+	height: 3px;
+	position: relative;
+	border-bottom: 1px solid #C2DBF3;
+}
+/* END THESE ARE ALSO IN toolPanel.css */
+
+.label_header {
+	color:#3399cc;
+	font-weight:bold;
+}
+
+#container_data_line_bg {
+	background-color:#C2DBF3;
+	padding:2px;
+	font-size:12px;
+	margin-bottom:10px;
+	font-weight:bold;
+}
+
+#container_data_line_bg  a{
+	text-decoration:none;
+	color:#123456
+}
+
+/* crumb-trail is in add_data */
+#crumb-trail {
+	font-size:medium;
+}
+
+#crumb-trail a{
+	color:#3C679A;
+	font-weight:bold;
+	text-decoration:none;
+}
+
+#crumb-trail a:hover{
+	color:blue;
+}
+
+/* 
+* jobs_table is on all the tool pages like TopHat, CuffLinks, etc.
+* it contains the file names and jobs corresponding to each of those files
+*/
+#jobs_table  {
+	margin-top:10px;
+	text-align:left;
+	width:100%;
+	border:0;
+	border-spacing:0;
+}
+
+#jobs_table thead {
+	background-color:#989B9F;
+}
+
+#jobs_table thead th {
+	border-top:1px solid #989b9f;
+	border-bottom:1px solid #989b9f;
+	padding:5px 10px;
+}
+
+#jobs_table td {
+	padding:5px 10px;
+}
+
+#jobs_table tr.even, #manage_data tr.even, #jobs_table tr.file {
+	background-color:#e8eef7;
+}
+.text_submit{
+	border:0;
+	color:#3C679A;
+	font-weight:bold;
+	text-decoration:none;
+	font-size:16px;
+}
+
+.disabled_text_submit{
+	font-weight:bold;
+	padding:0;
+	font-size:16px;
+	color:#999999;
+}
+
+#small_disclaimer{
+	font-size:small;
+	color:#999999;
+}
+
+/*
+* Manage Data is different from our other data tables (only files, no jobs)
+* therefor it needs its own style definitions
+*/
+#manage_data {
+	min-width: 760px;
+	width:100%;
+	border-spacing:0;
+	margin-top:10px;
+}
+#manage_data thead tr th{
+	font-weight: bold;
+	background-color:#e8eef7;
+	border-bottom: 1px solid #989b9f;
+	border-top: 1px solid #989b9f;
+	white-space:nowrap;
+	text-align:left;
+	padding:5px 10px;
+}
+#manage_data tr td {
+	padding: 3px 10px;
+}
+
+/*
+* #launch_job_table* is used on the advanced mode page for launching jobs.
+*/
+#launch_job_table_holder{
+	width:100%;
+	border-top:1px solid black;
+	border-bottom:1px solid black;
+	margin:10px 0;
+	padding:10px 0 75px 0;
+}
+
+#launch_job_table{
+
+}
+	
+#launch_job_table td{
+	padding-left:10px;
+}
+
+#launch_job_table td.label_header {
+	padding-left:0px;
+	color:#3399cc;
+	font-weight:bold;
+}
+
+/* in Add Data */
+#folders {
+	float:left;
+	width:40%;
+	max-height:200px;
+	overflow:auto;
+}
+
+#folders div {
+	padding:2px 20px;
+	margin-left:5px;
+	background: url(/images/ngs/generic_folder.png) no-repeat left;
+}
+#folders div.up {
+	padding:2px 20px;
+	margin-left:5px;
+	background: url(/images/ngs/generic_folder_up.png) no-repeat left;
+}
+
+#folders a {
+	color:black;
+	text-decoration:none;
+	margin-left:-20px;
+	padding-left:25px
+}
+
+#files {
+	float:right;
+	width:59%;
+	padding-top:5px;
+	max-height:200px;
+	overflow:auto;
+}
+
+#files div {
+	padding:2px 0;
+	margin-left:5px;
+	background: url(/images/ngs/document_import.png) no-repeat 22px;
+}
+
+#files div input {
+	margin-right:27px;
+}
+
+#file_folder_divider {
+	background-color:lightgrey;
+	width:1px;
+	height:200px;
+	float:left;
+}
+/* END in Add Data */
+
+
+#graphs .graph {
+	border: 1px solid orange;
+	display:block;
+	margin: 3px 0;
+}
+#graphs .graph.active {
+	border: 1px solid green;
+}
+
+.alpha{
+	opacity:0.4;
+	filter:alpha(opacity=40); /* For IE8 and earlier */
+}
+
+tr.fade {
+  -transition-property: background-color;  
+  -transition-duration: 2s; 
+  -moz-transition-property: background-color;  
+  -moz-transition-duration: 2s; 
+  -webkit-transition-property: background-color;  
+  -webkit-transition-duration: 2s; 
+  -o-transition-property: background-color;  
+  -o-transition-duration: 2s;    
+  background-color: #fdfdfd;
+}
+
+.highlight {
+	background-color: pink;
+}
+
+.cl_highlight {
+	background-color:#e8eef7;
+}
+
+/*---- Sample Data Information Matrix Tables ---*/
+
+#matrix-table {
+	border-collapse:collapse;
+	width:90%;
+	margin:20px auto;
+	
+}
+#matrix-table th{
+	font-weight:bold;
+	text-align:left;
+	border-bottom:2px solid black;
+	padding:2px 10px;
+}
+#matrix-table td{
+	padding:2px 10px;
+	border-bottom:1px solid grey;
+}
+#matrix-table .label{
+	font-weight:bold;
+	border-bottom:2px solid black;
+}
+
+/*---- End Sample Data Information Matrix Tables ---*/
+
+#cuffdiff_tables select {
+	border:1px solid grey;
+}

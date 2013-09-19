@@ -1,0 +1,98 @@
+<div id="graphs" class="container_data1">
+	<div id="container_data_line_bg">
+		<a href="javascript:;" onclick="document.location.replace('/project/ngs/tools/job_list_cuffdiff?pid=<% $pid %>')">< Back</a>
+	</div>
+	<div id="title"><% $job_title %></div>
+	<div id="content">
+		<table><tr style="vertical-align:top"><td id="menu">
+%	for (@png_files) {
+%  			my $path = $_->file_path; 
+%  			my ($key) = $path =~ /([^._\/]+)_plot.png$/;
+%  			my $desc  = $graph_desc{$key} || "No description for $key";
+			<a href="javascript:;" 
+			onclick="javascript:selectGraph('<& "../../.comp/filepath_to_web", file => $_->file_path &>', '<% $desc %>');"><img 
+			src="<& "../../.comp/filepath_to_web", file => $_->file_path &>"	
+			width="64px" class="graph-one graph" /></a>
+%	}
+
+	</td><td id="graph" style="padding-left:75px">
+	
+%  my ($key) = $path_to_image =~ /([^._\/]+)_plot.png$/;
+%  my $desc  = $graph_desc{$key} || "No description for $key";
+			<% $desc . $manual %><br>
+			<img src="<& "../../.comp/filepath_to_web", file => $path_to_image &>"
+			     style="margin-left:50px">
+	</td></tr></table>
+
+
+		<div style="clear:both;"></div>
+	</div>
+</div>
+<script type="text/javascript">
+	function selectGraph(img_src, desc){
+		// Get the path of the image depending on the specified type, assign this to the $path_to_image variable
+		// update the image on screen using the path obtained above
+		var manual = '<br><% $manual %><br><br>';
+		desc = desc + manual;
+		//$('graph').update(desc + '<img src="https://foundation.iplantcollaborative.org/io-v1/io/download' + img_src + '">');
+		$('graph').update(desc + '<img src="'+img_src+'" style="margin-left:50px">');
+	}
+</script>
+%#-----------------------------------------------------------------
+<%args>
+	$pid => 0
+	$jid => 0
+</%args>
+
+<%once>
+	use DNALC::Pipeline::NGS::JobOutputFile ();
+</%once>
+
+<%init>
+
+	my @out_files = DNALC::Pipeline::NGS::JobOutputFile->search(job_id => $jid, project_id => $pid);
+	my @png_files = grep {$_->is_local && $_->file_path =~ /\.png$/} map {$_->file } @out_files; 
+
+	my $job_title;
+	my $path_to_image; #needs to be set to the first graph type initially
+
+	$path_to_image = @png_files ? $png_files[0]->file_path : '';
+
+	#active_class will be set to active depending on which graph is being displayed
+	my $active_class;
+
+	# A brief description for each graph_type
+	# keys are extracted with the regex /([^_]+)_plot.png$/
+	
+	my $manual = "http://bioconductor.org/packages/2.11/bioc/vignettes/cummeRbund/inst/doc/cummeRbund-manual.pdf";
+	$manual = qq( <span style="font-size:small">See the <a href="$manual" target="_blank">CummeRbund Manual</a></span>);
+
+	my %graph_desc = (
+		density => "The cummeRbund Density plot shows the distributions of FPKM score " .
+		           "(fragments per kilobase/million reads -- a normalized abundance score) across samples.",
+
+
+		SCV => "The squared coefficient of variation is a normalized measure of cross-replicate variability ".
+		       "that can be useful for evaluating the quality your RNA-seq data. Differences in CV 2 " .
+                       "can result in lower numbers of differentially expressed genes due to a higher degree ".
+		       "of variability between replicate fpkm estimates.",
+
+
+		MA => "MvsA plots can be useful to determine any systematic bias that may be present between ".
+		      "conditions. It can be used to examine these intensity vs fold-change.",
+
+		dispersion => "Overdispersion is a common problem in RNA-Seq data.  The dispersion plot allows you ".
+		              "to visualize the estimated overdispersion for each sample as a quality control measure.",
+
+		scatter    => "Scatterplots can be useful to identify global changes and trends in gene expression ".
+		              "between pairs of conditions.",
+
+		matrix	   => "The volcano plot is a useful visualization to compare fold change and significance between ".
+		              "conditions (-log P-values).",
+
+	);	
+
+
+
+
+</%init>

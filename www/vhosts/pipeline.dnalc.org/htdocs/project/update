@@ -1,0 +1,104 @@
+<%args>
+	$pid => 0
+	$public => undef
+	$type => ''
+	$title => undef
+	$description => undef
+</%args>
+%#--------------------------------------------------------
+<%once>
+	use DNALC::Pipeline::MasterProject ();
+	use DNALC::Pipeline::Project ();
+	use DNALC::Pipeline::Phylogenetics::Project ();
+	use DNALC::Pipeline::TargetProject ();
+	use DNALC::Pipeline::Config ();
+	use DNALC::Pipeline::Utils qw(random_string);
+
+	#use Data::Dumper;
+
+</%once>
+%#--------------------------------------------------------
+<%init>
+#my $pcf = DNALC::Pipeline::Config->new->cf('PIPELINE');
+$r->content_type('text/plain');
+
+my $s = $m->session->{pipeline};
+
+my $status  = 'error';
+my $message = '';
+my $error = 0;
+
+unless ($s->{logged_in}) {
+	$message = 'Your session has expired. Please login!';
+} else {
+	
+	my ($mp) = DNALC::Pipeline::MasterProject->search(user_id => $s->{user_id}, project_id => $pid, project_type => $type);
+	unless ($mp) {
+		$message = "Project not found!";
+	}
+	else {
+		if (defined $public && $mp->public != $public) {
+			$mp->public($public);
+			if ($mp->is_changed && $mp->update) {
+				$status = 'success';
+			}
+			else {
+				$message = 'There is nothing to update!';
+			}
+		}
+
+		my $proj;
+		if ($type eq 'annotation') {
+			$proj = DNALC::Pipeline::Project->retrieve($pid);
+		}
+		elsif ($type eq 'target') {
+			$proj = DNALC::Pipeline::TargetProject->retrieve($pid);
+		}
+		elsif ($type eq 'phylogenetics') {
+			$proj = DNALC::Pipeline::Phylogenetics::Project->retrieve($pid);
+		}
+		elsif ($type eq 'NGS') {
+			$proj = DNALC::Pipeline::NGS::Project->retrieve($pid);
+		}
+
+		if ($proj && (defined $title || defined $description)) {
+			#my $proj = DNALC::Pipeline::Project->search(user_id => $s->{user_id}, name => $name);
+			#my $proj = DNALC::Pipeline::Project->retrieve($pid);
+			#print STDERR "\n----------------\n", $proj->name, " => ", $title, $/;
+			#print STDERR $proj->description, " => ", $description, $/;
+
+			if (defined $title && $title ne '' && $proj->name ne $title) {
+				if ($type eq 'annotation') {
+					my $otherproj = DNALC::Pipeline::Project->search(user_id => $s->{user_id}, name => $title);
+					if ($otherproj) {
+						$message = 'You already have a project with this title!';
+						$error = 1;
+					}
+					else {
+						$proj->name($title);
+					}
+				}
+				else {
+					$proj->name($title);
+				}
+			}
+
+			unless ($error) {
+				if (defined $description && $proj->description ne $description) {
+					$proj->description($description);
+				}
+				if ($proj->is_changed && $proj->update) {
+					$status = 'success';
+				}
+				else {
+					$message = 'There is nothing to update!';
+				}
+			}
+		}
+	}	
+}
+</%init>
+<%flags>
+	inherit => undef
+</%flags>
+{'status':'<% $status %>', 'message':'<% $message %>'}

@@ -1,0 +1,165 @@
+% if ($bs) {
+
+<h2>Veiwing Submission <% $bs->specimen_id |html %></h2>
+
+<table id="details">
+<tr>
+<td>Submitted on:</td>
+<td><% $created  |html %></td>
+</tr>
+% my $ac = 1;
+% while (exists $data->{"author_first$ac"}){
+<tr>
+	<td width="150">Author/Collector <% $ac |html %>:</td>
+	<td><% $data->{"author_first$ac"} |html %> <% $data->{"author_last$ac"} |html %></td>
+</tr>
+<tr>
+	<td>Affiliation:</td>
+	<td><% $data->{"author_affil$ac"} |html %></td>
+</tr>
+% $ac++;
+%}
+<tr>
+	<td>Project:</td>
+	<td><% $data->{project} |html %></td>
+</tr>
+<tr>
+<td>Institution Storing:</td>
+<td><% $data->{institution_storing} |html %></td>
+</tr>
+<tr>
+<td>Identified By:</td>
+<td><% $data->{tax} |html %></td>
+</tr>
+<tr>
+<td>Identifier's email:</td>
+<td><% $data->{tax_email} |html %></td>
+</tr>
+<tr>
+<td>Genus:</td>
+<td><% $data->{genus} |html %></td>
+</tr>
+<tr>
+<td>Species:</td>
+<td><% $data->{species} |html %></td>
+</tr>
+<tr>
+<td>Date Collected:</td>
+<td><% $data->{date_collected} |html %></td>
+</tr>
+<tr>
+<td>Country:</td>
+<td><% $data->{country} |html %></td>
+</tr>
+<tr>
+<td>State:</td>
+<td><% $data->{state} |html %></td>
+</tr>
+<tr>
+<td>City:</td>
+<td><% $data->{city} |html %></td>
+</tr>
+<tr>
+<td>Exact Site:</td>
+<td><% $data->{site_desc} |html %></td>
+</tr>
+<tr>
+<td>Host Organism:</td>
+<td><% $data->{host_exists} eq "yes" ? $data->{host} : "n/a" |html %></td>
+</tr>
+<tr>
+<td>Latitutide:</td>
+<td><% $data->{latitude} |html %></td>
+</tr>
+<tr>
+<td>Longitude:</td>
+<td><% $data->{longitude} |html %></td>
+</tr>
+<tr>
+<td>Notes:</td>
+<td><% $data->{notes} |html %></td>
+</tr>
+<tr>
+<td>Sex:</td>
+<td><% $data->{sex} |html %></td>
+</tr>
+<tr>
+<td>Life Stage:</td>
+<td><% $data->{stage} |html %></td>
+</tr>
+<tr>
+<td>Primer:</td>
+<td><% $data->{f_primer} |html %></td>
+</tr>
+%#<tr>
+%#<td>Reverse Primer</td>
+%#<td><% $data->{r_primer} |html %></td>
+%#</tr>
+</table>
+
+<div id="bimage_list_uploaded" style="margin-left:160px">
+% if ($bs->photos) {
+%  my $index = 0;
+%  for my $ph ($bs->photos) {
+%	next unless $ph->photo_thumb;
+%	my $thumb = File::Spec->catfile($photo_dir, $ph->photo_thumb);
+	<div><img src="<% $m->comp("../../.comp/filepath_to_web", file => $thumb, just_return => 1) |html %>" /></div>
+%  }
+% }
+</div>
+<br style="clear:both" />
+
+
+% }
+% else{
+<p style="color:red">Error: No such submission found</p>
+% }
+
+<div id="BOLDfooter">
+	<a href="./index.html?pid=<% $bs ? $bs->project_id : 0 |html %>">Back</a>&nbsp;
+</div>
+
+<%args>
+	$id => 0
+</%args>
+
+<%once>
+	use DNALC::Pipeline::App::Phylogenetics::ProjectManager ();
+	use DNALC::Pipeline::Phylogenetics::Bold ();
+	use DNALC::Pipeline::Config();
+	use Data::Dumper;
+</%once>
+
+<%init>
+	my $s = $m->session->{pipeline};
+	my $pid = $s->{boldpid};
+	$s->{"bold_$pid"} ||= {};
+	
+	my $js = JSON::XS->new->utf8;
+	
+	my $phy_cfg = DNALC::Pipeline::Config->new->cf("PHYLOGENETICS");
+	my $photo_dir = $phy_cfg->{PHOTO_SUBMISSION_DIR};
+	
+	#
+	# TODO - check ownership, unless they are all public
+	#
+	
+	#my $pm = DNALC::Pipeline::App::Phylogenetics::ProjectManager->new($pid);
+	#my $proj = $pm->project;
+	#unless ($proj && $proj->user_id == $s->{user_id}) {
+	#	$m->comp('/_message_add', 'Project not found!', 'error');
+	#	$m->redirect("./step6.html");
+	#	#print "Project not found!";
+	#	return;
+	#}
+	
+	my $bs = DNALC::Pipeline::Phylogenetics::Bold->retrieve($id);
+	my $data;
+	my $created;
+	if ($bs){
+		$data = $js->decode($bs->data);
+		$created = (split (" ", $bs->created))[0];
+	}
+	
+
+</%init>

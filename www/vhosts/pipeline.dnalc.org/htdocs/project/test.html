@@ -1,0 +1,16 @@
+<script>
+$(function() {
+$.ajax({
+type: "post",
+url: ":8080/WebApollo/Login?operation=login",
+processData: false,
+dataType: "json",
+contentType: "application/json",
+data: "{ username: 'demo', password: 'demo' }",
+success: function(data) {
+},
+error: function(jqXHR, textStatus, errorThrown) {
+}
+});
+});
+</script>

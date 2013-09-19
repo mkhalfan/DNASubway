@@ -1,0 +1,2519 @@
+@charset "UTF-8";
+/* CSS Document */
+
+#container_pageTitle{
+	width: 620px;
+	height: 24px;
+	padding: 8px 200px 10px 30px;
+	position:relative;
+	float: left;
+	color: #000000;
+	font-size:1.2em; font-family: sans-erif;
+	text-transform: uppercase;
+	letter-spacing: .5em;
+	font-weight: bold;
+	background: url("/images/v2/bg_pageTitle.jpg") bottom left no-repeat;
+	}
+	
+#container_pageTitle_text{
+	width: 660px;
+	height: 24px;
+	padding: 8px 140px 10px 30px;
+	postion:relative;
+	float: left;
+	color: #46726F;
+	font-size:1.2em; font-family: serif;
+	text-transform: uppercase;
+	letter-spacing: .3em;
+	font-weight: bold;
+	background: url("/images/v2/bg_pageTitle_textOnly.jpg") bottom left no-repeat;
+	}
+
+#container_leftMenu {
+	width: 150px;
+	height: 508px;
+	display: block;
+	float: left;
+	position: relative;
+	}
+#container_rightContent {
+	width: 850px;
+	height: auto;
+	padding-top: 8px;
+	background: url("/images/v2/header_lower.jpg") top right no-repeat;
+	float: right;
+	position: relative;
+	
+	}
+#conMemberHome_intro{
+	width: 620px;
+	height: auto;
+	padding: 60px 200px 38px 29px;
+	font-size: 1em;
+	font-family: helvetica, sans-serif;
+	text-align: justify;
+	color: #000;	
+	}
+#conMemberHome_introSpacer{
+	width: 620px;
+	height: 51px;
+	padding: 30px 200px 18px 29px;
+	background: url("/images/v2/bg_introspacer.jpg") left no-repeat;
+	font-size: 1em;
+	font-family: helvetica, sans-serif;
+	text-align: justify;
+	color: #000;	
+	}
+
+/*----LEFT MENU START--------*/
+.spacer_btGlossary {
+	width:140px;
+	height: 55px;
+	display: block;
+	position: relative;	
+	float: left;	
+
+}
+
+.spacer_bt {
+	width:140px;
+	height: 135px;
+	display: block;
+	position: relative;
+	float: left;		
+
+}
+.spacer_bt1 {
+	width:140px;
+	height: 10px;
+	display: block;
+	position: relative;
+	float: left;	
+
+}
+
+.bt_Glossary {
+	width:140px;
+	height: 40px;
+	position: relative;
+	float: left;
+
+}
+
+
+.bt_Glossary  a {
+	width:140px;
+	height: 40px;
+	background: url("/images/v2/bt_glossary1.jpg") left no-repeat;
+	display: block;
+	position: relative;
+	float: left;
+	margin: 5px 0px 10px 0px;
+}
+
+.bt_Glossary a:hover {
+
+	background: url("/images/v2/bt_glossary2.jpg") left no-repeat;
+
+}
+
+.bt_Glossary a.current {
+
+	background: url("/images/v2/bt_glossary2.jpg") left no-repeat;
+
+}
+.bt_Guide {
+	width:140px;
+	height: 40px;
+	position: relative;	
+    float: left;
+}
+
+.bt_Guide  a {
+	width:140px;
+	height: 40px;
+	background: url("/images/v2/bt_guide1.jpg") left no-repeat;
+	display: block;
+	position: relative;
+	float: left;
+	margin: 6px 0px 10px 0px;
+}
+
+.bt_Guide a:hover {
+
+	background: url("/images/v2/bt_guide2.jpg") left no-repeat;
+}
+.bt_MyProjects {
+	width:140px;
+	height: 50px;
+	position: relative;	
+	float: left;
+	margin: 0px 0px 10px 0px;	
+
+}
+
+
+.bt_MyProjects  a {
+	width:140px;
+	height: 50px;
+	background: url("/images/v2/bt_myProjects1.jpg") left no-repeat;
+	display: block;
+	position: relative;
+	float: left;
+	margin: 0px 0px 10px 0px;
+}
+
+.bt_MyProjects a:hover {
+	background: url("/images/v2/bt_myProjects2.jpg") left no-repeat;
+
+}
+
+.bt_MyProjects a.current {
+	background: url("/images/v2/bt_myProjects2.jpg") left no-repeat;
+
+}
+
+.bt_PublicProjects {
+	width:140px;
+	height: 50px;
+	position: relative;	
+	float: left;
+	margin: 0px 0px 15px 0px;
+
+}
+
+
+.bt_PublicProjects  a {
+	width:140px;
+	height: 50px;
+	background: url("/images/v2/bt_publicProjects1.jpg") left no-repeat;
+	display: block;
+	position: relative;
+	float: left;
+	margin: 0px 0px 15px 0px;
+}
+
+.bt_PublicProjects a:hover {
+	background: url("/images/v2/bt_publicProjects2.jpg") left no-repeat;
+
+}
+
+.bt_PublicProjects a.current {
+	background: url("/images/v2/bt_publicProjects2.jpg") left no-repeat;
+
+}
+
+
+/*----right content--------right content--------right content--------right content--------right content--------right content--------right content----*/
+
+/*----redLIne project----*/
+#con_star{
+	width: 300px;
+	height: 20px;
+	font-size: .95em;
+	color: #3399CC;
+	text-align: left;
+	position: relative;
+	float: left;
+	}
+	
+#conRedlineLeft1 {
+	width: 470px;
+	height: 560px;
+	background: url("/images/v2/map-redline_L1.jpg") top left no-repeat;
+	float: left;
+	position: relative;
+	
+	}
+
+#conRedlineRight1 {
+	width: 380px;
+	height:auto;
+	min-height: 320px;
+	background: url("/images/v2/map-redline_R1.jpg") top left no-repeat;
+	float: right;
+	position: relative;
+	margin-top: 25px;
+	
+	}
+	
+#conProject_newLeft {
+	width: 418px;
+	height:auto;
+	min-height: 320px;
+	padding: 85px 0px 12px 50px;
+	float: left;
+	position: relative;
+	}
+#conProject_newRight {
+	width: 310px;
+	height: auto; 
+    padding: 90px 20px 0px 10px;
+	margin-bottom: 10px;
+	float: right;
+	position:relative;
+	}
+	
+#conProject_dispatcher {
+	margin: 120px 0px 0px 20px;
+}
+
+#conProject_dispatcher div.btn {
+	border: 1px solid black;
+	margin: 20px 0px 20px 20px;
+	padding: 30px;
+	font-size: 30px;
+	cursor: pointer;
+	text-align: center;
+}
+
+#conProject_dispatcher div.btn:hover {
+	background-color: yellow;
+}
+
+input[disabled="disabled"], input[disabled], textarea[disabled], select[disabled], textarea[disabled="disabled"],{
+	background: #e0e0e0;
+}
+	
+.conNewPro_title{
+	width: 300px;
+	height: 20px;
+	margin: 0px auto; 
+	padding-bottom: 10px;
+	font-size: .95em;
+	color: #3399CC;
+	font-weight: bold;
+	text-align: left;
+	position: relative;
+	float: left;
+	}
+	
+.conNewPro_label{
+	width: 418px;
+	height: auto;
+	margin: 0px auto; 
+	padding-bottom: 4px;
+	color: #006699;
+	font-size: 0.9em;
+	text-align: left;
+	position: relative;
+	float: left;
+	}
+
+.conNewPro_label1{
+	width: 300px;
+	height: auto;
+	margin: 0px auto; 
+	padding-bottom: 4px;
+	color: #006699;
+	font-size: 0.9em;
+	text-align: left;
+	position: relative;
+	float: left;
+	}
+.conNewPro_label2{
+	width: 160px;
+	height: auto;
+	margin: 0px auto; 
+	padding: 0px 20px 4px 25px;
+	color: #006699;
+	font-size: 0.9em;
+	text-align: left;
+	position: relative;
+	float: left;
+	}
+
+.conRadiobox_align{
+	vertical-align: top;
+	}
+
+.conStylized_box1 {
+	float:left;
+	font-size:.95em;
+	padding: 2px;
+	border: .1em;
+	border-style: solid;
+	border-color: #669900;
+	width:220px;
+	margin:5px 0px 0px 15px;
+}
+.conStylized_box2 {
+	float:left;
+	border: .1em; border-style: solid; border-color: #669900; color: #996600;
+	width:360px;
+	margin:2px 10px 0px 15px;
+	padding: 4px;
+	font-size:.8em; font-family:  monaco;
+	text-transform: uppercase;
+	letter-spacing: .2em;
+	/*overflow-y: scroll;
+	overflow-x: hidden;*/
+	
+}
+
+.conStylized_box3 {
+	float:left;
+	padding: 2px;
+	border: .1em; border-style: solid; border-color: #669900; 
+	width:360px;
+	margin:2px 10px 0px 15px;
+	padding: 4px;
+	font-size:.85em;
+	color: #333333;	
+}
+.conStylized_box4 {
+	float:left;
+	font-size:.95em;
+	padding: 2px;
+	border: .1em;
+	border-style: solid;
+	border-color: #669900;
+	color: #666666;
+	width:280px;
+	margin:2px 0px 0px 0px;
+}
+.conStylized_box5 {
+	float:left;
+	border: .1em; border-style: solid; border-color: #669900; 
+	color: #996600;
+	width:360px;
+	margin:2px 10px 0px 20px;
+	padding: 4px;
+	font-size:.95em; 
+	/*overflow-y: scroll;
+	overflow-x: hidden;*/
+	
+}
+
+.conStylized_box6 {
+	float:left;
+	border: .1em; border-style: solid; border-color: #669900; color: #996600;
+	width:280px;
+
+	margin:2px 0px 0px 0px;
+	padding: 2px;
+	font-size:.95em; 
+	/*overflow-y: scroll;
+	overflow-x: hidden;*/
+}
+
+.conStylized_box7 {
+	float:left;
+	font-size:.95em;
+	border: .1em;
+	border-style: solid;
+	border-color: #669900;
+	color: #666666;
+	width:360px;
+	margin:2px 10px 0px 20px;
+	padding: 4px;
+}
+
+.conNewPro_smallContainer{
+	width: 146px;
+	height: auto;
+	margin: 0px auto; 
+	padding-bottom: 4px;
+	color: #006699;
+	font-size: 0.9em;
+	text-align: left;
+	position: relative;
+	float: left;
+	}
+
+.conBT_continue{
+	width: 140px;
+	height: 40px;
+	display:block;	
+	float: right;
+	margin-right: 30px;
+	}
+.conBT_continue a{
+	width: 140px;
+	height: 40px;
+	display:block;
+	margin-right: 30px;
+	background: url("/images/v2/bt_continue1.png")  no-repeat;
+	float: right;
+	}
+.conBT_continue a:hover{
+	background: url("/images/v2/bt_continue2.png")  no-repeat;
+	}
+
+/*---project INFO------*/
+
+#conProjectInfo {
+	width: 850px;
+	height: 162px;
+	float: left;
+	position: relative;
+	background: url("/images/v2/projectInfo.jpg") top no-repeat;
+	}
+	
+#conProjectInfo_header {
+	width: 820px;
+	height: 60px;
+	float: left;
+	position: relative;
+	padding: 6px 0px 0px 30px;
+	}
+	
+#conProjectInfo_title {
+	width: 600px;
+	height: 18px;
+	padding-top: 6px;
+	float: left;
+	position: relative;
+	font-size: .95em;
+	font-weight: bold;
+	font-family: helvetica, sans-serif;	
+	text-align: left;
+	color: #000;
+
+	}
+	
+#conProjectInfo_projecttitle {
+	width: 520px;
+	height: 18px;
+	padding-top: 6px;
+	float: left;
+	position: relative;
+	font-size: .95em;
+	font-family: helvetica, sans-serif;	
+	text-align: left;
+	color: #006699;
+	font-weight: bold;
+	font-style: italic;
+	font-family: Times, serif;
+	}
+	
+#conProjectInfo_projectlog {
+	width: 160px;
+	height: 18px;
+	padding-top: 6px;
+	padding-left: 6px;
+	float: left;
+	position: relative;
+	font-size: .9em;
+	font-family: helvetica, sans-serif;	
+	text-align: left;
+	color: #006699;
+	font-weight: bold;
+
+	}
+#conProjectInfo_edit {
+	width: 170px;
+	height: 30px;
+	margin-top: 5px;
+	margin-right: 20px;
+	float: right;
+	position: relative;
+
+	}
+	
+.bt_projectInfo_edit {
+	width:100px;
+	height: 24px;
+	position: relative;	
+	float: right;	
+	display:block;
+
+}
+
+
+.bt_projectInfo_edit a {
+	width:100px;
+	height: 24px;
+	display: block;
+	position: relative;
+	
+	float: right;
+	background: url("/images/v2/bt_projectinfo_edit1.png") top no-repeat;
+	text-decoration: none;
+}
+
+.bt_projectInfo_edit a:hover {
+	background: url("/images/v2/bt_projectinfo_edit2.png") top no-repeat;
+
+}
+
+#conProjectInfo_edit {
+	width: 170px;
+	height: 30px;
+	margin-top: 5px;
+	margin-right: 20px;
+	float: right;
+	position: relative;
+}
+
+#conProjectInfo_clone {
+	width: 70px;
+	height: 30px;
+	margin-top: 5px;
+	margin-right: 20px;
+	float: right;
+}
+	
+.bt_projectInfo_clone {
+	width:100px;
+	height: 24px;
+	position: relative;	
+	float: right;	
+	display:block;
+
+}
+
+.bt_projectInfo_clone a {
+	width:100px;
+	height: 24px;
+	display: block;
+
+	background: url("/images/v2/bt_clone1.png") top no-repeat;
+	text-decoration: none;
+}
+
+.bt_projectInfo_clone a:hover {
+	background: url("/images/v2/bt_clone2.png") top no-repeat;
+
+}
+
+.bt_projectInfo_done {
+	width:80px;
+	height: 24px;
+	position: relative;	
+	float: left;	
+	display:block;
+
+}
+
+
+.bt_projectInfo_done a {
+	width:80px;
+	height: 24px;
+	display: block;
+	position: relative;
+	float: left;
+	background: url("/images/v2/bt_projectinfo_done1.png") top no-repeat;
+	text-decoration: none;
+}
+
+.bt_projectInfo_done a:hover {
+	background: url("/images/v2/bt_projectinfo_done2.png") top no-repeat;
+
+}
+
+.bt_projectInfo_cancel {
+	width:80px;
+	height: 24px;
+	position: relative;	
+	float: right;	
+	display:block;
+
+}
+
+
+.bt_projectInfo_cancel a {
+	width:80px;
+	height: 24px;
+	display: block;
+	position: relative;
+	float: right;
+	background: url("/images/v2/bt_projectinfo_cancel1.png") top no-repeat;
+	text-decoration: none;
+}
+
+.bt_projectInfo_cancel a:hover {
+	background: url("/images/v2/bt_projectinfo_cancel2.png") top no-repeat;
+
+}
+	
+		
+	
+.bt_more {
+	width:90px;
+	height: 16px;
+	position: relative;	
+	float: right;	
+
+}
+
+
+.bt_more  a {
+	width:90px;
+	height: 16px;
+	
+	display: block;
+	position: relative;
+	float: right;
+	font-weight: bold;
+	color: #996600;
+	font-size: 1em;
+	text-decoration: none;
+}
+
+.bt_more a:hover {
+	color: #FF6600;
+
+}
+	
+.conHistorylist {
+	/*width:276px;*/
+	font-size: 0.7em;
+	clear: both;
+	color: #996600;
+	/*float: left;
+	margin-left:-10px;
+	/*list-style-position: outside;*/
+	}
+
+.conProjectInfo_column1{
+	width: 246px;
+	height: 86px;
+	float: left;
+	position: relative;
+	padding-left: 30px;
+	margin-right: 2px;
+	}
+.conProjectInfo_column2{
+	width: 236px;
+	height: 86px;
+	float: left;
+	position: relative;
+	padding: 0px 10px 0px 10px;
+	border-top: 0px; border-right: 0px; border-bottom: 0px; border-left: .1em;
+	border-style: solid;
+	border-color: #CCCCCC;	
+	
+	}
+
+.conProjectInfo_column3{
+	width: 274px;
+	height: 86px;
+	float: left;
+	position: relative;
+	margin-left: 6px;
+	border-top: 0px; border-right: 0px; border-bottom: 0px; border-left: .1em;
+	padding-left: 14px;
+	border-style: solid;
+	border-color: #CCCCCC;	
+	
+	}
+.conProjectInfo_description{
+	width: 270px;
+	height: 80px;
+	color: #996600;
+	font-size: 0.8em;
+	text-align: left;
+	float: left;
+	}
+
+.conProjectInfo_Row{
+	width: 246px;
+	height: auto;
+	margin: 0px auto; 
+	padding-top: 2px;
+	float: left;
+	}
+.conProjectInfo_Cell1{
+	width: 80px;
+	height: auto;
+	margin: 0px auto; 
+	color: #006699;
+	font-size: 0.8em;
+	text-align: left;
+	float: left;
+	}
+.conProjectInfo_Cell2{
+	width: 156px;
+	height: auto;
+	margin: 0px auto; 
+	color: #996600;
+	font-size: 0.8em;
+	text-align: left;
+	float: left;
+	}
+.conProjectInfo_Cell3{
+	width: 80px;
+	height: auto;
+	margin: 0px auto; 
+	color: #996600;
+	font-size: 0.8em;
+	text-align: left;
+	float: left;
+	}
+
+.conProjectInfo_CellBT{
+	width: 76px;
+	height: 20px;
+	display:block;
+	margin: 0px auto; 
+	color: #555;
+	font-size: 0.85em;
+	text-align: left;
+	float: right;
+	}
+.conProjectInfo_CellBT a{
+	width: 76px;
+	height: 20px;
+	display:block;
+	margin: 0px auto;
+	padding-top: 2px;
+	color: #555;
+	background: url("/images/v2/bt_viewSM.png")  no-repeat;
+	font-size: 0.85em;
+	text-align: center; text-decoration: none;
+	float: right;
+	}
+.conProjectInfo_CellBT a:hover{
+	color:#FF6600;
+	}
+
+/*-END--project INFO------*/
+
+/*---REDLINE Console--left RUN----*/
+
+#conRedlineLeft2 {
+	width: 429px;
+	height: 226px;
+	background: url("/images/v2/map-redline_L2.jpg") top left no-repeat;
+	float: left;
+	position: relative;
+	padding-top: 108px;
+	padding-left: 41px;
+	
+	}	
+.conRedline_ConColumn{
+  width:124px;
+  height: 226px;
+  padding-right: 19px;
+  position: relative;
+  float:left;
+  }
+	
+.conRedline_ConCell{
+  width: 124px;
+  height: 26px;
+  margin: 0px 0px 19px 0px;
+  position: relative;
+  float: left;
+}
+.conRedline_keys{
+  width: 124px;
+  height: 120px;
+  padding-top: 34px ;
+  background: url("/images/v2/keys.jpg") bottom left no-repeat;
+  position: relative;
+  float: left;
+}
+.conRedline_ConCellEND{
+  width: 124px;
+  height: 26px;
+  position: relative;
+  margin: 0px 0px 10px 0px;
+  float: left;
+}
+
+.conRedline_ConCellAdd{
+  width: 124px;
+  height: 26px;
+  margin: 0px 0px 19px 0px;
+  background: url("/images/v2/bt_runAdd1.png") bottom left no-repeat;
+  position: relative;
+  float: left;
+}
+.conRedline_ConCellAdd1{
+  width: 124px;
+  height: 26px;
+  padding: 9px 0px 10px 0px;
+  background: url("/images/v2/bg_runAdd1.jpg") bottom left no-repeat;
+  position: relative;
+  float: left;
+}
+.conRedline_ConCellAdd2{
+  width: 124px;
+  height: 26px;
+  padding: 9px 0px 0px 0px;
+  background: url("/images/v2/bg_runUpload.jpg") bottom left no-repeat;
+  position: relative;
+  float: left;
+}
+.conRedline_ConCellAddF{
+  width: 124px;
+  height: 45px;
+  background: url("/images/v2/bg_runUploadF.jpg") top left no-repeat;
+  position: relative;
+  float: left;
+  margin-top:-4px;
+  padding:23px 0;
+}
+
+.conRedline_ConCell2{
+  width: 124px;
+  height: 26px;
+  position: relative;
+  margin: 0px 0px 2px 0px;
+  float: left;
+}
+	
+
+.conIndicator_box{
+	width: 18px;
+	height: 18px;
+ 	padding: 4px 6px 4px 0px;
+ 	position: relative;
+ 	float:left;
+
+}
+
+.conIndicator_not-processed{
+	width: 18px;
+	height: 18px;
+	display: block;
+	position: relative;
+	background: url("/images/v2/indicatorR.png") bottom left no-repeat;
+
+}
+
+.conIndicator_processing{
+	width: 18px;
+	height: 18px;
+	display: block;
+	position: relative;
+	background: url("/images/v2/indicator_running.gif") bottom left no-repeat;
+
+}
+
+.conIndicator_done{
+	width: 18px;
+	height: 18px;
+	display: block;
+	position: relative;
+	background: url("/images/v2/indicatorV.png") bottom left no-repeat;
+}
+
+.conIndicator_error{
+	width: 18px;
+	height: 18px;
+	display: block;
+	position: relative;
+	background: url("/images/v2/indicatorE.png") bottom left no-repeat;
+}
+
+.conIndicator_disabled {
+	width: 18px;
+	height: 18px;
+	display: block;
+	display: block;
+	position: relative;
+	background: url("/images/v2/indicatorX.png") bottom left no-repeat;
+}
+
+.conIndicatorBL_not-processed{
+	width: 18px;
+	height: 18px;
+	display: block;
+	position: relative;
+	background: url("/images/v2/indicatorBL_R.png") bottom left no-repeat;
+
+}
+
+.conIndicatorBL_processing{
+	width: 18px;
+	height: 18px;
+	display: block;
+	position: relative;
+	background: url("/images/v2/indicatorBL_running.gif") bottom left no-repeat;
+
+}
+
+.conIndicatorBL_done{
+	width: 18px;
+	height: 18px;
+	display: block;
+	position: relative;
+	background: url("/images/v2/indicatorBL_V.png") bottom left no-repeat;
+}
+
+.conIndicatorBL_error{
+	width: 18px;
+	height: 18px;
+	display: block;
+	position: relative;
+	background: url("/images/v2/indicatorBL_E.png") bottom left no-repeat;
+}
+
+.conIndicatorBL_disabled {
+	width: 18px;
+	height: 18px;
+	display: block;
+	display: block;
+	position: relative;
+	background: url("/images/v2/indicatorBL_X.png") bottom left no-repeat;
+}
+
+/* Greenline indicators */
+
+.conIndicatorGL_not-processed{
+	width: 18px;
+	height: 18px;
+	display: block;
+	position: relative;
+	background: url("/images/ngs/indicatorR_green.png") bottom left no-repeat;
+
+}
+
+.conIndicatorGL_processing{
+	width: 18px;
+	height: 18px;
+	display: block;
+	position: relative;
+	background: url("/images/ngs/indicator_running_green.gif") bottom left no-repeat;
+
+}
+
+.conIndicatorGL_done{
+	width: 18px;
+	height: 18px;
+	display: block;
+	position: relative;
+	background: url("/images/ngs/indicatorV_green.png") bottom left no-repeat;
+}
+
+.conIndicatorGL_error{
+	width: 18px;
+	height: 18px;
+	display: block;
+	position: relative;
+	background: url("/images/ngs/indicatorE_green.png") bottom left no-repeat;
+}
+
+.conIndicatorGL_disabled {
+	width: 18px;
+	height: 18px;
+	display: block;
+	display: block;
+	position: relative;
+	background: url("/images/ngs/indicatorX_green.png") bottom left no-repeat;
+}
+
+/* End Greenline Indicators */
+
+.conIndicator_Rb {
+	width: 18px;
+	height: 18px;
+	display: block;
+	position: relative;
+	background: url("/images/v2/indicatorRb.png") bottom left no-repeat;
+}
+
+.conIndicator_Rb_disabled {
+	width: 18px;
+	height: 18px;
+	display: block;
+	position: relative;
+	background: url("/images/v2/indicatorXb.png") bottom left no-repeat;
+}
+
+.conIndicator_runningb{
+	width: 18px;
+	height: 18px;
+	display: block;
+	position: relative;
+	background: url("/images/v2/indicator_running.gif") bottom left no-repeat;
+
+}
+
+.conIndicator_Vb{
+	width: 18px;
+	height: 18px;
+	display: block;
+	position: relative;
+	background: url("/images/v2/indicatorVb.png") bottom left no-repeat;
+
+}
+
+.conIndicator_Eb{
+	width: 18px;
+	height: 18px;
+	display: block;
+	position: relative;
+	background: url("/images/v2/indicatorEb.png") bottom left no-repeat;
+
+}
+
+.conIndicator_Xb{
+	width: 18px;
+	height: 18px;
+	display: block;
+	display: block;
+	position: relative;
+	background: url("/images/v2/indicatorXb.png") bottom left no-repeat;
+}
+
+.conIndicatorBL_grey{
+	width: 18px;
+	height: 18px;
+	display: block;
+	position: relative;
+	background: url("/images/v2/indicatorBL_grey.png") bottom left no-repeat;
+}
+
+.bt_Runblueline_grey{
+	width: 122px;
+	height: 26px;
+	background: url("/images/v2/bt_blueRun_grey.png") top no-repeat;
+	display: block;
+	position: relative;
+	float:left;
+	padding-top: 6px;
+	color: #555;
+	font-size: 0.75em;
+	text-align: center;
+	text-decoration: none;
+}
+
+.bt_run {
+	width:100px;
+	height: 26px;
+	position: relative;	
+	float: right;
+}
+
+.bt_run a {
+	width:100px;
+	height: 26px;
+	background: url("/images/v2/bt_run1.png") top no-repeat;
+	display: block;
+	position: relative;
+	float: right;
+	padding-top: 6px;
+	color: #555;
+	font-size: 0.75em;
+	text-align: center; text-decoration: none;
+}
+
+.bt_run a.disabled:hover {
+	background: url("/images/v2/bt_run1.png") top no-repeat;
+	cursor: default;
+}
+
+.bt_run a:hover {
+	background: url("/images/v2/bt_run2.png") top no-repeat;
+}
+
+.bt_runAdd {
+	width:124px;
+	height: 26px;
+	position: relative;	
+	float: right;
+}
+
+
+.bt_runAdd a {
+	width:100px;
+	height: 26px;
+	display: block;
+	position: relative;
+	float: right;
+	padding-left: 24px;
+	padding-top: 6px;
+	color: #555;
+	font-size: 0.75em;
+	text-align: center; text-decoration: none;
+}
+
+.bt_runAdd a:hover {
+	background: url("/images/v2/bt_runAdd2.png") top no-repeat;
+
+}
+
+#conRunAll_empty{
+	width: 600px;
+	height: 40px;
+	margin: 0px 0px 10px 30px;
+	display: block;
+	position: relative;
+	float: left;
+	padding: 4px 0px 0px 150px;
+	
+}
+
+#conRunAll{
+	width: 154px;
+	height: 32px;
+	margin: 0px 300px 10px 30px;
+	background: url("/images/v2/bg_runAll.jpg") top no-repeat;
+	position: relative;
+	float: left;
+	padding: 25px 150px 0px 150px;
+	z-index: 0;
+}
+
+.bt_RunAll {
+	width:152px;
+	height:32px;
+	position: relative;	
+	float: right;
+}
+
+
+.bt_RunAll a {
+	width:152px;
+	height:32px;
+	background: url("/images/v2/bt_runAll1.png") top no-repeat;
+	display: block;
+	position: relative;
+	float: right;
+	padding-top: 5px;
+	color: #555;
+	font-size: 0.75em;
+	text-align: center; text-decoration: none;
+	line-height: 0.8em;
+}
+
+.bt_RunAll a:hover {
+	background: url("/images/v2/bt_runAll2.png") top no-repeat;
+
+}
+
+#conMessage_FgenesH{
+	width: 410px;
+	height: auto;
+	margin: 0px 340px 10px 40px;
+	display:none;
+	position: relative;
+	float: left;
+	padding: 10px;
+	font-size:.95em;
+	border: .1em;
+	border-style: solid;
+	border-color: #669900;
+	background-color: #ECF8E0;
+	color: #000;
+}
+/*-END--REDLINE Console left--RUN------*/
+
+/*---REDLINE Console-RIGHT BROWSER-----*/
+
+#conRedlineRight2 {
+	width: 380px;
+	height:320px;
+	background: url("/images/v2/map-redline_R2.jpg") bottom left no-repeat;
+	float: right;
+	position: relative;
+	overflow: hidden;
+	z-index: 0;
+	
+	}
+#conRedline_ConColumnR1{
+  width:126px;
+  height: 34px;
+  margin: 199px 0px 0px 65px;
+  position: relative;
+  float:left;
+  }
+#conRedline_ConColumnR2{
+  width:126px;
+  height: 170px;
+  margin: 138px 24px 0px 0px;
+  position: relative;
+  float: right;
+  }
+.con_browserBT {
+	width:126px;
+	height: 34px;
+}
+
+.bt_browserBlueSpacer {
+	width:126px;
+	height: 34px;
+	display: block;
+	position: relative;	
+	margin-bottom: 28px;
+	margin-top: 28px;
+	float:left;
+}
+
+.conIndicator_boxBrowse{
+	width: 18px;
+	height: 18px;
+ 	margin: 8px 6px 8px 0px;
+ 	position: relative;
+ 	float:left;
+	display: block;
+}	
+
+.bt_browserRedLine {
+	width:100px;
+	height: 34px;
+	position: relative;	
+	float: right;
+}
+
+
+.bt_browserRedLine a {
+	width:100px;
+	height: 22px;
+	background: url("/images/v2/bt_browserRedline.png") top no-repeat;
+	display: block;
+	position: relative;
+	float: right;
+	padding-top: 12px;
+	color: #555;
+	font-size: 0.75em;
+	text-align: center; text-decoration: none; line-height: 0.95em;
+}
+
+.bt_browserRedLine a.disabled:hover {
+	background: url("/images/v2/bt_browserRedline.png") top no-repeat;
+	cursor: default;
+}
+
+.bt_browserRedLine a:hover {
+	background: url("/images/v2/bt_browserBnY2.png") top no-repeat;
+}
+
+.bt_browserBlue {
+	width:100px;
+	height: 34px;
+	position: relative;	
+	float: right;
+}
+
+.bt_browserBlue a {
+	width:100px;
+	height: 28px;
+	background: url("/images/v2/bt_browserblue1.png") top no-repeat;
+	display: block;
+	position: relative;
+	float: right;
+	padding-top: 6px;
+	color: #555;
+	font-size: 0.75em;
+	text-align: center; text-decoration: none; line-height: 0.95em;
+}
+
+.bt_browserBlue a.disabled:hover {
+	background: url("/images/v2/bt_browserblue1.png") top no-repeat;
+	cursor: default;
+}
+
+.bt_browserBlue a:hover {
+	background: url("/images/v2/bt_browserBnY2.png") top no-repeat;
+
+}
+
+
+#con_browserBlueAdd {
+	width:126px;
+	height: 34px;
+	position: relative;	
+	display: block;
+	background: url("/images/v2/bg_browserAdd.png") left no-repeat;
+}
+
+.bt_browserBlueAdd {
+	width:100px;
+	height: 34px;
+	position: relative;	
+	float: right;
+}
+
+
+.bt_browserBlueAdd a {
+	width:100px;
+	height: 28px;
+	background: url("/images/v2/bt_browserblue1.png") top left no-repeat;
+	display: block;
+	position: relative;
+	padding-top: 6px;
+	color: #555;
+	font-size: 0.75em;
+	float: right;
+	text-align: center; text-decoration: none; line-height: 0.95em;
+}
+
+.bt_browserBlueAdd a.disabled:hover {
+	background: url("/images/v2/bt_browserblue1.png") top no-repeat;
+	cursor: default;
+}
+
+.bt_browserBlueAdd a:hover {
+	background: url("/images/v2/bt_browserBnY2.png") top left no-repeat;
+}
+
+.bt_browserYellow {
+	width:100px;
+	height: 34px;
+	position: relative;
+	float: right;
+}
+
+
+.bt_browserYellow a {
+	width:100px;
+	height: 28px;
+	background: url("/images/v2/bt_browserYellow1.png") top no-repeat;
+	display: block;
+	position: relative;
+	float: right;
+	padding-top: 6px;
+	color: #555;
+	font-size: 0.75em;
+	text-align: center; text-decoration: none; line-height: 0.95em;
+}
+
+.bt_browserYellow a.disabled:hover {
+	background: url("/images/v2/bt_browserYellow1.png") top no-repeat;
+	cursor: default;
+}
+
+.bt_browserYellow a:hover {
+	background: url("/images/v2/bt_browserBnY2.png") top no-repeat;
+}
+
+/*//----------PUBLIC PROJECT START here PUBLIC PROJECT  START------------*/
+
+/*---YELLOWLINE NEW PROJECT------*/
+
+.conYellowline_keys{
+  width: 92px;
+  height: 136px;
+  margin: 12px 0px 0px 30px;
+  background: url("/images/v2/keys.jpg") bottom left no-repeat;
+  position: relative;
+  float: left;
+}
+
+#conYellowlineLeft1 {
+	width: 470px;
+	height: auto;
+	min-height: 320px;
+	background: url("/images/v2/map-yellowline_L1.jpg") top left no-repeat;
+	float: left;
+	position: relative;
+	
+	}
+
+#conYellowlineRight1 {
+	width: 380px;
+	height:auto;
+	min-height: 320px;
+	overflow: auto;
+	background: url("/images/v2/map-yellowline_R1.jpg") top left no-repeat;
+	float: right;
+	position: relative;
+	margin-top: 24px;
+	
+	}
+
+/*---YELLOWLINE Console--left RUN----*/
+
+
+#conYellowlineLeft2 {
+	width: 519px;
+	height: 290px;
+	background: url("/images/v2/map-yellowline_L2.jpg") top left no-repeat;
+	float: left;
+	position: relative;
+	padding-top: 104px;
+	padding-left: 38px;
+	
+	}
+	
+.conYellowline_ConColumn1{
+  width:173px;
+  height: 246px;
+  position: relative;
+  float:left;
+  }	
+.conYellowline_ConCell1{
+  width: 163px;
+  height: 22px;
+  position: relative;
+  float: left;
+  color: #000;
+  font-size: 0.7em;
+  text-align: left; 
+  margin-left:10px;
+}
+
+
+.conYellowline_ConCellTitle{
+  width: 143px;
+  height: 25px;
+  position: relative;
+  float: left;
+  color: #000;
+  font-size: 0.80em;
+  text-align: left; 
+  font-weight: bold;
+  margin-left:26px;
+}
+
+#conRun_yellowline{
+	width: 126px;
+	height: 43px;
+	background: url("/images/v2/map-yellowline_L2_line.jpg") top left no-repeat;
+	position: relative;
+	float: left;
+	padding: 5px 10px 0px 440px;
+	margin-bottom: 10px;
+}
+
+.bt_Runyellowline {
+	width:100px;
+	height: 34px;
+	position: relative;	
+	float: right;
+}
+
+
+.bt_Runyellowline a {
+	width:100px;
+	height: 22px;
+	background: url("/images/v2/bt_browserYellow1.png") top no-repeat;
+	display: block;
+	position: relative;
+	float: right;
+	padding-top: 12px;
+	color: #555;
+	font-size: 0.75em;
+	text-align: center; text-decoration: none; line-height: 0.95em;
+}
+
+.bt_Runyellowline a.disabled:hover {
+	background: url("/images/v2/bt_browserYellow1.png") top no-repeat;
+	cursor: default;
+}
+
+.bt_Runyellowline a:hover {
+	background: url("/images/v2/bt_browserBnY2.png") top no-repeat;
+}
+	
+/*---YELLOWLINE Console--right browse---*/
+#con_browserYellowSpacer {
+	height: 30px;
+}
+#conYellowlineRight2 {
+	width: 100px;
+	height: 192px;
+	background: url("/images/v2/map-yellowline_R2.jpg") bottom left no-repeat;
+	float: left;
+	padding: 137px 16px 0px 174px;
+	}
+
+/*---BlueLINE NEW PROJECT------*/
+#conBluelineLeft1 {
+	width: 470px;
+	height: auto;
+	background: url("/images/v2/map-blueline_L1.jpg") top left no-repeat;
+	float: left;
+	position: relative;
+	
+	}
+
+#conBluelineRight1 {
+	width: 380px;
+	height:auto;
+	min-height: 320px;
+	overflow: auto;
+	background: url("/images/v2/map-blueline_R1.jpg") top left no-repeat;
+	float: right;
+	position: relative;
+	margin-top: 24px;
+	
+	}
+
+.conNewPro_smallContainer_blue{
+	width: 110px;
+	height: auto;
+	margin: 0px auto; 
+	padding-bottom: 4px;
+	padding-top: 4px;
+	color: #006699;
+	font-size: 0.9em;
+	text-align: left;
+	position: relative;
+	float: left;
+	}
+/*---BLUE Console--left RUN----*/
+
+#conBluelineLeft2 {
+	width: 540px;
+	height: 320px;
+	background: url("/images/v2/map-blueline_L2.jpg") top left no-repeat;
+	float: left;
+	position: relative;
+	padding-top: 76px;
+	padding-left: 18px;
+		
+	}
+
+.conBlueline_ConColumn1{
+  width:160px;
+  height: 270px;
+  position: relative;
+  float:left;
+  }
+#conBlueline_ConColumn1_1{
+  width:148px;
+  height: auto;
+  padding-left: 6px;
+  position: relative;
+  float:left;
+  }
+ .conBlueline_ConColumn2{
+  width:148px;
+  height: 140px;
+  padding-left: 10px;
+  padding-top: 84px;
+  position: relative;
+  float:left;
+  }
+  
+ .conBlueline_ConColumn3{
+  width:148px;
+  height: auto;
+  padding-left: 14px;
+  padding-top: 43px;
+  position: relative;
+  float:left;
+  }
+  
+.conBlueline_ConColumnPHYLIP{
+  width:120px;
+  height: auto;
+  padding-left: 28px;
+  padding-top: 20px;
+  position: relative;
+  float:left;
+  }
+  
+  .conBlueline_ConColumn4{
+  width:148px;
+  height: 110px;
+ 
+  padding-top: 83px;
+  position: relative;
+  float:left;
+  }
+  
+ .conBlueline_ConColumn5{
+  width:126px;
+  height: 110px;
+  padding-left: 136px;
+  padding-top: 80px;
+  position: relative;
+  float:left;
+  }
+
+.conBlueline_keys{
+  width: 92px;
+  height: 136px;
+  margin: 0px 0px 0px 20px;
+  background: url("/images/v2/keys_blue.jpg") bottom left no-repeat;
+  position: relative;
+  float: left;
+}
+
+.conBlueline_ConCell{
+  width: 148px;
+  height: 26px;
+  margin: 0px 0px 14px 0px;
+  position: relative;
+  float: left;
+}
+.conBleline_ConCell1{
+  width: 148px;
+  height: 47px;
+  position: relative;
+  float: left;
+ 
+}
+
+
+.bt_Runblueline {
+  width: 122px;
+  height: 26px;
+  position: relative;
+  float: left;
+}
+
+.bt_Runblueline a{
+	width: 122px;
+	height: 26px;
+	background: url("/images/v2/bt_blueRun1.png") top no-repeat;
+	display: block;
+	position: relative;
+	float: right;
+	padding-top: 6px;
+	color: #555;
+	font-size: 0.75em;
+	text-align: center;
+	text-decoration: none;
+}
+
+.bt_Runbluelinea.disabled:hover {
+	background: url("/images/v2/bt_blueRun.png") top no-repeat;
+	cursor: default;
+}
+.bt_Runblueline a:hover{
+  background: url("/images/v2/bt_blueRun2.png") top no-repeat;
+}
+
+
+#conBluelineRight2 {
+	width: 268px;
+	height: 208px;
+	background: url("/images/v2/map-blueline_R2.jpg") bottom left no-repeat;
+	float: left;
+	position: relative;
+	padding: 121px 2px 0px 14px;
+	
+	}
+	
+#spacer_Runblueline {
+  width: 126px;
+  height: 39px;
+  position: relative;
+  display: block;
+  float: left;
+}
+
+/*---- Greenline Project Creation Screen ----*/
+
+#conGreenlineLeft1 {
+	width: 470px;
+	height: auto;
+	background: url("/images/ngs/map-greenline_L1.jpg") top left no-repeat;
+	float: left;
+	position: relative;
+}
+
+#conGreenlineRight1 {
+	width: 380px;
+	height:auto;
+	min-height: 320px;
+	overflow: none;
+	background: url("/images/ngs/map-greenline_R1.jpg") top left no-repeat;
+	float: right;
+	position: relative;
+	margin-top: 24px;
+}
+
+/*--------- End Greenline Project Creation Screen ----------*/
+
+/*---- Greenline Console ----*/
+#conGreenlineLeft2 {
+	width: 439px;
+	height: 276px;
+	background: url("/images/ngs/map-greenline_L2.jpg") top left no-repeat;
+	float: left;
+	position: relative;
+	padding-top: 100px;
+	padding-left: 31px;
+	z-index: 0;
+}
+
+.conGreenline_ConColumn{
+  width:124px;
+  height: 226px;
+  padding-right: 32px;
+  position: relative;
+  float:left;
+}
+  
+.conGreenline_ConColumn1{
+  width:124px;
+  height: 226px;
+  position: relative;
+  float:left;
+}
+
+.conGreenline_ConCell{
+  width: 124px;
+  height: 26px;
+  margin: 0px 0px 13px 0px;
+  position: relative;
+  float: left;
+}
+
+.bt_runGreenline {
+	width:100px;
+	height: 26px;
+	position: relative;
+	float: right;
+}
+
+.bt_runGreenline a {
+	width:100px;
+	height: 26px;
+	background: url("/images/ngs/bt_runGreen.png") top no-repeat;
+	display: block;
+	position: relative;
+	float: right;
+	padding-top: 6px;
+	color: #555;
+	font-size: 0.75em;
+	text-align: center; text-decoration: none;
+}
+
+.bt_runGreenline a:hover {
+	background: url("/images/v2/bt_run2.png") top no-repeat;
+}
+
+.conGreenlineIndicator_boxBrowse {
+	width: 18px;
+	height: 18px;
+ 	margin: 16px 0;
+ 	position: relative;
+ 	float:left;
+	display: block;
+}
+#conGreenlineRight2 {
+	width: 378px;
+	height: 248px;
+	background: url("/images/ngs/map-greenline_R2.jpg") top left no-repeat;
+	float: left;
+	position: relative;
+	margin-top:24px;
+	padding: 76px 0px 0px 0px;
+}
+#conGreenline_ConColumnR1{
+  width:124px;
+  height: 226px;
+  padding-right: 32px;
+  padding-left: 32px;
+  position: relative;
+  float:left;
+}
+#conGreenline_ConColumnR2{
+	width:124px;
+	height: 34px;
+	margin: 70px 20px 70px 0px;
+	position: relative;
+	float: right;
+}
+
+.bt_browserGreen {
+	width:100px;
+	height: 34px;
+	position: relative;
+	float: right;
+	margin-top:10px;
+}
+
+.bt_browserGreen a {
+	width:100px;
+	height: 34px;
+	background: url("/images/v2/bt_browserRedline.png") top no-repeat;
+	display: block;
+	position: relative;
+	float: right;
+	padding-top: 6px;
+	color: #555;
+	font-size: 0.75em;
+	text-align: center; text-decoration: none; line-height: 0.95em;
+}
+
+.bt_browserGreen a:hover {
+	background: url("/images/v2/bt_browserBnY2.png") top no-repeat;
+}
+
+.bt_Rungreenline_grey{
+	width: 100px;
+	height: 26px;
+	background: url("/images/v2/bt_blueRun_grey.png") top no-repeat;
+	display: block;
+	position: relative;
+	float:left;
+	padding-top: 6px;
+	color: #555;
+	font-size: 0.75em;
+	text-align: center;
+	text-decoration: none;
+}
+
+.conGreenline_keys{
+  width: 92px;
+  height: 136px;
+  margin: 30px 0px 0px 20px;
+  background: url("/images/ngs/keys_green.jpg") bottom left no-repeat;
+  position: relative;
+  float: left;
+}
+/*---- End Greenline Console ----*/
+
+
+
+/*//----------PUBLIC PROJECT START here PUBLIC PROJECT  START  --- PUBLIC PROJECT  START ---- PUBLIC PROJECT  START----  PUBLIC PROJECT  START------------------*/
+
+#conProject_tableHolder{
+	display: block;
+	width: 850px;
+	height: auto;
+	min-height: 500px;
+	float: left;
+	position: relative;
+}
+.conProject_table{
+	margin: 20px 15px 20px 15px;
+	width: 820px;
+	text-align: left;
+	border-collapse: collapse;
+}
+.conProject_table th{
+	font-size: .95em;
+	font-weight: normal;
+	padding: 8px;
+	background:#c9e6d1;
+	border-top: 1px solid #999999;
+	border-bottom: 4px solid #666666;
+	color: #003300;
+}
+.conProject_table td{
+	font-size: .75em;
+	border-bottom: 1px solid #ccc;
+	color: #333333;
+	padding: 6px 8px;
+}
+.conProject_table tr:hover td{
+	background: #E4FFEF;
+	color: #003300;
+}
+
+.conProject_table td.link{
+	color: #0080FF;	
+	display: block;
+	text-decoration: none; text-align: left;
+	
+}
+
+.conProject_table td.link a{
+	color: #0080FF;
+	display: block;
+	text-decoration: none; text-align: left;
+	
+}
+.conProject_table td.link a:hover{
+	color: #CC9900;
+	
+}
+
+#conProject_page{
+	width: 600px;
+	height: 40px;
+	margin:2px 30px 20px 0px;
+	float: right;
+	}
+	
+.conProject_pageNumber{
+	width: auto;
+	height: 26px;
+	display: block;
+	margin:0px 2px 0px 2px;
+	float: right;
+
+	}
+
+.conProject_pageNumber a{
+	width: auto;
+	height: 26px;
+	display: block;
+	margin:0px 2px 0px 2px;
+	font-size: 1em;
+	text-align: right;
+	text-decoration: none;
+	color: #777;
+	}
+.conProject_pageNumber a:hover{
+	color: #003300;
+	}
+.conProject_pageNumber a.current{
+	color: #996600;
+	text-decoration: underline;
+	}
+	
+
+.conProject_pageNext{
+	width:50px;
+	height: 26px;
+	display: block;
+	margin:0px 10px 0px 4px;
+	float: right;
+
+	}
+
+.conProject_pageNext a{
+	width:50px;
+	height: 26px;
+	display: block;
+	margin:0px 10px 0px 4px;
+	background: url("/images/v2/go_next1.jpg") top left no-repeat;
+	font-size: .8em;
+	text-align: right;
+	text-decoration: none;
+	letter-spacing: .1em;
+	color: #777;
+	}
+.conProject_pageNext a:hover{
+	background: url("/images/v2/go_next2.jpg") top left no-repeat;
+	color: #003300;
+	}
+.conProject_pagePrevious{
+	width:80px;
+	height: 26px;
+	display: block;
+	margin:0px 10px 0px 4px;
+	float: right;
+
+	}
+
+.conProject_pagePrevious a{
+	width:80px;
+	height: 26px;
+	display: block;
+	margin:0px 10px 0px 4px;
+	background: url("/images/v2/go_previous1.jpg") top right no-repeat;
+	font-size: .8em;
+	text-align: left;
+	text-decoration: none;
+	letter-spacing: .1em;
+	color: #777;
+	}
+.conProject_pagePrevious a:hover{
+	background: url("/images/v2/go_previous2.jpg") top right no-repeat;
+	color: #003300;
+	}
+
+.conProject_pageTotal{
+	width:90px;
+	height: 40px;
+	display: block;
+	margin:0px 10px 0px 10px;
+	float: right;
+
+	}
+
+.conProject_pageTotal a{
+	width:90px;
+	height: 40px;
+	display: block;
+	margin:0px auto;
+	background: url("/images/v2/gotoNext_pageTotal_down.png")  left no-repeat;
+	font-size: .8em;
+	text-align: right;
+	text-decoration: none;
+	letter-spacing: 0px;
+	color: #777;
+	}
+.conProject_pageTotal a:hover{
+	background: url("/images/v2/gotoNext_pageTotal_up.png")  left no-repeat;
+	color: #003300;
+	}
+
+/*//---------Upload Data Panel Start------------------*/
+
+.popup
+{
+   /*width: 324px;*/
+   width:auto;
+   /*height: 260px;*/
+   /*display:none;*/
+   position:absolute;
+   top:-180px;
+   left:-120px;
+   /*background: url("/images/v2/uploadData_panel.png") no-repeat;*/
+   background-color:white;
+   border:1px solid black;
+   padding: 24px 20px 20px 20px;
+   color: #006699;
+   font-family: Arial;
+   color: #006699;
+   text-align: left;
+   font-size: .85em;
+   z-index:30;
+   /*visibility:hidden;*/
+   margin:5px;
+}
+
+.panel_container {
+	width:240px;
+	/*height: 46px;*/
+	display: block;
+	text-align: left;
+	position:relative;
+	padding-left: 6px;
+	padding-bottom: 40px;
+	/*float: left;*/
+	font-size:0.9em;
+}
+.panel_container1 {
+	width:210px;
+	height: 26px;
+	display: block;
+	text-align: left;
+	position:relative;
+	padding-left: 26px;
+	padding-top: 10px;
+	/*float: left;*/
+}
+
+/* //---------Upload Data Panel END------------------*/
+
+
+/*//----------PUBLIC PROJECT  END------------------*/
+
+/* //--------GLossary Panel------------------*/
+
+/* //--------GLossary Panel--START----------------*/
+
+#glossarypanel{
+	height: 540px;
+	width: 170px;
+	left: 4px;
+	top: -410px;
+	display: none;
+	position: absolute;
+	background: url("/images/v2/glossary_panel.png") no-repeat;
+	z-index: 100;
+}
+
+#panel_glossaryClose {
+	width:22px;
+	height: 26px;
+	position:relative;
+	padding: 16px 20px 10px 118px;
+	float: left;
+}
+#panel_glossaryTopmenu{
+	width: 150px;
+	height: 20px;
+	float: left;
+	position: relative;
+	margin-top: 6px;
+	
+	
+}
+.panel_glossaryText{
+	width:150px;
+	height: 394px;
+	text-align: left;
+	position:relative;
+	padding: 16px 10px 10px 10px;
+  	font-family: Arial;  	
+	float: left;
+}
+
+.con_btGlossaryTitle{
+	width: 136px;
+	height: 22px;
+	padding:2px 6px 0px 8px;
+	position: relative;
+	float: left;
+
+}
+
+.bt_GlossaryTitle{
+	width:136px;
+	height: 22px;
+	display: block;
+	position: relative;	
+	font-size: .85em;
+	text-decoration: none;
+	font-weight: bold;
+	color: #663399;
+	
+}
+
+.bt_GlossaryTitle a {
+	width:136px;
+	height: 22px;
+	display: block;
+	position: relative;	
+	font-size: .85em;
+	text-decoration: none;
+	text-align: left;
+	font-weight: bold;
+	color: #663399;
+	background: none;
+	
+}
+
+.bt_GlossaryTitle a:hover{
+	font-weight: bold;
+	color: #9966CC;
+	background: none;
+}
+
+.con_GlossaryTextbox{
+
+    width: 136px;
+	height: auto;
+	padding:4px 6px 0px 2px;
+	position: relative;
+	float: left;
+	font-size: .8em;
+	text-align: left;
+	color: #333333;
+	display: none;
+}
+
+
+
+.bt_panelClose {
+	width:22px;
+	height: 22px;
+	position: relative;	
+	float: right;
+}
+
+
+.bt_panelClose a {
+	width:22px;
+	height: 22px;
+	background: url("/images/v2/bt_close1.png") top no-repeat;
+	display:block;
+	position: relative;
+	float: right;
+}
+
+.bt_panelClose a:hover {
+	background: url("/images/v2/bt_close2.png") top no-repeat;
+
+}
+
+#con_btCloseT{
+width: 140px;
+height: 30px;
+padding:3px 22px 0px 6px;
+position: relative;
+float: left;
+}
+
+.bt_CloseT {
+	width:140px;
+	height: 26px;
+	display: block;
+	position: relative;	
+	font-size: .95em;
+	text-decoration: none;
+	text-align: center;
+	color: black;
+	font-weight: bold;
+
+	
+}
+
+.bt_CloseT a {
+	position: relative;	
+	font-size: .95em;
+	text-decoration: none;
+	text-align: center;
+	color: black;
+	font-weight: bold;
+	background-image: none;
+	
+}
+
+.bt_CloseT a:hover{
+	background-image: none;
+	color: #FF6600;
+	font-weight: bold;
+}
+
+
+
+.bt_glossaryR {
+	width: 34px;
+	height: 16px;
+	display: block;
+	color: #666;
+	text-decoration: none;
+	display: block;
+	position: relative;
+	float: left;
+	padding-left: 6px;
+	
+	font-size: .8em;
+	text-decoration: none;
+	text-align: left;
+}
+
+
+.bt_glossaryR a {
+	width: 34px;
+	height: 16px;
+	display: block;
+	background: url("/images/v2/btbg_red1.png") left no-repeat;
+	color: #666;
+	text-decoration: none;
+	display: block;
+	position: relative;
+	float: left;
+	padding-left: 6px;
+	
+	font-size: .8em;
+	text-decoration: none;
+	text-align: left;
+}
+
+.bt_glossaryR a:hover {
+	color: #c1272d;
+	background: url("/images/v2/btbg_red2.png") left no-repeat;
+
+}
+
+.bt_glossaryR a.current {
+	color: #c1272d;
+	font-weight: bold;
+	background: url("/images/v2/btbg_red2.png") left no-repeat;	
+}
+
+.bt_glossaryY {
+	width: 60px;
+	height: 16px;
+	display: block;
+	color: #666;
+	text-decoration: none;
+	display: block;
+	position: relative;
+	float: left;
+	padding-left: 6px;
+	font-size: .8em;
+	text-decoration: none;
+	text-align: left;
+}
+
+
+.bt_glossaryY a {
+	width: 60px;
+	height: 16px;
+	display: block;
+	background: url("/images/v2/btbg_yellow1.png") left no-repeat;
+	color: #666;
+	text-decoration: none;
+	display: block;
+	position: relative;
+	float: left;
+	padding-left: 6px;
+	font-size: .8em;
+	text-decoration: none;
+	text-align: left;
+}
+
+.bt_glossaryY a:hover {
+	color: #fdba3f;
+	background: url("/images/v2/btbg_yellow2.png") left no-repeat;
+
+}
+
+.bt_glossaryY a.current {
+	color: #fdba3f;
+	font-weight: bold;
+	background: url("/images/v2/btbg_yellow2.png") left no-repeat;
+}
+
+.bt_glossaryB {
+	width: 38px;
+	height: 16px;
+	display: block;
+	color: #666;
+	text-decoration: none;
+	display: block;
+	position: relative;
+	float: left;
+	padding-left: 4px;
+	font-size: .8em;
+	text-decoration: none;
+	text-align: left;
+}
+
+
+.bt_glossaryB a {
+	width: 38px;
+	height: 16px;
+	display: block;
+	background: url("/images/v2/btbg_blue1.png") left no-repeat;
+	color: #666;
+	text-decoration: none;
+	display: block;
+	position: relative;
+	float: left;
+	padding-left: 4px;
+	font-size: .8em;
+	text-decoration: none;
+	text-align: left;
+}
+
+.bt_glossaryB a:hover {
+	color: #3953a4;
+	background: url("/images/v2/btbg_blue2.png") left no-repeat;
+
+}
+
+.bt_glossaryB a.current {
+	color: #3953a4;
+	font-weight: bold;
+	background: url("/images/v2/btbg_blue2.png") left no-repeat;
+}
+
+/* //--------GLossary Panel End------------------*/
+
+
+
+/* //-------TEXT ONLY PAGE------------------*/
+
+/* //--------Text only page text colume------------------*/
+.container_text1{
+	width: 760px;
+	padding: 20px 30px 35px 20px;
+	float: left;
+	position: relative;
+    color: #333;
+    font-size: .9em;
+    text-align: left; 
+	line-height: 1.2em;
+}
+
+
+.container_text2L{
+	width: 365px;
+	padding: 20px 25px 35px 20px;
+	float: left;
+	position: relative;
+    color: #333;
+    font-size: .9em;
+    text-align: left; 
+	line-height: 1.2em;
+}
+
+.container_text2R{
+	width: 365px;
+	padding: 20px 30px 35px 5px;
+	float: left;
+	position: relative;
+    color: #333;
+    font-size: .9em;
+    text-align: left; 
+	line-height: 1.2em;
+}
+
+.pager {
+	text-align: right;
+	padding-right: 16px;
+}
+
+/* - registration */
+table.register-table {
+	border-spacing: 0px;
+}
+
+table.register-table td.label{
+	font-size: small;
+}
+
+#acknoledgements li {
+	float: left;
+	list-style: none outside none;
+	padding: 5px;
+}
+
+#acknoledgements img {
+	border: none;
+}
+
+#acknoledgements a img {
+	-moz-opacity:.50;
+	/*-ms-filter:"alpha(opacity=100)";
+	filter:alpha(opacity=100);*/
+	opacity:.50; 
+}
+
+#acknoledgements a:hover img {
+	-moz-opacity:1.0;
+	/*filter:alpha(opacity=100);
+	-ms-filter:"alpha(opacity=100)";*/
+	opacity:1.0;
+}
+
+
+div.messages {
+	width: 300px;
+	margin: 0px auto; 
+	padding: 20px;
+	font-size: .95em;
+	color: #3399CC;
+	font-weight: bold;
+	text-align: left;
+	vertical-align: middle;
+}
+
+input.OK {
+	color:#050;
+	font: bold 100% 'trebuchet ms',arial,sans-serif;
+	padding-left: 20px;
+	padding-right: 20px;
+	background-color:#fed;
+	border: 1px solid;
+	border-color: #696 #363 #363 #696;
+	background: -webkit-gradient(linear, left top, left bottom, from(#ffffff), to(#ffeedd)); /* for webkit browsers */
+	background: -moz-linear-gradient(top,  #fff,  #fed); /* for firefox 3.6+ */
+	filter:progid:DXImageTransform.Microsoft.Gradient (GradientType=0,StartColorStr='#ffffffff',EndColorStr='#ffeeddaa'); /* IE */
+	outline: none;
+}
+
+/*---- Redline Gene Predictors Matrix Tables ---*/
+
+#matrix-table {
+	border-collapse:collapse;
+	margin-top:10px;
+}
+#matrix-table th{
+	font-weight:bold;
+	text-align:left;
+	border-bottom:2px solid black;
+	padding:2px 10px;
+}
+#matrix-table td{
+	padding:2px 10px;
+	border-bottom:1px solid grey;
+}
+#matrix-table .label{
+	font-weight:bold;
+	border-right:2px solid black;
+}
+
+/*---- End Redline Gene Predictors Matrix Tables ---*/
+
+/*-- New Redline import from GL/GFF styles --*/
+#gff_container{
+	font-size:0.9em;
+	color:#006699;
+	width:300px;
+	background-color: rgba(207, 236, 236, 0.6);
+	z-index:30;
+}
+#gff_container_inner{
+	border:1px solid black;
+	margin:5px;
+	padding:24px 20px;
+	background-color:white;
+}
+#gff_container_inner #top{
+	border-bottom:1px solid #C2DBF3;
+	margin-bottom:10px;
+	padding-bottom:15px;
+}
+#import_from_gl_space {
+	max-height:300px;
+	overflow-y:auto;
+	overflow-x:hidden;
+}
+#gl_iframe{
+	border:0;
+	width:240px;
+	overflow:hidden;
+}
+/*-- END New Redline import from GL/GFF styles --*/

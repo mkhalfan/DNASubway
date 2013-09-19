@@ -1,0 +1,3 @@
+{
+	LOG_CONF => "/var/www/lib/perl/config/log.conf",
+}

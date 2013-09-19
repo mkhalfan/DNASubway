@@ -1,0 +1,39 @@
+<h1>Samples</h1>
+
+<& "/_messages" &>
+
+<a href="./add_sample.html">Add sample</a>
+
+<table border="0">
+<tr>
+	<th>Organism</th><th>Common name</th>
+	<th>Clade</th><th>Seq lenght</th>
+	<th>Src Name/Release</th><th>Src location</th><th>&nbsp;</th>
+</tr>
+% for (@samples) {
+<tr class="<% $_->active ? "" : "sample-inactive"%>">
+	<td><% $_->organism %></td>
+	<td><% $_->common_name %></td>
+	<td><% uc $_->clade %></td>
+	<td><% nicebasepairs($_->sequence_length) %></td>
+	<td><a href="<% $_->source_url %>"><% $_->source_name %>/<% $_->source_release %></a></td>
+	<td><% $_->segment %>:<% $_->start %>-<% $_->stop %></td>
+	<td><a href="edit_sample.html?sid=<% $_->id %>">edit</a></td>
+</tr>
+% }
+</table>
+
+
+%#------------------------------------------------------------------------------
+<%once>
+	use DNALC::Pipeline::Config ();
+	use DNALC::Pipeline::Sample ();
+	use DNALC::Pipeline::Utils qw/nicebasepairs/;
+	use Data::Dumper;
+	
+</%once>
+%#------------------------------------------------------------------------------
+<%init>
+	#my @samples = DNALC::Pipeline::Sample->retrieve_all;
+	my @samples = DNALC::Pipeline::Sample->search_like( organism => "%", {order_by => "active DESC, organism"});
+</%init>

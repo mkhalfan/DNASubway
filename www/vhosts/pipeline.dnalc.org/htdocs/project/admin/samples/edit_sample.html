@@ -1,0 +1,310 @@
+<& "/_messages" &>
+
+<div id="stylized" class="myform" style="float:left">
+<form id="form" name="form" method="post" onsubmit="ch=$('active').checked; if (!ch) return confirm('Non active samples will not be available for creating projects!\n\nContinue?')">
+<h1>Edit sample</h1>
+<p></p>
+
+<label>Organism</label>
+<input type="text" name="organism" id="organism" value="<% $organism | html %>"/>
+
+<label>Common name
+<!--<span class="small"></span>-->
+</label>
+<input type="text" name="common_name" id="common_name" value="<% $common_name |html%>"/>
+
+<label>Clade
+<span class="small">Nomenclature</span>
+</label>
+<div style="float:left;">
+% for (('dicotyledons', 'monocotyledons', 'other plants', 'animals', 'fungi')) {
+%	my $i = substr $_, 0, 1;
+%	my $sel = $i eq $clade ? 'checked="checked"' : '';
+	<div><input type="radio" name="clade" value="<% $i %>" <%$sel%>/> <% $_ %></div>
+% }
+</div>
+<div style="float:left;">
+% for (('mamalia', 'birds', 'fish', 'insecta', 'nematoda')) {
+%	my $i = exists $species_map{$_} ? $species_map{$_} : substr $_, 0, 1;
+%	my $sel = $i eq $clade ? 'checked="checked"' : '';
+	<div><input type="radio" name="clade" value="<% $i %>" <%$sel%>/> <% $_ %></div>
+% }
+</div>
+<div class="spacer"></div>
+<label>Sequence data<span class="small">paste the sequence<br/>max 100kbp</span></label>
+<div style="float:left;padding: 5px 0px 5px 10px;">
+<br/>
+<div id="sequence_message">
+	Not shown
+	<a href="#" onclick="$('sequence_data').show();$('sequence_message').toggle();$('sequence_data').focus()">update</a>
+</div>
+<textarea style="display:none; float:none"
+	name="sequence_data" id="sequence_data" value="<% $sequence_data|html%>"></textarea>
+</div>
+<br clear="both"/>
+<label>Source name </label>
+	<input type="text" name="source_name" id="source_name" value="<% $source_name | html %>"/>
+	<br clear="both"/>
+	<label>Source release</label>
+	<input type="text" name="source_release" id="source_release" value="<% $source_release  | html %>"/>
+	<br clear="both"/>
+	<label>Source url<span class="small">Link to source</span></label>
+	<input type="text" name="source_url" id="source_url" value="<% $source_url | html %>"/>
+	<br clear="both"/>
+	<label>Segment <span class="small">e.g. chr1, ref02</span></label>
+	<input type="text" name="segment" id="segment" value="<% $segment | html %>"/>
+	<br clear="both"/>
+	<label>Start <span class="small">e.g. positive integer</span></label>
+	<input type="text" name="start" id="start" value="<% $start | html %>"/>
+	<br clear="both"/>
+	<label>Stop <span class="small">positiv integer &gt; Start</span></label>
+	<input type="text" name="stop" id="stop" value="<% $stop | html %>"/>
+	<br clear="both"/>
+	<label></label>
+	<input type="checkbox" name="active" id="active" value="1" <% $active ? "checked=\"checked\"" : "" %>/>
+	Active sample?
+	<div>
+		<br clear="both"/>
+	</div>
+
+<button type="submit">Update</button>
+<div class="spacer"></div>
+<input type="hidden" id="seq_changed" name="seq_changed" value="" />
+<input type="hidden" id="op" name="op" value="edit_sample" />
+</form>
+</div>
+
+<div id="stylized" class="myform" style="float:left; margin-left: 5px;">
+<form id="form" name="form" method="post" action="./edit_link">
+<input type="hidden" id="op" name="op" value="add" />
+<input type="hidden" id="sid" name="sid" value="<% $sample->id %>" />
+<h1>Export in other browsers</h1>
+<p>Links to other GBrowse portals..</p>
+% for (@links) {
+	<div><a href="<% $_->link_url%>" target="_blank"><% $_->link_name |html%></a> (<% $_->link_type %> like)
+	<a href="./edit_link?sid=<%$sid%>;lid=<%$_->id%>;op=remove" onclick="return confirm('Really remove this link?');" title="delete link">x</a>
+	<div style="padding-left: 10px;"><% $_->link_segment%>:<%$_->link_start%>-<% $_->link_stop %></div>
+	</div>
+% }
+<p></p>
+<h1>Add new link to an external browser</h1>
+<label>Name</label>
+<input type="text" name="link_name" id="link_name" value="<% $link_name | html %>"/>
+<label>Link<!--<span class="small"></span>--></label>
+<input type="text" name="link_url" id="link_url" value="<% $link_url | html %>"/>
+<label>Segment<!--<span class="small"></span>--></label>
+<input type="text" name="link_segment" id="link_segment" value="<% $link_segment | html %>"/>
+<label>Start</label>
+<input type="text" name="link_start" id="link_start" value="<% $link_start | html %>"/>
+<label>Stop</label>
+<input type="text" name="link_stop" id="link_stop" value="<% $link_stop | html %>"/>
+<label>Browser type</label>
+%#<input type="text" name="link_type" id="link_type" value="<% $link_type | html %>"/>
+<select style="margin: 2px 0 10px 10px" name="link_type" id="link_type">
+<option value="">set browser type</option>
+% for (@browser_types) {
+	<option value="<% $_%>"><%$_%></option>
+% }
+</select>
+<button type="submit">Add link</button>
+
+</form>
+</div>
+<br clear="both"/>
+%#------------------------------------------------------------------------------
+<%args>
+	$organism => ''
+	$common_name => ''
+	$sequence_data => ''
+	$clade => ''
+
+	$source_name => ''
+	$source_release => ''
+	$source_url => ''
+	$stop => ''
+	$start => ''
+	$segment => ''
+	$release_date => ''
+	
+	$link_url => ''
+	$link_name => ''
+	$link_segment => ''
+	$link_start => ''
+	$link_stop => ''
+	$link_type => ''
+	
+	$active => 0
+	
+	$op => ''
+	$sid => 0
+</%args>
+%#------------------------------------------------------------------------------
+<%once>
+	use DNALC::Pipeline::Config ();
+	use DNALC::Pipeline::Utils qw/random_string/;
+	use DNALC::Pipeline::App::Utils ();
+	use DNALC::Pipeline::Sample ();
+	use Regexp::Common qw/URI/;
+	use Data::Dumper;
+	
+	my @browser_types = qw/gbrowse ensemble/;
+	
+	my %species_map = (
+			mamalia => '♞',
+			birds => 'b',
+			fish => 'f',
+			insecta => 'i',
+			nematoda => 'w',
+		);
+</%once>
+%#------------------------------------------------------------------------------
+<%init>
+my $s = $m->session->{pipeline};
+my $sample = $sid ? DNALC::Pipeline::Sample->retrieve($sid) : 0;
+unless ($sample) {
+	$m->comp('/_message_add', "No sample was found for sample id = $sid!", 'error');
+	$m->redirect('./index.html');
+	#return;
+}
+
+my $cf = DNALC::Pipeline::Config->new;
+my $pcf = $cf->cf("PIPELINE");
+my $scf = $cf->cf("SAMPLE");
+my @links = $sample->links;
+
+#test if admin
+if ($r->method eq "GET") {
+	$organism = $sample->organism;
+	$common_name = $sample->common_name;
+	#$sequence_data = $sample->sequence_data;
+	$clade = $sample->clade;
+	$active = $sample->active;
+	
+	$source_name = $sample->source_name;
+	$source_release = $sample->source_release;
+	$segment = $sample->segment;
+	$start = $sample->start;
+	$stop = $sample->stop;
+	$source_url = $sample->source_url;
+	
+	$link_url = $s->{link_url};
+	$link_name = $s->{link_name};
+	$link_segment = $s->{link_segment};
+	$link_start = $s->{link_start};
+	$link_stop = $s->{link_stop};
+	$link_type = $s->{link_type};
+}
+elsif ( $r->method eq "POST") {
+	my $ok = 1;
+
+	if ($op eq "edit_sample") {
+	
+		my $file2process;
+
+		for (qw/organism common_name clade source_name source_release 
+				source_url stop start segment/) 
+		{
+			unless ($ARGS{$_}) {
+				my $lbl = ucfirst $_;
+				$lbl =~ s/_/ /g;
+				$m->comp('/_message_add', "$lbl is missing!", 'error');
+				$ok = 0;
+			}
+		}
+
+		if ($ok) {
+			if ($organism =~ /[^a-z0-9\s]/i || $common_name =~ /[^a-z0-9\s-]/i) {
+				$m->comp("/_message_add", "Organism name may contain only letters, digits and spaces", "error");
+				$ok = 0;
+			}
+			if ($start >= $stop) {
+				$ok = 0;
+				$m->comp('/_message_add', "Stop should be > Start!", 'error');
+			}
+			if ($source_url !~ /$RE{URI}{HTTP}/) {
+				$m->comp('/_message_add', "Source url is not well formatted!", 'error');
+				$ok = 0;
+			}
+			if (length ($sequence_data) > 110000) {
+				$ok = 0;
+				$m->comp('/_message_add', "Sequence is too large!", 'error');
+			}
+		}
+		
+		if ($ok) {
+
+			if ( $sequence_data && $sample->sequence_data ne $sequence_data) {
+				my $rc = undef;
+				$sequence_data =~ s/^\s+//g;
+				$sequence_data =~ s/\s+$//g;
+				if ($sequence_data =~ /^>/) {
+					$file2process = $pcf->{upload_dir} . "/" . random_string(7,7);
+					my $in = IO::File->new;
+					if ($in->open($file2process, "w")) {
+						print $in $sequence_data;
+						undef $in;
+					}
+					$rc = DNALC::Pipeline::App::Utils->process_input_file( $file2process );
+				}
+				else {
+					$m->comp("/_message_add", "Sequence is not in FASTA format!", "error");
+				}
+				
+				if ($rc && $rc->{status} eq "success") {
+					$rc->{seq}->display_id($scf->{samples_common_name});
+
+					my $smpl_dir = $scf->{samples_dir} . "/" . ($sample->id);
+					my $smpl_file = $smpl_dir . "/fasta.fa";
+					unless (-e $smpl_dir) {
+						mkdir $smpl_dir;
+					}
+					my $seq_out = Bio::SeqIO->new( -format => "fasta",
+												-file => "> $smpl_file");
+					$seq_out->write_seq($rc->{seq});
+					
+					my $seq_length = $rc->{seq}->length;
+					if ($seq_length != $sample->sequence_length) {
+						$sample->sequence_length($seq_length);
+					}
+					$sample->sequence_data( 
+						$scf->{samples_common_name} . "\n" . $rc->{seq}->seq
+					);
+				}
+				else {
+					$ok = 0;
+				}
+			}
+
+			if ($ok) {
+				$common_name = lc $common_name;
+				$sample->organism($organism) if $sample->organism ne $organism;
+				$sample->common_name($common_name) if $sample->common_name ne $common_name;
+				$sample->clade($clade) if $sample->clade ne $clade;
+				$sample->source_name($source_name) if $sample->source_name ne $source_name;
+				$sample->source_release($source_release);
+				$sample->segment($segment);
+				$sample->start( $start );
+				$sample->stop($stop);
+				$sample->source_url ($source_url);
+				$sample->active($active) if $sample->active($active) != $active;
+				print STDERR "active = $active\n";
+				eval {
+					$sample->update;
+				};
+				if ($@) {
+					$m->comp("/_message_add", "Error: $@", "error");
+				}
+				else {
+					$m->comp('/_message_add', "Sample updated successfully!");
+					$m->redirect("edit_sample.html?sid=" . $sample->id);
+				}
+			}
+		}
+		
+	}
+}
+
+</%init>
+%#------------------------------------------------------------------------------
+
+%#------------------------------------------------------------------------------

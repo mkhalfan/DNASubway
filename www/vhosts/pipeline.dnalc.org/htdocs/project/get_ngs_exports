@@ -1,0 +1,76 @@
+<div id="import_from_greenline" style="border:1px solid black; width: 300px;height:400px;">
+
+</div>
+%#-----------------------------------------------------
+<%args> 
+
+</%args>
+
+<%once>
+	use DNALC::Pipeline::NGS::Job;
+	use DNALC::Pipeline::MasterProject;
+	use DNALC::Pipeline::NGS::JobParam;
+	use DNALC::Pipeline::NGS::JobOutputFile;
+	use DNALC::Pipeline::NGS::DataFile;
+	use Data::Dumper;
+
+</%once>
+
+<%init>
+$m->session->{pipeline} ||= {};
+my $s = $m->session->{pipeline};
+my $uid = $s->{user_id};
+
+# all jobs for this user where task_id = 37 (cuffmerge) and status = 2 (complete)
+# basically saying get all the completed cuffmerge jobs for this user
+my @user_cm_jobs = DNALC::Pipeline::NGS::Job->search(user_id => $uid, task_id => '37', status_id => '2', deleted => 0);
+my %user_imports = get_gl_imports(@user_cm_jobs);
+
+# above is for user data, what about public projects?
+my @public_cm_jobs;
+my @public_ngs_projects = DNALC::Pipeline::MasterProject->search(project_type => 'NGS', public => 'TRUE');
+for my $p (@public_ngs_projects) {
+	my @project_cm_jobs = DNALC::Pipeline::NGS::Job->search(project_id => $p->project_id, task_id => '37', status_id => '2', deleted => 0);
+	for my $j (@project_cm_jobs) {
+		push (@public_cm_jobs, $j->id);
+	}
+}
+my %public_imports = get_gl_imports(@public_cm_jobs);
+
+print STDERR "user imports: \n", Dumper (%user_imports), $/;
+print STDERR "public imports: \n", Dumper (%public_imports);
+
+
+sub get_gl_imports {
+	my @cm_jobs = @_;
+	my %import_info;
+	for my $job (@cm_jobs) {
+		my $path_to_gff;
+		my $path_to_description;
+		my $job_name = (DNALC::Pipeline::NGS::JobParam->search(job_id => $job, name => "name"))[0]->value;
+		my @cm_output_files = DNALC::Pipeline::NGS::JobOutputFile->search(job_id => $job);
+		for my $output_file (@cm_output_files) {
+			my $file_id = int($output_file->file_id);
+			my $data_file = DNALC::Pipeline::NGS::DataFile->retrieve($file_id);
+			if ($data_file->file_type eq 'gff') {
+				$path_to_gff = $data_file->file_path;
+			}
+			elsif ($data_file->file_name eq 'description.txt' && $data_file->is_local) {
+				$path_to_description = $data_file->file_path;
+			}
+		}
+		if ($job_name && $path_to_gff && $path_to_description) {
+			$import_info{$job_name} = {path_to_gff => $path_to_gff, path_to_description => $path_to_description};
+		}
+		else {
+			print STDERR "Something went wrong in get_ngs_exports, no job name or no path to gff or no path to description", $/;
+		}
+	}
+	return %import_info;
+}
+
+</%init>
+
+<%flags>
+
+</%flags>

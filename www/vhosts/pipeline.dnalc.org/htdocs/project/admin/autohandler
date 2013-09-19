@@ -1,0 +1,84 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="author" content="Dolan DNA Learning Center" />
+<meta http-equiv="Content-Language" content="en" />
+<title><& SELF:title &> DNA Subway</title>
+<script type="text/javascript" src="/js/prototype-1.6.0.3.js"></script>
+%#<script type="text/javascript" src="/js/prototype.js"></script>
+% if ($m->request_comp->attr_if_exists('js') && @{$m->request_comp->attr('js')}) { 
+%	foreach my $js (@{$m->request_comp->attr('js')}) {
+%		next unless $js;
+<script type="text/javascript" src="/js/<% $ js %>"></script>
+%	}
+% }
+
+
+<link type='text/css' rel='stylesheet' href='/css/protected.css' />
+%#<link type='text/css' rel='stylesheet' href='/css/style.css' />
+% if ($m->request_comp->attr_if_exists('css') && @{$m->request_comp->attr('css')}) { 
+%	foreach my $css (@{$m->request_comp->attr('css')}) {
+%		next unless $css;
+<link type='text/css' rel='stylesheet' href='/css/<% $css %>' />
+%	}
+% }
+
+</head>
+<body>
+<div>
+	<a href="/project/admin/samples/index.html">samples</a>
+	<a href="/project/admin/target_samples/index.html">target samples</a>
+	<a href="/project/admin/stats/index.html">stats</a>
+%#	<a href="/project/admin/users/">users</a>
+%#	<a href="#">projects</a>
+</div>
+<div id="main">
+
+% $m->call_next;
+
+</div> <!-- #container_main  -->
+<div id="footer">© Cold Spring Harbor Laboratory. All rights reserved.</div>
+</body>
+</html>
+%#---------------------------------
+<%method title>\
+</%method>\
+%#---------------------------------
+<%attr>
+	js => []
+	css => []
+	load_window_ui => 0
+</%attr>
+%#---------------------------------
+<%init>
+	my $s = $m->session->{pipeline};
+
+	my $now = time();
+	if ($s->{logged_in} && ($now - $s->{last} > 3600)) {
+		$m->comp("/_message_add", "Your session expired!");
+		$s->{logged_in} = 0;
+		delete $s->{logged_in};
+		delete $s->{user_id};
+	}
+	$s->{last} = $now;
+	unless ($s->{logged_in}) {
+		$m->redirect("/");
+	}
+	
+	my $pcf = DNALC::Pipeline::Config->new->cf("PIPELINE");
+	my $user = $s->{username};
+	my $is_admin = grep {/^$user$/} @{$pcf->{ADMINS}};
+	unless ($is_admin) {
+		$m->comp("/_message_add", "Resource not available.", "error");
+		$m->redirect("/");
+	}
+	
+</%init>
+%#---------------------------------
+<%flags>
+	inherit => undef
+</%flags>
+%#---------------------------------
+
+%# vim: ft=mason

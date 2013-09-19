@@ -1,0 +1,47 @@
+<p>Assign TopHat alignment files to samples and replicates.  At least two samples are required.</p>
+% for my $sam (1..$samples) {
+Sample <% $sam %>:<br>
+%   for my $rep (1 .. $replicates) {
+%     my $id = $element->{id};
+%     $id =~ s/\d$/$rep/;
+%     $id =~ s/\d_/$sam\_/;
+<select class="<% $class %>" id="<% $id %>" name="<% $id %>">
+<option value="">-= Replicate <% $rep %> =-</option>
+%      for my $file (sort @files) {
+%        my ($fname,$id) = $file =~ /(\S+)\|(\d+)/;
+%	 my $sel = '';#my $sel = defined $user_value && $user_value eq $id ? q{selected="selected"} : "";
+	 <option value="<% $id %>" <% $sel %>><% $fname |html %></option>
+%      }
+</select>
+% if ($rep == 3) {
+<br>
+% } else {
+&nbsp;
+%	 }
+% }
+<br /><br />
+% }
+<%args>
+	$pm => undef
+	$element => undef
+	$user_value => undef
+	$class => ''
+	$filter => undef;
+	$input_files_only => undef
+</%args>
+<%init>
+	return unless $pm && $element;
+	
+	my @files = $pm->data;
+	@files = grep {$_->file_path =~ /$filter/ && !$_->is_local} @files;
+        my %seen;
+        @files = grep {! $seen{$_->file_path}++} @files;
+	@files = map {join('|',$_->file_name,$_->id)} @files;
+	# print STDERR Dumper \@files;
+	my $fastq = grep { $_->is_input } $pm->data;   	
+	#print STDERR "show_files_rep1: The number of original FASTQ inputs was $fastq\n";
+	my $samples = my $replicates = int($fastq/2) + 1;
+	$samples = 2 if $samples < 2;
+	$replicates = 4 if $replicates > 4;		
+	
+</%init>

@@ -1,0 +1,164 @@
+<div id="conbodyx" class="unselectable">
+<p>
+% if ($ok == 1) {
+	<script type="text/javascript">
+		top.phy.set_status("phy_tree", "not-processed");
+		top.phy.set_status("phy_tree_ml", "not-processed");
+		top.phy.close_window("phy_alignment");
+	</script>
+% } 
+% else {
+% 	unless ($proj) {
+		Error: can't open project "<% $pid|html%>".
+% 	} 
+%	else {
+%		if ( -e $algn_file) {
+			<div id="legend" style="top:49px;right:33px;display:none;">
+				<div style="height:20px;">
+					<!--[if !IE]> -->
+					<div class="draggable unselectable" onMouseDown="mouse_down(event, 'legend')" onMouseUp="mouse_up()"></div>
+					<!-- <![endif]-->
+					<div class="close_button"><img onclick="$('legend').hide();" src="/images/prototip/styles/blue/close.png"/></div>
+				</div>
+				<div id="legend_body">
+					<div id="color_codes">
+						<span>Color Codes</span>
+						<ul>
+							<li>Polar, hydrophilic</li>
+							<ul>
+								<li>No charge: 
+									<span class="no_charge">
+										<abbr data-title="G Glycine" class="aa_code_rollovers">G</abbr>
+										<abbr data-title="S Serine" class="aa_code_rollovers">S</abbr>
+										<abbr data-title="T Threonine" class="aa_code_rollovers">T</abbr>
+										<abbr data-title="C Cystine" class="aa_code_rollovers">C</abbr>
+										<abbr data-title="N Asparagine" class="aa_code_rollovers">N</abbr>
+										<abbr data-title="Q Glutamine" class="aa_code_rollovers">Q</abbr>
+									</span>
+								</li>
+								<li>Positive charge, basic: 
+									<span class="positive_charge">
+										<abbr data-title="H Histidine" class="aa_code_rollovers">H</abbr>
+										<abbr data-title="K Lycine" class="aa_code_rollovers">K</abbr>
+										<abbr data-title="R Arginine" class="aa_code_rollovers">R</abbr>
+									</span>
+								</li>
+								<li>Negative Charge, acidic: 
+									<span class="negative_charge">
+										<abbr data-title="D Aspartic Acid" class="aa_code_rollovers">D</abbr>
+										<abbr data-title="E Glutamic Acid" class="aa_code_rollovers">E</abbr>
+									</span>
+								</li>
+							</ul>
+							<li>Non-polar, hydrophobic</li>
+							<ul>
+								<li>Aliphatic: 
+									<span class="aliphatic">
+										<abbr data-title="A Alanine" class="aa_code_rollovers">A</abbr>
+										<abbr data-title="I Isoleucine" class="aa_code_rollovers">I</abbr>
+										<abbr data-title="L Leucine" class="aa_code_rollovers">L</abbr>
+										<abbr data-title="M Methionine" class="aa_code_rollovers">M</abbr>
+										<abbr data-title="P Proline" class="aa_code_rollovers">P</abbr>
+										<abbr data-title="V Valine" class="aa_code_rollovers">V</abbr>
+									</span>
+								</li>
+								<li>Aromatic: 
+									<span class="aromatic">
+										<abbr data-title="F Phenylalanine" class="aa_code_rollovers">F</abbr>
+										<abbr data-title="Y Tyosine" class="aa_code_rollovers">Y</abbr>
+										<abbr data-title="W Tryptophan" class="aa_code_rollovers">W</abbr>
+									</span>
+								</li>
+							</ul>
+							<li>Gaps in alignment: <span class="gaps">--</span></li>
+						</ul>
+						<a href="javascript:;" class="switch_view" onclick="$('color_codes').toggle();$('aa_codes').toggle();">View Amino Acid Codes</a>
+					</div>
+					<div id="aa_codes" style="display:none">
+						Amino Acid Codes
+						<table style="font-size:10px">
+							<tr><td>A</td><td>Alanine</td><td>L</td><td>Leucine</td></tr>
+							<tr><td>R</td><td>Arginine</td><td>K</td><td>Lycine</td></tr>
+							<tr><td>N</td><td>Asparagine</td><td>M</td><td>Methionine</td></tr>
+							<tr><td>D</td><td>Aspartic Acid</td><td>F</td><td>Phenylalanine</td></tr>
+							<tr><td>C</td><td>Cystine</td><td>P</td><td>Proline</td></tr>
+							<tr><td>E</td><td style="padding-right:15px;">Glutamic Acid</td><td>S</td><td>Serine</td></tr>
+							<tr><td>Q</td><td>Glutamine</td><td>T</td><td>Threonine</td></tr>
+							<tr><td>G</td><td>Glycine</td><td>W</td><td>Tryptophan</td></tr>
+							<tr><td>H</td><td>Histidine</td><td>Y</td><td>Tryosine</td></tr>
+							<tr><td>I</td><td>Isoleucine</td><td>V</td><td>Valine</td></tr>
+						</table>
+						<a href="javascript:;" class="switch_view" onclick="$('aa_codes').toggle();$('color_codes').toggle();">View Color Codes</a>
+					</div>
+				</div> <!-- end legend_body div -->
+			</div> <!-- end legend div -->
+			<% $algn_contents %>
+			<div id="alignment_links">
+				<div style="float:left">
+					<div style="float:left"><a href="get_alignment?pid=<% $pid %>"><img src="/images/download.png" border=0></a></div> 
+					<div style="float:left;padding: 2px 0px 0px 2px;"><a href="get_alignment?pid=<% $pid %>" style="color:grey">Download this alignment</a></div>
+					<div style="clear:both;height:1px">&nbsp;</div>
+					<div style="float:left"><a href="view_alignment_jalview?pid=<% $pid %>"><img src="/images/java.png" border=0></a></div> 
+					<div style="float:left;padding: 2px 0px 0px 2px;"><a href="view_alignment_jalview?pid=<% $pid %>" style="color:grey">Launch in Jalview</a></div>
+				</div>
+				<div style="float:right;margin-top:2px;color:#666;cursor:default;">DNASubway Alignment Viewer</div>
+			</div>
+%		} 
+%		else {
+			<div style="font-family:arial,hervetica,san-serif;font-size:12px;padding:20px;">
+				We have switched to a new alignment viewer. You will need to rebuild your alignment. 
+				<ol>
+				<li>Go to the previous step (Select Data)</li>
+				<li>Select the sequences you wish to align and press 'Save'</li>
+				<li>Run MUSCLE again</li>
+				</ol>
+				Thank you.
+			</div>
+%		}
+% 	}
+% } # end if_else $ok
+</div>
+%#----------------------------------------------------------------------------
+<%once>
+	use DNALC::Pipeline::App::Phylogenetics::ProjectManager ();
+	use IO::File ();
+</%once>
+%#----------------------------------------------------------------------------
+<%shared>
+	my $ok = 0;
+	
+	$r->content_type("text/html");
+	$r->no_cache(1);
+
+	$m->session->{pipeline} ||= {};
+	my $s = $m->session->{pipeline};
+	my $pcf = DNALC::Pipeline::Config->new->cf('PIPELINE');
+	my $pid = $m->request_args->{pid};
+	$pid =~ s/\D+//g;
+
+	my $pm = DNALC::Pipeline::App::Phylogenetics::ProjectManager->new($pid);
+	my $proj = $pm->project;
+	my $algn_file = $pm->get_alignment('html');
+	my $alignment_url = $m->comp("../../.comp/filepath_to_web", file => $algn_file, just_return => 1);
+	
+	my $algn_contents;
+	my $fh = IO::File->new();
+	if ($fh->open($algn_file)) {
+		while (<$fh>){
+			$algn_contents .= $_;
+		}
+		$fh->close;
+	}
+
+	my $project_type = $proj->type;
+	my $style = ($project_type eq 'protein' ? 'alignment_viewer_amino.css' : 'alignment_viewer_nucleotide.css');
+</%shared>
+%#----------------------------------------------------------------------------
+<%attr>
+	js => ['prototype-1.6.1.js', 'phylogenetics.js', 'alignment_viewer.js']
+</%attr>
+%#----------------------------------------------------------------------------
+%#----------------------------------------------------------------------------
+<%method style>\
+<link type="text/css" rel="stylesheet" href="/css/<% $style %>" />
+</%method>

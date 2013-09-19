@@ -1,0 +1,10 @@
+{
+	program => '/usr/local/bin/dnaml',
+	#menu_options => "L\nR\nS\nY\n",
+	menu_options => "2\nY\n",
+
+	input_file => 'infile',
+	output_file => 'outfile',
+	tree_file => 'outtree',
+	options => [],
+}

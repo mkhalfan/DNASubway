@@ -1,0 +1,83 @@
+<%args>
+	$pid => 0
+	$apollo => 0;
+</%args>
+<%once>
+	use DNALC::Pipeline::App::ProjectManager ();
+	use DNALC::Pipeline::Sample ();
+	use Data::Dumper;
+</%once>
+<%init>
+	$m->session->{pipeline} ||= {};
+	my $s = $m->session->{pipeline};
+	$r->content_type('text/plain');
+     
+	my $pm = DNALC::Pipeline::App::ProjectManager->new($pid);
+	my $proj = $pm->project;
+	unless ($proj) {
+		$m->comp('/_message_add', 'Project not found!', 'error');
+		$m->redirect('/project/');
+	}
+
+	unless ($proj->sample) {
+		print "# ERROR: project not based on a sample sequence.";
+		return;
+	}
+
+	my $sample = DNALC::Pipeline::Sample->new($proj->sample);
+	my $start  = $sample->start;
+	my $end    = $sample->stop;
+	my $ref    = lc $sample->segment;
+	my $offset = $start - 1;
+
+	my $pcf = $pm->config;
+	my $exporter = $pcf->{EXE_PATH} . '/jb_gff_export.pl';	
+	my $importer = $pcf->{EXE_PATH} . '/jb_gff_import.pl';
+	my $cleaner  = $pcf->{EXE_PATH} . '/jb_gff_clean.pl'; 
+	my $toggle   = $pcf->{EXE_PATH} . '/jb_toggle.pl';
+
+	my $gff3_files = $pm->get_available_gff3_files || [];
+
+	my @old_sources = qw/AUGUSTUS FGENESH SNAP REPEAT_MASKER TRNA_SCAN BLASTN BLASTX/;
+	system "$cleaner @old_sources";
+
+	my @sources;
+	for my $infile (@$gff3_files) {
+		my ($source) = $infile =~ m!/([_A-Z]+)/!;
+		my $outfile  = "/tmp/$pid.$source.gff3";
+		push @sources, $source;
+
+		system "$exporter $offset $ref $infile > $outfile";
+		system "$importer $outfile";
+
+		unlink $outfile;
+	}
+
+	my @preferred_sources;
+	my %available = map {$_ => 1} @sources;
+	for (@old_sources) {
+		next if /BLAST|REPEAT|TRNA/;
+		push @preferred_sources, $_ if $available{$_};
+	}	
+	
+	my $tracks;
+	unless ($apollo) {
+		$tracks = join(',','EG',@old_sources);
+        }
+	else {
+		$tracks = join(',',@preferred_sources,'EG');
+	}	
+		
+	system "$toggle $apollo";
+
+	my $wa_url = "http://pipeline-dev.dnalc.org:8080/WebApollo/jbrowse/?";
+	$wa_url .= "loc=$ref:$start..$end\&" . "tracks=$tracks";
+	$wa_url .= "\&overview=0\&tracklist=0" unless $apollo;
+	print STDERR "$0 URL: $wa_url\n";
+	$m->redirect($wa_url);
+
+</%init>
+
+<%flags>
+	inherit => undef
+</%flags>

@@ -1,0 +1,295 @@
+% if ($ok) {
+<script type="text/javascript">
+top.phy.close_window('BOLD');
+top.show_messages("GenBank submission processed successfully. Your ID for this submission is <% $id |html %>. Please keep this for future reference. You should be receiving an email confirming your submission momentarily.");
+</script>
+% } 
+% elsif ($error) {
+<div class="color:red">
+<h2>Error</h2>
+
+<& /_messages &>
+<p><a href="javascript:;" onclick="top.phy.close_window('BOLD');">Close</a></p>
+</div>
+% }
+% else {
+<div id="BOLDstep">Step 5 of 5</div>
+<div id="BOLDmain">
+
+<h2 id="frame_title">Verify Your Submission</h2>
+
+<& /_messages &>
+
+	<p>
+<form id="bform" method="POST">
+<input type="hidden" name="bstep" value="6" />
+	
+</form>
+	</p>
+<div id="loader" style="display:none;text-align:center;padding-top:100px;margin-left:-50px"><img src="/images/ajax-loader-2.gif" /></div>
+<table id="details">
+% my $ac = 1;
+% while (exists $bs->{spec_data}->{"author_first$ac"}) {
+<tr>
+	<td width="150">Author/Collector <% $ac |html %>:</td>
+	<td><% $bs->{spec_data}->{"author_first$ac"} |html %> <% $bs->{spec_data}->{"author_last$ac"} |html %></td>
+</tr>
+<tr>
+	<td>Affiliation:</td>
+	<td><% $bs->{spec_data}->{"author_affil$ac"} |html %></td>
+</tr>
+%   $ac++;
+% }
+<tr>
+	<td>Project:</td>
+	<td><% $bs->{spec_data}->{project} |html %></td>
+</tr>
+<tr>
+	<td>Institution Storing:</td>
+	<td><% $bs->{spec_data}->{institution_storing} |html %></td>
+</tr>
+<tr>
+	<td>Identified By:</td>
+	<td><% $bs->{spec_data}->{tax} |html %></td>
+</tr>
+<tr>
+	<td>Identifier's email:</td>
+	<td><% $bs->{spec_data}->{tax_email} |html %></td>
+</tr>
+<tr>
+<tr>
+	<td>Genus:</td>
+	<td><% $bs->{spec_data}->{genus} |html %></td>
+</tr>
+<tr>
+	<td>Species:</td>
+	<td><% $bs->{spec_data}->{species} |html %></td>
+</tr>
+<tr>
+	<td>Date Collected:</td>
+	<td><% $bs->{spec_data}->{date_collected} |html %></td>
+</tr>
+<tr>
+	<td>Country:</td>
+	<td><% $bs->{spec_data}->{country} |html %></td>
+</tr>
+<tr>
+	<td>State:</td>
+	<td><% $bs->{spec_data}->{state} |html %></td>
+</tr>
+<tr>
+	<td>City:</td>
+	<td><% $bs->{spec_data}->{city} |html %></td>
+</tr>
+<tr>
+	<td>Exact Site:</td>
+	<td><% $bs->{spec_data}->{site_desc} |html %></td>
+</tr>
+<tr>
+	<td>Isolation Source:</td>
+	<td><% $bs->{spec_data}->{isolation_source} |html %></td>
+</tr>
+<tr>
+	<td>Host Organism:</td>
+	<td><% $bs->{spec_data}->{host_exists} eq "yes" ? $bs->{spec_data}->{host} : "n/a" |html %></td>
+</tr>
+<tr>
+	<td>Latitutide:</td>
+	<td><% $bs->{spec_data}->{latitude} |html %></td>
+</tr>
+<tr>
+	<td>Longitude:</td>
+	<td><% $bs->{spec_data}->{longitude} |html %></td>
+</tr>
+<tr>
+	<td>Notes:</td>
+	<td><% $bs->{spec_data}->{notes} |html %></td>
+</tr>
+<tr>
+	<td>Sex:</td>
+	<td><% $bs->{spec_data}->{sex} |html %></td>
+</tr>
+<tr>
+	<td>Life Stage:</td>
+	<td><% $bs->{spec_data}->{stage} |html %></td>
+</tr>
+<tr>
+	<td>Primer:</td>
+	<td><% $bs->{spec_data}->{f_primer} |html %></td>
+</tr>
+%#<tr>
+%#	<td>Reverse Primer</td>
+%#	<td><% $bs->{spec_data}->{r_primer} |html %></td>
+%#</tr>
+</table>
+
+<div id="bimage_list_uploaded" style="margin-left:160px">
+
+% if ($bs->{photos}) {
+%  my $index = 0;
+%  for my $ph (@{$bs->{photos}}) {
+%	next unless $ph->{"th_path"};
+	<div><img src="<% $m->comp("../../.comp/filepath_to_web", file => $ph->{"th_path"}, just_return => 1) |html %>" /></div>
+%  }
+
+% }
+</div>
+<br style="clear:both" />
+
+</div>
+<div id="BOLDfooter">
+	<a href="./step5.html">Back</a>&nbsp;
+% unless ($b) {
+	<a href="#./step6.html" onclick="$('bimage_list_uploaded').hide();phy.next_bold_step();$('details').hide();$('loader').show();$('frame_title').update('Processing');$('BOLDfooter').hide();">Submit</a>
+% }
+</div>
+% }
+
+<%args>
+	$ok => 0
+	$error => 0
+	$id => ''
+</%args>
+
+<%once>
+	use JSON::XS ();
+	use DNALC::Pipeline::App::Phylogenetics::ProjectManager ();
+	use DNALC::Pipeline::Phylogenetics::Bold ();
+	use DNALC::Pipeline::Phylogenetics::Pair();
+	use DNALC::Pipeline::Config();
+	use DNALC::Pipeline::App::Utils ();
+	use Gearman::Client ();
+	use Storable qw/thaw nfreeze/;
+	use File::Basename qw/basename/;
+	use File::Copy qw/move/;
+	use Data::Dumper;
+</%once>
+
+<%init>
+	my $s = $m->session->{pipeline};
+	my $pid = $s->{boldpid};
+	$s->{"bold_$pid"} ||= {};
+	my $bs = $s->{"bold_$pid"};
+	
+	my $js = JSON::XS->new->utf8;
+
+	#print STDERR "S6. PID = ", $pid, Dumper($s), $/;
+	
+	my $pm = DNALC::Pipeline::App::Phylogenetics::ProjectManager->new($pid);
+	my $proj = $pm->project;
+	unless ($proj && $proj->user_id == $s->{user_id}) {
+		$m->comp('/_message_add', 'Project not found!', 'error');
+		$m->redirect("./step6.html");
+		#print "Project not found!";
+		return;
+	}
+
+	unless ($bs->{step5} == 1) {
+		$m->comp('/_message_add', 'Step 5 is incomplete!', 'error');
+		$m->redirect("./step5.html");
+	}
+	
+	for (@{$bs->{sel_seq}}) {
+		$_ =~ s/^\D//;
+	}
+	my $b = undef;#DNALC::Pipeline::Phylogenetics::Bold->search(project_id => $proj->id);	
+	
+	if ($r->method eq "POST") {
+		unless ($b) {
+			#print STDERR "Need a new table: phy_bold_sequences\n";
+			
+			if (1) {
+				for my $seq_to_store (@{$bs->{sel_seq}}) { # it`s actually a pair
+					$seq_to_store =~ s/^\D//;
+					# check if pair still exists here before creating database entry
+					# then process submission immediately
+					# user gets emailed from GBManager upon successful validation		
+					# upon successfull reponse from gearman, close window and
+					# give them confirmation message
+					if (DNALC::Pipeline::Phylogenetics::Pair->retrieve($seq_to_store)) {
+						$b = eval {
+								DNALC::Pipeline::Phylogenetics::Bold->create({
+									project_id => $proj->id,
+									sequence_id => $seq_to_store,
+									status => 'pending',
+									data => $js->pretty->encode($bs->{spec_data}),
+									container => $bs->{container} || "",
+								});
+							};
+
+						if ($@) {
+							print STDERR "Error: Unable to store GB data: ", $@, $/;
+							$m->comp('/_message_add', 'Unable to store submitted data!', 'error');
+							$m->redirect("./step6.html?error=1");
+						}
+
+						$b->add_to_bold_sequences({
+								pair_id => $seq_to_store,
+								project_id => $proj->id,
+						}) if $b;
+						
+						if ($b && $bs->{photos}) {
+							my $phy_cfg = DNALC::Pipeline::Config->new->cf("PHYLOGENETICS");
+							my $photo_dir = $phy_cfg->{PHOTO_SUBMISSION_DIR};
+							for my $ph (@{$bs->{photos}}) {
+								$b->add_to_photos({
+									project_id => $proj->id,
+									photo => basename($ph->{path}),
+									photo_thumb => basename($ph->{"th_path"}),
+								});
+								move($ph->{path}, $photo_dir);
+								move($ph->{"th_path"}, $photo_dir);
+							}
+						}
+
+						# PROCESS SUBMISSION HERE IMMEDIATELY, and redirect accordingly
+						my $pcf = DNALC::Pipeline::Config->new->cf('PIPELINE');
+						my $client = Gearman::Client->new;
+						my $sx = $client->job_servers(@{$pcf->{GEARMAN_SERVERS}});
+						
+						my $status;
+						my $msg;
+						my $params = nfreeze( {id => $b} );
+						my $rc = $client->do_task( 'phy_gb_submit' =>  $params, {timeout => 30});
+						#print STDERR "1st: ", Dumper ($rc), "\n";
+						$rc = thaw($$rc);
+						#print STDERR "2nd: ", Dumper ($rc), "\n";
+						if ($rc && defined $rc->{status}) {
+							$status = $rc->{status};
+							$msg = $rc->{message};
+							if ($status eq "success"){
+								$m->redirect("./step6.html?ok=1&id=". $b->specimen_id);
+							}
+							else {
+								$m->comp('/_message_add', 'Something went wrong in the submission process. We have all your data. We will be in touch. (error code 1)', 'error');
+								$b->status("FAILED: " . $msg);
+								$b->update;
+								$m->redirect("./step6.html?error=1");
+							}
+						}
+						else {
+								$m->comp('/_message_add', 'Something went wrong in the submission process. We have all your data. We will be in touch. (error code 2)', 'error');
+								$b->status("FAILED: Gearman failed");
+								$b->update;
+								DNALC::Pipeline::App::Utils->send_email({
+									To => 'mkhalfan@cshl.edu, ghiban@cshl.edu',
+									Message => "ID: $b\nSpecimen ID: " . $b->specimen_id . "\n Gearman Failed :(",
+									Subject => 'FAILED GB Submission',
+								});
+								$m->redirect("./step6.html?error=1");
+						}	
+					}
+					else{
+						$m->comp('/_message_add', 'Something went wrong, we can not find the pair you are trying to submit. Please rebuild your pair and consensus, and try submitting again.', 'error');
+						$m->redirect("./step6.html?error=1");		
+					}
+				}
+			}
+		}
+	}
+	elsif ($ok) {
+		delete $s->{boldpid};
+		delete $s->{"bold_$pid"};
+	}
+
+</%init>

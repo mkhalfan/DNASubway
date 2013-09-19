@@ -1,0 +1,91 @@
+			<tr>
+				<td colspan="2" class="label_header" style=padding-top:15px;">Input(s)</td>
+			</tr>
+			<tbody id="app_inputs">
+			<tr>
+				<td></td>
+				<td></td>
+			</tr>
+% 		for my $i (@{$app->inputs}) { 
+%			next if $i->{hidden};
+			<tr<% $flagged->{$i->{id}} ? ' class="flagged"' : ''%>>
+%				if ($i->{id} eq "info") {
+					<td colspan="2" class="info"><% $i->{label} |html%></td>
+%				} else {
+				<td><p><% $i->{required} ? "<sup>*</sup>" : "" %><% $i->{label} %></p></td>
+				<td>
+%				if ($i->{id} eq q{genome} ) {
+					include genomes - <% $form->{genome} || $i->{value} |html%>
+%				} elsif ($i->{display_type}) {
+					<div><p><& $i->{display_type}, pm => $pm, element => $i, filter => $app_input_filter,
+						input_files_only => $app->{conf}->{_input_only_files}, task_name => $app->{conf}->{_task_name},
+						user_value => defined $form->{$i->{id}} ? $form->{$i->{id}} : (ref $i->{value} ? $i->{value}->{default} : $i->{value}) &>
+					</p></div>
+%				} else {
+					<input type="text" id="<% $i->{id} %>" name="<% $i->{id} %>" 
+					req="<% $i->{required} %>" value="<% defined $form->{$i->{id}} ? $form->{$i->{id}} : $i->{value} |html%>" />
+%				}
+				</td>\
+%				}
+			</tr>
+%		}
+			</tbody>
+%# Only add parameter section if there are parameters defined
+%#               not jobName          not null      all params
+% my $nparams = grep {$_->{id} !~ /jobName/} grep {ref $_}  $app->parameters;
+% if ($nparams > 0) {
+				<tr>
+					<td colspan="2" class="label_header">Parameters
+                				<span style="font-size:10px;font-weight:100;color:#006699;position:relative;bottom:2px;">
+                				[<a href="javascript:;" onclick="NGS.prototype.toggle_params();"
+                				style="font-size:10px;font-weight:100;color:#006699">
+%	my ($spans,$tbody);
+%# 	if ($app =~ /cuffdiff/) {
+%# 		$spans = qq(<span id="show_params">show</span>
+%#       		    <span id="hide_params" style="display:none">hide</span></a>]</span>);
+%# 		$tbody = qq(<tbody id="app_parameters" style="display:none;">);
+%# 	} else {
+%		$spans = qq(<span id="show_params">hide</span>
+%			    <span id="hide_params" style="display:none">show</span> </a>]</span>);
+%		$tbody = qq(<tbody id="app_parameters">);
+% #	}	
+						<% $spans %>
+					</td>
+				</tr>
+			<% $tbody %>
+% 	for my $p (@{$app->parameters}) {
+%			next if $p->{hidden};
+%			my $val  = $form->{$p->{id}} || $p->{value} || $p->{defaultValue};
+%			my $type = $p->{semantics} && $p->{semantics}->{ontology} ? join(",", map {$_=~s/xs://;$_;} @{$p->{semantics}->{ontology}}) : 'text';
+				<tr<% $flagged->{$p->{id}} ? ' class="flagged"' : ''%> title="<% $p->{details} ? $p->{details}->{description} : '' %>">
+					<td title="<% $p->{type} %>"><% $p->{required} ? "<sup>*</sup>" : "" %><% $p->{label}%></td>
+					<td>\
+% 		if ($type =~ /boolean/) {
+			<input type="checkbox" id="<% $p->{id} %>" name="<% $p->{id} %>" req="<% $p->{required}%>"\
+			value="true" <% ($val =~ /true/ || $val eq "1") ? "checked=\"checked\"" : ""%> />
+%		} else {	
+%			my $size = $p->{id} eq 'description' ? '80' : '20';
+			<input type="text" id="<% $p->{id} %>" name="<% $p->{id} %>" 
+		        size=<% $size %> req="<% $p->{required}%>" value="<% $val |html%>"/>
+
+% }
+	
+					<!-- d_type: [<% $type %>/<% $val %>] -->
+					</td>
+				</tr>
+%	}
+			</tbody>
+% } # end if (@{$app->parameters})
+%#-----------------------------------------------------------------------
+<%args>
+	$app => undef
+	$form => {}
+	$flagged => {}
+	$pm => undef
+</%args>
+<%init>
+	return unless ($app && $pm);
+	
+	my $app_input_filter = $app->{conf}->{_input_file_filter};
+
+</%init>

@@ -1,0 +1,17 @@
+{
+	id => 'dnalc-fastqc-stampede-0.10.1u1',
+	#id => 'dnalc-fastqc-lonestar-0.10.1u1'
+	name => 'fastqc',
+	inputs => [
+		{ id => 'input', display_type => 'show_files', hidden => 0, label => 'Select an input FASTQ' },
+	],
+	parameters => [
+	],
+	_input_only_files => 1,				# show only the files marked as `is_input` in the drop down selector
+	_task_name => 'ngs_fastqc',
+	_input_file_filter => qr/\.fastq$/,
+	_output_dir => undef,
+	_output_files => '\.zip',
+
+	_on_success => 'handle_qc',
+}

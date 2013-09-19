@@ -1,0 +1,39 @@
+<%args>
+	$t => ''
+</%args>
+%#------------------------------------------------------------
+<%once>
+	use DNALC::Pipeline::Utils qw/nicebasepairs/;
+	use DNALC::Pipeline::Sample ();
+	use JSON::XS ();
+	
+	my %clade_map = (
+		animals => [qw/♞ f i w/], # mamals fish insect worms
+		fungi => [qw/x/],
+		plants => [qw/d m/],
+	);
+</%once>
+%#------------------------------------------------------------
+<%init>
+	$r->content_type("text/plain");
+	my $cached_samples = [];
+	if ($t) {
+		my $key = 'cached_aasamples_' . $t;
+		$cached_samples = $m->cache->get($key, busy_lock=>'30 sec');
+		unless (defined $cached_samples) {
+			my @samples = DNALC::Pipeline::Sample->get_by_type( $t);
+			$cached_samples = \@samples;
+			$m->cache->set($key, $cached_samples, '15 min') if @samples;
+		}
+	}
+
+</%init>
+[\
+% for (@$cached_samples) {
+{ 'id' : <% $_->id%>, 'organism':'<% $_->organism |js%>', 'common_name':'<% $_->common_name|js%>', \
+'clade':'<% $_->clade %>', 'segment':'<% $_->segment %>', 'len': '<% nicebasepairs($_->sequence_length)%>'}, \
+% }
+0]
+<%flags>
+	inherit => undef
+</%flags>

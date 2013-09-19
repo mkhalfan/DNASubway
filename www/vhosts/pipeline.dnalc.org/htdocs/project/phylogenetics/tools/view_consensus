@@ -1,0 +1,207 @@
+<div id="container_data_line">&nbsp;</div>
+<div id="view-consensus">
+% unless ($proj) {
+	Error: can't open project "<% $pid|html%>".
+% } 
+% else {
+	<div id="pair-menu">
+	<ul>
+%	my $cnt = 1;
+%	for my $p (@pairs) {
+		<li>
+			<div class="pair-id-block<% ($cnt == $num ? " active" : "")%>" title="<% $p->name |html%>">
+				<a href="./view_consensus?pid=<%$pid |html%>;pair_id=<% $p->id %>;num=<% $cnt ++ %>">
+				<span> <% $p->name |html%></span></a>
+			</div>
+		</li>
+%	}
+	</ul>
+	</div>
+	<div id="edit-panel">
+%	if ($pair) {
+		<div id="pair-title-block">
+			<div id="pair-header">
+				<span style="font-weight:normal">Pair</span> 
+				<span id="pair-title"><% $pair->name |html%></span>
+				<span id="edit-pair-title" style="display:none"> 
+					<input type="text" name="pair-name" id="pair-name" value="<% $pair->name |html%>" maxlength="128"/>
+				</span>
+			</div>
+			<div id="edit-name-link" class="text-links">[<a href="javascript:;" onclick="phy.edit_pair_name();">Edit Name</a>]</div>
+			<div id="save-name-link" style="display:none;" class="text-links">[<a href="javascript:;" onclick="phy.save_pair_name($('pair-name').value, <% $num %>, <% $pair %>);">Save</a>] [<a href="javascript:;" onclick="phy.edit_pair_name();">Cancel</a>]</div>
+			<div style="clear:both;height:0px">&nbsp;</div>
+		</div>
+		<div style="clear:both;height:0px">&nbsp;</div>
+		<div style="overflow: auto;" class="monospace">
+			<div id="labels" style="color:#996600;min-width:115px;">
+				<div id="seq1_name"></div>
+				<div id="seq2_name"></div>
+				<div id="consensus_div_name"></div>
+				<div id="trim-link" class="text-links" style="display:none;">[<a href="javascript:;" onclick="phy.enable_trim();">Trim Consensus</a>]</div>
+				<div id="trim-exit-link" style="display:none;" class="text-links">[<a href="javascript:;" onclick="phy.exit_trim();">Exit Trim Mode</a>]</div>
+				<img style="position:relative;top:5px;left:5px" src="/images/question-12.png" id="trim-help" />
+			</div>
+			<div id="colons" style="display:none">
+				<div>:</div>
+				<div>:</div>
+				<div>:</div>
+			</div>
+			<div id="sequences">
+				<div id="seq1_div"></div>
+				<div id="seq2_div"></div>
+				<div id="consensus_div_seq"></div>
+			</div>
+		</div>
+		
+		<p></p>
+		<div id="trim-info" style="display:none;">
+			<div>
+				<div class="trim_total_label">Left Trim: </div>
+				<div id="left_trim_value">0</div> bp 
+				<span>[<a href="javascript:;" onclick="phy.reset_consensus_trim('l');">Reset</a>]</span>
+			</div>
+			<div>
+				<div class="trim_total_label">Right Trim: </div>
+				<div id="right_trim_value">0</div> bp 
+				<span>[<a href="javascript:;" onclick="phy.reset_consensus_trim('r');">Reset</a>]</span>
+			</div>
+			<input type="submit" value="Trim" style="margin-top:10px;" onclick="phy.commit_consensus_trim(<% $pair %>);"/>
+		</div>
+		<p><img id="progress" style="padding-left:100px;display:none" src="/images/ajax-loader-2.gif" alt=""></p> 
+		<div id="change_base_area" class="monospace"></div>
+		<input type="button" id="save_changes_btn" value="Save Changes" onclick="phy.consensus_change()" style="margin-left:5px;display:none;"/>
+		<div id="trace_canvas_div" style="display:none; padding:20px;">
+			<canvas id="trace_viewer_1" height="210" style="margin-right:10px;border:1px solid grey;">Your browser doesnt support canvas objects.</canvas>
+			<canvas id="trace_viewer_2" height="210" style="border:1px solid grey;">&nbsp;</canvas>
+		</div>
+
+		<input type="hidden" id="step" value="5" />		
+		<input type="hidden" id="seq1" value="<% $seq1 |html%>" data-qscores="[<% $qstr1 %>]" />
+		<input type="hidden" id="seq2" value="<% $seq2 |html%>" data-qscores="[<% $qstr2 %>]" />
+		<input type="hidden" id="display_name_1" value="<% $display_name_1 |html%>" />
+		<input type="hidden" id="display_name_2" value="<% $display_name_2 |html%>" />
+		<input type="hidden" id="consensus" value="<% $consensus |html%>" />
+		<input type="hidden" id="pair_id" value="<% $pair->id %>" />
+%	}
+	</div>
+% }
+</div>
+<div style="clear: both;">&nbsp;</div>
+<div id="container_data_lineBottom">&nbsp;</div>
+<script type="text/javascript">
+	Event.observe(window, Prototype.Browser.IE ? 'load' : 'dom:loaded', function() {
+		new Tip('trim-help', "<strong>Trimming the Consensus Sequence</strong><p>To trim your consensus sequence, click the 'Trim Consensus' link to the left. Once you are in trim mode, rollover the consensus sequence and click on the base you wish to trim up to. Bases to be trimmed will be indicated by a red strikethrough. You can trim from both the left and right ends of the sequence. Reset your trimming by clicking the respective reset buttons. Once you have selected your regions for trimming, you must click the 'Trim' button in order to execute and save your trimmed consensus sequence.</p><p align=center><img src='/images/consensus_help.png' /></p><p><strong>Low Quality Bases</strong></p><p>Low quality bases are indicated in grey. This information may be helpful when determining what regions of the consensus to trim.</p><p><strong>Mismatches</strong></p><p>Mismatches between two trace files are highlighted in yellow. Click a mismatch to view the trace for both sequences in this region.</p>", {
+			className: 'blue_help_wide',
+			hook: {target:'bottomRight', tip:'topLeft'},
+			hideAfter: 1,
+			hideOn: false,
+			closeButton:true
+		});
+	});
+</script>
+
+
+%#----------------------------------------------------------------------------
+<%args>
+	$pid => 0
+	$pair_id => 0
+	$num => 1
+</%args>
+%#----------------------------------------------------------------------------
+<%once>
+	use DNALC::Pipeline::App::Phylogenetics::ProjectManager ();
+	use DNALC::Pipeline::Phylogenetics::Pair ();
+	use DNALC::Pipeline::Phylogenetics::DataFile ();
+	use DNALC::Pipeline::Utils qw/lcs_name/;
+	use File::Slurp qw(read_file);
+</%once>
+%#----------------------------------------------------------------------------
+<%init>
+	$r->content_type("text/html");
+	my ($status, $msg) = ("error", "");
+	$pid =~ s/\D+//g;
+	my $pm = DNALC::Pipeline::App::Phylogenetics::ProjectManager->new($pid);
+	my $proj = $pm->project;
+	my @pairs = ();
+	my @seqs = ();
+	my ($pair) = undef;
+	my $seq1;
+	my $seq2;
+	my $display_name_1;
+	my $display_name_2;
+	my $consensus; 
+	my $alignment;
+	my @alignment_line_1;
+	my @alignment_line_2;
+	my ($qstr1, $qstr2);
+
+	unless ($proj) {
+		$msg = "Project not found."
+	}
+	else {
+		@pairs = $pm->pairs;
+		if ($pair_id) {
+			($pair) = grep {$_->id == $pair_id} @pairs;
+		}
+		else {
+			$pair = $pairs[0];
+		}
+		@seqs = $pair->paired_sequences if $pair;
+		$alignment = $pair->alignment if $pair;
+		my @aln_lines = sort ((grep {!/^Consensus\s*:/} split('\n', $alignment))[0, 1]);
+
+		#@alignment_line_1 = split(': ', $aln_lines[0]);
+		#@alignment_line_2 = split(': ', $aln_lines[1]);
+		#@alignment_line_2 =(split(': ',(split('\n', $alignment))[1]));
+		#($display_name_1, $seq1) = ($alignment_line_1[0], $alignment_line_1[1]);
+		#($display_name_2, $seq2) = ($alignment_line_2[0], $alignment_line_2[1]);
+		($display_name_1, $seq1) = split(': ', $aln_lines[0]);
+		($display_name_2, $seq2) = split(': ', $aln_lines[1]);
+		
+		if ($pair) {
+			$consensus = $pair->consensus;
+			
+			my @pseq = sort {$a->seq->display_id cmp $b->seq->display_id } $pair->paired_sequences;
+
+			# Get Quality Scores
+			my ($df1) = DNALC::Pipeline::Phylogenetics::DataFile->search(id => $seqs[0]->seq_id->file_id );
+			my ($df2) = DNALC::Pipeline::Phylogenetics::DataFile->search(id => $seqs[1]->seq_id->file_id );
+
+			my @qs1 = $df1->file_type eq "trace" ? $df1->quality_values() : ();
+			my @qs2 = $df2->file_type eq "trace" ? $df2->quality_values() : ();
+			
+			my @qs1x = my @qs2x = ();
+			my $i = $seqs[0]->seq_id->start_pos + $pair->f_trim;
+			my $j = $seqs[1]->seq_id->start_pos + $pair->f_trim;
+
+			if ($pseq[0]->strand eq "R") {
+				$i = length($seqs[0]->seq_id->right_trim) + $pair->r_trim;
+				@qs1 = reverse @qs1;
+			}
+			if ($pseq[1]->strand eq "R") {
+				$j = length($seqs[1]->seq_id->right_trim) + $pair->r_trim;
+				@qs2 = reverse @qs2;
+			}
+
+			for (0 .. length($consensus) - 1) {
+				if (substr($seq1, $_, 1) ne "-") {
+					push @qs1x, $qs1[$i++];
+				}
+
+				if (substr($seq2, $_, 1) ne "-") {
+					push @qs2x, $qs2[$j++];
+				}
+
+			}
+			
+			$qstr1 = join ",", @qs1x;
+			$qstr2 = join ",", @qs2x;
+		}
+	}
+
+</%init>
+<%attr>
+	js => ['prototype-1.6.1.js', 'phylogenetics.js', 'prototip/prototip.js']
+	load_ie_canvas => 0
+</%attr>
+%#----------------------------------------------------------------------------

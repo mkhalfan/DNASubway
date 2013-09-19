@@ -1,0 +1,22 @@
+{
+	id => 'dnalc-fxtrim-stampede-0.0.13.2u1',
+	#id => 'dnalc-fxtrim-lonestar-0.0.13.2u1',
+	name => 'fastx-trimmer',
+	desc => 'FASTQ/A short-reads pre-processing tools',
+	inputs => [
+		{ id => 'seq1', display_type => 'show_files', hidden => 0, label => 'File to trim' },
+	],
+	parameters => [
+		{ id => 'quality_threshold', label => '<b>quality_trimmer:</b> Minimum quality', 'value' => '20' },
+		{ id => 'min_length', label => '<b>quality_trimmer:</b> Minimum trimmed read length', 'value' => '20' },
+
+		{ id => 'min_quality', label => '<b>quality_filter:</b> Minimum quality', 'value' => '20' },
+		{ id => 'percent_bases', label => '<b>quality_filter:</b> &#37; bases with >= minimum quality &#32;', 'value' => '50' },
+	],
+	_task_name => 'ngs_fxtrimmer',
+	_input_only_files => 1,
+	_input_file_filter => qr/\.(fq|fastq)(\.gz|\.bz2)?$/i,
+	_output_dir => qr/fastx_out/,
+	_output_files => qr/\.(fastq|zip)/,
+	_on_success => 'handle_trimmed_file',
+}

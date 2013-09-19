@@ -1,0 +1,196 @@
+% if ($warning) {
+        <script type="text/javascript">
+                var warning = "<% $warning %>";
+                top.show_messages(top.warning_message(warning));
+		resetSelects();
+        </script>
+% }
+<div class="container_data1">
+	<div id="container_data_line_bg"><a href="#" onclick="document.location.replace('/project/ngs/tools/job_list_cuffdiff?pid=<% $pid %>&noredirect=1')">< Back</a></div>
+% if ($app) {
+<div>New job using application <strong><% $app %></strong>:</div>
+
+%#	--------------------------- DEBUG ---------------------------------------
+%#		<& ./.comp/app_debug, app => $app &>
+%#	--------------------------- /DEBUG --------------------------------------
+<form method="post" name="cuffdiff_form" onsubmit="return ngs.check_cuffdiff()">
+	<div id="launch_job_table_holder">	
+		<table id="launch_job_table">
+			<& ./.comp/job_options, form => $form &>
+			<& ./.comp/build_app_form, pm => $pm, app => $app, form => $form, flagged => $flagged &>
+		</table>
+	</div>
+	<p style="text-align:center" id="button_wrapper">
+<input type="button" id="cancel" value="Cancel" onclick="document.location.replace('/project/ngs/tools/job_list_cuffdiff?pid=<% $pid %>&noredirect=1')" /> | 
+        <input type="submit" value="Submit" id="submit" />
+	</p>
+	<p style="text-align:center;display:none;" id="processing"> Processing... &nbsp;<img src="/images/ajax-loader-2.gif" style="width:12px;padding-left:5px;"></p>
+</form>
+<!-- 
+	<pre style="float:left">
+	<div>
+		status: <% $st->{status} %> <% $st->{message} ? " » " . $st->{message} : "" %>
+	</div>
+-->
+%#	<% Dumper($form) %>
+
+</pre>
+% } else {
+	No application found for conf file: 'NGS_CUFFDIFF'.
+% }
+</div> <!-- end container_data1 --> 
+
+<%args>
+	$pid => 0
+</%args>
+<%once>
+	use Data::Dumper;
+	use DNALC::Pipeline::Utils qw(clean_query);
+	use DNALC::Pipeline::App::NGS::ProjectManager ();
+	use DNALC::Pipeline::Config ();
+	use DNALC::Pipeline::User ();
+
+</%once>
+<%init>
+
+	$m->session->{pipeline} ||= {};
+	my $s = $m->session->{pipeline};
+
+	#my $path_info = $r->path_info;
+	#if ($r->path_info =~ /\/(\d+)$/) {
+	#	$pid = $1;
+	#}
+
+	my $apif = iPlant::FoundationalAPI->new(
+			user => $s->{username},
+			token => $s->{api_token},
+			debug => 0,
+		);
+	my $pm = DNALC::Pipeline::App::NGS::ProjectManager->new({project => $pid, debug => 1});
+	$pm->api_instance($apif) if $apif;
+	my $proj = $pm->project;
+
+	# project's owner
+	my $is_owner = $s->{user_id} == $proj->user_id if $proj;
+
+	my $app;
+	my $st = $pm->app("NGS_CUFFDIFF");
+
+	if ($st->{status} eq "success") {
+		$app = $st->{app};
+	}
+	else {
+		#print STDERR $st->{status}, " ", $st->{message}, $/;
+	}
+
+	my $app_inputs = $app->inputs if $app;
+	#print STDERR "app_inputs = ", Dumper( $app_inputs ), $/;
+	#my $app_params = $app->parameters if $app;
+
+	my $form = {};
+	my $flagged = {}; # to report errors
+	my $warning;
+	if ($r->method eq "POST") {
+		$form = \%ARGS;
+		
+		$form->{jobName} =~ s|/+||g;
+		
+		if ($form->{jobName} =~ /[^-_\w\d]/){
+			$form->{jobName} =~ s/\s+/_/g;
+			$form->{jobName} =~ s/[^-_\w\d]//g;
+		}
+		
+		$form->{jobName} ||= 'cd' . int(rand()*1000); 
+
+		for my $p (@{$app->parameters}) {
+			if ($p->{hidden} && !defined $form->{$p->{id}}) {
+				$form->{$p->{id}} = $p->{value} || $p->{defaultValue};
+			}
+			#if ($p->{id} eq "mate_inner_dist") {
+			#	print STDERR "app_th: p = ", $p->{validator}, $/;
+			#}
+		}
+
+		# what do we do when we don`t get the paths?!
+  	        $form->{ref_seq} = $pm->project_genome_path;
+                $form->{ref_gtf} = $pm->project_annotation_path;
+
+		if ($form->{notify_user}) {
+			$form->{callbackUrl} = $s->{user_email};
+		}
+
+		$form->{archive} = "true";
+		my $cf = DNALC::Pipeline::Config->new;
+		$form->{requestedTime} = $cf->cf('NGS_CUFFDIFF')->{_requestedTime} || '6:00:00';
+		
+		if (grep {defined $_} values %$form) {
+			my @file_ids = map {$form->{$_}} grep {$_ =~ /^sam\d_f\d|query\d+/g && $form->{$_} ne ""} sort keys %$form;
+			my @files = $pm->data;
+			my %seen;
+			for my $fid (@file_ids) {
+				my ($file_name) = map {$_->file_name} grep {$_->id == $fid } @files;
+				my $type = $file_name =~ /bam$/ ? 'BAM' : 'GTF';
+				$file_name =~ s/-fx\S+$//;
+
+				if ($seen{$type}->{$file_name}) {
+					$warning = "Input file $file_name is duplicated in the selected $type files<br>";
+					$warning .= "Please use only one processed $type file for each Fastq input.";
+					last;
+				}
+				else {
+					$seen{$type}->{$file_name} = 1;
+				}
+			}
+			
+			# Check of there are enough labels for the number of samples
+			$form->{labels} =~ s/\s+/_/g;
+			my $num_labels = my @labels = split(',', $form->{labels});
+			my %samples = map {$_ => 1} grep {$form->{$_} && s/^(sam\d+)\S+/$1/} keys %$form;
+			my $samples = keys %samples;
+			if (!$num_labels) {
+				$form->{labels} = "sample1";
+				for (2..$samples) {
+					$form->{labels} .= ",sample$_"; 
+				}
+			}				
+			elsif ($num_labels != %samples) {
+				$warning .= "The number of labels ($form->{labels}) is not equal to the number of samples.<br>";
+				$warning .= "Please enter a list of sample labels in the avdanced parameters.";
+			}
+
+			# clear select menus if we are forcing a re-submit
+			if ($warning) {
+				for my $select (grep {/^sam\d+/} keys %$form) {
+					$form->{$select} = '';
+				} 
+			}
+			#print STDERR Dumper $form;
+		}
+
+		unless ($warning) {
+			$st = $pm->submit_job('ngs_cuffdiff', $app, $form);
+	
+			if ($st->{status} ne "success") {
+				if ($st->{message} =~ /missing required/i && $st->{data} && %{$st->{data}}) {
+					for (keys %{$st->{data}}) {
+						$flagged->{$_} = 1;
+					}
+				}
+	
+			}
+			elsif ($st->{data}) {
+				# redirect to our job list page
+				$m->redirect("./job_list_cuffdiff?launched=1;pid=" . $pid);
+			}
+		}	
+		elsif ($app) {
+			for my $p (@{$app->parameters}) {
+				unless ($p->{hidden}) {
+					$form->{$p->{id}} = $p->{value} || $p->{defaultValue};
+				}
+			}
+		}			
+	}	
+		
+		
+</%init>

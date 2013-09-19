@@ -1,0 +1,32 @@
+{status:'<% $status|js%>', message:'<% $msg |js%>'}
+<%args>
+	$pid => 0
+</%args>
+<%once>
+	use DNALC::Pipeline::App::Phylogenetics::ProjectManager ();
+	use DNALC::Pipeline::Config();
+	use Gearman::Client ();
+	use Storable qw/thaw nfreeze/;
+</%once>
+<%init>
+	my ($status, $msg) = ("error", "");
+	my $s = $m->session->{pipeline};
+
+	$pid =~ s/\D+//g;
+	my $pcf = DNALC::Pipeline::Config->new->cf('PIPELINE');
+	my $client = Gearman::Client->new;
+	my $sx = $client->job_servers(@{$pcf->{GEARMAN_SERVERS}});
+	
+	my $params = nfreeze( {pid => $pid, user_id => $s->{user_id}});
+	my $rc = $client->do_task( 'phy_consensus' =>  $params);
+	$rc = thaw($$rc);
+	if ($rc && defined $rc->{status}) {
+		$status = $rc->{status};
+		$msg = $rc->{msg};
+	}
+
+</%init>
+
+<%flags>
+	inherit => undef
+</%flags>

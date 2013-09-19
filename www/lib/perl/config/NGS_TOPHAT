@@ -1,0 +1,36 @@
+{
+	id => 'dnalc-tophat-stampede-2.0.8u2',
+	name => 'tophat',
+	desc => 'A spliced read mapper for RNA-Seq',
+	inputs => [
+		{ id => 'query1', display_type => 'show_files', label => 'File to process'},
+		{ id => 'query2', hidden => 1, },
+		{ id => 'genome', display_type => 'genome', hidden => 1},
+		{ id => 'annotation', hidden => 1 },
+	],
+	parameters => [
+		{ id => 'bowtie_version', label => 'Bowtie version', 'value' => '2' },
+		{ id => 'library_type', label => 'Library type', 'value' => 'fr-unstranded' },
+		{ id => 'mate_inner_dist', label => 'Mate inner distance', 'value' => '200' },
+		{ id => 'mate_std_dev', label => 'Mate distance stdev', 'value' => '20' },
+		{ id => 'max_deletion_length', label => 'Maximum deletion length', 'value' => '3' },
+		{ id => 'max_insertion_length', label => 'Maximum insertion length', 'value' => '3' },
+		{ id => 'max_intron_length', label => 'Maximum intron length', 'value' => '10000' },
+		{ id => 'max_multihits', label => 'Maximum multiple hits to genome', 'value' => '20' },
+		{ id => 'min_anchor_length', label => 'Minimum anchor length', 'value' => '8' },
+		{ id => 'min_intron_length', label => 'Minimum intron length', 'value' => '70' },
+		{ id => 'min_isoform_fraction', label => 'Minimum isoform fraction', 'value' => '0.15' },
+		{ id => 'read_mismatches', label => 'Maximum allowed mismatches', 'value' => '2' },
+		{ id => 'segment_length', label => 'Segment length', 'value' => '20' },
+		{ id => 'splice_mismatches', label => 'Splice mismatches tolerated', 'value' => '0' },
+	],
+	_requestedTime => '4:00:00',
+	_task_name => 'ngs_tophat',
+	_input_only_files => 0,				# show only the files marked as `is_input` in the drop down selector
+	_input_file_filter => qr/\.f(ast)?q(\.gz|\.bz2)?$/, # show only the files matching this RE in the drop down selector
+	_output_dir => qr/\/tophat_out$/,          # folder to search for - here we have the output file(s)
+	_output_files => qr/\-th\d+\.bam(\.bai)?$/,  # output files we need to process
+	_propagate_input_file_name => qr/\.bam(:?\.bai)?$/,     # output file should have the same basename as the input
+	_on_success => 'handle_download_output',
+
+}

@@ -1,0 +1,278 @@
+<div id="phy-pair-builder">
+<style type="text/css">
+input[type="checkbox"] {
+	border: none;
+	margin: 0;
+	padding: 0;
+	vertical-align:middle;
+}
+</style>
+% if ($ok == 1) {
+<script type="text/javascript">
+%	if (@pairs) {
+	top.phy.set_status("phy_consensus", "not-processed");
+	top.phy.set_status("phy_pair", "done");
+%	} else {
+	//top.phy.set_status("phy_pair", "not-processed");
+	top.phy.set_status("phy_consensus", "disabled");
+%	}
+	top.phy.close_window("pair");
+</script>
+% }
+%#pairs: <% Dumper(\@pairs) %>
+	<div id="container_data_line">&nbsp;</div>
+%	unless (@pairs) {
+	<div style="text-align: right;font-size: small;">
+%#		<a id="try_auto" href="#" onclick="phy.auto_pair();">Try auto pairing </a>
+%#		<a id="swith_manual" href="#" onclick="document.location.reload();" style="display: none;">Switch to manual pairing</a>
+	</div>
+%	}
+	<div id="seqids">
+		<pre style="font-family:arial;font-size:0.8em;">
+% $cnt = 0;
+% for (@sequences) {
+%	my $class = $_->{type} eq "p" ? $pair_classes[$cnt++] : "";
+<div class="<% $class %>" id="id_<%$_->{s}%>"><% $_->{s}->display_id |html%></div>\
+% }
+		</pre>
+	</div>
+%#-----------------------------------------------------
+	<div id="seqs">
+		<pre>
+% $cnt = 0;
+% for (@sequences) {
+%	my $class = $_->{type} eq "p" ? $pair_classes[$cnt++] : "";
+<div class="<% $class %>" id="<%$_->{s}%>"><% $_->{s}->seq || ""|html %><% $_->{s}->seq  ? "" : " " %></div>\
+% }
+		</pre>
+	</div>
+%#-----------------------------------------------------
+	<div id="seqops">
+% if ($is_owner) {
+		<pre>
+% $cnt = 0;
+% for (@sequences) {
+%	my $is_pair = $_->{type} eq "p";
+%	my $class = $is_pair ? $pair_classes[$cnt++] : "";
+%	my $dir = $_->{type} eq "s" ? "F" : $_->{strand};
+<div class="<% $class %>" id="opdiv_<% $_->{s}->id %>"><a href="javascript:;" id="rc<% $_->{s}->id %>"\
+ onclick="phy.toggle_strand(this);"><% $dir %></a>\
+ <input type="checkbox" id="op<% $_->{s} %>" <% $is_pair ? "checked=\"checked\"" : ""%>/>\
+</div>\
+% }
+</pre>
+% }
+	</div>
+	
+%#-----------------------------------------------------	
+	<div id="seqops2">
+% if ($is_owner) {
+		<pre>
+% $cnt = 0;
+% for (@sequences) {
+%	my $is_pair = $_->{type} eq "p";
+%	my $class = $is_pair ? $pair_classes[$cnt] : "";
+% 	if ($is_pair && $cnt++ % 2 == 0) {
+<div class="<% $class %>" id="pb<% $_->{s}->id %>" pair_id="<% $_->{pair_id} %>">\
+<a style="text-decoration:none;color:black;" href="javascript:;" onclick="phy.pop_from_pair(<%$_->{s}->id%>);" title="Break this pair">x</a></div>\
+% 	}
+% }
+</pre>
+% }
+	</div>	
+%#-----------------------------------------------------	
+	<div id="right_sidebar_container" class="right_sidebar_container">
+%#	unless (@pairs) {
+%	if (!@pairs) {
+		<div id="auto_pair_box" class="blue_sidebar_box_container" style="display:block;margin-bottom:10px;">
+			<div class="blue_sidebar_box_title">
+				<img src="/images/FR-icon.jpg" style="vertical-align: middle;padding-right:7px;" /><strong>Auto Pair</strong>
+			</div>
+			<div class="blue_sidebar_box_body">
+				<span id="try_auto"><a href="#" onclick="phy.auto_pair();">Try auto pairing</a> <img src="/images/question-icon.png" id="auto-pair-help" align="top"/></span>
+				<a href="#" id="switch_manual" style="display:none;" onclick="document.location.reload();">Switch to manual pairing</a>
+				<a href="#" id="reset" style="display:none;" onclick="document.location.reload();">Reset</a>
+			</div>
+		</div>
+%	}
+%	if(0) {
+		<div id="pair_builder_toolbox" class="blue_sidebar_box_container" style="display:block;margin-bottom:10px;">
+			<div class="blue_sidebar_box_title">
+				<img src="/images/FR-icon.jpg" style="vertical-align: middle;padding-right:7px;" /><strong>Pair Builder</strong>
+			</div>
+			<div class="blue_sidebar_box_body">
+				<strong>13</strong> pairs<br />
+				<strong>12</strong> unpaired sequences<br /><br />
+				<a href="#" id="switch_manual" onclick="document.location.reload();">Break All Pairs</a><br />
+				<a href="#" id="switch_manual" onclick="document.location.reload();">Close Window</a>
+			</div>
+		</div>
+%	}
+		<div id="selection_changed" class="blue_sidebar_box_container" style="display:none;">
+			<div class="blue_sidebar_box_title">
+				<img src="/images/info.png" style="vertical-align: middle;padding-right:7px;" /><strong>Save Your Pairs</strong>
+			</div>
+			<div class="blue_sidebar_box_body">
+				Once you have updated your pairs, you must save them.<br />
+				<input type="submit" id="save_selection" value="Save" class="bluebtn" onclick="javascript:phy.do_pair();"/>
+			</div>
+		</div>
+	</div>
+%#-----------------------------------------------------
+
+	<div style="clear: both;"></div>
+% if ($is_owner) {
+%#	if (!@pairs) {
+%#	<div style="text-align: center;">
+%#		<input type="button" id="do_pair" value="Save" onclick="javascript:phy.do_pair();"/>
+%#	</div>
+%# 	}
+	<form method="post" id="forma1">
+		<input type="hidden" id="step" value="1" />
+		<input type="hidden" id="has_pairs" value="<% @pairs ? 1 : 0 %>" />
+		<input type="hidden" id="rm_pairs" name="rm_pairs" value="" />
+		<input type="hidden" id="data" name="data" value='<% $json->encode(\@paired_seqids) %>' />
+	</form>
+% }
+
+	<div id="container_data_lineBottom">&nbsp;</div>
+</div><!-- END of container_data2-->
+
+<script type="text/javascript">
+Event.observe(window, Prototype.Browser.IE ? 'load' : 'dom:loaded', function() {
+new Tip('auto-pair-help', "Auto Pair will attempt to pair your sequences for you. Please note this may not always work, in which case you will need to pair your sequences manually.", {
+		className: 'blue_help',
+	});
+	});
+</script>
+
+<%args>
+	$rm_pairs => ''
+	$data => ''
+	$pid => 0
+	$ok => 0
+</%args>
+<%once>
+	#use diagnostics;
+	use File::Slurp qw/read_file/;
+	use DNALC::Pipeline::App::Phylogenetics::ProjectManager ();
+	use DNALC::Pipeline::Config ();
+	use DNALC::Pipeline::User ();
+	use JSON::XS ();
+	use Data::Dumper;
+</%once>
+<%init>
+	$r->content_type("text/html");
+	my $s = $m->session->{pipeline};
+
+	my $json = JSON::XS->new->utf8;
+	my @files = ();
+	my @pair_classes = ();
+
+	my $pm = DNALC::Pipeline::App::Phylogenetics::ProjectManager->new($pid);
+	my $proj = $pm->project;
+	unless ($proj) {
+		#$m->comp('/_message_add', 'Project not found!', 'error');
+		#$m->redirect('/project/');
+		print "Project not found!";
+		return;
+	}
+
+	my $user = DNALC::Pipeline::User->retrieve($proj->user_id);
+	my $is_owner = $s->{user_id} == $user->user_id;
+
+	my @sequences = ();
+	my @pairs = $pm->pairs;
+	my @paired_seqids = map {[ map {$_->seq->id} $_->paired_sequences]} @pairs;
+	my $cnt = 0;
+	for my $pair (@pairs) {
+		push @sequences, map {
+					{s => $_->seq, type => "p", strand => $_->strand, pair_id => $pair}
+				} $pair->paired_sequences;
+		push @pair_classes, $cnt++ % 2 ? ("paired-light", "paired-light") : ("paired-dark", "paired-dark");
+	}
+	
+	push @sequences, map {
+				{s => $_, type => "s"}
+			} $pm->initial_sequences;
+	
+	if ($r->method eq "POST") {
+		$rm_pairs =~ s/,$//g;
+		$rm_pairs =~ s/[^\d,]//g;
+		my @to_rm = split /,/, $rm_pairs;
+		if (@to_rm) {
+			for  my $prm (@pairs) {
+				for my $pair_id (@to_rm) {
+					if ($prm->id == $pair_id) {
+						$prm->delete;
+						last;
+					}
+				}
+			}
+		}
+
+		my @new_pairs = ();
+		if ($data) {
+			my $decoded_data = $json->decode($data);
+			unless (ref $decoded_data eq "ARRAY") {
+				print "Error: Invalid data received!";
+				return;
+			}
+
+			# check to see if we have new data/pairs
+			for my $d (@$decoded_data) {
+				my $found = 0;
+				for my $pair (@pairs) {
+					next if $pair->isa("Class::DBI::Object::Has::Been::Deleted");
+					my @seq = $pair->paired_sequences;
+					if (($seq[0]->seq_id == $d->[0][0] || $seq[1]->seq_id == $d->[0][0])
+						&&
+						($seq[0]->seq_id == $d->[1][0] || $seq[1]->seq_id == $d->[1][0]))
+					{
+						#print STDERR "it matches: ", $seq[0]->seq_id,"/",$seq[1]->seq_id,  "==", $d->[0][0], "/", $d->[1][0], $/;
+						$found = 1;
+						# CHECK strand..
+						last;
+					}
+				}
+				# is must be a new pair
+				unless ($found) {
+					#print STDERR "new pair: ", $d->[0][0], "/", $d->[1][0], $/;
+					push @new_pairs, $d;
+				}
+			}
+
+			if (@new_pairs) {
+				for my $p (@new_pairs) {
+					my $pair = $pm->add_pair(
+						{seq_id => $p->[0]->[0],
+						 strand => $p->[0]->[1] ? "R" : "F",
+						},
+						{seq_id => $p->[1]->[0],
+						 strand => $p->[1]->[1] ? "R" : "F",
+						},
+					);
+				}
+				$pm->set_task_status("phy_pair", "done");
+			}
+		}
+		
+		# if changes have been made...
+		if (@to_rm or @new_pairs) {
+			@pairs = $pm->pairs;
+			unless (@pairs) {
+				if ($pm->get_task_status("phy_pair")->name eq "done") {
+					$pm->set_task_status("phy_pair", "not-processed");
+				}
+				if ($pm->get_task_status("phy_consensus")->name eq "done") {
+					$pm->set_task_status("phy_consensus", "not-processed");
+				}
+			}
+		}
+		$m->redirect("./pair?pid=" . $pid . ';ok=1');
+	}
+</%init>
+<%attr>
+	js => ['prototype-1.6.1.js', 'phylogenetics.js', 'prototip/prototip.js']
+</%attr>
+

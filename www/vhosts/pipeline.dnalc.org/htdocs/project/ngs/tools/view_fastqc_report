@@ -1,0 +1,56 @@
+<div id="" class="container_data1" style="width:97%">
+	<div id="container_data_line_bg">
+		<a href="javascript:;" onclick="document.location.replace('/project/ngs/tools/<% $sender %>?pid=<% $pid %>')">< Back</a>
+	</div>
+%	if (!$error){
+	<iframe src="<% $qc_report %>" frameborder=0 style="width:100%;height:400px"></iframe> 
+%	}
+%	else {
+		<% $error %>	
+%	}
+	<div style="clear:both;"></div>
+</div>
+
+%#-----------------------------------------------------------------
+<%args>
+	$pid => 0
+	$jid => 0
+	$sender => ''
+	$f => 0
+</%args>
+
+<%once>
+	use DNALC::Pipeline::App::NGS::ProjectManager ();
+	use DNALC::Pipeline::NGS::DataFile ();
+</%once>
+
+<%init>
+	my $pm = DNALC::Pipeline::App::NGS::ProjectManager->new({project => $pid, debug => 0});
+
+	my $qc_report;
+	my $error;
+	
+	my $proj = $pm->project;
+	unless ($proj) {
+		$error = 'Error: Project not found!';
+	}
+	else {
+		if ($sender eq "job_list_fxtrimmer") {
+			# NOTE: we are (temporarily) storing the job ID in the trimmed_file_id column for the trimmed file in 
+			# the DataFile table when we add it to the DB (in ProjectManager). Here we use the job ID to retrieve 
+			# the trimmed file, from which we obtain the qc_file_id.
+			my ($trimmed_file) = DNALC::Pipeline::NGS::DataFile->search(trimmed_file_id => $jid);
+		
+			if ($trimmed_file) {
+				$qc_report = $trimmed_file->qc_file_id ? $m->comp("../../.comp/filepath_to_web", file => $trimmed_file->qc_report, just_return => 1) : 0;
+			}
+		}
+		elsif ($sender eq "manage_data") {
+			my $file = DNALC::Pipeline::NGS::DataFile->retrieve($f);
+			$qc_report = $file->qc_file_id ? $m->comp("../../.comp/filepath_to_web", file => $file->qc_report, just_return => 1) : 0;
+		}
+		else {
+			$error = 'Error: Sender not recognized';
+		}
+	}
+</%init>

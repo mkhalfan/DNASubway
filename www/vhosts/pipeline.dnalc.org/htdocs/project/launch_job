@@ -1,0 +1,112 @@
+<%args>
+	$t => ''
+	$pid => 0
+</%args>
+%#-------------------------------------------------
+<%once>
+	use DNALC::Pipeline::Project ();
+	use DNALC::Pipeline::Config ();
+	use DNALC::Pipeline::App::WorkflowManager ();
+	use DNALC::Pipeline::Utils qw(isin);
+	use DNALC::Pipeline::CacheMemcached ();
+	use Crypt::Simple;
+	use URI::Escape;
+	use Data::Dumper;
+
+	use Gearman::Client ();
+
+	my @routines = qw/trna_scan augustus fgenesh repeat_masker/;
+</%once>
+%#-------------------------------------------------
+<%init>
+	$r->content_type('text/plain');
+
+	$m->session->{pipeline} ||= {};
+	my $s = $m->session->{pipeline};
+
+	my $warn_message = '';
+
+	unless ($t) {
+		print "{'status':'error', 'message': 'Task unknown.'}";
+		return;
+	}
+
+	my $mc_key = "status-$t-$pid";
+	my $memcached = DNALC::Pipeline::CacheMemcached->new;
+	if ($memcached->get($mc_key) eq 'processing') {
+		print "{'status':'error', 'message':'Task is being processed.'}";
+		return;
+	}
+
+	my $proj = DNALC::Pipeline::Project->retrieve($pid);
+	unless ($proj) {
+		print "{'status':'error', 'message':'Project unknown.'}";
+		return;
+	}
+
+	if (!$s->{logged_in}) {
+		print "{'status':'error', 'message':'Your session expired. Please <a href=\"/\">log in</a>.'}";
+		return;
+	}
+
+	if ($proj->user_id != $s->{user_id}) {
+		print "{'status':'error', 'message':'Analysis only available to project owner.'}";
+		return;
+	}
+
+	my $wfm = DNALC::Pipeline::App::WorkflowManager->new( $proj );
+	if ($t ne 'repeat_masker') {
+		if ($wfm->get_status('repeat_masker')->name ne "done" ) {
+			print "{'status':'error', 'message':'Repeat Masker must be run first.'}";
+			return;
+		}
+	}
+
+	if ($t eq 'fgenesh' && $proj->sample eq "" ) {
+		if ($s->{username} =~ /^guest_/i) {
+			print "{'status':'error', 'message':'Guest users may not run FGenesH on uploaded data.'}";
+			return;
+		}
+
+		my $cf = DNALC::Pipeline::Config->new->cf('FGENESH');
+
+		if ($cf->{RUN_LIMIT_PER_DAY} && $s->{username} !~ /^guest_/i ) {
+			#print STDERR "We have limits per day: ", $cf->{RUN_LIMIT_PER_DAY}, $/;
+			my $runs = $wfm->count_runs(task => 'fgenesh');
+			if ($runs >= $cf->{RUN_LIMIT_PER_DAY}) {
+				print "{'status':'error', 'message':'$cf->{RUN_LIMIT_PER_DAY_MSG_EXCEEDED}'}";
+				return;
+			}
+			elsif ($runs >= $cf->{RUN_LIMIT_PER_DAY}/2) {
+				$warn_message = $cf->{RUN_LIMIT_PER_DAY_MSG_WARN};
+				$warn_message =~ s/__\$runs__/$runs+1/e;
+			}
+		}
+	}
+
+	my $pcf = DNALC::Pipeline::Config->new->cf('PIPELINE');
+	my $client = Gearman::Client->new;
+	$client->job_servers(@{$pcf->{GEARMAN_SERVERS}});
+	my $h = $client->dispatch_background( $t => $pid);
+	if ($h) {
+		$h = uri_escape(encrypt($h));
+		$memcached->set($mc_key, 'processing');
+	}
+	print STDERR  "Launched [$t], h = ", $h, $/;
+</%init>
+%#-------------------------------------------------
+<%flags>
+	inherit => undef
+</%flags>
+%#-------------------------------------------------
+% if ($h) {
+{'status':'success', 'h':'<% $h %>'\
+%	if ($warn_message) {
+, 'warning' : '<% $warn_message %>'\
+%	}
+}
+% } else {
+{'status':'error', 'message':'Unable to submit job request.'}
+% }
+%#-------------------------------------------------
+%# vim: ft=mason

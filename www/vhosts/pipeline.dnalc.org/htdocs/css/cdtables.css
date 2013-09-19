@@ -1,0 +1,99 @@
+html{
+	font-family:arial,monospace;
+}
+
+h2{
+	font-size:18px;
+
+}
+#container_data_line_bg {
+	background-color:#C2DBF3;
+	padding:2px;
+	font-size:12px;
+	margin-bottom:10px;
+	font-weight:bold;
+}
+
+#container_data_line_bg  a{
+	text-decoration:none;
+	color:#123456
+}
+
+#cd_table, table.dataTable thead {
+	border-spacing:0;
+	font-size:12px;
+}
+
+#cd_table a{
+	text-decoration:none;
+	font-weight:bold;
+	color:#3C679A;
+}
+
+#cd_table th, table.dataTable thead th{
+	font-weight: bold;
+	background-color:#e8eef7;
+	border-bottom: 1px solid #989b9f;
+	border-top: 1px solid #989b9f;
+	white-space:nowrap;
+	text-align:left;
+	font-size:14px;
+}
+
+#cd_table tr td {
+	vertical-align: top;
+	padding: 3px 10px;
+}
+
+#cd_table tr.odd, #cd_table tr.odd td.sorting_1 {
+	background-color:white;
+}
+
+#cd_table tr.even, #cd_table tr.even td.sorting_1{
+	background-color:#e8eef7;
+}
+
+#cd_table_filter {
+	margin-bottom:5px;
+	float:left;
+	font-size:12px;
+}
+
+#cd_table_info {
+	margin-top:5px;
+	font-size:12px;
+}
+
+#export-csv {
+	width:200px;
+	float:right;
+	margin:5px;
+}
+#export-csv a{
+	text-decoration:none;
+	font-weight:bold;
+	color:#3C679A;
+	font-size:12px;
+}
+
+#export-csv a img {
+	border:0;
+	padding-bottom:10px;
+	padding-right:5px;
+}
+table.dataTable thead th.sorting {
+	background: url("/images/v2/sort_both.png") no-repeat scroll right center transparent;
+	background-color: #e8eef7
+}
+table.dataTable thead th.sorting_asc {
+	background: url("/images/v2/sort_asc.png") no-repeat scroll right center transparent;
+	background-color: #e8eef7;
+	color:#3C679A;
+}
+table.dataTable thead th.sorting_desc {
+	background: url("/images/v2/sort_desc.png") no-repeat scroll right center transparent;
+	background-color: #e8eef7;
+	color:#3C679A;
+}
+
+

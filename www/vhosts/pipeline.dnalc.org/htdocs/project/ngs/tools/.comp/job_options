@@ -1,0 +1,42 @@
+	<tbody id="app_info">
+		<tr>
+			<td colspan="2" class="label_header">Job options</td>
+		</tr>
+<!--
+		<tr>
+			<td>Job name:</td>
+			<td><input type="text" id="jobName" name="jobName" value="<% $form->{jobName} |html %>" /></td>
+		</tr>
+-->
+% if (0) {
+		<tr>
+			<td>Requested time:</td>
+			<td><input type="text" id="requestedTime" name="requestedTime" value="<% $form->{requestedTime} || q{0:15:00}|html %>" /></td>
+		</tr>
+		<tr>
+			<td>Memory:</td>
+			<td><input type="text" id="memory" name="memory" value="<% $form->{memory} || q{1G}|html %>" /></td>
+		</tr>
+		<tr>
+			<td><sup>*</sup>Processors:</td>
+			<td>
+				<select id="processors" name="processors">
+%					for my $p (1, 2, 4, 8, 16) {
+				<option value="<% $p |html %>" <% $p == $form->{processors} ? q{selected="selected"} : q{}%>><% $p %></option>
+%					}
+				</select>
+			</td>
+		</tr>
+% }
+		<tr>
+			<td>Notify me when job ends:</td>
+			<td><input type="checkbox" id="notify_user" name="notify_user" <% $form->{notify_user} ne "yes" ? "" : "checked=\"checked\"" %> value="yes" /></td>
+		</tr>
+	</tbody>
+	
+<%args>
+	$form => undef;
+</%args>
+<%init>
+
+</%init>

@@ -1,0 +1,185 @@
+<%args>
+	#$pid => 0
+	#$target => ''
+</%args>
+<%once>
+	use DNALC::Pipeline::App::ProjectManager ();
+	use DNALC::Pipeline::Sample ();
+	use IO::File ();
+</%once>
+<%init>
+	my $path_info = $r->path_info;
+	my $s = $m->session->{pipeline};
+	$r->content_type('text/plain');
+	
+	my ($pid, $target, $lid);
+
+	my @err = ();
+
+	if ($path_info =~ /(\d+)\/(\d+)\/(\w+)\//) {
+		$pid   = $1;
+		$lid = $2;
+		$target  = $3;
+	}
+
+	my $pm = DNALC::Pipeline::App::ProjectManager->new($pid);
+	my $proj = $pm->project;
+	unless ($proj) {
+		$m->comp('/_message_add', 'Project not found!', 'error');
+		$m->redirect('/project/');
+	}
+
+	unless ($proj->sample) {
+		print "# ERROR: project not based on a sample sequence.";
+		return;
+	}
+
+	my $scf  = DNALC::Pipeline::Config->new->cf('SAMPLE');
+	my $pcf = $pm->config;
+	my $use_cache = 1;
+	
+	# only if $target is in the config file
+	unless (grep {/$target/} keys %{$scf->{export_browsers}}) {
+		print "# ERROR: invalid URL specified";
+		print STDERR "Target $target is not in the [export_browsers] list\n";
+		return;
+	}
+
+	my ($sample_link) = DNALC::Pipeline::SampleLink->search(link_id => $lid, sample_id => $proj->sample);
+	
+	unless ($sample_link) {
+		print "# ERROR: Something went wrong.";
+		print STDERR "Sample link not found: lid = ", $lid, $/;;
+		return;
+	}
+
+	my $gff_file = $pm->work_dir . "/gff3_$target.gff";
+	
+	# cache the data for 2 minutes.. it's way faster when browsing the data.
+	my $time  = time();
+	my $mtime = (stat($gff_file))[9];
+	$use_cache = 0 if $!; # drop cached data if error stat-ing file!
+	if ($use_cache && $time - 120 > $mtime) {
+		$use_cache = 0;
+	}
+
+	unless ($use_cache) {
+		my $gff3_files = $pm->get_available_gff3_files || [];
+		my @params = ();
+		for my $gff (@$gff3_files) {
+			push @params, ('-g', $gff);
+		}
+
+		if ( @params) {
+
+			my $user_annot_file = $pm->work_dir . '/user_data.gff';
+
+			my $trimmed_common_name = $pm->cleaned_common_name;
+
+			my @cmd = ($pcf->{EXE_PATH} . '/dump_user_annotations.pl', 
+							'--profile', $pm->chado_user_profile,
+							'--seqid', $trimmed_common_name,
+							'--type', 'user',
+							'--file', $user_annot_file
+						);
+			#print STDERR "@cmd", $/;
+			my $rc = system ( @cmd);
+			#print STDERR  "RC = ", $rc , $/;
+
+			if ($rc == 0 && -f $user_annot_file) {
+				#print STDERR  "User file = ", $user_annot_file, $/;
+				push @params, ('-g', $user_annot_file);
+			}
+
+			my $gff_merger = $pcf->{EXE_PATH} . '/gff3_merger2.pl';
+			#my @args = ($gff_merger, @params, '-f', $pm->fasta_file, '-o', $gff_file);
+			my @args = ($gff_merger, @params, '-o', $gff_file);
+			push (@args, '-t', $sample_link->link_start - 1, '-s', $sample_link->link_segment);
+			
+			print STDERR "@args", $/;
+
+			system (@args) && die "Error: $!\n";
+		}
+		else {
+			print "Error: No gff3 files were found! Perhaps no routine has been called.";
+		}
+	}
+	else {
+		print STDERR "Using the 'cached' version...\n";
+	}
+
+	#print $gff_file, $/;
+	if (-f $gff_file) {
+		#my $col1 = $sample->segment . ':' . $sample->start . '..' . $sample->stop;
+		if ($target =~ /gbrowse/i) {
+			print q{[gene:AUGUSTUS]
+glyph = gene
+sub_part = CDS
+fgcolor = #0f6969
+bgcolor = #0f6969
+key = DNASubway Augustus
+
+[gene:SNAP]
+glyph = gene
+fgcolor = #a5cba9
+bgcolor = #a5cba9
+key = DNASubway Snap
+
+[gene:FGenesH]
+glyph = gene
+fgcolor = #589c7f
+bgcolor = #589c7f
+key = DNASubway FgenesH
+
+[gene:user]
+glyph = gene
+fgcolor = cyan
+bgcolor = #3366ff
+key = DNASubway User genes
+
+[repeat_region:RepeatMasker]
+glyph = generic
+bgcolor = #663187
+fgcolor = #663187
+key = DNASubway Repeat Masker
+
+[match:BLASTN]
+glyph = segments
+fgcolor = #c48f0e
+bgcolor = #c48f0e
+key = DNASubway BlastN
+
+[match:BLASTN_USER]
+glyph = segments
+fgcolor = #987625
+bgcolor = #987625
+key = DNASubway BlastN User
+
+[match:BLASTX]
+glyph = segments
+fgcolor = #925732
+bgcolor = #925732
+key = DNASubway BlastX
+
+}, "\n";
+		}
+		print "##gff-version 3\n";
+
+		my $in = IO::File->new;
+		if ($in->open($gff_file, "r")) {
+			while ( my $line = <$in> ){
+				next if $line =~ /^##gff/;
+				print $line;
+			}
+		}
+		undef $in;
+	}
+	else {
+		print "Error: GFF file not found!";
+	}
+
+</%init>
+
+<%flags>
+	inherit => undef
+</%flags>

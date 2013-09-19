@@ -1,0 +1,54 @@
+{
+	ADMINS => [qw/corbel cornel hilgert mak/],
+	ADMIN_EMAIL => '"DNASubway Admin" <dnalcadmin@cshl.edu>',
+	EXE_PATH => '/var/www/bin',
+	CHADO_POOL_SIZE => 4,
+	GMOD_ROOT => '/usr/local/gmod',
+	GMOD_DUMPFILE => '/usr/local/gmod/src/ontology_only_chado_dump.sql',
+	GMOD_PROFILE => 'default',
+	GBROWSE_CONF_DIR => '/etc/httpd/conf/gbrowse.conf',
+	GBROWSE2_CONF_DIR => '/etc/gbrowse2',
+	GBROWSE_TEMPLATE => 'gbrowse.template',
+	GBROWSE_DB_DIR   => '/var/www/html/gbrowse/databases',
+	GBROWSE_URL  => '/cgi-bin/gbrowse',
+	GBROWSE2_URL  => '/cgi-bin/gb2/gbrowse',
+	enabled_routines => [qw/augustus fgenesh repeat_masker snap trna_scan blastx blastn blastn_user/],
+	web_project_dir => '/files/projects_files',
+	project_dir => '/var/www/vhosts/pipeline.dnalc.org/var/projects',
+	upload_dir => '/var/www/vhosts/pipeline.dnalc.org/var/projects/0000',
+	upload_mime_types => ['text/plain', 'application/octet-stream', 'chemical/seq-aa-fasta'],
+	upload_max_size => 150 * 1024, # max 150 KB
+
+	GEARMAN_SERVERS => ['127.0.0.1:7003'],
+	#GEARMAN_SERVERS => ['128.196.172.201:7003'],
+	MEMCACHED_SERVERS => ['127.0.0.1:11211'],
+	LDAP_ENABLED => 0,
+	API_TOKEN_TTL => 10 * 60 * 60, # 10 hours
+
+	'user_evidence_upload_max_size' => 0,
+
+	sequence_length => 150_000,
+
+	SMTP_SERVER => "exsmtp.cshl.edu",
+	PROJECT_HOME => 'http://pipeline-dev.dnalc.org',
+	SSL_LOGIN => 0,
+	API_ENABLED => 1,
+	COMPONENT   => 'The Stampede HPC cluster',
+	APOLLO_USERCONF_DIR => '/var/www/vhosts/pipeline.dnalc.org/var/apollo_userconf',
+	APOLLO_WRITE_DIR => '/var/www/vhosts/pipeline.dnalc.org/htdocs/files/apollo/apollo_dump',
+	APOLLO_WEB_PATH => '/files/apollo/apollo_dump',
+	APOLLO_HEADLESS => '/usr/local/apollo/bin/apollo',
+	APOLLO_PROJECT_HOME => 'http://pipeline-dev.dnalc.org',
+	APOLLO_VENDOR => 'Dolan DNA Learning Center',
+	APOLLO_DESC => 'DNALC Apollo Webstart',
+	#APOLLO_CDN => 'http://d33d42zhfxxccw.cloudfront.net/',
+	#APOLLO_CDN => 'http://gfx.dnalc.org/files/apollo/webstart/',
+	APOLLO_CDN => '',
+
+	EMAIL_TEMPLATE_DIR => '/var/www/vhosts/pipeline.dnalc.org/var/templates/email',
+	RECAPTCHA => {
+		public => '6Lfg0QoAAAAAAAogZGUShVKVNGS8MYHSfb4lDh5g',
+		private => '6Lfg0QoAAAAAALO_tMCJnpoUz_S8B0STQmQjD_Q6'
+	},
+	EOL_KEY => '9ab98ff1de0ef6115e3d004f8df764032e5fe48d',
+}

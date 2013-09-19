@@ -1,0 +1,213 @@
+<& "/_messages" &>
+<div id="stylized" class="myform">
+<form id="form" name="form" method="post" >
+<h1>Add sample</h1>
+
+<label>Organism
+<!--<span class="small">Genus species</span>-->
+</label>
+<input type="text" name="organism" id="organism" value="<% $organism | html %>"/>
+
+<label>Common name
+<!--<span class="small"></span>-->
+</label>
+<input type="text" name="common_name" id="common_name" value="<% $common_name |html%>"/>
+
+<label>Clade
+<span class="small">Nomenclature</span>
+</label>
+<div style="float:left;">
+% for (('dicotyledons', 'monocotyledons', 'other plants')) {
+%	my $i = substr $_, 0, 1;
+%	my $sel = $i eq $clade ? 'checked="checked"' : '';
+	<div><input type="radio" name="clade" value="<% $i %>" <%$sel%>/> <% $_ %></div>
+% }
+</div>
+<div style="float:left;">
+% for (('mamalia', 'birds', 'fish', 'insecta', 'nematoda')) {
+%	my $i = exists $species_map{$_} ? $species_map{$_} : substr $_, 0, 1;
+%	my $sel = $i eq $clade ? 'checked="checked"' : '';
+	<div><input type="radio" name="clade" value="<% $i %>" <%$sel%>/> <% $_ %></div>
+% }
+</div>
+<div class="spacer"></div>
+<label>Sequence data<span class="small">max 100kbp</span></label>
+<textarea name="sequence_data"><% $sequence_data|html%></textarea>
+
+	<label>Source name </label>
+	<input type="text" name="source_name" id="source_name" value="<% $source_name | html %>"/>
+	<br clear="both"/>
+	<label>Source release</label>
+	<input type="text" name="source_release" id="source_release" value="<% $source_release  | html %>"/>
+	<br clear="both"/>
+	<label>Source url<span class="small">Link to source</span></label>
+	<input type="text" name="source_url" id="source_url" value="<% $source_url | html %>"/>
+	<br clear="both"/>
+	<label>Segment <span class="small">e.g. chr1, ref02</span></label>
+	<input type="text" name="segment" id="segment" value="<% $segment | html %>"/>
+	<br clear="both"/>
+	<label>Start <span class="small">e.g. positive integer</span></label>
+	<input type="text" name="start" id="start" value="<% $start | html %>"/>
+	<br clear="both"/>
+	<label>Stop <span class="small">positiv integer &gt; Start</span></label>
+	<input type="text" name="stop" id="stop" value="<% $stop | html %>"/>
+	<br clear="both"/>
+
+<button type="submit">Add</button>
+<div class="spacer"></div>
+
+</form>
+</div>
+
+%#------------------------------------------------------------------------------
+<%args>
+	$organism => ''
+	$common_name => ''
+	$sequence_data => ''
+	$clade => ''
+
+	$source_name => ''
+	$source_release => ''
+	$source_url => ''
+	$stop => ''
+	$start => ''
+	$segment => ''
+
+</%args>
+%#------------------------------------------------------------------------------
+<%once>
+	use DNALC::Pipeline::Config ();
+	use DNALC::Pipeline::Utils qw/random_string/;
+	use DNALC::Pipeline::App::Utils ();
+	use DNALC::Pipeline::Sample ();
+	use Regexp::Common qw/URI/;
+	use Data::Dumper;
+	
+	my %species_map = (
+			mamalia => '♞',
+			birds => 'b',
+			fish => 'f',
+			insecta => 'i',
+			nematoda => 'w',
+		);
+</%once>
+%#------------------------------------------------------------------------------
+<%init>
+
+#test if admin
+
+if ($r->method eq "POST") {
+	my $cf = DNALC::Pipeline::Config->new;
+	my $pcf = $cf->cf("PIPELINE");
+	my $scf = $cf->cf("SAMPLE");
+	my ($smpl, $rc);
+	my $ok = 1;
+
+	for (qw/organism common_name clade source_name source_release 
+				source_url segment stop start /
+	) {
+		unless ($ARGS{$_}) {
+			my $lbl = ucfirst $_;
+			$lbl =~ s/_/ /g;
+			$m->comp('/_message_add', "$lbl is missing!", 'error');
+			$ok = 0;
+		}
+	}
+
+	if ($ok) {
+		if ($organism =~ /[^a-z0-9\s]/i || $common_name =~ /[^a-z0-9\s-]/i) {
+			$m->comp("/_message_add", "Organism name may contain only letters, digits and spaces", "error");
+			$ok = 0;
+		}
+		if ($start >= $stop) {
+			$ok = 0;
+			$m->comp('/_message_add', "Stop should be > Start!", 'error');
+		}
+		#if ($source_url !~ /$RE{URI}{HTTP}/) {
+		#	$m->comp('/_message_add', "Source url is not well formatted!", 'error');
+		#	$ok = 0;
+		#}
+	}
+
+	if (length ($sequence_data) > 110000) {
+		$ok = 0;
+		$m->comp('/_message_add', "Sequence data is too large! Accepting max. 100kb", 'error');
+	}
+
+	if ($ok) {
+		$sequence_data =~ s/^\s+//g;
+		$sequence_data =~ s/\s+$//g;
+		unless ($sequence_data =~ /^>/) {
+			$m->comp('/_message_add', "Sequence is not in FASTA format!", 'error');
+			$ok = 0;
+		}
+	}
+	if ($ok) { # if still ok..
+		my $file2process = $pcf->{upload_dir} . "/" . random_string(7,7);
+		my $in = IO::File->new;
+		if ($in->open($file2process, "w")) {
+			print $in $sequence_data;
+			undef $in;
+		}
+		
+		$rc = DNALC::Pipeline::App::Utils->process_input_file( $file2process );
+		#print STDERR Dumper($rc), $/;
+		unless ($rc->{status} eq "success") {
+			$ok = 0;
+			$m->comp('/_message_add', $rc->{message}, 'error');
+		}
+	}
+
+	if ($ok) { # if still $ok == 1
+	
+		$smpl = eval {
+					DNALC::Pipeline::Sample->create({
+						organism => $organism,
+						common_name => $common_name,
+						clade => $clade,
+						sequence_length => $rc->{seq}->length,
+						#sequence_data => $sequence_data,
+						source_name => $source_name,
+						source_release => $source_release,
+						source_url => $source_url,
+						segment => $segment,
+						start => $start,
+						stop =>$stop,
+						
+					});
+				};
+		if ($@) {
+			print STDERR $@, $/;
+		}
+		print STDERR "sample = ", $smpl, $/;
+		
+		if ($smpl) {
+
+			$rc->{seq}->display_id($scf->{samples_common_name});
+			my $smpl_dir = $scf->{samples_dir} . "/" . $smpl->id;
+			my $smpl_file = $smpl_dir . "/fasta.fa";
+			unless (-e $smpl_dir) {
+				mkdir $smpl_dir;
+			}
+			my $seq_out = Bio::SeqIO->new( -format => 'Fasta', 
+											-file => "> $smpl_file");
+			$seq_out->write_seq($rc->{seq});
+			
+			# store the sequence in the db
+			$smpl->sequence_data(
+				$scf->{samples_common_name} . "\n" . $rc->{seq}->seq
+			);
+			
+			$m->comp('/_message_add', "Sample added successfully!");
+			$m->comp('/_message_add', "The sample is not yet active!");
+			$m->redirect('./edit_sample.html?sid=' . $smpl->id);
+		}
+		$m->comp('/_message_add', "Unable to process the sequence data!", 'error');
+		
+	}
+}
+
+</%init>
+%#------------------------------------------------------------------------------
+
+%#------------------------------------------------------------------------------

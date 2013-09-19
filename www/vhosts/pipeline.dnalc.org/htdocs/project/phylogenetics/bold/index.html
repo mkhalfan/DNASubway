@@ -1,0 +1,140 @@
+	<& /_messages &>
+% if ($enable_export) {
+	<p>
+	<form id="bform" method="post">
+%#	<input type="hidden" name="pid" value="<% $pid |html%>" />
+	<input type="hidden" name="bstep" value="0" />
+	<div>
+	<h2>Instructions</h2>
+	<p>To submit your sequence to Genbank, create a new submission by clicking 'New Submission' below, select a sequence and provide the required information. Please note: only sequences which you have paired and built a consensus sequence for are eligible for submission at this time.</p> 
+	<p>
+	You will need the following to submit your sequence:
+	<ul>
+	<li>Collectors/Authors <img src="/images/question-icon.png" align="top" id="collectors" /></li>
+	<li>Institution storing your specimen <img src="/images/question-icon.png" align="top" id="institution" /></li>
+	<li>Identifier <img src="/images/question-icon.png" align="top" id="identifier" /></li>
+	<li>Identifiers email address</li>
+	<li>Taxonomic identification of your specimen <img src="/images/question-icon.png" align="top" id="tax" /></li>
+	<li>Date specimen was collected</li>
+	<li>Location your specimen was collected <img src="/images/question-icon.png" align="top" id="location" /></li>
+	<li>Sex of your specimen</li>
+	<li>Life stage of your specimen</li>
+	<li>One or more photos of your specimen <img src="/images/question-icon.png" align="top" id="photos" /></li>
+	<!--<li>The names of the forward and reverse PCR primers employed <img src="/images/question-icon.png" align="top" id="primers" /></li>-->
+	</ul>
+	Below you may review your past submissions (if you have any) or begin a new one. Please note: Only one submission per sequence per team should be made.
+	</p>
+% if ($bsubmissions) {
+	<p>
+		<div>You have submitted the following sequences:</div>
+		<ul>
+% 		while (my $b = $bsubmissions->next) {
+			<li><% $b->specimen_id %> <span  style="font-size:11px">(<a href="view.html?id=<%$b |html %>">view</a>)</span></li>
+%		}
+		</ul>
+	</p>	
+% }
+	</div>
+	
+
+	<div>
+	<a href="javascript:;" onclick="phy.next_bold_step();">New submission</a><a href="javascript:;" onclick="phy.next_bold_step();"><img src="/images/arrow-circle.png" border=0 width="16px" height="16px" style="padding-left:4px;" align="top" /></a></span>
+	</div>
+	</form>
+	</p>
+	<script type="text/javascript">
+	Event.observe(window, Prototype.Browser.IE ? 'load' : 'dom:loaded', function() {
+	new Tip('collectors', "Name of person(s) who collected the sample.", {
+			className: 'blue_help',
+		});
+	new Tip('institution', "Name of the institution (e.g. a museum or school) where the sample is stored.", {
+			className: 'blue_help'
+		});
+	new Tip('identifier', "Name of the specialist (e.g. botanist, entomologist, curator, etc.) that identified the species of your sample.", {
+			className: 'blue_help'
+		});
+	new Tip('tax', "Specify the genus and species of the sample.", {
+			className: 'blue_help',
+		});
+	new Tip('location', "Country, state/province, city, latitude, longitude, and a text description of the exact site where the sample was collected.", {
+			className: 'blue_help'
+		});
+	new Tip('photos', "Upload up to 3 jpg photos (max 1MB each).", {
+			className: 'blue_help'
+		});
+	new Tip('primers', "Name of each primer used in the PCR.", {
+			className: 'blue_help'
+		});
+		});
+	</script>
+% } else {
+<p style="padding:5px;background-color:yellow;font-weight:bold;">
+In order to export sequences to GenBank, you must:
+</p>
+<ul style="font-weight:bold;">
+<li>be working with an rbcL or COI project</li>
+<li>have at least 2 trace files in your project</li>
+<li>not have started your project using a sample data set</li>
+<li>ensure your sequences have been trimmed</li>
+<li>not use a guest account</li>
+</ul>
+
+%}
+
+<%args>
+	$pid => 0
+	$bstep => undef
+</%args>
+
+<%once>
+	use DNALC::Pipeline::App::Phylogenetics::ProjectManager ();
+	use DNALC::Pipeline::Phylogenetics::Bold ();
+	use Data::Dumper;
+</%once>
+<%init>
+	my $s = $m->session->{pipeline};
+	my $bsubmissions;
+
+	my $pm = DNALC::Pipeline::App::Phylogenetics::ProjectManager->new($pid);
+	my $proj = $pm->project;
+	unless ($proj && $proj->user_id == $s->{user_id}) {
+		#$m->comp('/_message_add', 'Project not found!', 'error');
+		print "Project not found!";
+		return;
+	}
+	elsif ($r->method eq "POST") {
+		#print STDERR "S0/POST PID = ", $pid, $/;
+		if (defined $bstep && $bstep == 0) {
+			$s->{boldpid} = $proj->id;
+			$m->redirect('./step1.html');
+		}
+	}
+	elsif ($r->method eq "GET") {
+		$bsubmissions = DNALC::Pipeline::Phylogenetics::Bold->search(project_id => $proj->id);
+	}
+	
+	## Enable export to genbank if you have trace files in your project and they are not sample sequences 
+	## and they are trimmed and the project type is rbcL or COI
+	my $enable_export = 0;
+
+	## trace_seqs = the number of trace files in the project (we want more than 1 to enable export - so you can have a pair)
+	my $trace_seqs = DNALC::Pipeline::Phylogenetics::DataSequence->search_trace_sequences($proj);
+	
+	## get trimmed status 
+	## 1 = not done
+	## 2 = done
+	my $trimmed = $pm->get_task_status('phy_trim');
+	
+	## get project type, true if it is rbcL or COI
+	my $is_barcoding = ($proj->type eq "rbcL" or $proj->type eq "COI" ? 1 : 0);
+
+	## proj->sample is false if the project was not created with a sample data set, true if it was
+	if (	$s->{username} !~ m/^guest_/
+		&& $trace_seqs->count > 1 
+		&& $proj->sample == 0 
+		&& $trimmed == 2 
+		&& $is_barcoding)
+	{
+		$enable_export = 1;
+	}
+</%init>

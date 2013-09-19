@@ -1,0 +1,14 @@
+[GENERAL]
+description =  __USER__'s __ORGANISM__ Data
+db_adaptor    = Bio::DB::SeqFeature::Store
+db_args       = -adaptor memory
+                -dsn '/var/www/html/gbrowse/databases/__USER__/__PID__/gff3.gff'
+
+initial landmark = __ORGANISM__:1..10000
+
+#include gbrowse_conf.inc
+
+cache time = 24
+ 
+#include gbrowse_gff_tracks.inc
+

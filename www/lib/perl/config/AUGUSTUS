@@ -1,0 +1,27 @@
+{
+	program => '/usr/local/bin/augustus',
+	options => [
+				'--AUGUSTUS_CONFIG_PATH=/usr/local/augustus/config',
+				#'--species=arabidopsis',
+				'--gff3=on',			#output in gff3 format
+			],
+
+	option_output_file => '--outfile',
+	output_file => 'augustus.gff3',
+	option_glue => '=',
+	file_to_parse => qr/stdout\.gff3$/,
+	gff3_file	=> 'augustus.gff',
+	species_map => {
+		d => '--species=arabidopsis',
+		m => '--species=maize',
+		default => '--species=arabidopsis',
+
+		'♞' => '--species=human', # the horse char :p
+		h => '--species=human',
+		f => '--species=elephant_shark',
+		i => '--species=fly',
+		b => '',
+		w => '--species=caenorhabditis',
+	},
+
+}

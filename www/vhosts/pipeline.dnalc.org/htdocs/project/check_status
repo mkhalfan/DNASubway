@@ -1,0 +1,106 @@
+% if ($status) {
+{'status':'<%$success%>','running' : <% $status->{running} %>, 'known' : <% $status->{known} %>, 'output':'<& './.comp/filepath_to_web', file => $output &>'}
+% } else {
+{'status':'error','message':'???'}
+% }
+%#-------------------------------------------------
+<%args>
+	$t => ''
+	$h => ''
+	$pid => 0
+</%args>
+%#-------------------------------------------------
+<%once>
+	use Gearman::Client ();
+	use DNALC::Pipeline::Config ();
+	use DNALC::Pipeline::App::ProjectManager ();
+	use DNALC::Pipeline::App::WorkflowManager ();
+	use DNALC::Pipeline::CacheMemcached ();
+	use DNALC::Pipeline::Config ();
+	use Crypt::Simple;
+	use URI::Escape;
+	use Data::Dumper;
+
+	my @routines = qw/trna_scan augustus fgenesh repeat_masker/;
+</%once>
+%#-------------------------------------------------
+<%init>
+	$r->content_type('text/plain');
+	$r->no_cache(1);
+
+	$m->session->{pipeline} ||= {};
+	my $s = $m->session->{pipeline};
+	my $success = 'success';
+
+	unless ($t) {
+		print "{'status':'error', 'message': 'Task unknown.'}";
+		return;
+	}
+
+	unless ($h) {
+		print "{'status':'error', 'message': 'Unknown error.'}";
+		return;
+	}
+	
+	my $memcached = DNALC::Pipeline::CacheMemcached->new;
+	my $mc_key = "status-$t-$pid";
+	if ($memcached) {
+		if ($memcached->get($mc_key) =~ /processing/i) {
+			print "{'status':'success','running' : 1, 'known' : 1, 'output':''}";
+			return;
+		}
+		elsif ($memcached->get($mc_key) =~ /error/i) {
+			print "{'status':'error','message':'Failed to process task.'}";
+			return;
+		}
+	}
+	
+	my $pm = DNALC::Pipeline::App::ProjectManager->new($pid);
+	my $proj = $pm->project; 
+	unless ($proj) {
+		print "{'status':'error', 'message':'Project unknown.'}";
+		return;
+	}
+
+	my ($output, $status) = ('', undef);
+	if ($h eq '-1') {
+		my $wfm = DNALC::Pipeline::App::WorkflowManager->new( $proj );
+		my $task_status = $wfm->get_status($t);
+		if ($task_status->name ne 'error') {
+			$status = {
+					running => $task_status->name eq 'processing' ? 1 : 0,
+					known => $task_status->name eq 'processing' ? 1 : 0
+				};
+			print STDERR  "STAT = ", $pm->get_gff3_file($t), $/;
+			$output = $task_status->name eq 'done' ? $pm->get_gff3_file($t) : '';
+		}
+	}
+	else {
+		$h = decrypt(uri_unescape($h));
+		my $pcf = DNALC::Pipeline::Config->new->cf('PIPELINE');
+		my $client = Gearman::Client->new;
+		$client->job_servers(@{$pcf->{GEARMAN_SERVERS}});
+		my $jst = $client->get_status($h);
+
+		$status = {
+				running => $jst->running,
+				known => $jst->known
+			};
+		if ($jst && !$jst->running && !$jst->known) {
+
+			my $wfm = DNALC::Pipeline::App::WorkflowManager->new( $proj );
+			my $task_status = $wfm->get_status($t);
+			if ($task_status && $task_status->name eq 'done' ) {
+				$output = $pm->get_gff3_file($t);
+			}
+			else {
+				$success = 'error';
+			}
+		}
+	}
+</%init>
+%#-------------------------------------------------
+<%flags>
+	inherit => undef
+</%flags>
+%# vim: ft=mason

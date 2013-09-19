@@ -1,0 +1,190 @@
+<div class="container_data1">
+	<div id="container_data_line_bg"><a href="javascript:;" onclick="document.location.replace('/project/ngs/tools/job_list_fxtrimmer?pid=<% $pid %>')">< Back</a></div>
+% if ($app) {
+<div>New job using application <strong><% $app %></strong>:</div>
+	<p>
+%#	--------------------------- DEBUG ---------------------------------------
+%#		<& ./.comp/app_debug, app => $app &>
+%#	--------------------------- /DEBUG --------------------------------------
+		
+		<form method="post" onsubmit="ngs.replace_buttons()">
+			<div id="launch_job_table_holder">
+				<table>
+					<& ./.comp/job_options, form => $form &>
+					<& ./.comp/build_app_form, pm => $pm, app => $app, form => $form, flagged => $flagged &>
+					<tr>
+						<td></td>
+					</tr>
+				</table>
+			</div>
+			<p style="text-align:center" id="button_wrapper">
+			<input type="button" id="cancel" value="Cancel" 
+			onclick="document.location.replace('/project/ngs/tools/job_list_fxtrimmer?pid=<% $pid %>')"/> | <input type="submit" value="Submit" id="submit" />
+			</p>
+			<p style="text-align:center;display:none;" id="processing"> Processing... &nbsp;<img src="/images/ajax-loader-2.gif" style="width:12px;padding-left:5px;"></p>
+		</form>
+	</p>
+
+% } else {
+	No application found for conf file: 'FASTX_TRIMMER'.
+% }
+</div>
+%#-----------------------------------------------------------------
+<%args>
+	$pid => 0
+	$fid => 0
+</%args>
+<%once>
+	use Data::Dumper;
+	use DNALC::Pipeline::Utils qw(clean_query);
+	use DNALC::Pipeline::App::NGS::ProjectManager ();
+	use DNALC::Pipeline::NGS::DataFile ();
+	
+	use DNALC::Pipeline::CacheMemcached ();
+
+	use DNALC::Pipeline::User ();
+	use File::Basename qw/dirname/;
+
+</%once>
+<%init>
+
+	$m->session->{pipeline} ||= {};
+	my $s = $m->session->{pipeline};
+
+	#my $path_info = $r->path_info;
+	#if ($r->path_info =~ /\/(\d+)$/) {
+	#	$pid = $1;
+	#}
+
+	my $apif = iPlant::FoundationalAPI->new(
+			user => $s->{username},
+			token => $s->{api_token},
+			debug => 0,
+		);
+	my $pm = DNALC::Pipeline::App::NGS::ProjectManager->new({project => $pid, debug => 1});
+	$pm->api_instance($apif) if $apif;
+	my $proj = $pm->project;
+
+	# project's owner
+	my $is_owner = $s->{user_id} == $proj->user_id if $proj;
+
+	my $app;
+	my $st = $pm->app("NGS_FXTRIMMER");
+
+	if ($st->{status} eq "success") {
+		$app = $st->{app};
+	}
+	else {
+		print STDERR $st->{status}, " ", $st->{message}, $/;
+	}
+
+	my $form = {};
+	my $flagged = {}; # to report errors
+
+	if ($r->method eq "POST") {
+		$form = \%ARGS;
+		#print STDERR $app->{conf}->{_task_name}, ": formx = ", Dumper( $form ), $/;
+		
+		$form->{jobName} =~ s|/+||g;
+		
+		if ($form->{jobName} =~ /[^-_\w\d]/){
+			$form->{jobName} =~ s/\s+/_/g;
+			$form->{jobName} =~ s/[^-_\w\d]//g;
+		}
+		
+        $form->{jobName} ||= 'fx' . int(rand()*1000);
+	
+		## MOHAMMED's NEW CODE FOR BASIC RUNNING ##
+		if ($form->{basic_run} && $form->{basic_run} == 1) {
+			for my $p (@{$app->parameters}) {
+				$form->{$p->{id}} = $p->{value} || $p->{defaultValue};
+			}
+			$form->{is_basic} = "true";
+			
+		}
+		
+		for my $p (@{$app->parameters}) {
+			if ($p->{hidden} && !defined $form->{$p->{id}}) {
+				$form->{$p->{id}} = defined $p->{value} ? $p->{value} : $p->{defaultValue};
+			}
+			my $type = $p->{semantics} && $p->{semantics}->{ontology} ? join(",", map {$_=~s/xs://;$_;} @{$p->{semantics}->{ontology}}) : 'text';
+			if ($type =~ /boolean/ && !defined $form->{$p->{id}}) {
+				$form->{$p->{id}} = 'false';
+			}
+		}
+
+		unless (defined $form->{archive}) {
+            $form->{archive} = "true";
+        }
+		
+		if ($form->{notify_user}) {
+			$form->{callbackUrl} = $s->{user_email};
+		}
+		
+		$form->{requestedTime} ||= '2:45:00';
+
+		$st = $pm->submit_job($app->{conf}->{_task_name}, $app, $form);
+		#print STDERR $app->{conf}->{_task_name}, ": JOB status = ", Dumper( $st ), $/;
+		#print STDERR $app->{conf}->{_task_name}, ": form = ", Dumper( $form ), $/;
+
+		if ($st->{status} ne "success") {
+			if ($st->{message} =~ /missing required/i && $st->{data} && %{$st->{data}}) {
+				for (keys %{$st->{data}}) {
+					$flagged->{$_} = 1;
+				}
+			}
+		}
+		else {
+			if ($form->{basic_run} == 1 && $st->{data}){
+				$m->redirect("./return_status?s=success&job_name=" . $st->{data}->attrs->{name}. "&job_status=" . $st->{data}->status . "&job_id=" . $st->{data}->id);
+			}
+			elsif ($st->{data}) {
+				# cache status
+				my $mc_key = sprintf("ngs-%d-%s-%d", $pm->project->id, "ngs_fxtrimmer", $form->{seq1});
+				print STDERR "mc_key: ", $mc_key, $/;
+				$pm->{_mc}->set($mc_key, 'pending', 9000);
+			
+				# redirect to our job list page
+				print STDERR "JOB ID: ", $st->{data}->id, "//", $st->{data}->api_job_id, $/;
+				#$m->comp('/_message_add', 'Job submitted!');
+				$m->redirect("./job_list_fxtrimmer?pid=" . $pid . "&jid=" . $st->{data}->id);
+			}
+		}
+	}
+	elsif ($app) {
+		
+		for my $p (@{$app->parameters}) {
+			unless ($p->{hidden}) {
+				$form->{$p->{id}} = defined $p->{value} ? $p->{value} : $p->{defaultValue};
+			}
+		}
+		
+				
+		# set the default file
+		if ($fid && $fid =~ /^\d+$/) {
+			$form->{seq1} = $fid;
+			
+			# If there is a fastQC report for this file, 
+			# Get the length of the read, need in fxtrimmer
+			my $df = DNALC::Pipeline::NGS::DataFile->retrieve($fid);
+			if ($df && (my $qc_report = $df->qc_report)) {
+				my $qc_data_file = File::Spec->catfile(dirname($qc_report), 'fastqc_data.txt');
+				my $qcr_fh = IO::File->new($qc_data_file);
+				if ($qcr_fh) {
+					while (<$qcr_fh>) {
+						if (/^Sequence length\s+(\d+)/) {
+							$form->{last} = $1;
+							last;
+						}
+					}
+					$qcr_fh->close;
+				}
+				else {
+					print STDERR "Can't open report to read data: $qc_data_file\n";
+				}
+			}
+		}
+		
+	}
+
+</%init>

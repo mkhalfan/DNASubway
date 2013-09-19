@@ -1,0 +1,15 @@
+{
+	program => '/usr/local/bin/merger',
+	options => [
+		'--auto',
+		'-gapopen', '50.0',
+		'-gapextend', '5',
+	],
+	'outfile' => '-outfile',
+	'outseq' => '-outseq',
+	'sreverse1' => '-sreverse1',
+	'sreverse2' => '-sreverse2',
+	'sid1' => '-sid1',
+	'sid2' => '-sid2',
+	'redirect' => 1,
+}

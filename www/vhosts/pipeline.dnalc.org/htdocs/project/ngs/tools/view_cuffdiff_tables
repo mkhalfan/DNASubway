@@ -1,0 +1,143 @@
+<script type="text/javascript">
+function on_load(iframe) {
+  try {
+    $('please_wait').setStyle({display:'none'});
+    $('iframe_holder').setStyle({display:'inline'});
+  } catch (e) {
+    alert('exception: ' + e);
+  }
+}
+</script>
+<div id="cuffdiff_tables" class="container_data1" style="width:95%;height:405px;">
+	<div id="container_data_line_bg">
+		<div style="float:left;padding-top:2px;">
+			<a href="javascript:;" onclick="document.location.replace('/project/ngs/tools/job_list_cuffdiff?pid=<% $pid %>')">< Back</a>
+		</div>
+		<div style="float:right;padding-right:5px;">
+			View:
+			<select name="genes_or_transcripts" id="genes_or_transcripts">
+				<option value="genes">Genes</option>
+				<option value="transcripts">Transcripts</option>
+			</select>
+			<select name="sample_one" id="sample_one">
+% for (@sample_names_one) {
+	<option value="<% $_ |html%>"><% $_ |html%></option>
+% }
+			</select>
+			<select name="sample_two" id="sample_two">
+% for (@sample_names_two) {
+	<option value="<% $_ |html%>"><% $_ |html%></option>
+% }
+			</select>
+
+			<a href="javascript:;" onclick="reload()" style="margin:0 5px;">Go</a>
+				
+		</div>
+		<div style="clear:both;height:0px;">&nbsp;</div>
+	</div>
+	  <div id="please_wait" class="cl_highlight" style="margin-top:20px">
+   	    <b>Note: </b>The Cuffdiff data will take a moment to process. A table will appear below when loading is complete...
+          </div>
+	<div id="iframe_holder" style="width:100%;height:100%;display:none">
+		<iframe src="<% $data_table_link %>" frameborder=0 onload="on_load(this)" style="width:100%;height:100%"></iframe> 
+	</div>
+	
+</div>
+
+<input type="hidden" id="step" name="step" value="4" />
+<input type="hidden" id="selected_sample_one" name="selected_sample_one" value="<% $sample1 %>" />
+<input type="hidden" id="selected_sample_two" name="selected_sample_two" value="<% $sample2 %>" />
+<input type="hidden" id="selected_type" name="selected_type" value="<% $type %>" />
+
+<script type="text/javascript">
+	function reload(){
+		if ($("sample_one").value == $("sample_two").value) {
+			$("sample_one").setStyle({backgroundColor: "pink"});
+			$("sample_two").setStyle({backgroundColor: "pink"});
+			alert("Please select two different samples to compare.");
+		}
+		else {
+		document.location.replace('/project/ngs/tools/view_cuffdiff_tables?pid=<% $pid %>&jid=<% $jid %>&sample1=' + $("sample_one").value + '&sample2=' + $("sample_two").value + "&type=" + $("genes_or_transcripts").value);
+		}
+	}
+</script>
+
+<%args>
+	$pid => 0
+	$jid => 0
+	$sample1 => ''
+	$sample2 => ''
+	$type => ''
+</%args>
+<%once>
+	use DNALC::Pipeline::NGS::JobOutputFile ();
+	use Data::Dumper();
+</%once>
+<%init>
+	$r->content_type("text/html");
+	$r->no_cache(1);
+
+	$m->session->{pipeline} ||= {};
+	my $s = $m->session->{pipeline};
+	my $pcf = DNALC::Pipeline::Config->new->cf('PIPELINE');
+	
+	# Get all output files for this job
+	my @out_files = DNALC::Pipeline::NGS::JobOutputFile->search(job_id => $jid, project_id => $pid);
+	
+	# Retrieve the index file
+	my ($index) = grep {$_->is_local && $_->file_path =~ /summary.txt$/} map {$_->file } @out_files; 
+	
+	# Declare some variables
+	my %index_hash;
+	my @sample_names_one;
+	my @sample_names_two;
+	
+	# Open the index file
+	open (FILE, $index->file_path) or die $!;
+	while (<FILE>) {
+		# We only record the information for the "genes_*" files, we will substitute
+		# "genes" with "transcripts" when we need to serve the transcipt files
+		if ($_ =~ /^genes_/) {
+			chomp;
+			
+			# Lines in the index file look like this: genes_1_summary.csv	genes_1_summary.html	sample1	sample2
+			my @line = split("\t", $_);
+			
+			# This creates a hash element like this: "sample1-sample2" => "genes_1_summary.html"
+			$index_hash{$line[2] . "-" . $line[3]} = $line[1];
+			
+			# If this sample name already exists in our array of sample names, don't add it again!
+			# (we use these arrays to populate the dropdown menu)
+			if (!grep(/$line[2]/, @sample_names_one)) {
+				push (@sample_names_one, $line[2]);
+			}
+			if (!grep(/$line[3]/, @sample_names_two)) {
+				push (@sample_names_two, $line[3]);
+			}
+		}
+	}
+	#print STDERR Dumper (%index_hash);
+	# Assign a default value to $file_to_fetch, this will be used when you first load this page
+	my $file_to_fetch = "_summary.html";
+	
+	# If you are on this page and change your selection and then press go, these values will not be empty
+	# and $file_to_fetch will be overwriten based on your selections
+	if ($sample1 ne "" && $sample2 ne "" && $type ne "") {
+		if (defined $index_hash{$sample1 . "-" . $sample2}) {
+			$file_to_fetch = $index_hash{$sample1 . "-" . $sample2};
+		}
+		elsif (defined $index_hash{$sample2 . "-" . $sample1}) {
+			$file_to_fetch = $index_hash{$sample2 . "-" . $sample1};
+		}
+		
+		if ($type eq "transcripts") {
+			$file_to_fetch =~ s/genes/transcripts/;
+		}
+	}
+	
+	#print STDERR "\nI would load this file: ", $file_to_fetch, $/;
+	
+	my ($data_table_file) = grep {$_->is_local && $_->file_path =~ /$file_to_fetch$/} map {$_->file } @out_files;
+	my $data_table_link = $m->comp("../../.comp/filepath_to_web", file => $data_table_file->file_path, just_return => 1);
+
+</%init>

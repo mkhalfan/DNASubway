@@ -1,0 +1,43 @@
+%#--------------------------------
+<%args>
+	$f => ''
+	$nw => ''
+</%args>
+%#--------------------------------
+<%once>
+	use DNALC::Pipeline::Config ();
+</%once>
+%#--------------------------------
+<%init>
+	my $pcf = DNALC::Pipeline::Config->new->cf('PIPELINE');
+</%init>
+%#--------------------------------
+<html>
+<body>
+% if ($f) {
+<applet archive="/files/jalview/jalviewApplet.jar" name="Jalview" 
+	codebase="/files/jalview/" 
+	code="jalview.bin.JalviewLite" height="15" width="110">
+	<param name="file" value="<% $f %>">
+	<param name="treeFile" value="<% $nw %>">
+	<param name="showAnnotation" value="true">
+	<param name="wrap" value="false">
+	<param name="nojmol" value="true">
+	<param name="windowHeight" value="500">
+	<param name="windowWidth" value="750">
+	<param name="showFullId" value="false">
+	<param name="defaultColour" value="Clustal">
+	<param name="linkLabel_1" value="Details" />
+	<param name="linkUrl_1" value="<% $pcf->{PROJECT_HOME} %>/project/target/details?hn=$SEQUENCE_ID$" />
+	<param name="showbutton" value="false" />
+%#	<param name="debug" value="true" />
+%#	<p id="java_install"><a href="http://java.sun.com/webapps/getjava/BrowserRedirect?host=java.com">Install Java</a>.</p>
+</applet>
+% }
+</body>
+</html>
+%#--------------------------------
+<%flags>
+	inherit => undef
+</%flags>
+%#--------------------------------

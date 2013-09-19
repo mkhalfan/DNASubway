@@ -1,0 +1,27 @@
+% for (@files) {
+%	if (defined $user_value && $user_value eq $_->id) {
+%#       print STDERR "INPUT FILE_PATH: ", $_->file_path, "\n";
+%	(my $fname = $_->file_path) =~ s!\S+/!!;
+		<% $fname %>
+		<input type="hidden" id="<% $element->{id} %>" name="<% $element->{id} %>" value="<% $_->id %>">
+%	}
+% }
+
+<%args>
+	$pm => undef
+	$element => undef
+	$user_value => undef
+	$class => ''
+	$filter => undef;
+	$input_files_only => undef
+	$task_name => ''
+</%args>
+<%init>
+	return unless $pm && $element;
+	
+	my @files = $input_files_only ? grep {$_->is_input} $pm->data : $pm->data;
+	@files = grep {$_->file_path =~ /$filter/ && !$_->is_local} @files if $filter;
+	
+	#use Data::Dumper;
+	#print STDERR Dumper($user_value);
+</%init>

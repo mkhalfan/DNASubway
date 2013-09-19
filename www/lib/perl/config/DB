@@ -1,0 +1,16 @@
+[
+	# DSN
+	'DBI:Pg:database=pipeline_sm2;host=localhost',
+	# DB USER
+	'pipeline',
+	# DB USER'S PASSWORD
+	'pipeline123',
+	# DBI OPTIONS
+	{
+		PrintError => 0,
+		RaiseError => 1,
+		ShowErrorStatement => 1,
+		AutoCommit => 1,
+		ChopBlanks => 1,
+	}
+]; 

@@ -1,0 +1,46 @@
+{
+	program => '/usr/bin/blastall',
+	blastdb => '/data/blast/db',
+	blastmat => '/usr/share/blast',
+	#redirect => 0, # use shell redirection => implies executing the programm under shell
+	options => [
+		'-a',	2,
+		'-b',	250,
+		'-v',	250,
+		'-e',	'1e-5',
+		'-p',	'blastx',
+		#'-d', 	'uniprot_viridiplantae_sprot',
+		'-F',	'"m"',
+		'-U',
+		'-K',	40,
+		'-W',	3,
+		'-P',	0,
+		'-I',	'T',
+		#'-i',
+	],
+	file_to_parse => qr/stdout\.txt$/,
+	parser_program => '/var/www/bin/bp_search2gff_revised.pl',
+	parser_opt => [
+		'--version', 3,
+		'-m',
+		'--method', 'match_part',
+		'--shatter',
+		'--coverage', '0.05',
+		'--identity', '0.2',
+		'--bits', '30',
+	],
+	gff3_file => 'output.gff',
+	species_map => {
+		default => 'uniprot_viridiplantae_sprot',
+
+		'♞' => 'uniprot.mamalia', # the horse char :p
+		a => 'uniprot.bilateria',
+		b => 'uniprot.aves',
+		h => 'uniprot.mamalia',
+		f => 'uniprot.fish',
+		i => 'uniprot.insecta',
+		w => 'uniprot.nematoda',
+		x => 'uniprot.fungi', # fungi
+	},
+
+}
