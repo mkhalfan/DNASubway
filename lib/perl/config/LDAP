@@ -1,5 +1,0 @@
-{
-	SERVER => 'ldap.iplantcollaborative.org',
-	BASE => 'ou=People,dc=iplantcollaborative,dc=org',
-	
-}

@@ -1,8 +1,0 @@
-{
-	PROJECTS_DIR => '/var/www/vhosts/pipeline.dnalc.org/var/projects/ngs', 
-	admin_user => 'dnalcadmin',
-	admin_pwd  => 'Ala#Bala8_9',
-
-	# jobs' path (relative to users' $HOME)
-	archive_path => 'DNASubway', 
-};

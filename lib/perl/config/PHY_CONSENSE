@@ -1,9 +1,0 @@
-{
-	program => '/usr/local/bin/consense',
-	menu => {},
-	menu_options => "1\n2\nY\n",
-
-	input_file => 'intree',
-	output_tree => 'outtree',
-	options => [],
-}
