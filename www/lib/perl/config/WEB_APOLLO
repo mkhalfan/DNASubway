@@ -1,0 +1,5 @@
+{
+	webapp => '/usr/local/tomcat7/webapps',
+	pguser => 'dnasubway',
+	pgpass => 'iPlant'
+}
