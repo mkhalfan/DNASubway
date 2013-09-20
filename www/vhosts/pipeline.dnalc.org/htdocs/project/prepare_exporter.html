@@ -5,6 +5,7 @@
 <%once>
 	use DNALC::Pipeline::App::ProjectManager ();
 	use DNALC::Pipeline::Sample ();
+	use DNALC::Pipeline::Config ();
 	use Data::Dumper;
 </%once>
 <%init>
@@ -30,12 +31,14 @@
 	my $ref    = lc $sample->segment;
 	my $offset = $start - 1;
 
-	my $pcf = $pm->config;
+	my $config = $pm->config;
+	my $cfg = DNALC::Pipeline::Config->new();
+	my $wconfig = $cfg->cf->('WEB_APOLLO');
 
-	my $exporter = $pcf->{EXE_PATH} . '/jb_gff_export.pl';	
-	my $importer = $pcf->{EXE_PATH} . '/jb_gff_import.pl';
-	my $cleaner  = $pcf->{EXE_PATH} . '/jb_gff_clean.pl'; 
-	my $toggle   = $pcf->{EXE_PATH} . '/jb_toggle.pl';
+	my $exporter = $config->{EXE_PATH} . '/jb_gff_export.pl';	
+	my $importer = $config->{EXE_PATH} . '/jb_gff_import.pl';
+	my $cleaner  = $config->{EXE_PATH} . '/jb_gff_clean.pl'; 
+	my $toggle   = $config->{EXE_PATH} . '/jb_toggle.pl';
 
 	my $gff3_files = $pm->get_available_gff3_files || [];
 
@@ -71,11 +74,12 @@
 		
 	system "$toggle $apollo";
 
-	my $wa_url = "http://pipeline-dev.dnalc.org:8080/WebApollo/jbrowse/?";
-	$wa_url .= "loc=$ref:$start..$end\&" . "tracks=$tracks";
-	$wa_url .= "\&overview=0\&tracklist=0" unless $apollo;
-	print STDERR "$0 URL: $wa_url\n";
-	$m->redirect($wa_url);
+
+	my $url = $wconfig('WEB_APOLLO_URL');
+	$url .= "loc=$ref:$start..$end\&" . "tracks=$tracks";
+	$url .= "\&overview=0\&tracklist=0" unless $apollo;
+	print STDERR "$0 URL: $url\n";
+	$m->redirect($url);
 
 </%init>
 
