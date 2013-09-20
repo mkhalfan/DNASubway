@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- configuration file for GFF3 data adapter -->
+
+<gff3_config>
+
+	<!-- path to where to put generated GFF3 file.  This path is a
+	relative path that will be where you deployed your WebApollo
+	instance (so that it's accessible from HTTP download requests) -->
+	<tmp_dir>tmp</tmp_dir>
+
+	<!-- value to use in the source column (column 2) of the generated
+	GFF3 file. -->
+	<source>WebApollo</source>
+
+</gff3_config>

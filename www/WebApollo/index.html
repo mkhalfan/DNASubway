@@ -1,0 +1,40 @@
+<html>
+<head>
+<script type="text/javascript" src="jslib/jquery-ui-menubar/jquery-1.8.2.js"></script>
+<title>WebApollo</title>
+<script>
+        // Ajax login to WebApollo
+	$(function() {
+		$.ajax({
+			type: "post",
+			url: "Login?operation=login",
+			processData: false,
+			dataType: "json",
+			contentType: "application/json",
+			data: "{ username: 'web_apollo_admin', password: 'web_apollo_admin' }",
+			success: function(data) {
+			  goToJBrowse(); // redirect to JBrowse on success
+			},
+			error: function(jqXHR, textStatus, errorThrown) {
+			}
+		});
+	});
+
+  function getURLParameter(name) {
+    return decodeURIComponent(
+      (new RegExp('[?|&]' + name + 
+        '=' + '([^&;]+?)(&|#|;|$)').exec(location.search)||[,""])[1].replace(/\+/g, '%20'))
+	|| '1:1..100000';
+  }
+
+  function goToJBrowse () {
+    var loc = getURLParameter('loc');
+    var tracks = getURLParameter('tracks');
+    window.location = 'jbrowse?loc=' + loc + ';tracks=' + tracks;
+  }
+</script>
+</head>
+<body>
+One moment please...
+</body>
+</html>
