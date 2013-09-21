@@ -1,5 +1,6 @@
 
 {
 	WEBAPP_PATH => '/var/www/vhosts/pipeline.dnalc.org/var/webapps/project/',
+	WEB_APOLLO_BASE =>' /var/www/vhosts/pipeline.dnalc.org/var/webapps/project/web_apollo_base/web_apollo_base.tar.gz',
 	WEB_APPOLLO_URL => '//beckett.iplantcollaborative.org:8080/project/'
 }
