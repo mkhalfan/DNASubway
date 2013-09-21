@@ -1,6 +1,5 @@
 
 {
-	webapp => '/usr/local/tomcat7/webapps',
-	pguser => 'dnasubway',
-	pgpass => 'iPlant'
+	WEBAPP_PATH => '/var/www/vhosts/pipeline.dnalc.org/var/webapps/project/',
+	WEB_APPOLLO_URL => '//beckett.iplantcollaborative.org:8080/project/'
 }
