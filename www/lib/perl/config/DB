@@ -1,6 +1,6 @@
 [
 	# DSN
-	'DBI:Pg:database=pipeline_sm2;host=localhost',
+	'DBI:Pg:database=pipeline;host=localhost',
 	# DB USER
 	'pipeline',
 	# DB USER'S PASSWORD

@@ -1,5 +1,5 @@
 {
-	id => 'dnalc-cuffmerge-stampede-2.1.1',
+	id => 'dnalc-cuffmerge-stampede-2.1.1u1',
 	name => 'cuffmerge',
 	desc => 'Merge assembled cufflinks transcripts from different RNA-Seq samples',
 	inputs => [
@@ -21,6 +21,7 @@
                 { id => 'ref_gtf', display_type => 'annotation', hidden => 1, label => '' },
 	],
 	parameters => [
+		{ id => 'description', hidden => 0, label => 'Description (mandatory)', value => ''}
 	],
 
         _requestedTime => '2:00:00',
@@ -28,5 +29,7 @@
 	_output_dir => [qr/\/cuffmerge_out$/],
 	_output_files => qr/merged|description/,
 	_on_success => 'handle_download_output',
+	_description => qq(This tools uses Cuffmerge to merge the selected Cufflinks transcripts into a GFF3 file).
+			qq( suitable for export to the red line or other applications.) 
 }
 

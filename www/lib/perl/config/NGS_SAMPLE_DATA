@@ -8,6 +8,34 @@
                 populus_trichocarpa => '',
                 sorghum_bicolor => '',
                 vitis_vinifera => '',
+		homo_sapiens => qq(
+<b><i>Modulation of NF-kB-Dependent Gene Transcription Using Programmable DNA Minor Groove Binders</i>
+</b>(NCBI Sequence Read Archive <a href="http://trace.ncbi.nlm.nih.gov/Traces/sra/?stu\
+dy=SRP009790">Accession SRP009790</a>)
+<br />
+<table id="matrix-table">
+<tr>
+<td class="label">File</td><td class="label">Sample</td><td class="label">SRR Accession</td></tr>
+<tr>
+<td>non_induced_rep1.fastq</td>
+<td>NF-kB non-induced</td>
+<td><a href="http://trace.ncbi.nlm.nih.gov/Traces/sra/sra.cgi?cmd=viewer&m=data&s=viewer&run=SRR389020">SRR389020</a></td>
+</tr><tr>
+<td>non_induced_rep1.fastq</td>
+<td>NF-kB non-induced</td>
+<td><a href="http://trace.ncbi.nlm.nih.gov/Traces/sra/sra.cgi?cmd=viewer&m=data&s=viewer&run=SRR389021">SRR389021</a></td>
+</tr><tr>
+<td>non_induced_rep1.fastq</td>
+<td>NF-kB induced</td>
+<td><a href="http://trace.ncbi.nlm.nih.gov/Traces/sra/sra.cgi?cmd=viewer&m=data&s=viewer&run=SRR389021">SRR389021</a></td>
+</tr><tr>
+<td>non_induced_rep1.fastq</td>
+<td>NF-kB induced</td>
+<td><a href="http://trace.ncbi.nlm.nih.gov/Traces/sra/sra.cgi?cmd=viewer&m=data&s=viewer&run=SRR389022">SRR389022</a></td>
+</tr><tr>
+</tr>
+</table>
+),
 		arabidopsis_thaliana => qq(
 <b><i>Genome-wide mapping of the HY5-mediated gene networks in Arabidopsis that involve 
 both transcriptional and post-transcriptional regulations: RNA-Seq</b></i> (NCBI Sequence Read Archive <a href="http://trace.ncbi.nlm.nih.gov/Traces/sra/?study=SRP003951">Accession SRP003951</a>)

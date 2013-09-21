@@ -5,4 +5,7 @@
 
 	# jobs' path (relative to users' $HOME)
 	archive_path => 'DNASubway', 
+
+	subway_url => 'http://becket.iplantcollaborative.org',
+	remote_url => 'http://friday.iplantc.org/gb2/gbrowse'
 };

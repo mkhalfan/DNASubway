@@ -5,7 +5,7 @@
 	BOOTSTRAPS => 100,
 	MAX_SEQ_COUNT => 80,
 	MAX_BLAST_RESULTS => 20,
-	DNALC_TRANSFER_DIR => '/var/tmp',
+	DNALC_TRANSFER_DIR => '/var/www/vhosts/pipeline.dnalc.org/var/dnalc_transfer',
 	PHOTO_SUBMISSION_DIR => '/var/www/vhosts/pipeline.dnalc.org/var/projects/phylogenetics/photo_submissions',
 	BOLD_SUBMISSION_DIR => '/var/www/vhosts/pipeline.dnalc.org/var/projects/phylogenetics/bold_submissions',
 	GB_SUBMISSION_DIR => '/var/www/vhosts/pipeline.dnalc.org/var/projects/phylogenetics/gb_submissions',
@@ -13,6 +13,6 @@
 	GB_FTP_HOST => 'ftp-private.ncbi.nlm.nih.gov',
 	GB_FTP_USER => 'test_dnasubway',
 	GB_VALIDATION_USER => 'test_dnasubway_bankit',
-	GB_FTP_PW => '',
+	GB_FTP_PW => 'pby8V4Eu',
 	EXPORT_ON => 1,
 }

@@ -1,5 +1,5 @@
 {
-	id => 'dnalc-cuffdiff-stampede-test-2.1.1',
+	id => 'dnalc-cuffdiff-stampede-2.1.1u3',
 	#id => 'dnalc-cuffdiff-lonestar-2.1.1u1',
 	name => 'cuffdiff',
 	desc => 'Find significant changes in transcript expression, splicing, and promoter use.',

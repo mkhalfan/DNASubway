@@ -2,9 +2,8 @@
 	samples_common_name => '__%SPECIESNAMEHERE%__',
 	samples_dir => '/var/www/vhosts/pipeline.dnalc.org/var/samples',
 	target_samples_dir => '/var/www/vhosts/pipeline.dnalc.org/var/target_samples',
-
 	# browser types
-	export_browsers => {
+    export_browsers => {
 		gbrowse => {
 					param_prefix => ';eurl=',
 					param_postfix => '',
@@ -12,6 +11,6 @@
 		ensemble => {
 					param_prefix => ';contigviewbottom=url:',
 					param_postfix => '=normal',
-				},	
-		},
+				},
+	},
 }
