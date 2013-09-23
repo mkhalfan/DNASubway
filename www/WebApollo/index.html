@@ -11,7 +11,7 @@
 			processData: false,
 			dataType: "json",
 			contentType: "application/json",
-			data: "{ username: 'web_apollo_admin', password: 'web_apollo_admin' }",
+			data: "{ username: 'demo', password: 'demo' }",
 			success: function(data) {
 			  goToJBrowse(); // redirect to JBrowse on success
 			},
@@ -20,17 +20,8 @@
 		});
 	});
 
-  function getURLParameter(name) {
-    return decodeURIComponent(
-      (new RegExp('[?|&]' + name + 
-        '=' + '([^&;]+?)(&|#|;|$)').exec(location.search)||[,""])[1].replace(/\+/g, '%20'))
-	|| '1:1..100000';
-  }
-
   function goToJBrowse () {
-    var loc = getURLParameter('loc');
-    var tracks = getURLParameter('tracks');
-    window.location = 'jbrowse?loc=' + loc + ';tracks=' + tracks;
+    window.location = 'jbrowse' + location.search;
   }
 </script>
 </head>
