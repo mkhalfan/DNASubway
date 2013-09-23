@@ -198,7 +198,7 @@
         </div>
       </span>
       <span class="bt_browserRedLine"><a id="apollo_btn" href="javascript:;" \
-        onclick="<% $rm_status eq "done" && $is_owner ? "launch('apollo',null,'WebApollo');" : "" %>" \
+        onclick="<% $rm_status eq "done" && $is_owner ? "launch('apollo',1,'WebApollo');" : "" %>" \
 	class="<% $rm_status eq "done" && $is_owner ? '' : 'disabled'%>">WebApollo</a>
       </span>
     </span><!--END of CLASS  con_browserBT-->
@@ -207,23 +207,14 @@
   <span id="conRedline_ConColumnR2">
     <span class="con_browserBT">
       <span class="conIndicator_boxBrowse">
-        <div id="gbrowse_ind" class="conIndicator_<%$rm_status eq 
-          "done" ? 'Rb' : 'Rb_disabled' %>">
+        <div id="gbrowse_ind" class="conIndicator_<% $rm_status eq
+          "done" && $is_owner ? 'not-processed' : 'disabled' %>">
         </div>
       </span>
-    </span>
-    <span class="bt_browserBlue">
-%   if ( $sample && $sample->links) {
-      <a id="exporter_btn" href="javascript:;" \
-        class="<% $rm_status eq "done" ? 'Rb' : 'disabled'%>" \
-        onclick="<% $rm_status eq "done" ? 
-        "launch('exporter',null,'JBrowse')" : "" %>">
-        <div style="margin-top:7px">JBrowse</div>
-      </a>
-% }   else {
-      <a id="exporter_btn">No Browser<br>Available</a>
-% }
-
+      <span class="bt_browserRedLine"><a id="exporter_btn" href="javascript:;" \
+        onclick="<% $rm_status eq "done" && $is_owner ? "launch('exporter',null,'JBrowse');" : "" %>" \
+        class="<% $rm_status eq "done" && $is_owner ? '' : 'disabled'%>">JBrowse</a>
+      </span>
     </span>
 
 %   if ( $sample && $sample->links && 0) {

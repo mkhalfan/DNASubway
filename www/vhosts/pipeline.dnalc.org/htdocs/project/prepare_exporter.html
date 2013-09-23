@@ -35,10 +35,14 @@
 	my $wconfig = DNALC::Pipeline::Config->new->cf('WEB_APOLLO');
 
 
-
 	my $path = $wconfig->{WEBAPP_PATH} . "/$pid";
-	print STDERR "$0 JBrowse PATH: $path\n";
+	print STDERR "JBrowse PATH: $path\n";
 
+	#unless (-d $path) {
+	#    print STDERR "Ooops, there is no web apollo instance!\ncreating... \n";
+        #    $pm->create_web_apollo($pid,$wconfig->{WEBAPP_PATH});
+	#    print STDERR "OK\n";
+        #}
 
 	# To handle GFF dumps from Subway for JBrowse
 	my $exporter = $config->{EXE_PATH} . '/jb_gff_export.pl';	
@@ -52,15 +56,39 @@
 	# To decide if we are using JBrowse or WebApollo
 	my $toggle   = $config->{EXE_PATH} . '/jb_toggle.pl';
 
-	# get all GFF analysis reslts for the project web files
+
+	# Save any new apollo-derived annotations
+	unless ($apollo) {
+	    my $apollo_cache = $pm->work_dir . '/WEB_APOLLO';
+	    mkdir $apollo_cache unless -d $apollo_cache;
+	    my @gff_files;
+	    while (my $gff_file = <$path/tmp/*/*/*gz>) {
+	        push @gff_files, $gff_file;
+            }
+
+	    my $last_gff_file = pop @gff_files;
+
+	    print STDERR "I am saving the webapollo data\n";
+	    my $begin = time;
+	    open IN, "zcat $last_gff_file |" or die "Could not open $last_gff_file:$!";
+	    open OUT, ">$apollo_cache/web_apollo.gff3" or die $!;
+	    while (<IN>) {
+	        last if /FASTA/;
+	        next if /^#/;
+		last if /FASTA/;
+	        s/transcript/mRNA/;
+		print OUT;
+	    }
+	    my $elapsed = time - $begin;
+	    print STDERR "That took me $elapsed seconds\n";
+	}
+
+	# get all GFF analysis results from the project web files
 	my $gff3_files = $pm->get_available_gff3_files || [];
 
-	print STDERR "GFF:\n",Dumper $gff3_files;
+	#print STDERR "GFF:\n",Dumper $gff3_files;
 
-	# Clean up data from previous runs
-	my @old_sources = qw/AUGUSTUS FGENESH SNAP REPEAT_MASKER TRNA_SCAN BLASTN BLASTX/;
-	system "$cleaner @old_sources";
-
+	my @old_sources = qw/WEB_APOLLO AUGUSTUS FGENESH SNAP REPEAT_MASKER TRNA_SCAN BLASTN BLASTX/;
 
 	# Whether to include the WebApollo plugin
 	system "$toggle $pid $apollo";
@@ -75,11 +103,14 @@
 		my $outfile  = "/tmp/$pid.$source.gff3";
 		push @sources, $source;
 
+		# collect garbage
+		system "$cleaner $pid $source";
+
 		# massage GFF format
 		system "$exporter $offset $ref $infile > $outfile";
 
 		# convert to JSON flatfiles
-		system "$importer $pid $outfile";
+		system "$importer $pid $outfile" unless $apollo and $source eq 'WEB_APOLLO';
 
 		unlink $outfile;
 	}
@@ -96,7 +127,7 @@
 
         my $tracks;
         unless ($apollo) {
-            $tracks = join(',','EG',@old_sources);
+            $tracks = join(',','WEB_APOLLO','EG',@preferred_sources);
         }
         else {
             $tracks = join(',',@preferred_sources,'EG');
