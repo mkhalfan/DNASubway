@@ -21,6 +21,7 @@ sub new {
 	my ($class, $project) = @_;
 
 	my $self = bless {
+	                                web_apollo_config => DNALC::Pipeline::Config->new->cf('WEB_APOLLO'),
 					config => DNALC::Pipeline::Config->new->cf('PIPELINE'),
 					logger => DNALC::Pipeline::ProjectLogger->new,
 				}, __PACKAGE__;
@@ -56,6 +57,50 @@ sub config {
 }
 #-----------------------------------------------------------------------------
 
+sub organism {
+    my $self = shift;
+    $self->{organism} ||= shift;
+    return $self->{organism};
+}
+
+sub create_web_apollo {
+    my $self     = shift;
+    my $pid      = shift;
+    my $webapp_path = shift;
+
+    my $organism = lc $self->organism;
+    $organism =~ s/\s+/_/;
+    my $web_apollo_base = "../../base.tar.gz";
+
+    # First, we unpack the web_apollo directory tree (with symlinks)
+    my $target_dir = "$webapp_path/$pid";
+    mkdir $target_dir or die "Could not create target $target_dir:$!";
+    chdir $target_dir or die "Could not cd to $target_dir:$!";
+    system "tar zxvf $web_apollo_base &> /dev/null";
+    -d 'config' or die "tarball was not unpacked!";
+
+    # Set up permissions so WebApollo/tomcat can save annotations
+    system "chmod 777 tmp annotations";
+
+    # Interpolate variables in config.xml
+    chdir 'config' or die "No config directory:$!";
+    open IN,  'config.base.xml' or die $!;
+    open OUT, '>config.xml' or die $!;
+
+    while (<IN>) {
+	s/WEBAPP_PATH/$target_dir/;
+	s/PROJECT_ID/$pid/;
+	s/ORGANISM/$organism/;
+	print OUT;
+    }
+    close IN;
+    close OUT;
+
+    print STDERR "Created WebApollo instance at $target_dir\n";
+}
+
+
+
 sub create_project {
 	my ($self, $params) = @_;
 
@@ -68,6 +113,7 @@ sub create_project {
 	}
 	my $common_name = $params->{common_name};
 	my $organism = $params->{organism};
+        $self->organism($organism);
 	my $clade = $params->{clade} || 'u';
 	my $name = $params->{name};
 	my $user_id = $params->{user_id};
@@ -118,12 +164,9 @@ sub create_project {
 	my $out = Bio::SeqIO->new(-file => "> $fasta_file", -format => 'Fasta');
 	$out->write_seq( $seq );
 	
-#	my $rc = $self->init_chado;
-
-#	unless ($rc) {
-#		$proj->delete;
-#		return {status => 'fail', msg => "Unable to initialize the project!"};
-#	}
+	# set up a WebApollo instance
+	my $webapp_path = $self->{web_apollo_config}{'WEBAPP_PATH'};
+	$self->create_web_apollo($proj,$webapp_path);
 
 	return {status => 'success', msg => $msg};
 }
@@ -365,7 +408,7 @@ sub chado_user_profile {
 #
 sub get_gff3_file {
 	my ($self, $routine) = @_;
-	
+
 	unless ($routine) {
 		print STDERR  "ProjectManager->get_gff3_file: routine is missing!!", $/;
 		return;
