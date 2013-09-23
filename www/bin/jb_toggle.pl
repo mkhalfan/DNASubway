@@ -1,13 +1,17 @@
 #!/usr/bin/perl -w
 use strict;
 
-use constant JB     => '/usr/local/tomcat7/webapps/WebApollo/jbrowse/data';
+# Load either WebApollo or plain old JBrowse config
 
-my $web_apollo = shift;
+use constant JB     => '/usr/local/tomcat7/webapps/project';
 
-chdir JB;
+my $pid = shift;
+my $apollo = shift;
 
-my $target = $web_apollo ? 'apollo.json' : 'jbrowse.json';
+my $path = JB . "/$pid/jbrowse/data";
+chdir $path or die "could not cd to $path:$!";
+
+my $target = $apollo ? 'apollo.json' : 'jbrowse.json';
 
 system "cp $target trackList.json";
 

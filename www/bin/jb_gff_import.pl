@@ -4,11 +4,13 @@ use Data::Dumper;
 
 # Import GFF into JBrowse
 
-use constant JBPATH => '/usr/local/tomcat7/webapps/WebApollo/jbrowse';
+use constant JBPATH => '/usr/local/tomcat7/webapps/project';
 use constant IMPORT => 'bin/flatfile-to-json.pl';
 
 
-chdir JBPATH || die "I could not cd to ".JBPATH." $!";
+my $pid = shift;
+my $jb_path = JBPATH . "/$pid/jbrowse";
+chdir $jb_path || die "I could not cd to $jb_path";
 
 my $infile = shift || die "I need a GFF3 infile! $!";
 -f $infile || die "The infile $infile does not exist! $!";
@@ -16,10 +18,7 @@ my $infile = shift || die "I need a GFF3 infile! $!";
 my ($source) = $infile =~ /([^\.]+)\.gff3/;
 my $track_path = "data/tracks/$source";
 
-#my $data = shift;
-#-d $data || die "Data folder $data is not a directory! $!";
 
-# Import the gff
 my %nice_name = (
 		 FGENESH   => 'FGenesH',
    		 AUGUSTUS  => 'Augustus',
