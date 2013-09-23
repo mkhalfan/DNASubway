@@ -32,53 +32,82 @@
 	my $offset = $start - 1;
 
 	my $config = $pm->config;
-	my $cfg = DNALC::Pipeline::Config->new();
-	my $wconfig = $cfg->cf->('WEB_APOLLO');
+	my $wconfig = DNALC::Pipeline::Config->new->cf('WEB_APOLLO');
 
+
+
+	my $path = $wconfig->{WEBAPP_PATH} . "/$pid";
+	print STDERR "$0 JBrowse PATH: $path\n";
+
+
+	# To handle GFF dumps from Subway for JBrowse
 	my $exporter = $config->{EXE_PATH} . '/jb_gff_export.pl';	
+
+	# To handle import of Subway GFF 
 	my $importer = $config->{EXE_PATH} . '/jb_gff_import.pl';
+
+	# To clean up old GFF in JBrowse
 	my $cleaner  = $config->{EXE_PATH} . '/jb_gff_clean.pl'; 
+
+	# To decide if we are using JBrowse or WebApollo
 	my $toggle   = $config->{EXE_PATH} . '/jb_toggle.pl';
 
+	# get all GFF analysis reslts for the project web files
 	my $gff3_files = $pm->get_available_gff3_files || [];
 
+	print STDERR "GFF:\n",Dumper $gff3_files;
+
+	# Clean up data from previous runs
 	my @old_sources = qw/AUGUSTUS FGENESH SNAP REPEAT_MASKER TRNA_SCAN BLASTN BLASTX/;
 	system "$cleaner @old_sources";
 
+
+	# Whether to include the WebApollo plugin
+	system "$toggle $pid $apollo";
+
+	# Load GFF into JBrowse
 	my @sources;
+
+	print STDERR "I will import the subway GFF now\n";
+	my $begin = time;
 	for my $infile (@$gff3_files) {
 		my ($source) = $infile =~ m!/([_A-Z]+)/!;
 		my $outfile  = "/tmp/$pid.$source.gff3";
 		push @sources, $source;
 
+		# massage GFF format
 		system "$exporter $offset $ref $infile > $outfile";
-		system "$importer $outfile";
+
+		# convert to JSON flatfiles
+		system "$importer $pid $outfile";
 
 		unlink $outfile;
 	}
+	my $elapsed = time - $begin;
+	print STDERR "That took me $elapsed seconds\n";
 
-	my @preferred_sources;
-	my %available = map {$_ => 1} @sources;
-	for (@old_sources) {
-		next if /BLAST|REPEAT|TRNA/;
-		push @preferred_sources, $_ if $available{$_};
-	}	
-	
-	my $tracks;
-	unless ($apollo) {
-		$tracks = join(',','EG',@old_sources);
+
+        my @preferred_sources;
+        my %available = map {$_ => 1} @sources;
+        for (@old_sources) {
+            next if /BLAST|REPEAT|TRNA/;
+            push @preferred_sources, $_ if $available{$_};
         }
-	else {
-		$tracks = join(',',@preferred_sources,'EG');
-	}	
-		
-	system "$toggle $apollo";
+
+        my $tracks;
+        unless ($apollo) {
+            $tracks = join(',','EG',@old_sources);
+        }
+        else {
+            $tracks = join(',',@preferred_sources,'EG');
+        }
 
 
-	my $url = $wconfig('WEB_APOLLO_URL');
-	$url .= "loc=$ref:$start..$end\&" . "tracks=$tracks";
-	$url .= "\&overview=0\&tracklist=0" unless $apollo;
-	print STDERR "$0 URL: $url\n";
+        my $url = $wconfig->{WEB_APOLLO_URL} . "/$pid?";
+	$url .= "overview=0\&tracklist=0\&" unless $apollo;
+        $url .= "loc=$ref:$start..$end\&tracks=$tracks";
+        print STDERR "JBrowse URL: $url\n";
+
 	$m->redirect($url);
 
 </%init>

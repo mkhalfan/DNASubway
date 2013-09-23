@@ -215,7 +215,7 @@
     <span class="bt_browserBlue">
 %   if ( $sample && $sample->links) {
       <a id="exporter_btn" href="javascript:;" \
-        class="<% $rm_status eq "done" ? '' : 'disabled'%>" \
+        class="<% $rm_status eq "done" ? 'Rb' : 'disabled'%>" \
         onclick="<% $rm_status eq "done" ? 
         "launch('exporter',null,'JBrowse')" : "" %>">
         <div style="margin-top:7px">JBrowse</div>
