@@ -1,68 +1,65 @@
 {
-   "share_link" : 0,
-   "TRACK DEFAULTS": {
-        "maxHeight" : 75
-   },
-   "tracks" : [
-      {
-         "style" : {
-            "className" : "feature"
-         },
-         "key" : "Ensembl genes",
-         "storeClass" : "JBrowse/Store/SeqFeature/NCList",
-         "trackType" : null,
-         "urlTemplate" : "tracks/EG/{refseq}/trackData.json",
-         "compress" : 0,
-         "type" : "FeatureTrack",
-         "label" : "EG"
-      },
-      {
-         "storeClass" : "JBrowse/Store/SeqFeature/BAM",
-         "urlTemplate" : "bam/at_RNA-Seq.bam",
-         "style" : {
-            "height" : 5,
-            "color_rev_strand" : "red",
-            "color_fwd_strand" : "blue"
-         },
-         "label" : "tophat_aln",
-         "type" : "JBrowse/View/Track/Alignments2",
-         "key" : "TopHat Alignments"
-      },
-      {
-         "storeClass" : "JBrowse/Store/SeqFeature/BAM",
-         "urlTemplate" : "bam/at_RNA-Seq.bam",
-         "style" : {
-            "height" : 30
-         },
-         "label" : "tophat_cov",
-         "type" : "JBrowse/View/Track/Wiggle/XYPlot",
-         "key" : "TopHat Coverage"
-      },
-      {
-         "style" : {
-            "className" : "feature"
-         },
-         "key" : "Cufflinks transcripts",
-         "storeClass" : "JBrowse/Store/SeqFeature/NCList",
-         "trackType" : null,
-         "urlTemplate" : "tracks/CT/{refseq}/trackData.json",
-         "compress" : 0,
-         "type" : "FeatureTrack",
-         "label" : "CT"
-      
-      }
-   ],
-   "plugins" : [
-      {
-         "location" : "./plugins/WebApollo",
-         "name" : "WebApollo"
-      }
-   ],
-   "names" : {
-      "url" : "names/",
-      "type" : "Hash"
-   },
-   "favicon" : "./plugins/WebApollo/img/webapollo_favicon.ico",
-   "formatVersion" : 1,
-   "alwaysOnTracks" : "DNA,Annotations"
+    "share_link": 0,
+    "TRACK DEFAULTS": {
+        "maxHeight": 75
+    },
+    "tracks": [
+        {
+            "chunkSize": 20000,
+            "storeClass": "JBrowse/Store/Sequence/StaticChunked",
+            "urlTemplate": "seq/{refseq_dirpath}/{refseq}-",
+            "type": "SequenceTrack",
+            "label": "DNA",
+            "key": "Reference sequence"
+        },
+        {
+            "style": {
+                "className": "feature"
+            },
+            "key": "Ensembl genes",
+            "storeClass": "JBrowse/Store/SeqFeature/NCList",
+            "trackType": null,
+            "urlTemplate": "tracks/EG/{refseq}/trackData.json",
+            "compress": 0,
+            "type": "FeatureTrack",
+            "label": "EG"
+        },
+        {
+            "storeClass": "JBrowse/Store/SeqFeature/BAM",
+            "urlTemplate": "bam/at_RNA-Seq.bam",
+            "style": {
+                "height": 5,
+                "color_rev_strand": "red",
+                "color_fwd_strand": "blue"
+            },
+            "label": "tophat_aln",
+            "type": "JBrowse/View/Track/Alignments2",
+            "key": "TopHat Alignments"
+        },
+        {
+            "style": {
+                "className": "feature"
+            },
+            "key": "Cufflinks transcripts",
+            "storeClass": "JBrowse/Store/SeqFeature/NCList",
+            "trackType": null,
+            "urlTemplate": "tracks/CT/{refseq}/trackData.json",
+            "compress": 0,
+            "type": "FeatureTrack",
+            "label": "CT"
+        }
+    ],
+    "plugins": [
+        {
+            "location": "./plugins/WebApollo",
+            "name": "WebApollo"
+        }
+    ],
+    "names": {
+        "url": "names/",
+        "type": "Hash"
+    },
+    "favicon": "./plugins/WebApollo/img/webapollo_favicon.ico",
+    "formatVersion": 1,
+    "alwaysOnTracks": "DNA,Annotations"
 }

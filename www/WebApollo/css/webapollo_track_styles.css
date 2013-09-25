@@ -12,10 +12,15 @@
   height: 16px;
 }
 
+.evidence-CDS,
 .webapollo-CDS {
     height: 75%;
     top: 13%;
-    background-color: cornflowerblue;
+    background-color: blue;
+}
+
+.evidence-CDS {
+    background-color: teal;
 }
 
 .webapollo-UTR {
@@ -23,6 +28,26 @@
     top: 13%;
     background-color: gainsboro;
 }
+
+.webapollo-blastn_part,
+.webapollo-blastx_part {
+    position: absolute;
+    height: 8px;
+    margin-top: -2px;
+    background-color: goldenrod;
+    border-style: solid;
+    border-color: goldenrod;
+    border-width: 1px 1px 1px 1px;
+    z-index: 8;
+    min-width: 1px;
+    cursor: pointer;
+}
+
+.webapollo-blastx_part {
+    border-color: brown;
+    background-color: brown;
+}
+
 
 .mRNA, 
 .plus-mRNA, 
@@ -298,6 +323,22 @@ div.basic-hist {
     /*    margin-top: 2px; */  /* rely on centering in code instead? */
 }
 
+.magenta-80pct,
+.plus-magenta-80pct,
+.minus-magenta-80pct  {
+    background-color: #8F408F;
+    height: 60%;
+    top: 20%;
+}
+
+.purple-80pct,
+.plus-purple-80pct,
+.minus-purple-80pct  {
+    background-color: #8F408F;
+    height: 60%;
+    top: 20%;
+}
+
 .purple-60pct, 
 .plus-purple-60pct, 
 .minus-purple-60pct  {
@@ -317,10 +358,43 @@ div.basic-hist {
 .darkblue-80pct, 
 .plus-darkblue-80pct, 
 .minus-darkblue-80pct  {
-    background-color: #1F3DDE;
+    background-color: #00008B;
     height: 80%;
     top: 10%;
 }
+
+.blue-80pct,
+.plus-blue-80pct,
+.minus-blue-80pct  {
+    background-color: #0000FF;
+    height: 80%;
+    top: 10%;
+}
+
+.darkcyan-80pct,
+.plus-darkcyan-80pct,
+.minus-darkcyan-80pct  {
+    background-color: #008B8B;
+    height: 80%;
+    top: 10%;
+}
+
+.goldenrod-80pct,
+.plus-goldenrod-80pct,
+.minus-goldenrod-80pct  {
+    background-color: #DAA420;
+    height: 80%;
+    top: 10%;
+}
+
+.brown-80pct,
+.plus-brown-80pct,
+.minus-brown-80pct  {
+    background-color: #8B4513;
+    height: 80%;
+    top: 10%;
+}
+
 
 .bluegreen-80pct, 
 .plus-bluegreen-80pct, 
@@ -752,6 +826,8 @@ div.canvas-track-control {
     background-color: white; 
     border: 2px black solid;
 }
+
+
 */
 
 /* maker    background-color: rgb(255,204,204); */
