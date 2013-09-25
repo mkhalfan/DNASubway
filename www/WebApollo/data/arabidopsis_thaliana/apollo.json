@@ -53,12 +53,12 @@
             "label": "EG"
         },
         {
+	    "maxFeatureScreenDensity": 3,
+            "maxHeight": 100,
             "storeClass": "JBrowse/Store/SeqFeature/BAM",
             "urlTemplate": "bam/at_RNA-Seq.bam",
             "style": {
-                "height": 5,
-                "color_rev_strand": "red",
-                "color_fwd_strand": "blue"
+                "height": 5
             },
             "label": "tophat_aln",
             "type": "JBrowse/View/Track/Alignments2",
