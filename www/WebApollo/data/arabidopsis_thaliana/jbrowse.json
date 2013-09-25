@@ -38,7 +38,10 @@
         },
         {
             "style": {
-                "className": "feature"
+                "className": "feature",
+                "subfeatureClasses": {
+                    "CDS":"cadetblue-80pct"
+                }
             },
             "key": "Cufflinks transcripts",
             "storeClass": "JBrowse/Store/SeqFeature/NCList",
