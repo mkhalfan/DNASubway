@@ -207,7 +207,7 @@
   <span id="conRedline_ConColumnR2">
     <span class="con_browserBT">
       <span class="conIndicator_boxBrowse">
-        <div id="gbrowse_ind" class="conIndicator_<% $rm_status eq
+        <div id="jbrowse_ind" class="conIndicator_<% $rm_status eq
           "done" && $is_owner ? 'not-processed' : 'disabled' %>">
         </div>
       </span>
@@ -217,27 +217,8 @@
       </span>
     </span>
 
-%   if ( $sample && $sample->links && 0) {
-    <div class="bt_browserBlueSpacer">
-      <div id="con_browserBlueAdd">
-        <span class="conIndicator_boxBrowse">
-          <div id="exporter_ind" class="conIndicator_<%$rm_status eq "done" ? 
-            'Rb' : 'Rb_disabled' %>">
-	  </div>
-        </span>
-	<span class="bt_browserBlueAdd">
-          <a id="exporter_btn" href="javascript:;" \
-            class="<% $rm_status eq "done" ? '' : 'disabled'%>" \
-	    onclick="<% $rm_status eq "done" ? 
-            "launch('exporter',null,'" .  $external_browser_name . "')" : "" %>">
-	    <div style="margin-top:7px"><% $external_browser_name %></div>
-          </a>
-        </span>
-      </div>
-    </div>
-%   } else {
     <span class="bt_browserBlueSpacer"></span>
-%	}
+
     <span class="con_browserBT ">
       <span class="conIndicator_boxBrowse">
         <div id="target_ind" class="conIndicator_<% $rm_status eq 
@@ -335,6 +316,13 @@
 </div><!--END of ID conProjectInfo-->
 </div><!--END of ID container_rightContent-->  
 
+% # This is to pre-load web_apollo to avoid latency when it is launched for real
+<div style="display:none" id="hiddenWebApollo">
+  <iframe src="<% $web_apollo_url %>"></iframe>
+</div>
+
+
+
 %#-------------------------------------------------
 
 <%args>
@@ -409,6 +397,9 @@ my $is_owner = $s->{user_id} == $user->user_id;
 my ($mp) = DNALC::Pipeline::MasterProject->search(user_id => $user->id, project_id => $proj->id);
 my $is_public = $mp ? $mp->public : 0;
 
+
+my $web_apollo_url = "/project/prepare_exporter.html?pid=$pid;apollo=1;sleep=10";
+
 my $username = $s->{username};
 my $is_admin = grep {/^$username$/} @{$pcf->{ADMINS}};
 
@@ -471,9 +462,6 @@ else { # most likely is GET
 	$institution ||= "-";
 }
 
-## Get External Browser Name
-
-my $external_browser_name = 'JBrowse';
 
 </%init>
 %#-------------------------------------------------

@@ -17,7 +17,7 @@ var rnames = {
 			'blastn_user' : 'User BLASTN',
 			'blastx_user' :'User BLASTX',
 			'gbrowse' : 'GBrowse',
-			'exporter' : 'External Browser',
+			'exporter' : 'JBrowse',
 			'target' : 'Phylogenetic Tree'
 		};
 
@@ -40,7 +40,6 @@ function check_status (pid, op, h) {
 			//dbg = r;
 			if (r.status == 'success') {
 				var file = r.output || '#';
-
 				if (r.running == 0 && !r.known) {
 					//b.removeClassName('processing');
 					b.removeClassName('disabled');
@@ -92,6 +91,8 @@ function check_status (pid, op, h) {
 							$('apollo_btn').removeClassName('disabled');
 							$('apollo_ind').removeClassName("conIndicator_disabled");
 							$('apollo_ind').addClassName("conIndicator_not-processed");
+                                                        $('jbrowse_ind').removeClassName("conIndicator_disabled");
+                                                        $('jbrowse_ind').addClassName("conIndicator_not-processed");
 							$('evidence_ind').removeClassName('conIndicator_disabled');
 							$('evidence_ind').addClassName('conIndicator_not-processed');
 							$('add_evidence_link').removeClassName('disabled');
@@ -115,7 +116,8 @@ function check_status (pid, op, h) {
 						$('target_btn').removeClassName('disabled');
 						$('target_ind').removeClassName("conIndicator_Rb_disabled");
 						$('target_ind').addClassName("conIndicator_Rb");
-					}
+						}
+
 				} else {}
 			}
 			else  if (r.status == 'error') {
@@ -221,6 +223,10 @@ function run (op) {
 	} catch (e) {
 		debug(e.toString());
 	};
+
+	if (op != 'repeat_masker') {
+		document.innerHTML = 'Sheldon';
+        }
 }
 
 

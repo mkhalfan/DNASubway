@@ -1,6 +1,7 @@
 <%args>
 	$pid => 0
 	$apollo => 0;
+	$sleep => 0;
 </%args>
 <%once>
 	use DNALC::Pipeline::App::ProjectManager ();
@@ -9,6 +10,12 @@
 	use Data::Dumper;
 </%once>
 <%init>
+        # we may need a delay to let tomcat deploy the new webapp
+        if ($sleep) {
+	    print STDERR "I am going to sleep for a little while\n";
+	    sleep $sleep;
+        }
+
 	$m->session->{pipeline} ||= {};
 	my $s = $m->session->{pipeline};
 	$r->content_type('text/plain');
@@ -66,21 +73,24 @@
 	        push @gff_files, $gff_file;
             }
 
-	    my $last_gff_file = pop @gff_files;
+	    # We just want the most recent WebApollo saved GFF
+	    my ($last_gff_file ) = sort {-M $a <=> -M $b} grep {-e} @gff_files;
 
-	    print STDERR "I am saving the webapollo data\n";
-	    my $begin = time;
-	    open IN, "zcat $last_gff_file |" or die "Could not open $last_gff_file:$!";
-	    open OUT, ">$apollo_cache/web_apollo.gff3" or die $!;
-	    while (<IN>) {
-	        last if /FASTA/;
-	        next if /^#/;
-		last if /FASTA/;
-	        s/transcript/mRNA/;
-		print OUT;
-	    }
-	    my $elapsed = time - $begin;
-	    print STDERR "That took me $elapsed seconds\n";
+	    if ($last_gff_file) {
+	        print STDERR "I am saving the webapollo data\n";
+		my $begin = time;
+		open IN, "zcat $last_gff_file |" or die "Could not open $last_gff_file:$!";
+		open OUT, ">$apollo_cache/web_apollo.gff3" or die $!;
+		while (<IN>) {
+		    last if /FASTA/;
+		    next if /^#/;
+		    last if /FASTA/;
+	            s/transcript/mRNA/;
+		    print OUT;
+	        }
+	        my $elapsed = time - $begin;
+	        print STDERR "That took me $elapsed seconds\n";
+            }
 	}
 
 	# get all GFF analysis results from the project web files
@@ -121,17 +131,17 @@
         my @preferred_sources;
         my %available = map {$_ => 1} @sources;
         for (@old_sources) {
-            next if /BLAST|REPEAT|TRNA/;
+            next if /BLASTX|REPEAT|TRNA/;
             push @preferred_sources, $_ if $available{$_};
         }
 
-        my $tracks;
+
         unless ($apollo) {
-            $tracks = join(',','WEB_APOLLO','EG',@preferred_sources);
+	    @preferred_sources = ('WEB_APOLLO',grep {!/BLAST/} @preferred_sources,'EG');
         }
-        else {
-            $tracks = join(',',@preferred_sources,'EG');
-        }
+
+	my $tracks = join(',',@preferred_sources);
+
 
 
         my $url = $wconfig->{WEB_APOLLO_URL} . "/$pid?";
