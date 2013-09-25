@@ -5,14 +5,6 @@
     },
     "tracks": [
         {
-            "chunkSize": 20000,
-            "storeClass": "JBrowse/Store/Sequence/StaticChunked",
-            "urlTemplate": "seq/{refseq_dirpath}/{refseq}-",
-            "type": "SequenceTrack",
-            "label": "DNA",
-            "key": "Reference sequence"
-        },
-        {
             "style": {
                 "className": "feature"
             },
@@ -40,10 +32,10 @@
             "style": {
                 "className": "feature",
                 "subfeatureClasses": {
-                    "CDS":"cadetblue-80pct"
+                    "CDS":"lightseagreen-80pct"
                 }
             },
-            "key": "Cufflinks transcripts",
+            "key": "Cufflinks transfrags",
             "storeClass": "JBrowse/Store/SeqFeature/NCList",
             "trackType": null,
             "urlTemplate": "tracks/CT/{refseq}/trackData.json",

@@ -68,10 +68,10 @@
             "style": {
                 "className": "feature",
                 "subfeatureClasses": {
-		    "CDS":"cadetblue-80pct"
+		    "CDS":"lightseagreen-80pct"
 	      	}
             },
-            "key": "Cufflinks transcripts",
+            "key": "Cufflinks transfrags",
             "storeClass": "JBrowse/Store/SeqFeature/NCList",
             "trackType": null,
             "urlTemplate": "tracks/CT/{refseq}/trackData.json",
