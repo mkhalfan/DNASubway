@@ -379,6 +379,14 @@ div.basic-hist {
     top: 10%;
 }
 
+.lightseagreen-80pct,
+.plus-lightseagreen-80pct,
+.minus-lightseagreen-80pct  {
+    background-color: #20B2AA;
+    height: 80%;
+    top: 10%;
+}
+
 .goldenrod-80pct,
 .plus-goldenrod-80pct,
 .minus-goldenrod-80pct  {
