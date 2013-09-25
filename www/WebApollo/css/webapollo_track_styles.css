@@ -452,14 +452,14 @@ div.basic-hist {
 .plus-bam-read, 
 .minus-bam-read {
     height: 5px; 
-    background-color: #AACDDC;
+    background-color: gainsboro;
     z-index: 8;
 }
 
 /* testing different coloration of BAM alignments on minus strand
 .minus-bam {
     height: 5px; 
-    background-color: #AA00AA;
+    background-color: red;
     z-index: 8;
 }
 */
@@ -469,9 +469,13 @@ div.basic-hist {
 .plus-cigarM, 
 .minus-cigarM  {
     height: 100%; 
-    background-color: #1B8A99;
+    background-color: blue;
     z-index: 8;   /* rendered below most other subfeatures */
     min-width: 1px;
+}
+
+.minus-cigarM {
+     background-color: red;
 }
 
 /* CIGAR string "D" subfeature, indicating deletion in aligned sequence relative to viewed sequence */
