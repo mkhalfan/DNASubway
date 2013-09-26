@@ -1,7 +1,7 @@
 {
 	API_ENABLED => 0,
-	COMPONENT => 'iPlant infrastructure',
-	#COMPONENT => 'iPlant Foundation API',
+	#COMPONENT => 'iPlant infrastructure',
+	COMPONENT => 'iPlant Foundation API',
 	#COMPONENT => 'The Stampede HPC cluster',
 	ADMINS => [qw/corbel mak cooluser/],
 	ADMIN_EMAIL => '"DNASubway Admin" <dnalcadmin@iplantcollaborative.org>',
