@@ -503,13 +503,4 @@ Event.observe(document, 'keypress', function(ev) {
 	}
 });
 
-$(document).keydown(function(e) {
-    if (e.keyCode === 8 || e.keyCode === 8) {
-        var element = e.target.nodeName.toLowerCase();
-        if ((element != 'input' && element != 'textarea') || $(e.target).attr("readonly")) {
-            alert('delete');
-	    return false;
-        }
-    }
-}); 
 
