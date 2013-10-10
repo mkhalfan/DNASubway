@@ -1,0 +1,6 @@
+We need seperate directories for lonestar and stampede because 
+they use different builds of R.
+
+
+For architecture reasons, R was built as a standalone application,
+with bioconductor 2.11 and cummeRbund 2.0 installed.

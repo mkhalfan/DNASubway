@@ -1,0 +1,54 @@
+{
+    "name": "dnalc-fastqc-stampede",
+    "parallelism": "serial",
+    "version": "0.10.1",
+    "helpURI": "http://hannonlab.cshl.edu/fastx_toolkit/",
+    "label": "FastQC",
+    "shortDescription": "",
+    "longDescription": "",
+    "author": "Sheldon McKay",
+    "datePublished": "Feb 21, 2013",
+    "tags": [
+        "next-gen"
+    ],
+    "ontology": [
+        "http://sswap.info/iPlant/FoundationalAPI"
+    ],
+    "executionHost": "stampede.tacc.xsede.org",
+    "executionType": "HPC",
+    "deploymentPath": "/iplant/home/smckay/applications/dnalc/fastx",
+    "templatePath": "fastqc.sh",
+    "testPath": "library/test.sh",
+    "checkpointable": "false",
+    "modules": [
+        "purge",
+        "load TACC",
+        "load irods"
+    ],
+    "inputs": [
+        {
+            "id": "input",
+            "value": {
+                "default": "/shared/iplantcollaborative/example_data/tophat/athaliana_rna.fq",
+                "validator": "",
+                "required": true,
+                "visible": true
+            },
+            "details": {
+                "label": "FASTQ sequence library 1",
+                "description": ""
+            },
+            "semantics": {
+                "ontology": [
+                    "http://sswapmeet.sswap.info/util/Sequence"
+                ],
+                "minCardinality": 1,
+                "fileTypes": [
+                    "fastq-0"
+                ]
+            }
+        }
+    ],
+    "parameters": [],
+    "outputs": []
+}
