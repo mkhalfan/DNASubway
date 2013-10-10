@@ -171,7 +171,7 @@ END
 ;
 
     my $first = 1;
-    my $ehref = 'http://ensemblgenomes.org/search?site=ensembl&q=';
+    my $ehref = 'http://ensemblgenomes.org/search/eg/';
     while (<TXT>) {
 	chomp;
 	if ($first) {
