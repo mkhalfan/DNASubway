@@ -1,0 +1,511 @@
+{
+    "name": "dnalc-cufflinks-stampede",
+    "parallelism": "serial",
+    "version": "2.1.1",
+    "helpURI": "http://cufflinks.cbcb.umd.edu/",
+    "label": "CuffLinks",
+    "shortDescription": "Transcript assembly and basic quantitation for RNA-Seq",
+    "longDescription": "",
+    "author": "Sheldon McKay",
+    "datePublished": "Apr 19, 2013",
+    "tags": [
+        "next-gen",
+        "assembly",
+        "rnaseq"
+    ],
+    "ontology": [
+        "http://sswap.info/iPlant/FoundationalAPI"
+    ],
+    "executionHost": "stampede.tacc.xsede.org",
+    "executionType": "HPC",
+    "deploymentPath": "/iplant/home/smckay/applications/dnalc/cufflinks/stampede",
+    "templatePath": "cufflinks.sh",
+    "testPath": "library/test.sh",
+    "checkpointable": "false",
+    "modules": [
+        "purge",
+        "load TACC",
+        "load irods",
+	"load samtools"
+    ],
+    "inputs": [
+        {
+            "id": "query1",
+            "value": {
+                "default": "/smckay/cuffdiff_test/WT_rep1.bam",
+                "validator": "",
+                "required": true,
+                "visible": true
+            },
+            "details": {
+                "label": "RNA reads aligned with TopHat",
+                "description": ""
+            },
+            "semantics": {
+                "ontology": [
+                    "http://sswapmeet.sswap.info/util/Alignment"
+                ],
+                "minCardinality": 1,
+                "fileTypes": [
+                    "BAM-0.1.2",
+                    "SAM-0.1.2"
+                ]
+            }
+        },
+        {
+            "id": "ANNOTATION",
+            "value": {
+                "default": "/smckay/cuffdiff_test/annotation.gtf",
+                "validator": "",
+                "required": false,
+                "visible": true
+            },
+            "details": {
+                "label": "Reference annotation",
+                "description": "Tells Cufflinks to use the supplied reference annotation to estimate isoform expression. It will not assemble novel transcripts, and the program will ignore alignments not structurally compatible with any reference transcript."
+            },
+            "semantics": {
+                "ontology": [
+                    "http://sswapmeet.sswap.info/util/Annotation"
+                ],
+                "minCardinality": 1,
+                "fileTypes": [
+                    "GTF-2.2",
+                    "GFF-3.0"
+                ]
+            }
+        },
+        {
+            "id": "GUIDE_GTF",
+            "value": {
+                "default": "",
+                "validator": "",
+                "required": false,
+                "visible": true
+            },
+            "details": {
+                "label": "Guide annotation for RABT",
+                "description": "Tells Cufflinks to use the supplied reference annotation (GFF) to guide RABT assembly. Reference transcripts will be tiled with faux-reads to provide additional information in assembly."
+            },
+            "semantics": {
+                "ontology": [
+                    "http://sswapmeet.sswap.info/util/Annotation"
+                ],
+                "minCardinality": 1,
+                "fileTypes": [
+                    "GTF-2.2",
+                    "GFF-3.0"
+                ]
+            }
+        },
+        {
+            "id": "MASK_GTF",
+            "value": {
+                "default": "",
+                "validator": "",
+                "required": false,
+                "visible": true
+            },
+            "details": {
+                "label": "Mask annotation file",
+                "description": "Tells Cufflinks to ignore all reads that could have come from transcripts in this GTF file."
+            },
+            "semantics": {
+                "ontology": [
+                    "http://sswapmeet.sswap.info/util/Annotation"
+                ],
+                "minCardinality": 1,
+                "fileTypes": [
+                    "GTF-2.2",
+                    "GFF-3.0"
+                ]
+            }
+        },
+        {
+            "id": "BIAS_FASTA",
+            "value": {
+                "default": "/smckay/cuffdiff_test/genome.fas",
+                "validator": "",
+                "required": false,
+                "visible": true
+            },
+            "details": {
+                "label": "Genome FASTA file",
+                "description": "Tells Cufflinks to run its new bias detection and correction algorithm which can significantly improve accuracy of transcript abundance estimates."
+            },
+            "semantics": {
+                "ontology": [
+                    "http://sswapmeet.sswap.info/util/Annotation"
+                ],
+                "minCardinality": 1,
+                "fileTypes": [
+                    "FASTA-0"
+                ]
+            }
+        }
+    ],
+    "parameters": [
+        {
+            "id": "jobName",
+            "value": {
+                "default": "tophat",
+                "type": "string",
+                "validator": "",
+                "visible": true,
+                "required": true
+            },
+            "details": {
+                "label": "job name",
+                "description": "the name of the itinerant tophat job"
+            },
+            "semantics": {
+                "ontology": [
+                    "xs:string"
+                ]
+            }
+        },
+        {
+            "id": "minIsoformFraction",
+            "value": {
+                "default": 0.1,
+                "type": "number",
+                "validator": "",
+                "visible": true,
+                "required": true
+            },
+            "details": {
+                "label": "Minimum isoform fraction",
+                "description": ""
+            },
+            "semantics": {
+                "ontology": [
+                    "xs:decimal"
+                ]
+            }
+        },
+        {
+            "id": "preMrnaFraction",
+            "value": {
+                "default": 0.15,
+                "type": "number",
+                "validator": "",
+                "visible": true,
+                "required": true
+            },
+            "details": {
+                "label": "Pre-mRNA fraction",
+                "description": ""
+            },
+            "semantics": {
+                "ontology": [
+                    "xs:decimal"
+                ]
+            }
+        },
+        {
+            "id": "minFragsPerTransfrag",
+            "value": {
+                "default": 10,
+                "type": "number",
+                "validator": "",
+                "visible": true,
+                "required": true
+            },
+            "details": {
+                "label": "Minimum number of fragments needed for new transfrags",
+                "description": ""
+            },
+            "semantics": {
+                "ontology": [
+                    "xs:integer"
+                ]
+            }
+        },
+        {
+            "id": "maxIntronLength",
+            "value": {
+                "default": 300000,
+                "type": "number",
+                "validator": "",
+                "visible": true,
+                "required": true
+            },
+            "details": {
+                "label": "Maxiumum intron length",
+                "description": ""
+            },
+            "semantics": {
+                "ontology": [
+                    "xs:integer"
+                ]
+            }
+        },
+        {
+            "id": "smallAnchorFraction",
+            "value": {
+                "default": 0.09,
+                "type": "number",
+                "validator": "",
+                "visible": true,
+                "required": true
+            },
+            "details": {
+                "label": "Small anchor fraction",
+                "description": ""
+            },
+            "semantics": {
+                "ontology": [
+                    "xs:decimal"
+                ]
+            }
+        },
+        {
+            "id": "overhangTolerance",
+            "value": {
+                "default": 10,
+                "type": "number",
+                "validator": "",
+                "visible": true,
+                "required": true
+            },
+            "details": {
+                "label": "Read overhang tolerance",
+                "description": ""
+            },
+            "semantics": {
+                "ontology": [
+                    "xs:integer"
+                ]
+            }
+        },
+        {
+            "id": "maxBundleLength",
+            "value": {
+                "default": 3500000,
+                "type": "number",
+                "validator": "",
+                "visible": true,
+                "required": true
+            },
+            "details": {
+                "label": "Maximum genomic length for an assembled bundle",
+                "description": ""
+            },
+            "semantics": {
+                "ontology": [
+                    "xs:integer"
+                ]
+            }
+        },
+        {
+            "id": "minIntronLength",
+            "value": {
+                "default": 50,
+                "type": "number",
+                "validator": "",
+                "visible": true,
+                "required": true
+            },
+            "details": {
+                "label": "Minimum assembled intron length",
+                "description": ""
+            },
+            "semantics": {
+                "ontology": [
+                    "xs:integer"
+                ]
+            }
+        },
+        {
+            "id": "trim3avgcovThresh",
+            "value": {
+                "default": 10,
+                "type": "number",
+                "validator": "",
+                "visible": true,
+                "required": true
+            },
+            "details": {
+                "label": "Minimum average coverage before beginning 3' trimming",
+                "description": ""
+            },
+            "semantics": {
+                "ontology": [
+                    "xs:integer"
+                ]
+            }
+        },
+        {
+            "id": "trim3dropoffFrac",
+            "value": {
+                "default": 0.1,
+                "type": "number",
+                "validator": "",
+                "visible": true,
+                "required": true
+            },
+            "details": {
+                "label": "Coverage threshold for 3' trimming",
+                "description": ""
+            },
+            "semantics": {
+                "ontology": [
+                    "xs:decimal"
+                ]
+            }
+        },
+        {
+            "id": "intronOverhangTolerance",
+            "value": {
+                "default": 10,
+                "type": "number",
+                "validator": "",
+                "visible": true,
+                "required": true
+            },
+            "details": {
+                "label": "Intron overhang tolerance",
+                "description": "The number of bp allowed to enter the intron of a reference transcript when determining if an assembled transcript should be merged with it."
+            },
+            "semantics": {
+                "ontology": [
+                    "xs:integer"
+                ]
+            }
+        },
+        {
+            "id": "overhangTolerance3",
+            "value": {
+                "default": 600,
+                "type": "number",
+                "validator": "",
+                "visible": true,
+                "required": true
+            },
+            "details": {
+                "label": "3' overhange tolerance",
+                "description": "The number of bp allowed to overhang the 3' end of a reference transcript when determining if an assembled transcript should be merged with it."
+            },
+            "semantics": {
+                "ontology": [
+                    "xs:integer"
+                ]
+            }
+        },
+        {
+            "id": "noFauxReads",
+            "value": {
+                "default": false,
+                "type": "bool",
+                "validator": "",
+                "visible": true,
+                "required": false
+            },
+            "details": {
+                "label": "Don't use faux reads",
+                "description": "This option disables tiling of the reference transcripts with faux reads during RABT."
+            },
+            "semantics": {
+                "ontology": [
+                    "xs:boolean"
+                ]
+            }
+        },
+        {
+            "id": "multiReadCorrect",
+            "value": {
+                "default": false,
+                "type": "bool",
+                "validator": "",
+                "visible": true,
+                "required": false
+            },
+            "details": {
+                "label": "Perform multiply-matched read correction",
+                "description": "Tells Cufflinks to do an initial estimation procedure to more accurately weight reads mapping to multiple locations in the genome."
+            },
+            "semantics": {
+                "ontology": [
+                    "xs:boolean"
+                ]
+            }
+        },
+        {
+            "id": "upperQuartileNorm",
+            "value": {
+                "default": false,
+                "type": "bool",
+                "validator": "",
+                "visible": true,
+                "required": false
+            },
+            "details": {
+                "label": "Perform upper-quartile normalization",
+                "description": "Cufflinks normalizes by the upper quartile of the number of fragments mapping to individual loci instead of the total number of sequenced fragments."
+            },
+            "semantics": {
+                "ontology": [
+                    "xs:boolean"
+                ]
+            }
+        },
+        {
+            "id": "totalHitsNorm",
+            "value": {
+                "default": true,
+                "type": "bool",
+                "validator": "",
+                "visible": true,
+                "required": false
+            },
+            "details": {
+                "label": "Use total hits to calculate FPKM",
+                "description": "Cufflinks counts all fragments, including those not compatible with any reference transcript, towards the number of mapped hits used in the FPKM denominator."
+            },
+            "semantics": {
+                "ontology": [
+                    "xs:boolean"
+                ]
+            }
+        },
+        {
+            "id": "compatibleHitsNorm",
+            "value": {
+                "default": false,
+                "type": "bool",
+                "validator": "",
+                "visible": true,
+                "required": false
+            },
+            "details": {
+                "label": "Use annotation-compatible hits to calculate FPKM",
+                "description": "Cufflinks counts only those fragments compatible with some reference transcript towards the number of mapped hits used in the FPKM denominator."
+            },
+            "semantics": {
+                "ontology": [
+                    "xs:boolean"
+                ]
+            }
+        },
+        {
+            "id": "libraryType",
+            "value": {
+                "default": "fr-unstranded",
+                "type": "string",
+                "validator": "",
+                "visible": true,
+                "required": true
+            },
+            "details": {
+                "label": "Library type",
+                "description": "fr-unstranded|fr-firststrand|fr-unstranded"
+            },
+            "semantics": {
+                "ontology": [
+                    "xs:string"
+                ]
+            }
+        }
+    ],
+    "outputs": []
+}

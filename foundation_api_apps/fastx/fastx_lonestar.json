@@ -1,0 +1,191 @@
+{
+    "name": "dnalc-fxtrim-lonestar",
+    "parallelism": "serial",
+    "version": "0.0.13.2",
+    "helpURI": "http://hannonlab.cshl.edu/fastx_toolkit/",
+    "label": "Fastx_toolkit",
+    "shortDescription": "FASTQ/A short-reads pre-processing tools",
+    "longDescription": "",
+    "author": "Sheldon McKay",
+    "datePublished": "Apr 19, 2013",
+    "tags": [
+        "next-gen",
+        "assembly",
+        "rnaseq"
+    ],
+    "ontology": [
+        "http://sswap.info/iPlant/FoundationalAPI"
+    ],
+    "executionHost": "lonestar4.tacc.teragrid.org",
+    "executionType": "HPC",
+    "deploymentPath": "/iplant/home/smckay/applications/dnalc/fastx",
+    "templatePath": "fastx.sh",
+    "testPath": "library/test.sh",
+    "checkpointable": "false",
+    "modules": [
+        "purge",
+        "load TACC",
+        "load fastx_toolkit/0.0.13.2",
+        "load irods"
+    ],
+    "inputs": [
+        {
+            "id": "seq1",
+            "value": {
+                "default": "/shared/iplantcollaborative/example_data/tophat/athaliana_rna.fq",
+                "validator": "",
+                "required": true,
+                "visible": true
+            },
+            "details": {
+                "label": "FASTQ sequence library 1",
+                "description": ""
+            },
+            "semantics": {
+                "ontology": [
+                    "http://sswapmeet.sswap.info/util/Sequence"
+                ],
+                "minCardinality": 1,
+                "fileTypes": [
+                    "fastq-0"
+                ]
+            }
+        }
+    ],
+    "parameters": [
+        {
+            "id": "jobName",
+            "value": {
+                "default": "tophat",
+                "type": "string",
+                "validator": "",
+                "visible": true,
+                "required": true
+            },
+            "details": {
+                "label": "job name",
+                "description": "the name of the itinerant tophat job"
+            },
+            "semantics": {
+                "ontology": [
+                    "xs:string"
+                ]
+            }
+        },
+        {
+            "id": "first",
+            "value": {
+                "default": 1,
+                "type": "number",
+                "validator": "",
+                "visible": true,
+                "required": false
+            },
+            "details": {
+                "label": "First base to keep",
+                "description": "Trim the 3-primer end of the read up to this nucleotide position (default:1)"
+            },
+            "semantics": {
+                "ontology": [
+                    "xs:integer"
+                ]
+            }
+        },
+        {
+            "id": "last",
+            "value": {
+                "default": 200,
+                "type": "number",
+                "validator": "",
+                "visible": true,
+                "required": false
+            },
+            "details": {
+                "label": "Last base to keep",
+                "description": "Trim all bases 5-Primer to this nucleotide position (default: nine)"
+            },
+            "semantics": {
+                "ontology": [
+                    "xs:integer"
+                ]
+            }
+        },
+        {
+            "id": "quality_threshold",
+            "value": {
+                "default": 20,
+                "type": "number",
+                "validator": "",
+                "visible": true,
+                "required": false
+            },
+            "details": {
+                "label": "Minimum quality threshold for trimming",
+                "description": "This is the quality score below which the ends of reads will be trimmed (default: 20)"
+            },
+            "semantics": {
+                "ontology": [
+                    "xs:integer"
+                ]
+            }
+        },
+        {
+            "id": "min_length",
+            "value": {
+                "default": 20,
+                "type": "number",
+                "validator": "",
+                "visible": true,
+                "required": false
+            },
+            "details": {
+                "label": "Minimum trimmed read length",
+                "description": "Trimmed sequences shorter than this will be discarded (default: 20)"
+            },
+            "semantics": {
+                "ontology": [
+                    "xs:integer"
+                ]
+            }
+        },
+        {
+            "id": "min_quality",
+            "value": {
+                "default": 20,
+                "type": "number",
+                "validator": "",
+                "visible": true,
+                "required": false
+            },
+            "details": {
+                "label": "Minimum quality threshold for filtering",
+                "description": "Reads with the specified percentage of quality scores below this threshold will be filtered out (default: 20)"
+            },
+            "semantics": {
+                "ontology": [
+                    "xs:integer"
+                ]
+            }
+        },
+        {
+            "id": "percent_bases",
+            "value": {
+                "default": 50,
+                "type": "number",
+                "validator": "",
+                "visible": true,
+                "required": false
+            },
+            "details": {
+                "label": "Percent bases with minimum or greater quality score",
+                "description": "Sequences with this percentage of low quality bases will be discarded (default: 50)"
+            },
+            "semantics": {
+                "ontology": [
+                    "xs:double"
+                ]
+            }
+        }
+    ],
+    "outputs": []
+}

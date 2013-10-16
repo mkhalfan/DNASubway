@@ -1,0 +1,409 @@
+{
+    "name": "dnalc-tophat-stampede",
+    "parallelism": "serial",
+    "version": "2.0.8",
+    "helpURI": "http://tophat.cbcb.umd.edu/",
+    "label": "TopHat",
+    "shortDescription": "A spliced read mapper for RNA-Seq",
+    "longDescription": "",
+    "author": "Sheldon McKay",
+    "tags": [
+        "next-gen",
+        "aligner",
+        "rnaseq"
+    ],
+    "ontology": [
+        "http://sswap.info/iPlant/FoundationalAPI"
+    ],
+    "executionHost": "stampede.tacc.xsede.org",
+    "executionType": "HPC",
+    "deploymentPath": "/iplant/home/smckay/applications/dnalc/tophat",
+    "templatePath": "tophat.sh",
+    "testPath": "library/test.sh",
+    "checkpointable": "false",
+    "modules": [
+        "purge",
+        "load TACC",
+        "load python",
+        "load irods",
+        "load samtools"
+    ],
+    "inputs": [
+        {
+            "id": "query1",
+            "value": {
+                "default": "/shared/iplant_DNA_subway/sample_data/fastq/arabidopsis_thaliana/WT_rep1.fastq",
+                "validator": "",
+                "required": true,
+                "visible": true
+            },
+            "details": {
+                "label": "FASTQ sequence library 1",
+                "description": ""
+            },
+            "semantics": {
+                "ontology": [
+                    "http://sswapmeet.sswap.info/util/Sequence"
+                ],
+                "minCardinality": 1,
+                "fileTypes": [
+                    "fastq-0"
+                ]
+            }
+        },
+        {
+            "id": "query2",
+            "value": {
+                "default": "",
+                "validator": "",
+                "required": false,
+                "visible": true
+            },
+            "details": {
+                "label": "FASTQ sequence library 2",
+                "description": ""
+            },
+            "semantics": {
+                "ontology": [
+                    "http://sswapmeet.sswap.info/util/Sequence"
+                ],
+                "minCardinality": 1,
+                "fileTypes": [
+                    "fastq-0"
+                ]
+            }
+        },
+        {
+            "id": "genome",
+            "value": {
+                "default": "/shared/iplant_DNA_subway/genomes/arabidopsis_thaliana/genome.fas",
+                "validator": "",
+                "required": true,
+                "visible": true
+            },
+            "details": {
+                "label": "Reference genome",
+                "description": ""
+            },
+            "semantics": {
+                "ontology": [
+                    "http://sswapmeet.sswap.info/util/Sequence"
+                ],
+                "minCardinality": 1,
+                "fileTypes": [
+                    "fasta-0"
+                ]
+            }
+        },
+        {
+            "id": "annotation",
+            "value": {
+                "default": "/shared/iplant_DNA_subway/genomes/arabidopsis_thaliana/annotation.gtf",
+                "validator": "",
+                "required": false,
+                "visible": true
+            },
+            "details": {
+                "label": "Reference annotation",
+                "description": ""
+            },
+            "semantics": {
+                "ontology": [
+                    "http://sswapmeet.sswap.info/util/Annotation"
+                ],
+                "minCardinality": 1,
+                "fileTypes": [
+                    "gtf-0"
+                ]
+            }
+        }
+    ],
+    "parameters": [
+        {
+            "id": "jobName",
+            "value": {
+                "default": "tophat",
+                "type": "string",
+                "validator": "",
+                "visible": true,
+                "required": true
+            },
+            "details": {
+                "label": "job name",
+                "description": "the name of the itinerant tophat job"
+            },
+            "semantics": {
+                "ontology": [
+                    "xs:string"
+                ]
+            }
+        },
+        {
+            "id": "mate_inner_dist",
+            "value": {
+                "default": 200,
+                "type": "number",
+                "validator": "\\d++",
+                "visible": true,
+                "required": true
+            },
+            "details": {
+                "label": "Mate inner distance",
+                "description": ""
+            },
+            "semantics": {
+                "ontology": [
+                    "xs:integer"
+                ]
+            }
+        },
+        {
+            "id": "mate_std_dev",
+            "value": {
+                "default": 20,
+                "type": "number",
+                "validator": "\\d++",
+                "visible": true,
+                "required": true
+            },
+            "details": {
+                "label": "Mate distance stdev",
+                "description": ""
+            },
+            "semantics": {
+                "ontology": [
+                    "xs:integer"
+                ]
+            }
+        },
+        {
+            "id": "min_anchor_length",
+            "value": {
+                "default": 8,
+                "type": "number",
+                "validator": "\\d++",
+                "visible": true,
+                "required": true
+            },
+            "details": {
+                "label": "Minimum anchor length",
+                "description": ""
+            },
+            "semantics": {
+                "ontology": [
+                    "xs:integer"
+                ]
+            }
+        },
+        {
+            "id": "splice_mismatches",
+            "value": {
+                "default": 0,
+                "type": "number",
+                "validator": "\\d++",
+                "visible": true,
+                "required": true
+            },
+            "details": {
+                "label": "Splice mismatches tolerated",
+                "description": ""
+            },
+            "semantics": {
+                "ontology": [
+                    "xs:integer"
+                ]
+            }
+        },
+        {
+            "id": "min_intron_length",
+            "value": {
+                "default": 70,
+                "type": "number",
+                "validator": "\\d++",
+                "visible": true,
+                "required": true
+            },
+            "details": {
+                "label": "Minimum intron length",
+                "description": ""
+            },
+            "semantics": {
+                "ontology": [
+                    "xs:integer"
+                ]
+            }
+        },
+        {
+            "id": "max_intron_length",
+            "value": {
+                "default": 50000,
+                "type": "number",
+                "validator": "\\d++",
+                "visible": true,
+                "required": true
+            },
+            "details": {
+                "label": "Maximum intron length",
+                "description": ""
+            },
+            "semantics": {
+                "ontology": [
+                    "xs:integer"
+                ]
+            }
+        },
+        {
+            "id": "max_insertion_length",
+            "value": {
+                "default": 3,
+                "type": "number",
+                "validator": "\\d++",
+                "visible": true,
+                "required": true
+            },
+            "details": {
+                "label": "Maximum insertion length",
+                "description": ""
+            },
+            "semantics": {
+                "ontology": [
+                    "xs:integer"
+                ]
+            }
+        },
+        {
+            "id": "max_deletion_length",
+            "value": {
+                "default": 3,
+                "type": "number",
+                "validator": "\\d++",
+                "visible": true,
+                "required": true
+            },
+            "details": {
+                "label": "Maximum deletion length",
+                "description": ""
+            },
+            "semantics": {
+                "ontology": [
+                    "xs:integer"
+                ]
+            }
+        },
+        {
+            "id": "min_isoform_fraction",
+            "value": {
+                "default": 0.15,
+                "type": "number",
+                "validator": "",
+                "visible": true,
+                "required": true
+            },
+            "details": {
+                "label": "Minimum isoform fraction",
+                "description": ""
+            },
+            "semantics": {
+                "ontology": [
+                    "xs:float"
+                ]
+            }
+        },
+        {
+            "id": "max_multihits",
+            "value": {
+                "default": 20,
+                "type": "number",
+                "validator": "\\d++",
+                "visible": true,
+                "required": true
+            },
+            "details": {
+                "label": "Maxium multiple hits to genome",
+                "description": ""
+            },
+            "semantics": {
+                "ontology": [
+                    "xs:float"
+                ]
+            }
+        },
+        {
+            "id": "segment_length",
+            "value": {
+                "default": 25,
+                "type": "number",
+                "validator": "\\d++",
+                "visible": true,
+                "required": true
+            },
+            "details": {
+                "label": "Segment length",
+                "description": ""
+            },
+            "semantics": {
+                "ontology": [
+                    "xs:int"
+                ]
+            }
+        },
+        {
+            "id": "library_type",
+            "value": {
+                "default": "fr-unstranded",
+                "type": "string",
+                "validator": "",
+                "visible": true,
+                "required": true
+            },
+            "details": {
+                "label": "Library type",
+                "description": "fr-unstranded|fr-firststrand|fr-unstranded"
+            },
+            "semantics": {
+                "ontology": [
+                    "xs:int"
+                ]
+            }
+        },
+        {
+            "id": "read_mismatches",
+            "value": {
+                "default": 2,
+                "type": "number",
+                "validator": "\\d++",
+                "visible": true,
+                "required": true
+            },
+            "details": {
+                "label": "Final read alignments having more than these many mismatches are discarded",
+                "description": ""
+            },
+            "semantics": {
+                "ontology": [
+                    "xs:int"
+                ]
+            }
+        },
+        {
+            "id": "bowtie_version",
+            "value": {
+                "default": 2,
+                "type": "number",
+                "validator": "[1|2]",
+                "visible": true,
+                "required": false
+            },
+            "details": {
+                "label": "Bowtie version",
+                "description": ""
+            },
+            "semantics": {
+                "ontology": [
+                    "xs:int"
+                ]
+            }
+        }
+    ],
+    "outputs": []
+}
