@@ -2,6 +2,7 @@
 use strict;
 
 # Load either WebApollo or plain old JBrowse config
+# This is a tiny but very important script
 
 use constant JB     => '/usr/local/tomcat7/webapps/project';
 
