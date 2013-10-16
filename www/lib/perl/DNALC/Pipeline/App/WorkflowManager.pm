@@ -249,7 +249,7 @@ use Carp;
 			my $st = $self->run_fake('repeat_masker');
 			#return $st if $st->{success};
 			if ($st->{success}) {
-				$self->load_analysis_results($st->{gff_file}, 'repeat_masker');
+				#$self->load_analysis_results($st->{gff_file}, 'repeat_masker');
 				return $st;
 			}
 
@@ -281,7 +281,7 @@ use Carp;
 					$status->{success} = 1;
 					$status->{elapsed} = $rep_mask->{elapsed} + $rep_mask2->{elapsed};
 					$status->{gff_file}= $rep_mask->get_gff3_file;
-					my $rc = $self->load_analysis_results($status->{gff_file}, 'repeat_masker');
+					#my $rc = $self->load_analysis_results($status->{gff_file}, 'repeat_masker');
 					#$self->set_cache('repeat_masker', $crc);
 					print STDERR  "Time 2 = ", $rep_mask2->{elapsed}, $/;
 					$self->set_status('repeat_masker', 'done', $status->{elapsed});
@@ -313,7 +313,7 @@ use Carp;
 			my $st = $self->run_fake('augustus');
 			#return $st if $st->{success};
 			if ($st->{success}) {
-				$self->load_analysis_results($st->{gff_file}, 'augustus');
+				#$self->load_analysis_results($st->{gff_file}, 'augustus');
 				return $st;
 			}
 
@@ -334,7 +334,7 @@ use Carp;
 				$status->{success} = 1;
 				$status->{elapsed} = $augustus->{elapsed};
 				$status->{gff_file}= $augustus->get_gff3_file;
-				my $rc = $self->load_analysis_results($status->{gff_file}, 'augustus');
+				#my $rc = $self->load_analysis_results($status->{gff_file}, 'augustus');
 				$self->set_status('augustus', 'done', $augustus->{elapsed});
 				#my $crc = $self->crc($augustus->get_options);
 				#print STDERR  "AUGUSTUS CRC = ", $crc, $/;
@@ -362,7 +362,7 @@ use Carp;
 			my $st = $self->run_fake('trna_scan');
 			#return $st if $st->{success};
 			if ($st->{success}) {
-				$self->load_analysis_results($st->{gff_file}, 'trna_scan');
+				#$self->load_analysis_results($st->{gff_file}, 'trna_scan');
 				return $st;
 			}
 
@@ -381,7 +381,7 @@ use Carp;
 				$status->{success} = 1;
 				$status->{elapsed} = $trna_scan->{elapsed};
 				$status->{gff_file}= $trna_scan->get_gff3_file;
-				my $rc = $self->load_analysis_results($status->{gff_file}, 'trna_scan');
+				#my $rc = $self->load_analysis_results($status->{gff_file}, 'trna_scan');
 				$self->set_status('trna_scan', 'done', $trna_scan->{elapsed});
 				$self->set_cache('trna_scan', $crc);
 			}
@@ -406,7 +406,7 @@ use Carp;
 		if ($proj->sample) {
 			my $st = $self->run_fake('fgenesh');
 			if ($st->{success}) {
-				$self->load_analysis_results($st->{gff_file}, 'fgenesh');
+				#$self->load_analysis_results($st->{gff_file}, 'fgenesh');
 				return $st;
 			}
 		}
@@ -428,7 +428,7 @@ use Carp;
 				$status->{success} = 1;
 				$status->{elapsed} = $fgenesh->{elapsed};
 				$status->{gff_file}= $fgenesh->get_gff3_file;
-				my $rc = $self->load_analysis_results($status->{gff_file}, 'fgenesh');
+				#my $rc = $self->load_analysis_results($status->{gff_file}, 'fgenesh');
 				$self->set_status('fgenesh', 'done', $status->{elapsed});
 				#my $crc = $self->crc($fgenesh->get_options);
 				#$self->set_cache('fgenesh', $crc);
@@ -454,7 +454,7 @@ use Carp;
 		if ($proj->sample) {
 			my $st = $self->run_fake('snap');
 			if ($st->{success}) {
-				$self->load_analysis_results($st->{gff_file}, 'snap');
+				#$self->load_analysis_results($st->{gff_file}, 'snap');
 				return $st;
 			}
 		}
@@ -474,7 +474,7 @@ use Carp;
 				$status->{success} = 1;
 				$status->{elapsed} = $snap->{elapsed};
 				$status->{gff_file}= $snap->get_gff3_file;
-				my $rc = $self->load_analysis_results($status->{gff_file}, 'snap');
+				#my $rc = $self->load_analysis_results($status->{gff_file}, 'snap');
 				$self->set_status('snap', 'done', $snap->{elapsed});
 				#$self->set_cache('snap', $self->crc($snap->get_options));
 			}
@@ -499,7 +499,7 @@ use Carp;
 			my $st = $self->run_fake('blastn');
 			#return $st if $st->{success};
 			if ($st->{success}) {
-				$self->load_analysis_results($st->{gff_file}, 'blastn');
+				#$self->load_analysis_results($st->{gff_file}, 'blastn');
 				return $st;
 			}
 		}
@@ -517,7 +517,7 @@ use Carp;
 				$status->{success} = 1;
 				$status->{elapsed} = $blastn->{elapsed};
 				$status->{gff_file}= $blastn->get_gff3_file;
-				my $rc = $self->load_analysis_results($status->{gff_file}, 'blastn');
+				#my $rc = $self->load_analysis_results($status->{gff_file}, 'blastn');
 				$self->set_status('blastn', 'done', $blastn->{elapsed});
 				#$self->set_cache('blastn', $self->crc($blastn->get_options));
 			}
@@ -542,7 +542,7 @@ use Carp;
 			my $st = $self->run_fake('blastx');
 			#return $st if $st->{success};
 			if ($st->{success}) {
-				$self->load_analysis_results($st->{gff_file}, 'blastx');
+				#$self->load_analysis_results($st->{gff_file}, 'blastx');
 				return $st;
 			}
 		}
@@ -560,7 +560,7 @@ use Carp;
 				$status->{success} = 1;
 				$status->{elapsed} = $blastx->{elapsed};
 				$status->{gff_file}= $blastx->get_gff3_file;
-				my $rc = $self->load_analysis_results($status->{gff_file}, 'blastx');
+				#my $rc = $self->load_analysis_results($status->{gff_file}, 'blastx');
 				$self->set_status('blastx', 'done', $blastx->{elapsed});
 				#$self->set_cache('blastx', $self->crc($blastx->get_options));
 			}
@@ -597,7 +597,7 @@ use Carp;
 				$status->{success} = 1;
 				$status->{elapsed} = $blastn->{elapsed};
 				$status->{gff_file}= $blastn->get_gff3_file;
-				my $rc = $self->load_analysis_results($status->{gff_file}, 'blastn_user');
+				#my $rc = $self->load_analysis_results($status->{gff_file}, 'blastn_user');
 				$self->set_status('blastn_user', 'done', $blastn->{elapsed});
 				#$self->set_cache('blastn', $self->crc($blastn->get_options));
 			}
@@ -630,7 +630,7 @@ use Carp;
 				$status->{success} = 1;
 				$status->{elapsed} = $blastx->{elapsed};
 				$status->{gff_file}= $blastx->get_gff3_file;
-				my $rc = $self->load_analysis_results($status->{gff_file}, 'blastx_user');
+				#my $rc = $self->load_analysis_results($status->{gff_file}, 'blastx_user');
 				$self->set_status('blastx_user', 'done', $blastx->{elapsed});
 				#$self->set_cache('blastx_user', $self->crc($blastx->get_options));
 			}
@@ -707,34 +707,6 @@ use Carp;
 			carp "Unable to set cache for PID=", $self->project, ', task_name = ', $task_name, $/, $@, $/;
 		}
 
-	}
-	#-------------------------------------------------------------------------
-	#
-	# - stores the analysis results into the chado db
-	#
-	sub load_analysis_results {
-	    return 0; # skip it, we do not need it
-		my ($self, $gff_file, $routine) = @_;
-
-		my $username = $self->pmanager->username;
-		return unless -f $gff_file && defined $username;
-		if (-s $gff_file < 20) {
-			print STDERR  "SKIPPING FILE (too small): ", $gff_file, $/;
-			return;
-		}
-		#my $profile = sprintf("%s_%d", $username, $self->project->id);
-		my $profile = $self->pmanager->chado_user_profile;
-		my $config = $self->pmanager->config;
-
-		my $cmd = $config->{EXE_PATH} . '/load_analysis_results.pl';
-		my @args = ('--username', $username, 
-				'--profile', $profile,
-				'--algorithm', $routine,
-				'--gff', $gff_file);
-		#print STDERR  "\n\nLOADING DATA:\n", $cmd, " ", "@args", $/;
-		#print STDERR  '-' x 20, $/;
-		system($cmd, @args);
-		return 1;
 	}
 	#-------------------------------------------------------------------------
 	#
