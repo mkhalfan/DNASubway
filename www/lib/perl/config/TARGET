@@ -1,8 +1,0 @@
-{
-	TARGET_SERVER => 'http://target.iplantcollaborative.org',
-	DNA_URL		=> '/ap_TARGeT_dna.php',
-	PROTEIN_URL => '/ap_TARGeT_protein.php',
-	MAX_GENOMES => 4,
-	MAX_SEQ_LEN => 10_000,
-	PROJECTS_DIR => '/var/www/vhosts/pipeline.dnalc.org/var/projects/target',
-}

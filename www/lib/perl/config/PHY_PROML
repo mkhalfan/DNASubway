@@ -1,9 +1,0 @@
-{
-	program => '/usr/local/bin/proml',
-	menu_options => "2\nY\n",
-
-	input_file => 'infile',
-	output_file => 'outfile',
-	tree_file => 'outtree',
-	options => [],
-}

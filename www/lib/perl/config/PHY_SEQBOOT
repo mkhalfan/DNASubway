@@ -1,9 +1,0 @@
-{
-	program => '/usr/local/bin/seqboot',
-	menu => {},
-	menu_options => "2\nR\n%d\nY\n101\n", # will be using sprintf to set the # of bootstraps
-
-	input_file => 'infile',
-	output_file => 'outfile',
-	options => [],
-}
