@@ -1,0 +1,62 @@
+<%args>
+	$pid => 0
+</%args>
+<%once>
+	use DNALC::Pipeline::App::ProjectManager ();
+        use DNALC::Pipeline::App::NGS::ProjectManager ();
+	use DNALC::Pipeline::Sample ();
+	use DNALC::Pipeline::Config ();
+	use Data::Dumper;
+</%once>
+<%init>
+	$m->session->{pipeline} ||= {};
+	my $s = $m->session->{pipeline};
+	$r->content_type('text/plain');
+     
+	# We need configs for both green and red lines because
+	# Jbrowse support code is in red line
+	my $green_pm = DNALC::Pipeline::App::NGS::ProjectManager->new({project => $pid});
+	my $red_pm   = DNALC::Pipeline::App::ProjectManager->new();
+
+	my $config  = $pm->config;
+	my $wconfig = DNALC::Pipeline::Config->new->cf('WEB_APOLLO');
+
+	my $webapp_path = $wconfig->{WEBAPP_PATH};
+	my $species     = $pm->project->{organism};
+	my $project_path = $green_pm->work_dir;
+
+	# This is where we deploy a new tomcat webapp for JBrowse
+	unless ( -e "$project_path/WEB_APOLLO") {
+		$red_pm->create_web_apollo($webapp_path,$pid,$organism,$project_path);
+	}		
+	
+	# Tell webapollo we only want jBrowse
+	my $toggle   = $config->{EXE_PATH} . '/jb_toggle.pl';
+	system "$toggle 1";
+
+	# set up BAM files for jBrowse
+        # code to do that here hint: create a new jb-* script in /var/www/bin
+	# we need to 
+	# 1) copy the bam file to the jbrowse data folder (probably just a symlink 
+        #    from the physical file to the jbrowse data folder. Look in the a thaliana
+ 	#    base web application to see how bam files are handled in the directory
+        #    structure and also in the trackList.json (read jbrowse.json) folder.
+	# 2) add a track definition in the trackList.json file
+
+	# launch jbrowse
+	# we need to
+	# 1) build the URL, which has the tracks flagged for display
+	#    it will just be the EG and our BAM
+	my $your_bam_name = "This is where you will create a specific bam ID for each Tophat or cufflinks Bame"
+	my $tracks = "EG,$you_bam_name";
+	my $url = $wconfig->{WEB_APOLLO_URL} . "/$pid?";
+	$url .= "overview=0\&tracklist=0\&tracks=$tracks";
+
+
+	$m->redirect($url);
+
+</%init>
+
+<%flags>
+	inherit => undef
+</%flags>
