@@ -57,48 +57,66 @@ sub config {
 }
 #-----------------------------------------------------------------------------
 
-sub organism {
-    my $self = shift;
-    $self->{organism} ||= shift;
-    return $self->{organism};
-}
 
+# Build the WebApollo webapp for tomcat
+# called upon red line project creation 
 sub create_web_apollo {
     my $self     = shift;
-    my $pid      = shift;
     my $webapp_path = shift;
 
-    my $organism = lc $self->organism;
+    # We could be calling this from the green line,
+    # in which case, we need all this info as args.
+    my $pid      = shift || $self->project->id;
+    my $organism = shift || $self->project->organism;
+    my $work_dir = shift || $self->work_dir;
+
     $organism =~ s/\s+/_/;
-    my $web_apollo_base = "../../base.tar.gz";
+    $organism = lc $organism;
 
-    # First, we unpack the web_apollo directory tree (with symlinks)
-    my $target_dir = "$webapp_path/$pid";
-    mkdir $target_dir or die "Could not create target $target_dir:$!";
-    chdir $target_dir or die "Could not cd to $target_dir:$!";
-    system "tar zxvf $web_apollo_base &> /dev/null";
-    -d 'config' or die "tarball was not unpacked!";
+    my $web_apollo_base = "$webapp_path/../$organism.tar.gz";
 
-    # Set up permissions so WebApollo/tomcat can save annotations
-    system "chmod 777 tmp annotations";
+    # First, we unpack the web_apollo webapp directory tree
+    # but we won't actually deploy the webapp via a symlink 
+    # until the config file is done.
+    my $symlink_path = "$webapp_path/$pid";
+    my $actual_path = $work_dir . "/WEB_APOLLO/web_app";
 
-    # Interpolate variables in config.xml
-    chdir 'config' or die "No config directory:$!";
-    open IN,  'config.base.xml' or die $!;
-    open OUT, '>config.xml' or die $!;
+    unless (-e $actual_path) { # not a re-deployment
+	my $base_path = $work_dir . "/WEB_APOLLO";
+	unless (-d $base_path) {
+	    mkdir $base_path or die "Could not create $base_path:$!";
+	}
+	mkdir $actual_path or die "Could not create target $actual_path:$!";
+	chdir $actual_path or die "Could not cd to $actual_path:$!";
+	system "tar zxvf $web_apollo_base &> /dev/null";
+	-d 'config' or die "tarball was not unpacked!";
 
-    while (<IN>) {
-	s/WEBAPP_PATH/$target_dir/;
-	s/PROJECT_ID/$pid/;
-	s/ORGANISM/$organism/;
-	print OUT;
+	# Set up permissions so WebApollo/tomcat can save annotations
+	system "chmod 777 tmp annotations";
+
+	# Interpolate variables in config.xml
+	chdir 'config' or die "No config directory:$!";
+	open IN,  'config.base.xml' or die $!;
+	open OUT, '>config.xml' or die $!;
+	
+	while (<IN>) {
+	    s/WEBAPP_PATH/$symlink_path/;
+	    s/PROJECT_ID/$pid/;
+	    s/ORGANISM/$organism/;
+	    print OUT;
+	}
+	
+	close IN;
+	close OUT;
     }
-    close IN;
-    close OUT;
 
-    print STDERR "Created WebApollo instance at $target_dir\n";
+    # This is the actual webapp deployment, tomcat will pick it ip
+    # in a second or so.
+    system "ln -s $actual_path $symlink_path"; 
+
+    # Wahoo, success!
+    print STDERR "Created WebApollo instance at $symlink_path\n";
 }
-
 
 
 sub create_project {
@@ -113,7 +131,6 @@ sub create_project {
 	}
 	my $common_name = $params->{common_name};
 	my $organism = $params->{organism};
-        $self->organism($organism);
 	my $clade = $params->{clade} || 'u';
 	my $name = $params->{name};
 	my $user_id = $params->{user_id};
@@ -166,7 +183,7 @@ sub create_project {
 	
 	# set up a WebApollo instance
 	my $webapp_path = $self->{web_apollo_config}{'WEBAPP_PATH'};
-	$self->create_web_apollo($proj,$webapp_path);
+	$self->create_web_apollo($webapp_path);
 
 	return {status => 'success', msg => $msg};
 }
