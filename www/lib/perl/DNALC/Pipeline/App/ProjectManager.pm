@@ -21,7 +21,7 @@ sub new {
 	my ($class, $project) = @_;
 
 	my $self = bless {
-	                                web_apollo_config => DNALC::Pipeline::Config->new->cf('WEB_APOLLO'),
+					web_apollo_config => DNALC::Pipeline::Config->new->cf('WEB_APOLLO'),
 					config => DNALC::Pipeline::Config->new->cf('PIPELINE'),
 					logger => DNALC::Pipeline::ProjectLogger->new,
 				}, __PACKAGE__;
@@ -135,6 +135,7 @@ sub create_project {
 	my $name = $params->{name};
 	my $user_id = $params->{user_id};
 	my $sample = $params->{sample};
+	my $gff = $params->{gff};
 
 	my $seq_length = $seq->length;
 	my $crc = $self->compute_crc($seq);
@@ -180,12 +181,43 @@ sub create_project {
 	my $fasta_file = $self->work_dir . '/fasta.fa';
 	my $out = Bio::SeqIO->new(-file => "> $fasta_file", -format => 'Fasta');
 	$out->write_seq( $seq );
+
+	#copy over gff
+	if (defined $gff && $gff ne ''){
+		my $new_dir = $self->work_dir . '/USER_GFF';
+		mkdir $new_dir, 0755;
+		move($gff, $self->work_dir . '/USER_GFF/gff_upload.gff');
+	}
 	
 	# set up a WebApollo instance
 	my $webapp_path = $self->{web_apollo_config}{'WEBAPP_PATH'};
 	$self->create_web_apollo($webapp_path);
 
 	return {status => 'success', msg => $msg};
+}
+
+# Replace the user_gff
+sub add_user_gff {
+	# check
+	my ($self, $r) = @_;
+	unless ($r->upload($type)) {
+		return {status => 'fail', message => 'Missing the upload file.'}
+	}
+
+	# save upload
+	my $st = DNALC::Pipeline::App::Utils->save_upload( { r => $r, param_name => $type});
+
+	# copy over gff
+	if (-f $st->{path}){
+		my $new_dir = $self->work_dir . '/USER_GFF';
+		mkdir $new_dir, 0755 unless (-f $new_dir);
+		move($st->{path}, $self->work_dir . '/USER_GFF/gff_upload.gff');
+	} else {
+		return {status => 'error', message => 'Uploaded file not found'};
+	}
+
+	# profit
+	return {status => 'success'};
 }
 
 #-----------------------------------------------------------------------------
@@ -197,7 +229,7 @@ sub create_project {
 #
 sub add_evidence {
 	my ($self, $r, $type) = @_;
-	unless ($type =~ /^evid_(?:nt|prot)$/) {
+	unless ($type =~ /^evid_(?:nt|prot|gff)$/) {
 		return {status => 'fail', message => 'Invalid params.'}
 	}
 	unless ($r->upload($type)) {
@@ -497,6 +529,10 @@ sub get_available_gff3_files {
 		my $f = $self->get_gff3_file($routine);
 		#print STDERR  $routine, "->", $f, $/;
 		push @files, $f if defined ($f) &&  -f $f;
+	}
+	my $user_uploaded_gff = $self->work_dir . '/USER_GFF/gff_upload.gff';
+	if (-f $user_uploaded_gff) {
+		push (@files, $user_uploaded_gff);
 	}
 	return \@files;
 }

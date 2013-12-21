@@ -51,6 +51,9 @@ sub save_upload {
 		while (my $line = <$fh>) {
 			$seq_data .= $line;
 		}
+		if ($args->{is_gff}){
+			#validate GFF
+		}
 		if ($args->{clean_sequence}) {
 			if (my @ids = ($seq_data =~ m/^((?:>|;).*)/mg)) {
 				$sequence_id = join "\n", @ids;

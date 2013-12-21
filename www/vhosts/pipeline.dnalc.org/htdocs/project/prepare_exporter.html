@@ -32,15 +32,15 @@
 		return;
 	}
 
+	# This is where would add user meta-data
 	my $sample = DNALC::Pipeline::Sample->new($proj->sample);
 	my $start  = $sample->start;
 	my $end    = $sample->stop;
-	my $ref    = lc $sample->segment;
+	my $ref    = $sample->segment;
 	my $offset = $start - 1;
 
 	my $config = $pm->config;
 	my $wconfig = DNALC::Pipeline::Config->new->cf('WEB_APOLLO');
-
 
 	my $path = $wconfig->{WEBAPP_PATH} . "/$pid";
 	print STDERR "JBrowse PATH: $path\n";
@@ -96,7 +96,7 @@
 	# get all GFF analysis results from the project web files
 	my $gff3_files = $pm->get_available_gff3_files || [];
 
-	#print STDERR "GFF:\n",Dumper $gff3_files;
+	print STDERR "GFF:\n",Dumper $gff3_files;
 
 	my @old_sources = qw/WEB_APOLLO AUGUSTUS FGENESH SNAP REPEAT_MASKER TRNA_SCAN BLASTN BLASTX/;
 
@@ -122,26 +122,24 @@
 		# convert to JSON flatfiles
 		system "$importer $pid $outfile" unless $apollo and $source eq 'WEB_APOLLO';
 
-		unlink $outfile;
+		#unlink $outfile;
 	}
 	my $elapsed = time - $begin;
 	print STDERR "That took me $elapsed seconds\n";
 
 
+	# Look here if you want to change which tracks are shown by default
         my @preferred_sources;
         my %available = map {$_ => 1} @sources;
         for (@old_sources) {
             next if /BLASTX|REPEAT|TRNA/;
             push @preferred_sources, $_ if $available{$_};
         }
-
-
         unless ($apollo) {
 	    @preferred_sources = ('WEB_APOLLO',grep {!/BLAST/} @preferred_sources,'EG');
         }
 
 	my $tracks = join(',',@preferred_sources);
-
 
 
         my $url = $wconfig->{WEB_APOLLO_URL} . "/$pid?";

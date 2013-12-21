@@ -154,7 +154,7 @@
               <div id="evidence_uploads">
                 <div class="panel_container">
                   <% $nt_evid ne "done" ? "Add" : "Replace" %> GFF data:                     
-		  <input class="conStylized_box1" type="file" id="evid_nt" name="evid_gff"/>
+		  <input class="conStylized_box1" type="file" id="evid_gff" name="evid_gff"/>
 	        </div>
                 <div class="panel_container">
                   <% $nt_evid ne "done" ? "Add" : "Replace" %> DNA data in FASTA format:                     
@@ -416,7 +416,7 @@ if ($r->method eq "POST") {
 	if (!$is_owner) {
 		$m->comp('/_message_add', 'Only the owner of the project is allowed to do this!', 'error');
 	}
-	elsif ($ARGS{evid_nt} || $ARGS{evid_prot}) {
+	elsif ($ARGS{evid_nt} || $ARGS{evid_prot} || $ARGS{evid_gff}) {
 		for my $evt (qw/evid_nt evid_prot/) {
 			if ($ARGS{$evt}) {
 				my $routine = $evt eq "evid_nt" ? "blastn_user" : "blastx_user";
@@ -441,7 +441,17 @@ if ($r->method eq "POST") {
 				}
 			}
 		}
-	}
+    if ($ARGS{evid_gff}) {
+      my $st = $pm->add_user_gff($r);
+      if ($st->{status} eq "success") {
+            $m->comp('/_message_add', 'GFF Upload Successful');
+      } else {
+            $m->comp("/_message_add", 
+              "Error adding GFF: " . $st->{message}, 
+              "error");
+      }
+    }
+  }
 	else {
 		$m->comp('/_message_add', 'No evidence added.', 'error');
 	}

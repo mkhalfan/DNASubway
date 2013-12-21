@@ -2,9 +2,12 @@
 use strict;
 
 # Import GFF into JBrowse
-use constant JB     => '/usr/local/tomcat7/webapps/WebApollo/jbrowse';
+use constant JB     => '/usr/local/tomcat7/webapps/project';
 
-chdir JB || die "I could not cd to ".JB." $!";
+my $pid = shift;
+my $jdb = JB . "/$pid/jbrowse";
+
+chdir $jdb || die "I could not cd to $jdb:$!";
 
 while (my $source = shift) {
     print STDERR "$0: I am deleting the old JBrowse track $source!\n";

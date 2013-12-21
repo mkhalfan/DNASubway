@@ -70,8 +70,8 @@
 		
 		<div class="conNewPro_title" style="padding-top:10px;">Add Evidence</div>
 		<div class="conNewPro_label">
-			<input class="conRadiobox_align" type="radio" name="add_evidence" id="add_evidence" onclick="$('gff_container').toggle();"/>
-			<label for="add_evidence" >Import GFF from Green Line or Maker</label>
+			<input class="conRadiobox_align" type="radio" name="add_evidence" id="add_evidence" value='1' onclick="$('gff_container').toggle();"/>
+			<label for="add_evidence" >Import GFF from Green Line or Maker</label><span id="gff_name_span">&nbsp;</span>
 		</div>
 
 		<div id="con_star" style="font-size:0.8em;margin-top:10px;font-style:italic"><b>*</b> Denotes required information</div>
@@ -130,8 +130,8 @@
 			</div>
 			<div style="clear:both">&nbsp</div>
 			<div style="text-align:center;">
-				<input type="button" value="  Cancel  " class="input" onclick="$('gff_container').hide();" /> 
-				<input type="submit" value="  Upload  " class="input" style="margin-left:10px;" />
+				<input type="button" value="  Cancel  " class="input" onclick="$('gff_container').hide();$('evid_gff').clear();" /> 
+				<input type="button" value="  Proceed  " class="input" style="margin-left:10px;" onclick="$('gff_name_span').update(' [' + $('evid_gff').value.split('\\').pop() + ']');$('gff_container').hide();" />
 			</div>
 		</div>
 		<div id="import_from_gl_space" style="display:none;"></div>
@@ -175,6 +175,9 @@
 	$sequence => ''
 	$description => ''
 	$otype => ''
+	$add_evidence => ''
+	$evid_gff => ''
+
 </%args>
 <%once>
 	use DNALC::Pipeline::Utils qw/nicebasepairs random_string/;
@@ -214,6 +217,7 @@ if ($r->method eq 'POST') {
 	my $file2process;
 	my $converted_to_dna = 0;
 	my $sequence_id = "";
+	my $gff2process;
 
 	for ($name, $organism, $common_name) {
 		$_ =~ s/\s+/ /g;
@@ -297,7 +301,20 @@ if ($r->method eq 'POST') {
 				$sequence_id = $st->{sequence_id};
 			}
 		}
+		if ($add_evidence == 1){
+			my $st = DNALC::Pipeline::App::Utils->save_upload( {
+						r => $r,
+						param_name => 'evid_gff',
+					});
 
+			if ($st->{status} eq "fail") {
+				push @err, "Unable to upload file: ". $st->{message};
+			}
+			else {
+				$gff2process = $st->{path};
+			}
+
+		}
 		my @subnames = split /\s/, $organism;
 		unless (2 == @subnames) {
 			push @err, "Organism name should contain only two words: genus and species";
@@ -346,6 +363,7 @@ if ($r->method eq 'POST') {
 						sample => $species,
 						clade => $group,
 						description => $description,
+						gff => $gff2process,		
 					});
 			if ($st->{status} eq 'success') {
 				print STDERR  "New PID = ", $pm->project, $/;
